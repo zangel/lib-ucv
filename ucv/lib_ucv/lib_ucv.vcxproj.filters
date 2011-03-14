@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\baldzarika">
+      <UniqueIdentifier>{d20ea444-5b0b-4423-ad93-f181ebecf494}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\baldzarika\ucv">
+      <UniqueIdentifier>{d57523f7-4f75-4ca7-91e1-1859329c6f30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\baldzarika">
+      <UniqueIdentifier>{763e6580-8e44-451d-9796-d8a742c3ff57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\baldzarika\ucv">
+      <UniqueIdentifier>{7bbbe471-cf03-4caa-997d-6338283c6a2f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\baldzarika\ucv\config.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\fixed_point.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\integral.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\point2.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\size2.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\gil_channel_traits.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\convert_scale.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\surf.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\feature_point.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\baldzarika\ucv\config.cpp">
+      <Filter>Source Files\baldzarika\ucv</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ucv\feature_point.cpp">
+      <Filter>Source Files\baldzarika\ucv</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ucv\surf.cpp">
+      <Filter>Source Files\baldzarika\ucv</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

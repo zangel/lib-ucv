@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_ucv", "lib_ucv\lib_ucv.vcxproj", "{D60FD689-2C93-486B-9705-C6BA83BB29FE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_ucv_test", "lib_ucv_test\lib_ucv_test.vcxproj", "{B1190B83-0454-484D-B6B6-FB950BD97C57}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D60FD689-2C93-486B-9705-C6BA83BB29FE} = {D60FD689-2C93-486B-9705-C6BA83BB29FE}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D60FD689-2C93-486B-9705-C6BA83BB29FE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D60FD689-2C93-486B-9705-C6BA83BB29FE}.Debug|Win32.Build.0 = Debug|Win32
+		{D60FD689-2C93-486B-9705-C6BA83BB29FE}.Release|Win32.ActiveCfg = Release|Win32
+		{D60FD689-2C93-486B-9705-C6BA83BB29FE}.Release|Win32.Build.0 = Release|Win32
+		{B1190B83-0454-484D-B6B6-FB950BD97C57}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B1190B83-0454-484D-B6B6-FB950BD97C57}.Debug|Win32.Build.0 = Debug|Win32
+		{B1190B83-0454-484D-B6B6-FB950BD97C57}.Release|Win32.ActiveCfg = Release|Win32
+		{B1190B83-0454-484D-B6B6-FB950BD97C57}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
