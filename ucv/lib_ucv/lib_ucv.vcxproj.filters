@@ -25,6 +25,12 @@
     <Filter Include="Source Files\baldzarika\ucv">
       <UniqueIdentifier>{7bbbe471-cf03-4caa-997d-6338283c6a2f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\baldzarika\ucv\gles">
+      <UniqueIdentifier>{13aa3e26-8545-473f-b619-ad878b8f417a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\baldzarika\ucv\gles">
+      <UniqueIdentifier>{dac3081f-64d2-4e70-9a33-e9643a2ebe26}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -57,6 +63,21 @@
     <ClInclude Include="include\baldzarika\ucv\feature_point.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\gles\fb_objects.h">
+      <Filter>Header Files\baldzarika\ucv\gles</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\gles\fbo.h">
+      <Filter>Header Files\baldzarika\ucv\gles</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\gles\hessian_detector.h">
+      <Filter>Header Files\baldzarika\ucv\gles</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\gles\shaders.h">
+      <Filter>Header Files\baldzarika\ucv\gles</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\gles\texture.h">
+      <Filter>Header Files\baldzarika\ucv\gles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ucv\config.cpp">
@@ -67,6 +88,21 @@
     </ClCompile>
     <ClCompile Include="src\baldzarika\ucv\surf.cpp">
       <Filter>Source Files\baldzarika\ucv</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ucv\gles\fb_objects.cpp">
+      <Filter>Source Files\baldzarika\ucv\gles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ucv\gles\fbo.cpp">
+      <Filter>Source Files\baldzarika\ucv\gles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ucv\gles\hessian_detector.cpp">
+      <Filter>Source Files\baldzarika\ucv\gles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ucv\gles\shaders.cpp">
+      <Filter>Source Files\baldzarika\ucv\gles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ucv\gles\texture.cpp">
+      <Filter>Source Files\baldzarika\ucv\gles</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
