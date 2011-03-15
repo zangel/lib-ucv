@@ -26,15 +26,7 @@ namespace baldzarika { namespace ucv {
 			src_channel_t *src_row=reinterpret_cast<src_channel_t *>(src.row_begin(y));
 			dst_channel_t *dst_row=reinterpret_cast<dst_channel_t *>(dst.row_begin(y));
 			for(std::size_t x=0;x<static_cast<std::size_t>(src.width());++x)
-			{
-				//float src_v=src_row[x];
-				//float scale_v=scale;
-				//float src_vpt=PT(src_row[x]);
-				//float src_vpts=(PT(src_row[x])*scale);
-				//float src_vptsd=dst_channel_t(PT(src_row[x])*scale);
 				dst_row[x]=PT(src_row[x])*scale;
-				//float dst_v=dst_row[x];
-			}
 		}
 		return true;
 	}

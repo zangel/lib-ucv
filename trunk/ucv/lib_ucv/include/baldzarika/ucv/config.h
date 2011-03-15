@@ -15,9 +15,13 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 
+#if defined(HAVE_GLES2)
+#include <GLES2/GL2.h>
+#include <GLES2/gl2ext.h>
+#endif //HAVE_GLES2
+
+
 #include <vector>
-
-
 
 namespace baldzarika { namespace ucv {
 	
