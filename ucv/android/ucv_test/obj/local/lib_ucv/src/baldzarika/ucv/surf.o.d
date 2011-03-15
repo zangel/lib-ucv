@@ -473,6 +473,119 @@
  /usr/local/sdk/boost_1_45_0/boost/gil/bit_aligned_pixel_reference.hpp \
  /usr/local/sdk/boost_1_45_0/boost/gil/typedefs.hpp \
  /usr/local/sdk/boost_1_45_0/boost/gil/device_n.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/sampler.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/dynamic_image_all.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../gil_all.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../gil_config.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../channel_algorithm.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../algorithm.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../pixel.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../packed_pixel.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../planar_pixel_reference.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../gil_concept.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../color_base.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../channel.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../planar_pixel_iterator.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../pixel_iterator_adaptor.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../step_iterator.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../iterator_from_2d.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../image.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../image_view_factory.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../typedefs.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../metafunctions.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../color_convert.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../device_n.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../virtual_locator.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../position_iterator.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../locator.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../bit_aligned_pixel_iterator.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/algorithm.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../algorithm.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/any_image.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/any_image_view.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/variant.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../gil_config.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../utilities.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/bind.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/bind/bind.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/ref.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/utility/addressof.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/mem_fn.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/bind/mem_fn.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/get_pointer.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/config/no_tr1/memory.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/bind/mem_fn_template.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/bind/mem_fn_cc.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/type.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/is_placeholder.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/bind/arg.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/visit_each.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/bind/storage.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/bind/bind_template.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/bind/bind_cc.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/bind/bind_mf_cc.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/bind/bind_mf2_cc.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/bind/placeholders.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/mpl/sizeof.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/mpl/max.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../image_view.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../image.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/apply_operation.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/apply_operation_base.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/image_view_factory.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../image_view_factory.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/pixel_numeric_operations.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../gil_config.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../pixel.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../color_base_algorithm.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/channel_numeric_operations.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../channel.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/resample.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/lambda.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/core.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/type_traits/transform_traits.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/type_traits/cv_traits.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/tuple/tuple.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/tuple/detail/tuple_basic.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/lambda_config.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/lambda_fwd.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/arity_code.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/actions.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/lambda_traits.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/type_traits/object_traits.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/function_adaptors.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/type_traits/same_traits.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/utility/result_of.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/preprocessor/iteration/iterate.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/preprocessor/slot/slot.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/preprocessor/slot/detail/def.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/preprocessor/repetition/enum_shifted_params.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/preprocessor/iteration/detail/iter/forward1.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/preprocessor/iteration/detail/bounds/lower1.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/preprocessor/slot/detail/shared.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/preprocessor/iteration/detail/bounds/upper1.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/utility/detail/result_of_iterate.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/return_type_traits.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/select_functions.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/lambda_functor_base.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/lambda_functors.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/ret.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/operator_actions.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/operator_lambda_func_base.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/operator_return_type_traits.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/is_instance_of.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/preprocessor/enum_shifted_params.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/preprocessor/repeat_2nd.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/indirect_reference.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/detail/is_incrementable.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/pointee.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/detail/container_fwd.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/operators.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/member_ptr.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/bind.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/lambda/detail/bind_functions.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/affine.hpp \
+ /usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../utilities.hpp \
  /usr/local/sdk/boost_1_45_0/boost/smart_ptr.hpp \
  /usr/local/sdk/boost_1_45_0/boost/scoped_ptr.hpp \
  /usr/local/sdk/boost_1_45_0/boost/smart_ptr/scoped_ptr.hpp \
@@ -483,7 +596,6 @@
  /usr/local/sdk/boost_1_45_0/boost/smart_ptr/scoped_array.hpp \
  /usr/local/sdk/boost_1_45_0/boost/shared_ptr.hpp \
  /usr/local/sdk/boost_1_45_0/boost/smart_ptr/shared_ptr.hpp \
- /usr/local/sdk/boost_1_45_0/boost/config/no_tr1/memory.hpp \
  /usr/local/sdk/boost_1_45_0/boost/throw_exception.hpp \
  /usr/local/sdk/boost_1_45_0/boost/exception/detail/attribute_noreturn.hpp \
  /usr/local/sdk/boost_1_45_0/boost/exception/exception.hpp \
@@ -580,11 +692,6 @@
  /usr/local/sdk/boost_1_45_0/boost/mpl/empty.hpp \
  /usr/local/sdk/boost_1_45_0/boost/mpl/aux_/empty_impl.hpp \
  /usr/local/sdk/boost_1_45_0/boost/multi_index/detail/msvc_index_specifier.hpp \
- /usr/local/sdk/boost_1_45_0/boost/tuple/tuple.hpp \
- /usr/local/sdk/boost_1_45_0/boost/ref.hpp \
- /usr/local/sdk/boost_1_45_0/boost/utility/addressof.hpp \
- /usr/local/sdk/boost_1_45_0/boost/tuple/detail/tuple_basic.hpp \
- /usr/local/sdk/boost_1_45_0/boost/type_traits/cv_traits.hpp \
  /usr/local/sdk/boost_1_45_0/boost/multi_index/detail/index_loader.hpp \
  /usr/local/sdk/boost_1_45_0/boost/serialization/nvp.hpp \
  /usr/local/sdk/boost_1_45_0/boost/serialization/level.hpp \
@@ -645,23 +752,6 @@
  /usr/local/sdk/boost_1_45_0/boost/multi_index/detail/rnd_index_ptr_array.hpp \
  /usr/local/sdk/boost_1_45_0/boost/multi_index/detail/safe_ctr_proxy.hpp \
  /usr/local/sdk/boost_1_45_0/boost/multi_index/random_access_index_fwd.hpp \
- /usr/local/sdk/boost_1_45_0/boost/bind.hpp \
- /usr/local/sdk/boost_1_45_0/boost/bind/bind.hpp \
- /usr/local/sdk/boost_1_45_0/boost/mem_fn.hpp \
- /usr/local/sdk/boost_1_45_0/boost/bind/mem_fn.hpp \
- /usr/local/sdk/boost_1_45_0/boost/get_pointer.hpp \
- /usr/local/sdk/boost_1_45_0/boost/bind/mem_fn_template.hpp \
- /usr/local/sdk/boost_1_45_0/boost/bind/mem_fn_cc.hpp \
- /usr/local/sdk/boost_1_45_0/boost/type.hpp \
- /usr/local/sdk/boost_1_45_0/boost/is_placeholder.hpp \
- /usr/local/sdk/boost_1_45_0/boost/bind/arg.hpp \
- /usr/local/sdk/boost_1_45_0/boost/visit_each.hpp \
- /usr/local/sdk/boost_1_45_0/boost/bind/storage.hpp \
- /usr/local/sdk/boost_1_45_0/boost/bind/bind_template.hpp \
- /usr/local/sdk/boost_1_45_0/boost/bind/bind_cc.hpp \
- /usr/local/sdk/boost_1_45_0/boost/bind/bind_mf_cc.hpp \
- /usr/local/sdk/boost_1_45_0/boost/bind/bind_mf2_cc.hpp \
- /usr/local/sdk/boost_1_45_0/boost/bind/placeholders.hpp \
  /usr/local/sdk/boost_1_45_0/boost/multi_index/detail/rnd_index_loader.hpp \
  /usr/local/sdk/boost_1_45_0/boost/multi_index/ordered_index.hpp \
  /usr/local/sdk/boost_1_45_0/boost/multi_index/detail/bidir_node_iterator.hpp \
@@ -688,7 +778,10 @@
  /usr/local/sdk/boost_1_45_0/boost/integer_fwd.hpp \
  /usr/local/sdk/boost_1_45_0/boost/functional/hash/detail/hash_float_generic.hpp \
  /usr/local/sdk/boost_1_45_0/boost/functional/hash/extensions.hpp \
- /usr/local/sdk/boost_1_45_0/boost/detail/container_fwd.hpp \
+ /cygdrive/d/Software/SDK/android/android-ndk-r4-crystax/build/platforms/android-5/arch-arm/usr/include/GLES2/GL2.h \
+ /cygdrive/d/Software/SDK/android/android-ndk-r4-crystax/build/platforms/android-5/arch-arm/usr/include/GLES2/gl2platform.h \
+ /cygdrive/d/Software/SDK/android/android-ndk-r4-crystax/build/platforms/android-5/arch-arm/usr/include/KHR/khrplatform.h \
+ /cygdrive/d/Software/SDK/android/android-ndk-r4-crystax/build/platforms/android-5/arch-arm/usr/include/GLES2/gl2ext.h \
  /cygdrive/d/Projects/work/ucv/ucv/android/ucv_test/jni/../../../lib_ucv/include/baldzarika/ucv/surf.h \
  /cygdrive/d/Projects/work/ucv/ucv/android/ucv_test/jni/../../../lib_ucv/include/baldzarika/ucv/feature_point.h \
  /cygdrive/d/Projects/work/ucv/ucv/android/ucv_test/jni/../../../lib_ucv/include/baldzarika//ucv/point2.h \
@@ -1644,6 +1737,232 @@
 
 /usr/local/sdk/boost_1_45_0/boost/gil/device_n.hpp:
 
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/sampler.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/dynamic_image_all.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../gil_all.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../gil_config.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../channel_algorithm.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../algorithm.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../pixel.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../packed_pixel.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../planar_pixel_reference.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../gil_concept.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../color_base.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../channel.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../planar_pixel_iterator.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../pixel_iterator_adaptor.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../step_iterator.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../iterator_from_2d.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../image.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../image_view_factory.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../typedefs.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../metafunctions.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../color_convert.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../device_n.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../virtual_locator.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../position_iterator.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../locator.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../bit_aligned_pixel_iterator.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/algorithm.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../algorithm.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/any_image.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/any_image_view.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/variant.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../gil_config.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../utilities.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/bind.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/bind/bind.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/ref.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/utility/addressof.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/mem_fn.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/bind/mem_fn.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/get_pointer.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/config/no_tr1/memory.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/bind/mem_fn_template.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/bind/mem_fn_cc.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/type.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/is_placeholder.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/bind/arg.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/visit_each.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/bind/storage.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/bind/bind_template.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/bind/bind_cc.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/bind/bind_mf_cc.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/bind/bind_mf2_cc.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/bind/placeholders.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/mpl/sizeof.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/mpl/max.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../image_view.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../image.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/apply_operation.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/apply_operation_base.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/image_view_factory.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../extension/dynamic_image/../../image_view_factory.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/pixel_numeric_operations.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../gil_config.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../pixel.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../color_base_algorithm.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/channel_numeric_operations.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../channel.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/resample.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/lambda.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/core.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/type_traits/transform_traits.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/type_traits/cv_traits.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/tuple/tuple.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/tuple/detail/tuple_basic.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/lambda_config.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/lambda_fwd.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/arity_code.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/actions.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/lambda_traits.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/type_traits/object_traits.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/function_adaptors.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/type_traits/same_traits.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/utility/result_of.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/preprocessor/iteration/iterate.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/preprocessor/slot/slot.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/preprocessor/slot/detail/def.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/preprocessor/repetition/enum_shifted_params.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/preprocessor/iteration/detail/iter/forward1.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/preprocessor/iteration/detail/bounds/lower1.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/preprocessor/slot/detail/shared.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/preprocessor/iteration/detail/bounds/upper1.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/utility/detail/result_of_iterate.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/return_type_traits.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/select_functions.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/lambda_functor_base.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/lambda_functors.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/ret.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/operator_actions.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/operator_lambda_func_base.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/operator_return_type_traits.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/is_instance_of.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/preprocessor/enum_shifted_params.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/preprocessor/repeat_2nd.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/indirect_reference.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/detail/is_incrementable.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/pointee.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/detail/container_fwd.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/operators.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/member_ptr.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/bind.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/lambda/detail/bind_functions.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/affine.hpp:
+
+/usr/local/sdk/boost_1_45_0/boost/gil/extension/numeric/../../utilities.hpp:
+
 /usr/local/sdk/boost_1_45_0/boost/smart_ptr.hpp:
 
 /usr/local/sdk/boost_1_45_0/boost/scoped_ptr.hpp:
@@ -1663,8 +1982,6 @@
 /usr/local/sdk/boost_1_45_0/boost/shared_ptr.hpp:
 
 /usr/local/sdk/boost_1_45_0/boost/smart_ptr/shared_ptr.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/config/no_tr1/memory.hpp:
 
 /usr/local/sdk/boost_1_45_0/boost/throw_exception.hpp:
 
@@ -1858,16 +2175,6 @@
 
 /usr/local/sdk/boost_1_45_0/boost/multi_index/detail/msvc_index_specifier.hpp:
 
-/usr/local/sdk/boost_1_45_0/boost/tuple/tuple.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/ref.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/utility/addressof.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/tuple/detail/tuple_basic.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/type_traits/cv_traits.hpp:
-
 /usr/local/sdk/boost_1_45_0/boost/multi_index/detail/index_loader.hpp:
 
 /usr/local/sdk/boost_1_45_0/boost/serialization/nvp.hpp:
@@ -1988,40 +2295,6 @@
 
 /usr/local/sdk/boost_1_45_0/boost/multi_index/random_access_index_fwd.hpp:
 
-/usr/local/sdk/boost_1_45_0/boost/bind.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/bind/bind.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/mem_fn.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/bind/mem_fn.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/get_pointer.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/bind/mem_fn_template.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/bind/mem_fn_cc.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/type.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/is_placeholder.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/bind/arg.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/visit_each.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/bind/storage.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/bind/bind_template.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/bind/bind_cc.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/bind/bind_mf_cc.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/bind/bind_mf2_cc.hpp:
-
-/usr/local/sdk/boost_1_45_0/boost/bind/placeholders.hpp:
-
 /usr/local/sdk/boost_1_45_0/boost/multi_index/detail/rnd_index_loader.hpp:
 
 /usr/local/sdk/boost_1_45_0/boost/multi_index/ordered_index.hpp:
@@ -2074,7 +2347,13 @@
 
 /usr/local/sdk/boost_1_45_0/boost/functional/hash/extensions.hpp:
 
-/usr/local/sdk/boost_1_45_0/boost/detail/container_fwd.hpp:
+/cygdrive/d/Software/SDK/android/android-ndk-r4-crystax/build/platforms/android-5/arch-arm/usr/include/GLES2/GL2.h:
+
+/cygdrive/d/Software/SDK/android/android-ndk-r4-crystax/build/platforms/android-5/arch-arm/usr/include/GLES2/gl2platform.h:
+
+/cygdrive/d/Software/SDK/android/android-ndk-r4-crystax/build/platforms/android-5/arch-arm/usr/include/KHR/khrplatform.h:
+
+/cygdrive/d/Software/SDK/android/android-ndk-r4-crystax/build/platforms/android-5/arch-arm/usr/include/GLES2/gl2ext.h:
 
 /cygdrive/d/Projects/work/ucv/ucv/android/ucv_test/jni/../../../lib_ucv/include/baldzarika/ucv/surf.h:
 
