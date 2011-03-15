@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE( create_open_cv_window )
 	cv::namedWindow(OPENCV_WND_NAME);
 }
 
-#if 1
+#if 0
 BOOST_AUTO_TEST_CASE( test_fixed_point )
 {
 	using namespace baldzarika::ucv;
