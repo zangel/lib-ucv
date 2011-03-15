@@ -25,7 +25,7 @@ namespace baldzarika { namespace ucv {
 		typedef gil::image< integral_pixel_t, false, std::allocator<unsigned char> > integral_image_t;
 		typedef integral_image_t::view_t integral_view_t;
 
-		typedef fixed_point<7, 24>	response_t;
+		typedef fixed_point<15, 16>	response_t;
 		typedef gil::pixel<response_t, ucv::gil::gray_layout_t> response_pixel_t;
 		typedef ucv::gil::image< response_pixel_t, false, std::allocator<unsigned char> > response_image_t;
 		typedef response_image_t::view_t response_view_t;

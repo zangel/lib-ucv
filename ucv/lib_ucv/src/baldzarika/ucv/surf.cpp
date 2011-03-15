@@ -290,12 +290,15 @@ namespace baldzarika { namespace ucv  {
 					
 					//H[0][0]
 					response_t d_xx=ml.get_response(x+1, y, *this)+ml.get_response(x-1, y, *this)-v*r_2;
+					float f_d_xx=d_xx;
 
 					//H[1][1]
 					response_t d_yy=ml.get_response(x, y+1, *this)+ml.get_response(x, y-1, *this)-v*r_2;
+					float f_d_yy=d_yy;
 
 					//H[2][2]			
 					response_t d_ss=cur_response+bl.get_response(x, y, *this)-v*r_2;
+					float f_d_ss=d_ss;
 					
 					//H[0][1] H[1][0]
 					response_t d_xy=
@@ -303,6 +306,7 @@ namespace baldzarika { namespace ucv  {
 							ml.get_response(x+1, y+1, *this)-ml.get_response(x-1, y+1, *this)-
 							ml.get_response(x+1, y-1, *this)+ml.get_response(x-1, y-1, *this)
 						)*inv_4;
+					float f_d_xy=d_xy;
 					
 					//H[0][2] H[2][0]
 					response_t d_xs=
@@ -310,6 +314,7 @@ namespace baldzarika { namespace ucv  {
 							m_response_view(x+1, y).operator response_t()-m_response_view(x-1, y).operator response_t()-
 							bl.get_response(x+1, y, *this)+bl.get_response(x-1, y, *this)
 						)*inv_4;
+					float f_d_xs=d_xs;
 					
 					//H[1][2] H[2][1]
 					response_t d_ys=
@@ -317,6 +322,7 @@ namespace baldzarika { namespace ucv  {
 							m_response_view(x, y+1).operator response_t()-m_response_view(x, y-1).operator response_t()-
 							bl.get_response(x, y+1, *this)+bl.get_response(x, y-1, *this)
 						)*inv_4;
+					float f_d_ys=d_ys;
 
 					response_t det=
 						(
@@ -327,20 +333,33 @@ namespace baldzarika { namespace ucv  {
 							d_xy*d_xy*d_ss-
 							d_xs*d_yy*d_xs
 						);
+					float f_det=det;
 
 					if(det==zero) continue;
 					response_t inv_det=one/det;
+
+					float f_inv_det=inv_det;
 					
 					response_t H_inv[3][3]=
 						{
-							{  (d_yy*d_ss-d_ys*d_ys), -(d_xy*d_ss-d_ys*d_xs),  (d_xy*d_ys-d_yy*d_xs)  },
-							{ -(d_xy*d_ss-d_xs*d_ys),  (d_xx*d_ss-d_xs*d_xs), -(d_xx*d_ys-d_xy*d_xs)  },
-							{  (d_xy*d_ys-d_xs*d_yy), -(d_xx*d_ys-d_xs*d_xy),  (d_xx*d_yy-d_xy*d_xy)  }
+							{  (d_yy*d_ss-d_ys*d_ys), -(d_xy*d_ss-d_xs*d_ys),  (d_xy*d_ys-d_xs*d_yy)  },
+							{ -(d_xy*d_ss-d_ys*d_xs),  (d_xx*d_ss-d_xs*d_xs), -(d_xx*d_ys-d_xs*d_xy)  },
+							{  (d_xy*d_ys-d_yy*d_xs), -(d_xx*d_ys-d_xy*d_xs),  (d_xx*d_yy-d_xy*d_xy)  }
 						};
-
+#if 1
 					response_t xx=-inv_det*(H_inv[0][0]*d_x+H_inv[0][1]*d_y+H_inv[0][2]*d_s);
 					response_t xy=-inv_det*(H_inv[1][0]*d_x+H_inv[1][1]*d_y+H_inv[1][2]*d_s);
 					response_t xi=-inv_det*(H_inv[2][0]*d_x+H_inv[2][1]*d_y+H_inv[2][2]*d_s);
+#else
+					response_t xx=-inv_det*(H_inv[0][0]*d_x+H_inv[1][0]*d_y+H_inv[2][0]*d_s);
+					response_t xy=-inv_det*(H_inv[0][1]*d_x+H_inv[1][1]*d_y+H_inv[2][1]*d_s);
+					response_t xi=-inv_det*(H_inv[0][2]*d_x+H_inv[1][2]*d_y+H_inv[2][2]*d_s);
+#endif
+
+					float f_xx=xx;
+					float f_xy=xy;
+					float f_xi=xi;
+
 
 					if(	fabs(xx)<inv_2 && fabs(xy)<inv_2 && fabs(xi)<inv_2)
 					{
