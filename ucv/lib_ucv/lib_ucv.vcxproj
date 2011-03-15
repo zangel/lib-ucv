@@ -91,7 +91,6 @@
     <ClInclude Include="include\baldzarika\ucv\fixed_point.h" />
     <ClInclude Include="include\baldzarika\ucv\gil_channel_traits.h" />
     <ClInclude Include="include\baldzarika\ucv\gles\fbo.h" />
-    <ClInclude Include="include\baldzarika\ucv\gles\fb_objects.h" />
     <ClInclude Include="include\baldzarika\ucv\gles\hessian_detector.h" />
     <ClInclude Include="include\baldzarika\ucv\gles\shaders.h" />
     <ClInclude Include="include\baldzarika\ucv\gles\texture.h" />
@@ -104,7 +103,6 @@
     <ClCompile Include="src\baldzarika\ucv\config.cpp" />
     <ClCompile Include="src\baldzarika\ucv\feature_point.cpp" />
     <ClCompile Include="src\baldzarika\ucv\gles\fbo.cpp" />
-    <ClCompile Include="src\baldzarika\ucv\gles\fb_objects.cpp" />
     <ClCompile Include="src\baldzarika\ucv\gles\hessian_detector.cpp" />
     <ClCompile Include="src\baldzarika\ucv\gles\shaders.cpp" />
     <ClCompile Include="src\baldzarika\ucv\gles\texture.cpp" />

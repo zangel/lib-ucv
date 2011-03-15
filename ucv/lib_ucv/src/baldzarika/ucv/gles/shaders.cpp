@@ -57,9 +57,6 @@ namespace baldzarika { namespace ucv { namespace gles {
 			char shader_compile_log[1024];
 			GLint log_length(0);
 			glGetShaderInfoLog(m_gl_handle, 1024, &log_length, shader_compile_log);
-#if defined(ANDROID)
-			__android_log_print(ANDROID_LOG_INFO, UCV_NAME, "shader::is_compiled: status=%d, len=%d, %s", int(compile_status), log_length, shader_compile_log);
-#endif
 			return false;
 		}
 		return true;

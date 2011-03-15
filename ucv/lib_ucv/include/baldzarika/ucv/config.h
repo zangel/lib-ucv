@@ -4,6 +4,8 @@
 #include <boost/config.hpp>
 #include <boost/gil/image.hpp>
 #include <boost/gil/typedefs.hpp>
+#include <boost/gil/extension/numeric/sampler.hpp>
+#include <boost/gil/extension/numeric/resample.hpp>
 
 #include <boost/smart_ptr.hpp>
 #include <boost/noncopyable.hpp>

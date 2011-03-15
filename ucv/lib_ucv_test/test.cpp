@@ -179,18 +179,29 @@ BOOST_AUTO_TEST_CASE( test_surf )
 	cv::imshow(OPENCV_WND_NAME, cv_img);
 	cv::waitKey();
 
-	ucv::surf::gray_image_t gray_img(cv_img.cols, cv_img.rows, 4);
-	ucv::convert_scale(
+	ucv::gil::gray8_image_t gil_gray_img(cv_img.cols/2, cv_img.rows/2);
+	ucv::gil::resize_view(
 		ucv::gil::interleaved_view(
 			cv_img.cols, cv_img.rows,
 			reinterpret_cast<ucv::gil::gray8_pixel_t*>(cv_img.data),
 			cv_img.step
 		),
+		gil::view(gil_gray_img),
+		gil::bilinear_sampler()
+	);
+
+	cv::Mat cv_gray_img(gil_gray_img.height(), gil_gray_img.width(), CV_8UC1, &ucv::gil::view(gil_gray_img)[0][0]);
+	cv::imshow(OPENCV_WND_NAME, cv_gray_img);
+	cv::waitKey();
+
+	ucv::surf::gray_image_t gray_img(gil_gray_img.width(), gil_gray_img.height(), 4);
+	ucv::convert_scale(
+		ucv::gil::view(gil_gray_img),
 		ucv::gil::view(gray_img),
 		ucv::surf::integral_t(1.0f/255.0f)
 	);
 
-	ucv::surf the_surf(ucv::size2ui(cv_img.cols, cv_img.rows), 3, 4, 2, 1.0e-6f);
+	ucv::surf the_surf(ucv::size2ui(gray_img.width(), gray_img.height()), 3, 4, 2, 1.0e-6f);
 
 	posix_time::ptime start=posix_time::microsec_clock::local_time();
 	the_surf.update(ucv::gil::view(gray_img));
@@ -202,7 +213,7 @@ BOOST_AUTO_TEST_CASE( test_surf )
 
 	for(std::size_t ifp=0;ifp<fps.size();++ifp)
 	{
-		cv::circle(cv_img, cv::Point(fps[ifp].x,fps[ifp].y),2, cv::Scalar(255.0));
+		cv::circle(cv_img, cv::Point(2.0f*fps[ifp].x,2.0f*fps[ifp].y),2, cv::Scalar(255.0));
 	}
 	cv::imshow(OPENCV_WND_NAME, cv_img);
 	cv::waitKey();
