@@ -49,141 +49,7 @@ namespace baldzarika { namespace ucv  {
 
 	} //namespace anonymous
 
-#if 0
-	namespace {
-
-		const real_t pi=3.14159f;
-		const real_t real_zero=real_t(0.0f);
-		const real_t pi_2=real_t(2.0f)*pi;
-		const real_t pi_i3=real_t(3.14159f/3.0f);
-		const real_t pi_5i3=real_t(3.14159f*5.0f/3.0f);
-		
-				
-		const real_t gauss_25[7][7]=
-		{
-			{	0.02350693969273f,	0.01849121369071f,	0.01239503121241f,	0.00708015417522f,	0.00344628101733f,	0.00142945847484f,	0.00050524879060f	},
-			{	0.02169964028389f,	0.01706954162243f,	0.01144205592615f,	0.00653580605408f,	0.00318131834134f,	0.00131955648461f,	0.00046640341759f	},
-			{	0.01706954162243f,	0.01342737701584f,	0.00900063997939f,	0.00514124713667f,	0.00250251364222f,	0.00103799989504f,	0.00036688592278f	},
-			{	0.01144205592615f,	0.00900063997939f,	0.00603330940534f,	0.00344628101733f,	0.00167748505986f,	0.00069579213743f,	0.00024593098864f	},
-			{	0.00653580605408f,	0.00514124713667f,	0.00344628101733f,	0.00196854695367f,	0.00095819467066f,	0.00039744277546f,	0.00014047800980f	},
-			{	0.00318131834134f,	0.00250251364222f,	0.00167748505986f,	0.00095819467066f,	0.00046640341759f,	0.00019345616757f,	0.00006837798818f	},
-			{	0.00131955648461f,	0.00103799989504f,	0.00069579213743f,	0.00039744277546f,	0.00019345616757f,	0.00008024231247f,	0.00002836202103f	}
-		};
-
-
-		
-
-
-		inline real_t haar_x(gil::gray32s_view_t iv, point2i const &p, boost::uint32_t s)
-		{
-			return	box_integral(iv, point2i(p.x,p.y-s/2), size2ui(s/2, s))-
-					box_integral(iv, point2i(p.x-s/2,p.y-s/2), size2ui(s/2, s));
-		}
-
-		inline real_t haar_y(gil::gray32s_view_t iv, point2i const &p, boost::uint32_t s)
-		{
-			return	box_integral(iv, point2i(p.x-s/2,p.y), size2ui(s, s/2))-
-					box_integral(iv, point2i(p.x-s/2,p.y-s/2), size2ui(s, s/2));
-		}
-
-		inline real_t get_angle(real_t x, real_t y)
-		{
-			if(y<real_zero)
-			{
-				if(x<real_zero) return pi+real_t(std::atan(float(y/x)));
-				if(x>real_zero) return pi_2-real_t(std::atan(float(-y/x)));
-			}
-			else
-			{
-				if(x<real_zero) return pi-real_t(std::atan(float(-y/x)));
-				if(x>real_zero) return real_t(std::atan(float(y/x)));
-			}
-			return real_zero;
-		}
-
-	} //namespace anonymous
-
-	void surf_orientations(gil::gray32s_view_t iv, std::vector<feature_point> &fps)
-	{
-		for(std::size_t ifp=0;ifp<fps.size();++ifp)
-		{
-			point2ui pt(
-				static_cast<boost::uint32_t>(std::floor(fps[ifp].x+0.5f)),
-				static_cast<boost::uint32_t>(std::floor(fps[ifp].y+0.5f))
-			);
-			real_t scale=real_t(fps[ifp].m_scale);
-			boost::uint32_t s=static_cast<boost::uint32_t>(std::floor(fps[ifp].m_scale+0.5f));
-
-			real_t res_x[109], res_y[109], angle[109];
-			for(boost::uint32_t k=0;k<109;++k)
-			{
-				real_t gauss=gauss_25[std::abs(orientation_indices::get().m_values[k][0])][std::abs(orientation_indices::get().m_values[k][1])];
-				res_x[k]=gauss*haar_x(iv,
-					point2i(
-						pt.x+orientation_indices::get().m_values[k][0]*s,
-						pt.y+orientation_indices::get().m_values[k][1]*s
-					),
-					4*s
-				);
-
-				res_y[k]=gauss*haar_y(iv,
-					point2i(
-						pt.x+orientation_indices::get().m_values[k][0]*s,
-						pt.y+orientation_indices::get().m_values[k][1]*s
-					),
-					4*s
-				);
-
-				angle[k]=get_angle(res_x[k],res_y[k]);
-			}
-
-			real_t max_sum=real_zero;
-			real_t orientation=real_zero;
-			for(boost::uint32_t a=0;a<42;++a)
-			{
-				const real_t real_015=real_t(0.15f);
-				const real_t real_2=real_t(2.0f);
-
-				real_t ang1=real_t(a)*real_015;
-				real_t ang2=(ang1+pi_i3>pi_2?ang1-pi_5i3:ang1+pi_i3);
-
-				real_t sum_x=real_zero;
-				real_t sum_y=real_zero;
-
-				for(boost::uint32_t k=0;k<109;++k)
-				{
-					const real_t &ang=angle[k];
-					if(ang1<ang2 && ang1<ang && ang<ang2)
-					{
-						sum_x+=res_x[k];  
-						sum_y+=res_y[k];
-					} 
-					else
-					if(ang2<ang1 && ((ang>real_zero && ang<ang2) || (ang>ang1 && ang<pi_2)))
-					{
-						sum_x+=res_x[k];  
-						sum_y+=res_y[k];
-					}
-				}
-				real_t this_sum=sum_x*sum_x+sum_y*sum_y;
-				if(this_sum>max_sum) 
-				{
-					max_sum=this_sum;
-					orientation=get_angle(sum_x, sum_y);
-				}
-			}
-			fps[ifp].m_orientation=orientation;
-		}
-	}
-
-#endif
-	//surf::response_layer::response_layer()
-	//	: m_response_offset(0,0)
-	//	, m_sample_step(0)
-	//	, m_filter_size(0)
-	//{
-	//}
-
+	
 	surf::response_layer::response_layer(response_layer const &that)
 		: m_surf(that.m_surf)
 	{
@@ -270,7 +136,7 @@ namespace baldzarika { namespace ucv  {
 		return true;
 	}
 
-	bool surf::response_layer::detect(response_layer &bl, response_layer &ml, std::vector<feature_point> &fps)
+	bool surf::response_layer::detect(response_layer &bl, response_layer &ml, std::vector<feature_point_t> &fps)
 	{
 		static const response_t inv_2=detail::constants::one<response_t>()/response_t(2);
 		static const response_t inv_4=detail::constants::one<response_t>()/response_t(4);
@@ -371,28 +237,23 @@ namespace baldzarika { namespace ucv  {
 							{ -(d_xy*d_ss-d_ys*d_xs),  (d_xx*d_ss-d_xs*d_xs), -(d_xx*d_ys-d_xs*d_xy)  },
 							{  (d_xy*d_ys-d_yy*d_xs), -(d_xx*d_ys-d_xy*d_xs),  (d_xx*d_yy-d_xy*d_xy)  }
 						};
-#if 1
+
 					response_t xx=-inv_det*(H_inv[0][0]*d_x+H_inv[0][1]*d_y+H_inv[0][2]*d_s);
 					response_t xy=-inv_det*(H_inv[1][0]*d_x+H_inv[1][1]*d_y+H_inv[1][2]*d_s);
 					response_t xi=-inv_det*(H_inv[2][0]*d_x+H_inv[2][1]*d_y+H_inv[2][2]*d_s);
-#else
-					response_t xx=-inv_det*(H_inv[0][0]*d_x+H_inv[1][0]*d_y+H_inv[2][0]*d_s);
-					response_t xy=-inv_det*(H_inv[0][1]*d_x+H_inv[1][1]*d_y+H_inv[2][1]*d_s);
-					response_t xi=-inv_det*(H_inv[0][2]*d_x+H_inv[1][2]*d_y+H_inv[2][2]*d_s);
-#endif
+
 
 					//float f_xx=xx;
 					//float f_xy=xy;
 					//float f_xi=xi;
-
-
+					
 					if(	fabs(xx)<detail::constants::one<response_t>() && fabs(xy)<detail::constants::one<response_t>() && fabs(xi)<detail::constants::one<response_t>())
 					{
 						fps.push_back(
-							feature_point(
-								point2f(
-									(float(xx)+x)*m_sample_step,
-									(float(xy)+y)*m_sample_step
+							feature_point_t(
+								feature_point_t::point2_t(
+									(xx+response_t(x))*response_t(m_sample_step),
+									(xy+response_t(y))*response_t(m_sample_step)
 								),
 								coeff_1*(response_t(ml.m_filter_size)+xi*response_t(ml.m_filter_size-bl.m_filter_size))
 							)
@@ -602,7 +463,7 @@ namespace baldzarika { namespace ucv  {
 		return true;
 	}
 
-	bool surf::detect(std::vector<feature_point> &fps)
+	bool surf::detect(std::vector<feature_point_t> &fps)
 	{
 		fps.clear();
 		for(boost::uint32_t o=0;o<m_octaves;++o)
@@ -618,14 +479,16 @@ namespace baldzarika { namespace ucv  {
 		return true;
 	}
 
-	bool surf::describe(std::vector<feature_point> &fps)
+	bool surf::describe(std::vector<feature_point_t> &fps)
 	{
 		if(!compute_orientations(fps))
+			return false;
+		if(!compute_descriptors(fps))
 			return false;
 		return true;
 	}
 
-	bool surf::compute_orientations(std::vector<feature_point> &fps)
+	bool surf::compute_orientations(std::vector<feature_point_t> &fps)
 	{
 		static response_t const r_3i20=0.15f;
 		static response_t const r_2=2.0f;
@@ -633,11 +496,11 @@ namespace baldzarika { namespace ucv  {
 		for(std::size_t ifp=0;ifp<fps.size();++ifp)
 		{
 			point2ui pt(
-				static_cast<boost::uint32_t>(std::floor(fps[ifp].x+0.5f)),
-				static_cast<boost::uint32_t>(std::floor(fps[ifp].y+0.5f))
+				static_cast<boost::uint32_t>(floor(fps[ifp].x+detail::constants::half<feature_point_t::value_type>())),
+				static_cast<boost::uint32_t>(floor(fps[ifp].y+detail::constants::half<feature_point_t::value_type>()))
 			);
 			response_t scale=fps[ifp].m_scale;
-			boost::uint32_t s=static_cast<boost::uint32_t>(std::floor(fps[ifp].m_scale+0.5f));
+			boost::uint32_t s=static_cast<boost::uint32_t>(floor(fps[ifp].m_scale+detail::constants::half<feature_point_t::value_type>()));
 
 			response_t res_x[109], res_y[109], angle[109];
 			for(boost::uint32_t k=0;k<109;++k)
@@ -708,6 +571,19 @@ namespace baldzarika { namespace ucv  {
 		return true;
 	}
 
+	bool surf::compute_descriptors(std::vector<feature_point_t> &fps)
+	{
+		for(std::size_t ifp=0;ifp<fps.size();++ifp)
+		{
+			point2ui pt(
+				static_cast<boost::uint32_t>(floor(fps[ifp].x+detail::constants::half<feature_point_t::value_type>())),
+				static_cast<boost::uint32_t>(floor(fps[ifp].y+detail::constants::half<feature_point_t::value_type>()))
+			);
+			response_t scale=fps[ifp].m_scale;
+		}
+		return true;
+	}
+
 	surf::response_t surf::haar_x(point2i const &p, boost::uint32_t s)
 	{
 		return	box_integral<integral_view_t, response_t>(gil::view(m_integral_img), point2i(p.x,p.y-s/2), size2ui(s/2, s))-
@@ -733,6 +609,18 @@ namespace baldzarika { namespace ucv  {
 			if(x>detail::constants::zero<response_t>()) return atan2(y,x);
 		}
 		return detail::constants::zero<response_t>();
+	}
+
+	surf::response_t surf::gaussian(boost::int32_t x, boost::int32_t y, response_t const &sig)
+	{
+		return detail::constants::half<response_t>()/(detail::constants::pi<response_t>()*sig*sig)*
+			exp(response_t(-(x*x+y*y))*detail::constants::half<response_t>()/(sig*sig));
+	}
+	
+	surf::response_t surf::gaussian(response_t const &x, response_t const &y, response_t const &sig)
+	{
+		return detail::constants::half<response_t>()/(detail::constants::pi<response_t>()*sig*sig)*
+			exp(-(x*x+y*y)*detail::constants::half<response_t>()/(sig*sig));
 	}
 
 } //namespace ucv

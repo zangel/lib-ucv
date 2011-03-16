@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE( create_open_cv_window )
 	cv::namedWindow(OPENCV_WND_NAME);
 }
 
-#if 0
+
 BOOST_AUTO_TEST_CASE( test_fixed_point )
 {
 	using namespace baldzarika::ucv;
@@ -31,6 +31,19 @@ BOOST_AUTO_TEST_CASE( test_fixed_point )
 	BOOST_CHECK_EQUAL(1, static_cast<int>(fixed_t(3)/fixed_t(2)) );
 	BOOST_CHECK_EQUAL(1.5f, static_cast<float>(fixed_t(3)/fixed_t(2)));
 
+	//sqrt
+	BOOST_CHECK_EQUAL(static_cast<int>(sqrt(fixed_t(144))), 12);
+	BOOST_CHECK_LT(fabs(static_cast<float>(sqrt(fixed_t(2)))-sqrt(2.0f)), 1.0e-3f);
+
+	//sin
+	BOOST_CHECK_LT( fabs(static_cast<float>(sin(baldzarika::ucv::detail::constants::zero<fixed_t>()))-sin(0.0f)), 1.0e-3f);
+	BOOST_CHECK_LT( fabs(static_cast<float>(sin(baldzarika::ucv::detail::constants::pi_i2<fixed_t>()))-sin(3.1415926535897932384626433832795f/2.0f)), 1.0e-3f);
+
+	//cos
+	BOOST_CHECK_LT( fabs(static_cast<float>(cos(baldzarika::ucv::detail::constants::zero<fixed_t>()))-cos(0.0f)), 1.0e-3f);
+	BOOST_CHECK_LT( fabs(static_cast<float>(cos(baldzarika::ucv::detail::constants::pi_i2<fixed_t>()))-cos(3.1415926535897932384626433832795f/2.0f)), 1.0e-3f);
+	
+	
 	//fabs
 	BOOST_CHECK( (fabs( fixed_point<15,16>(1) ) == fixed_point<15,16>(1)) );
 	BOOST_CHECK( (fabs( fixed_point<15,16>(0) ) == fixed_point<15,16>(0)) );
@@ -58,12 +71,13 @@ BOOST_AUTO_TEST_CASE( test_fixed_point )
 	float y=sin(3.14f/2.0f);
 	float x=cos(3.14f/2.0f);
 	
-	BOOST_CHECK_CLOSE( static_cast<float>(atan2(fixed_point<15,16>(y),fixed_point<15,16>(x))), atan2(y, x), 7.2e-2f);
-	BOOST_CHECK_CLOSE( static_cast<float>(atan2(fixed_point<15,16>(y),fixed_point<15,16>(-x))), atan2(y, -x), 7.2e-2f);
-	BOOST_CHECK_CLOSE( static_cast<float>(atan2(fixed_point<15,16>(-y),fixed_point<15,16>(x))), atan2(-y, x), 7.2e-2f);
-	BOOST_CHECK_CLOSE( static_cast<float>(atan2(fixed_point<15,16>(-y),fixed_point<15,16>(-x))), atan2(-y, -x), 7.2e-2f);
+	BOOST_CHECK_LT( fabs(static_cast<float>(atan2(fixed_point<15,16>(y),fixed_point<15,16>(x)))-atan2(y, x)), 7.2e-2f);
+	BOOST_CHECK_LT( fabs(static_cast<float>(atan2(fixed_point<15,16>(y),fixed_point<15,16>(-x)))-atan2(y, -x)), 7.2e-2f);
+	BOOST_CHECK_LT( fabs(static_cast<float>(atan2(fixed_point<15,16>(-y),fixed_point<15,16>(x)))-atan2(-y, x)), 7.2e-2f);
+	BOOST_CHECK_LT( fabs(static_cast<float>(atan2(fixed_point<15,16>(-y),fixed_point<15,16>(-x)))-atan2(-y, -x)), 7.2e-2f);
 }
 
+#if 0
 BOOST_AUTO_TEST_CASE( test_fixed_point_atan2_speed )
 {
 	using namespace baldzarika::ucv;
@@ -205,7 +219,7 @@ BOOST_AUTO_TEST_CASE( test_surf )
 
 	posix_time::ptime start=posix_time::microsec_clock::local_time();
 	the_surf.update(ucv::gil::view(gray_img));
-	std::vector<ucv::feature_point> fps;
+	std::vector<ucv::surf::feature_point_t> fps;
 	the_surf.detect(fps);
 	the_surf.describe(fps);
 	posix_time::ptime finish=posix_time::microsec_clock::local_time();
@@ -214,7 +228,11 @@ BOOST_AUTO_TEST_CASE( test_surf )
 
 	for(std::size_t ifp=0;ifp<fps.size();++ifp)
 	{
-		cv::circle(cv_img, cv::Point(2.0f*fps[ifp].x,2.0f*fps[ifp].y),2, cv::Scalar(255.0));
+		cv::circle(cv_img,
+			cv::Point(2.0f*static_cast<float>(fps[ifp].x), 2.0f*static_cast<float>(fps[ifp].y)),
+			2,
+			cv::Scalar(255.0)
+		);
 	}
 	cv::imshow(OPENCV_WND_NAME, cv_img);
 	cv::waitKey();

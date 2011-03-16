@@ -101,7 +101,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ucv\config.cpp" />
-    <ClCompile Include="src\baldzarika\ucv\feature_point.cpp" />
     <ClCompile Include="src\baldzarika\ucv\gles\fbo.cpp" />
     <ClCompile Include="src\baldzarika\ucv\gles\hessian_detector.cpp" />
     <ClCompile Include="src\baldzarika\ucv\gles\shaders.cpp" />

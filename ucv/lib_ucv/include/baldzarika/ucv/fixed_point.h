@@ -75,6 +75,7 @@ namespace baldzarika { namespace ucv {
 
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(zero, 0.0)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(one, 1.0)
+			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(two, 2.0)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(half, 0.5)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(pi, 3.1415926535897932384626433832795)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(pi_2, 6.283185307179586476925286766559)
@@ -86,6 +87,7 @@ namespace baldzarika { namespace ucv {
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(atan_c1, 0.1963)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(atan_c2, 0.9817)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(i_255, 0.9817)
+			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(e, 2.7182818284590452353602874713527)
 
 		} //namespace constants
 	}
@@ -329,6 +331,132 @@ namespace baldzarika { namespace ucv {
 			return (y<detail::constants::zero<fixed_point>()?-angle:angle);
 		}
 
+		friend fixed_point exp(fixed_point const &x)
+		{
+			static fixed_point const a[]=
+			{
+				1.64872127070012814684865078781,
+				1.28402541668774148407342056806,
+				1.13314845306682631682900722781,
+				1.06449445891785942956339059464,
+				1.03174340749910267093874781528,
+				1.01574770858668574745853507208,
+				1.00784309720644797769345355976,
+				1.00391388933834757344360960390,
+				1.00195503359100281204651889805,
+				1.00097703949241653524284529261,
+				1.00048840047869447312617362381,
+				1.00024417042974785493700523392,
+				1.00012207776338377107650351967,
+				1.00006103701893304542177912060,
+				1.00003051804379102429545128481,
+				1.00001525890547841394814004262,
+				1.00000762942363515447174318433,
+				1.00000381470454159186605078771,
+				1.00000190735045180306002872525,
+				1.00000095367477115374544678825,
+				1.00000047683727188998079165439,
+				1.00000023841860752327418915867,
+				1.00000011920929665620888994533,
+				1.00000005960464655174749969329,
+				1.00000002980232283178452676169,
+				1.00000001490116130486995926397,
+				1.00000000745058062467940380956,
+				1.00000000372529030540080797502,
+				1.00000000186264515096568050830,
+				1.00000000093132257504915938475,
+				1.00000000046566128741615947508
+			};
+			
+			fixed_point y(1);
+			for(boost::int32_t i=F-1; i>=0; --i)
+			{
+				if(!(x.m_value & 1<<i))
+					y*=a[F-i-1];
+			}
+
+			boost::int32_t x_int=floor(x);
+			if(x_int<0)
+			{
+				for(boost::int32_t i=1;i<=-x_int;++i)
+					y/=detail::constants::e<fixed_point>();
+			}
+			else
+			{
+				for(boost::int32_t i=1;i<=x_int;++i)
+					y*=detail::constants::e<fixed_point>();
+			}
+			return y;
+		}
+
+		friend fixed_point cos(fixed_point const &x)
+		{
+			static fixed_point const i_2t3t4=0.04166666666666666666666666666667;
+			static fixed_point const i_2t3t4t5t6=0.00138888888888888888888888888889;
+
+			fixed_point x_=fmod(x, detail::constants::pi_2<fixed_point>());
+			if(x_>detail::constants::pi<fixed_point>())
+				x_-=detail::constants::pi_2<fixed_point>();
+			fixed_point xx=x_*x_;
+			fixed_point y=-xx*i_2t3t4t5t6;
+			y+=i_2t3t4;
+			y*=xx;
+			y-=detail::constants::half<fixed_point>();
+			y*=xx;
+			return y+detail::constants::one<fixed_point>();
+		}
+
+
+		friend fixed_point sin(fixed_point const &x)
+		{
+			static fixed_point const i_2t3=0.16666666666666666666666666666667;
+			static fixed_point const i_2t3t4t5=0.00833333333333333333333333333333;
+			static fixed_point const i_2t3t4t5t6t7=1.984126984126984126984126984127e-4;
+			
+			fixed_point x_=fmod(x, detail::constants::pi_2<fixed_point>());
+			if(x_>detail::constants::pi<fixed_point>())
+				x_-=detail::constants::pi_2<fixed_point>();
+
+			fixed_point xx=x_*x_;
+			
+			fixed_point y=-xx*i_2t3t4t5t6t7;
+			y+=i_2t3t4t5;
+			y*=xx;
+			y-=i_2t3;
+			y*=xx;
+			y+=detail::constants::one<fixed_point>();
+			return y*x_;
+		}
+		
+		friend fixed_point sqrt(fixed_point const &x)
+		{
+			if(x<detail::constants::zero<fixed_point>())
+				return 0;
+			
+			typename fixed_point<2*I, 2*F>::value_type op=
+				typename fixed_point<2*I, 2*F>::value_type(x.m_value)<<(I+1);
+			
+			typename fixed_point<2*I, 2*F>::value_type res=0;
+			typename fixed_point<2*I, 2*F>::value_type one=
+				typename fixed_point<2*I, 2*F>::value_type(1)<<
+				(std::numeric_limits<typename fixed_point<2*I, 2*F>::value_type>::digits-1);
+
+			while(one>op)
+				one>>=2;
+			
+			while(one!=0)
+			{
+				if(op>=res+one)
+				{
+					op=op-(res+one);
+					res=res+(one<<1);
+				}
+				res >>= 1;
+				one >>= 2;
+			}
+			return fixed_point(static_cast<value_type>(res), detail::fp_explicit_tag());
+		}
+	
 	private:
 		value_type		m_value;
 	};

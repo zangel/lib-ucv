@@ -14,6 +14,8 @@ namespace baldzarika { namespace ucv {
 	{
 	public:
 
+		typedef feature_point< fixed_point<15, 16>, fixed_point<0, 15> > feature_point_t;
+		
 		typedef fixed_point<7, 24> gray_t;
 		typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
 		typedef gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
@@ -41,7 +43,7 @@ namespace baldzarika { namespace ucv {
 			operator bool() const;
 
 			bool				build();
-			bool				detect(response_layer &bl, response_layer &ml, std::vector<feature_point> &fps);
+			bool				detect(response_layer &bl, response_layer &ml, std::vector<feature_point_t> &fps);
 						
 			response_t			get_response(boost::int32_t x, boost::int32_t y, response_layer const &src) const;
 			
@@ -76,14 +78,19 @@ namespace baldzarika { namespace ucv {
 
 		bool						resize(size2ui const &is);
 		bool						update(gray_view_t gi);
-		bool						detect(std::vector<feature_point> &fps);
-		bool						describe(std::vector<feature_point> &fps);
+		bool						detect(std::vector<feature_point_t> &fps);
+		bool						describe(std::vector<feature_point_t> &fps);
 
 	protected:
-		bool						compute_orientations(std::vector<feature_point> &fps);
+		bool						compute_orientations(std::vector<feature_point_t> &fps);
+		bool						compute_descriptors(std::vector<feature_point_t> &fps);
+
 		response_t					haar_x(point2i const &p, boost::uint32_t s);
 		response_t					haar_y(point2i const &p, boost::uint32_t s);
 		response_t					get_angle(response_t const &x, response_t const &y);
+		static response_t			gaussian(boost::int32_t x, boost::int32_t y, response_t const &sig);
+		static response_t			gaussian(response_t const &x, response_t const &y, response_t const &sig);
+
 
 
 
@@ -98,8 +105,6 @@ namespace baldzarika { namespace ucv {
 
 		response_image_t			m_response_img;
 		response_layers_t			m_response_layers;
-
-		std::vector<feature_point>	m_feature_points;
 	};
 
 } //namespace ucv
