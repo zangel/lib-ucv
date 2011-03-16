@@ -221,7 +221,7 @@ void UCVActivity::onSurfaceChanged(local_ref<egl::EGL10> const &gl, int width, i
 	glViewport(0, 0, width, height);
 	if(Native *pn=reinterpret_cast<Native*>((jlong)(m_Native)))
 	{
-		pn->m_surf.reset(new ucv::surf(ucv::size2ui(width/2, height/2), 2, 4, 2, 1.0e-3f));
+		pn->m_surf.reset(new ucv::surf(ucv::size2ui(width/2, height/2), 2, 4, 2, 1.0e-4f));
 		pn->m_gil_gray_img.recreate(width/2, height/2, 4);
 		pn->m_gray_img.recreate(width/2, height/2, 4);
 
@@ -350,8 +350,17 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 				ucv::surf::integral_t(1.0f/255.0f)
 			);
 
+			boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
 			pn->m_surf->update(ucv::gil::view(pn->m_gray_img));
 			pn->m_surf->detect(pn->m_features);
+			boost::posix_time::ptime finsh=boost::posix_time::microsec_clock::local_time();
+			pn->m_surf->describe(pn->m_features);
+			boost::posix_time::ptime finsh_describe=boost::posix_time::microsec_clock::local_time();
+
+			__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "surf: %d, %d",
+				(finsh-start).total_microseconds(),
+				(finsh_describe-finsh).total_microseconds()
+			);
 		}
 	}
 }
