@@ -80,9 +80,6 @@
     <ClCompile Include="src\baldzarika\ucv\config.cpp">
       <Filter>Source Files\baldzarika\ucv</Filter>
     </ClCompile>
-    <ClCompile Include="src\baldzarika\ucv\feature_point.cpp">
-      <Filter>Source Files\baldzarika\ucv</Filter>
-    </ClCompile>
     <ClCompile Include="src\baldzarika\ucv\surf.cpp">
       <Filter>Source Files\baldzarika\ucv</Filter>
     </ClCompile>
