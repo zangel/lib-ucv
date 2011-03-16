@@ -201,12 +201,13 @@ BOOST_AUTO_TEST_CASE( test_surf )
 		ucv::surf::integral_t(1.0f/255.0f)
 	);
 
-	ucv::surf the_surf(ucv::size2ui(gray_img.width(), gray_img.height()), 3, 4, 2, 1.0e-6f);
+	ucv::surf the_surf(ucv::size2ui(gray_img.width(), gray_img.height()), 3, 4, 2, 4.0e-4f);
 
 	posix_time::ptime start=posix_time::microsec_clock::local_time();
 	the_surf.update(ucv::gil::view(gray_img));
 	std::vector<ucv::feature_point> fps;
 	the_surf.detect(fps);
+	the_surf.describe(fps);
 	posix_time::ptime finish=posix_time::microsec_clock::local_time();
 
 	std::cout << "surf::update+detect=" << (finish-start).total_microseconds() << std::endl;

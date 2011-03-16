@@ -25,7 +25,7 @@ namespace baldzarika { namespace ucv {
 		typedef gil::image< integral_pixel_t, false, std::allocator<unsigned char> > integral_image_t;
 		typedef integral_image_t::view_t integral_view_t;
 
-		typedef fixed_point<15, 16>	response_t;
+		typedef fixed_point<10, 21>	response_t;
 		typedef gil::pixel<response_t, ucv::gil::gray_layout_t> response_pixel_t;
 		typedef ucv::gil::image< response_pixel_t, false, std::allocator<unsigned char> > response_image_t;
 		typedef response_image_t::view_t response_view_t;
@@ -81,9 +81,9 @@ namespace baldzarika { namespace ucv {
 
 	protected:
 		bool						compute_orientations(std::vector<feature_point> &fps);
-		decimal_t					haar_x(point2i const &p, boost::uint32_t s);
-		decimal_t					haar_y(point2i const &p, boost::uint32_t s);
-		decimal_t					get_angle(decimal_t const &x, decimal_t const &y);
+		response_t					haar_x(point2i const &p, boost::uint32_t s);
+		response_t					haar_y(point2i const &p, boost::uint32_t s);
+		response_t					get_angle(response_t const &x, response_t const &y);
 
 
 
