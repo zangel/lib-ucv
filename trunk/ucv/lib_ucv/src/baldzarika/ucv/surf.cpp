@@ -4,6 +4,51 @@
 
 namespace baldzarika { namespace ucv  {
 
+	namespace {
+		
+		static surf::response_t const gauss_25[7][7]=
+		{
+			{	0.02350693969273,	0.01849121369071,	0.01239503121241,	0.00708015417522,	0.00344628101733,	0.00142945847484,	0.00050524879060	},
+			{	0.02169964028389,	0.01706954162243,	0.01144205592615,	0.00653580605408,	0.00318131834134,	0.00131955648461,	0.00046640341759	},
+			{	0.01706954162243,	0.01342737701584,	0.00900063997939,	0.00514124713667,	0.00250251364222,	0.00103799989504,	0.00036688592278	},
+			{	0.01144205592615,	0.00900063997939,	0.00603330940534,	0.00344628101733,	0.00167748505986,	0.00069579213743,	0.00024593098864	},
+			{	0.00653580605408,	0.00514124713667,	0.00344628101733,	0.00196854695367,	0.00095819467066,	0.00039744277546,	0.00014047800980	},
+			{	0.00318131834134,	0.00250251364222,	0.00167748505986,	0.00095819467066,	0.00046640341759,	0.00019345616757,	0.00006837798818	},
+			{	0.00131955648461,	0.00103799989504,	0.00069579213743,	0.00039744277546,	0.00019345616757,	0.00008024231247,	0.00002836202103	}
+		};
+
+		class orientation_indices
+		{
+		private:
+			orientation_indices()
+			{
+				boost::int32_t idx=0;
+				for(boost::int32_t i=-6;i<=6;++i)
+				{
+					for(boost::int32_t j=-6;j<=6;++j)
+					{
+						if(i*i+j*j<36)
+						{
+							m_values[idx][0]=i;
+							m_values[idx][1]=j;
+							idx++;
+						}
+					}
+				}
+			}
+
+		public:
+			static orientation_indices const& get()
+			{
+				static orientation_indices _orientation_indices;
+				return _orientation_indices;
+			}
+		public:
+			boost::int32_t	m_values[109][2];
+		};
+
+	} //namespace anonymous
+
 #if 0
 	namespace {
 
@@ -26,35 +71,7 @@ namespace baldzarika { namespace ucv  {
 		};
 
 
-		class orientation_indices
-		{
-		private:
-			orientation_indices()
-			{
-				int idx=0;
-				for(int i=-6;i<=6;++i)
-				{
-					for(int j=-6;j<=6;++j)
-					{
-						if(i*i+j*j<36)
-						{
-							m_values[idx][0]=i;
-							m_values[idx][1]=j;
-							idx++;
-						}
-					}
-				}
-			}
-
-		public:
-			static orientation_indices const& get()
-			{
-				static orientation_indices _orientation_indices;
-				return _orientation_indices;
-			}
-		public:
-			int		m_values[109][2];
-		};
+		
 
 
 		inline real_t haar_x(gil::gray32s_view_t iv, point2i const &p, boost::uint32_t s)
@@ -202,14 +219,14 @@ namespace baldzarika { namespace ucv  {
 
 	bool surf::response_layer::build()
 	{
-		static const response_t three(3.0f);
-		static const response_t coeff(0.81f);
+		static response_t const three(3.0f);
+		static response_t const coeff(0.81f);
 		
 		integral_view_t iv=gil::view(m_surf.m_integral_img);
 		boost::int32_t const b=(m_filter_size-1)/2+1;
 		boost::int32_t const l=m_filter_size/3;
 		boost::int32_t const w=m_filter_size;
-		response_t const s_coeff=response_t(1)/response_t(w*w);
+		response_t const s_coeff=(response_t(1)/response_t(w))/response_t(w);
 		
 		for(boost::int32_t ry=0;ry<m_response_view.height();++ry) 
 		{
@@ -222,20 +239,26 @@ namespace baldzarika { namespace ucv  {
 				response_t d_xx=
 					box_integral<integral_view_t,response_t>(iv, point2i(ix-b, iy-l+1), size2ui(w, 2*l-1))-
 					box_integral<integral_view_t,response_t>(iv, point2i(ix-l/2, iy-l+1), size2ui(l, 2*l-1))*three;
+				//float d_xx_=d_xx;
 				
 				response_t d_yy=
 					box_integral<integral_view_t,response_t>(iv, point2i(ix-l+1, iy-b), size2ui(2*l-1, w))-
 					box_integral<integral_view_t,response_t>(iv, point2i(ix-l+1, iy-l/2), size2ui(2*l-1, l))*three;
+				//float d_yy_=d_yy;
 				
 				response_t d_xy=
 					box_integral<integral_view_t,response_t>(iv, point2i(ix+1, iy-l), size2ui(l, l))+
 					box_integral<integral_view_t,response_t>(iv, point2i(ix-l, iy+1), size2ui(l, l))-
 					box_integral<integral_view_t,response_t>(iv, point2i(ix-l, iy-l), size2ui(l, l))-
 					box_integral<integral_view_t,response_t>(iv, point2i(ix+1, iy+1), size2ui(l, l));
+
+				//float d_xy_=d_xy;
 				
 				d_xx*=s_coeff;
 				d_yy*=s_coeff;
 				d_xy*=s_coeff;
+
+				//float s_coeff_=s_coeff;
 
 				//float f_d_xx=d_xx;
 				//float f_d_yy=d_yy;
@@ -249,15 +272,14 @@ namespace baldzarika { namespace ucv  {
 
 	bool surf::response_layer::detect(response_layer &bl, response_layer &ml, std::vector<feature_point> &fps)
 	{
-		static const response_t inv_2=response_t(1)/response_t(2);
-		static const response_t r_2=response_t(2);
-		static const response_t inv_4=response_t(1)/response_t(4);
-		static const response_t coeff_1=response_t(0.1333f);
-		static const response_t zero=response_t(0);
-		static const response_t one=response_t(1);
+		static const response_t inv_2=detail::constants::one<response_t>()/response_t(2);
+		static const response_t inv_4=detail::constants::one<response_t>()/response_t(4);
+		static const response_t r_2=2;
+		static const response_t coeff_1=0.1333f;
+		static response_t const det_eps=1.0e-3f;
+		static response_t const prec_s=500;
 
 		response_t const response_treshold(m_surf.m_treshold);
-
 		boost::int32_t border=(m_filter_size+1)/(2*m_sample_step);
 
 		for(boost::int32_t y=border+1;y<m_response_view.height()-border;++y)
@@ -283,46 +305,48 @@ namespace baldzarika { namespace ucv  {
 
 				if(fp_detected)
 				{
+					
 					response_t v=ml.get_response(x, y, *this);
-					response_t d_x=(ml.get_response(x+1, y, *this)-ml.get_response(x-1, y, *this))*inv_2;
-					response_t d_y=(ml.get_response(x, y+1, *this)-ml.get_response(x, y-1, *this))*inv_2;
-					response_t d_s=(cur_response-bl.get_response(x, y, *this))*inv_2;
+					response_t v_r_2=v*r_2;
+					response_t d_x=prec_s*(ml.get_response(x+1, y, *this)-ml.get_response(x-1, y, *this))*inv_2;
+					response_t d_y=prec_s*(ml.get_response(x, y+1, *this)-ml.get_response(x, y-1, *this))*inv_2;
+					response_t d_s=prec_s*(cur_response-bl.get_response(x, y, *this))*inv_2;
 					
 					//H[0][0]
-					response_t d_xx=ml.get_response(x+1, y, *this)+ml.get_response(x-1, y, *this)-v*r_2;
-					float f_d_xx=d_xx;
+					response_t d_xx=prec_s*(ml.get_response(x+1, y, *this)+ml.get_response(x-1, y, *this)-v_r_2);
+					//float f_d_xx=d_xx;
 
 					//H[1][1]
-					response_t d_yy=ml.get_response(x, y+1, *this)+ml.get_response(x, y-1, *this)-v*r_2;
-					float f_d_yy=d_yy;
+					response_t d_yy=prec_s*(ml.get_response(x, y+1, *this)+ml.get_response(x, y-1, *this)-v_r_2);
+					//float f_d_yy=d_yy;
 
 					//H[2][2]			
-					response_t d_ss=cur_response+bl.get_response(x, y, *this)-v*r_2;
-					float f_d_ss=d_ss;
+					response_t d_ss=prec_s*(cur_response+bl.get_response(x, y, *this)-v_r_2);
+					//float f_d_ss=d_ss;
 					
 					//H[0][1] H[1][0]
-					response_t d_xy=
+					response_t d_xy=prec_s*
 						(
 							ml.get_response(x+1, y+1, *this)-ml.get_response(x-1, y+1, *this)-
 							ml.get_response(x+1, y-1, *this)+ml.get_response(x-1, y-1, *this)
 						)*inv_4;
-					float f_d_xy=d_xy;
+					//float f_d_xy=d_xy;
 					
 					//H[0][2] H[2][0]
-					response_t d_xs=
+					response_t d_xs=prec_s*
 						(
 							m_response_view(x+1, y).operator response_t()-m_response_view(x-1, y).operator response_t()-
 							bl.get_response(x+1, y, *this)+bl.get_response(x-1, y, *this)
 						)*inv_4;
-					float f_d_xs=d_xs;
+					//float f_d_xs=d_xs;
 					
 					//H[1][2] H[2][1]
-					response_t d_ys=
+					response_t d_ys=prec_s*
 						(
 							m_response_view(x, y+1).operator response_t()-m_response_view(x, y-1).operator response_t()-
 							bl.get_response(x, y+1, *this)+bl.get_response(x, y-1, *this)
 						)*inv_4;
-					float f_d_ys=d_ys;
+					//float f_d_ys=d_ys;
 
 					response_t det=
 						(
@@ -333,12 +357,13 @@ namespace baldzarika { namespace ucv  {
 							d_xy*d_xy*d_ss-
 							d_xs*d_yy*d_xs
 						);
-					float f_det=det;
+					//float f_det=det;
 
-					if(det==zero) continue;
-					response_t inv_det=one/det;
+					
+					if(fabs(det)<det_eps) continue;
+					response_t inv_det=detail::constants::one<response_t>()/det;
 
-					float f_inv_det=inv_det;
+					//float f_inv_det=inv_det;
 					
 					response_t H_inv[3][3]=
 						{
@@ -356,12 +381,12 @@ namespace baldzarika { namespace ucv  {
 					response_t xi=-inv_det*(H_inv[0][2]*d_x+H_inv[1][2]*d_y+H_inv[2][2]*d_s);
 #endif
 
-					float f_xx=xx;
-					float f_xy=xy;
-					float f_xi=xi;
+					//float f_xx=xx;
+					//float f_xy=xy;
+					//float f_xi=xi;
 
 
-					if(	fabs(xx)<inv_2 && fabs(xy)<inv_2 && fabs(xi)<inv_2)
+					if(	fabs(xx)<detail::constants::one<response_t>() && fabs(xy)<detail::constants::one<response_t>() && fabs(xi)<detail::constants::one<response_t>())
 					{
 						fps.push_back(
 							feature_point(
@@ -595,35 +620,119 @@ namespace baldzarika { namespace ucv  {
 
 	bool surf::describe(std::vector<feature_point> &fps)
 	{
-		//surf_orientations(gil::view(m_integral_img), fps);
+		if(!compute_orientations(fps))
+			return false;
 		return true;
 	}
 
-	decimal_t surf::haar_x(point2i const &p, boost::uint32_t s)
+	bool surf::compute_orientations(std::vector<feature_point> &fps)
 	{
-		return	box_integral<integral_view_t, decimal_t>(gil::view(m_integral_img), point2i(p.x,p.y-s/2), size2ui(s/2, s))-
-				box_integral<integral_view_t, decimal_t>(gil::view(m_integral_img), point2i(p.x-s/2,p.y-s/2), size2ui(s/2, s));
-	}
-	
-	decimal_t surf::haar_y(point2i const &p, boost::uint32_t s)
-	{
-		return	box_integral<integral_view_t, decimal_t>(gil::view(m_integral_img), point2i(p.x-s/2,p.y), size2ui(s, s/2))-
-				box_integral<integral_view_t, decimal_t>(gil::view(m_integral_img), point2i(p.x-s/2,p.y-s/2), size2ui(s, s/2));
+		static response_t const r_3i20=0.15f;
+		static response_t const r_2=2.0f;
+
+		for(std::size_t ifp=0;ifp<fps.size();++ifp)
+		{
+			point2ui pt(
+				static_cast<boost::uint32_t>(std::floor(fps[ifp].x+0.5f)),
+				static_cast<boost::uint32_t>(std::floor(fps[ifp].y+0.5f))
+			);
+			response_t scale=fps[ifp].m_scale;
+			boost::uint32_t s=static_cast<boost::uint32_t>(std::floor(fps[ifp].m_scale+0.5f));
+
+			response_t res_x[109], res_y[109], angle[109];
+			for(boost::uint32_t k=0;k<109;++k)
+			{
+				response_t gauss=gauss_25[std::abs(orientation_indices::get().m_values[k][0])][std::abs(orientation_indices::get().m_values[k][1])];
+				res_x[k]=gauss*haar_x(
+					point2i(
+						pt.x+orientation_indices::get().m_values[k][0]*s,
+						pt.y+orientation_indices::get().m_values[k][1]*s
+					),
+					4*s
+				);
+				//float f_res_x=res_x[k];
+
+				res_y[k]=gauss*haar_y(
+					point2i(
+						pt.x+orientation_indices::get().m_values[k][0]*s,
+					pt.y+orientation_indices::get().m_values[k][1]*s
+					),
+					4*s
+				);
+				//float f_res_y=res_y[k];
+				
+				angle[k]=get_angle(res_x[k],res_y[k]);
+				//float f_angle=angle[k];
+				//int c=0;
+			}
+
+			response_t max_sum=detail::constants::zero<response_t>();
+			response_t orientation=detail::constants::zero<response_t>();
+			for(boost::uint32_t a=0;a<42;++a)
+			{
+				
+
+				response_t ang1=response_t(a)*r_3i20;
+				response_t ang2=((ang1+detail::constants::pi_i3<response_t>())>detail::constants::pi_2<response_t>()?
+					ang1-detail::constants::pi_5i3<response_t>():
+					ang1+detail::constants::pi_i3<response_t>());
+
+				response_t sum_x=detail::constants::zero<response_t>();
+				response_t sum_y=detail::constants::zero<response_t>();
+
+				for(boost::uint32_t k=0;k<109;++k)
+				{
+					response_t const &ang=angle[k];
+					if(ang1<ang2 && ang1<ang && ang<ang2)
+					{
+						sum_x+=res_x[k];  
+						sum_y+=res_y[k];
+					} 
+					else
+					if(ang2<ang1 && ((ang>detail::constants::zero<response_t>() && ang<ang2) || (ang>ang1 && ang<detail::constants::pi_2<response_t>())))
+					{
+						sum_x+=res_x[k];  
+						sum_y+=res_y[k];
+					}
+				}
+				response_t this_sum=sum_x*sum_x+sum_y*sum_y;
+				if(this_sum>max_sum) 
+				{
+					max_sum=this_sum;
+					orientation=get_angle(sum_x, sum_y);
+				}
+			}
+			//float f_orientation=orientation;
+			fps[ifp].m_orientation=orientation;
+		}
+		return true;
 	}
 
-	decimal_t surf::get_angle(decimal_t const &x, decimal_t const &y)
+	surf::response_t surf::haar_x(point2i const &p, boost::uint32_t s)
 	{
-		if(y<detail::constants::zero<decimal_t>())
+		return	box_integral<integral_view_t, response_t>(gil::view(m_integral_img), point2i(p.x,p.y-s/2), size2ui(s/2, s))-
+				box_integral<integral_view_t, response_t>(gil::view(m_integral_img), point2i(p.x-s/2,p.y-s/2), size2ui(s/2, s));
+	}
+	
+	surf::response_t surf::haar_y(point2i const &p, boost::uint32_t s)
+	{
+		return	box_integral<integral_view_t, response_t>(gil::view(m_integral_img), point2i(p.x-s/2,p.y), size2ui(s, s/2))-
+				box_integral<integral_view_t, response_t>(gil::view(m_integral_img), point2i(p.x-s/2,p.y-s/2), size2ui(s, s/2));
+	}
+
+	surf::response_t surf::get_angle(surf::response_t const &x, surf::response_t const &y)
+	{
+		if(y<detail::constants::zero<response_t>())
 		{
-			if(x<detail::constants::zero<decimal_t>()) return detail::constants::pi<decimal_t>()+atan2(y,x);
-			if(x>detail::constants::zero<decimal_t>()) return detail::constants::pi_2<decimal_t>()-atan2(-y,x);
+			if(x<detail::constants::zero<response_t>()) return detail::constants::pi<response_t>()+atan2(y,x);
+			if(x>detail::constants::zero<response_t>()) return detail::constants::pi_2<response_t>()-atan2(-y,x);
 		}
 		else
 		{
-			if(x<detail::constants::zero<decimal_t>()) return detail::constants::pi<decimal_t>()-atan2(-y,x);
-			if(x>detail::constants::zero<decimal_t>()) return atan2(y,x);
+			if(x<detail::constants::zero<response_t>()) return detail::constants::pi<response_t>()-atan2(-y,x);
+			if(x>detail::constants::zero<response_t>()) return atan2(y,x);
 		}
-		return detail::constants::zero<decimal_t>();
+		return detail::constants::zero<response_t>();
 	}
 
 } //namespace ucv
