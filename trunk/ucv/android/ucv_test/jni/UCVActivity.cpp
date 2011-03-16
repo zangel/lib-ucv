@@ -105,7 +105,7 @@ namespace {
 		boost::scoped_ptr<ucv::surf> m_surf;
 		ucv::gil::gray8_image_t	m_gil_gray_img;
 		ucv::surf::gray_image_t m_gray_img;
-		std::vector<ucv::feature_point> m_features;
+		std::vector<ucv::surf::feature_point_t> m_features;
 
 		boost::scoped_ptr<ucv::gles::program> m_features_program;
 
@@ -250,7 +250,7 @@ void UCVActivity::onDrawFrame(local_ref<egl::EGL10> const &gl)
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			std::vector<ucv::feature_point> fps(pn->m_features);
+			std::vector<ucv::surf::feature_point_t> fps(pn->m_features);
 
 			if(fps.size())
 			{
@@ -258,9 +258,9 @@ void UCVActivity::onDrawFrame(local_ref<egl::EGL10> const &gl)
 				float *p_fpts=fp_points.get();
 				for(std::size_t ifp=0;ifp<fps.size();++ifp)
 				{
-					ucv::feature_point const &fp=fps[ifp];
-					p_fpts[0]=2.0f*(fp.x/float(pn->m_gray_img.width())-0.5f);
-					p_fpts[1]=-2.0f*(fp.y/float(pn->m_gray_img.height())-0.5f);
+					ucv::surf::feature_point_t const &fp=fps[ifp];
+					p_fpts[0]=2.0f*(static_cast<float>(fp.x)/float(pn->m_gray_img.width())-0.5f);
+					p_fpts[1]=-2.0f*(static_cast<float>(fp.y)/float(pn->m_gray_img.height())-0.5f);
 					p_fpts[2]=0.0;
 					p_fpts[3]=1.0f;
 					p_fpts+=4;
