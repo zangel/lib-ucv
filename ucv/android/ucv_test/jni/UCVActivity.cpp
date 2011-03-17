@@ -8,6 +8,11 @@
 #include <baldzarika/ucv/gles/shaders.h>
 #include <boost/date_time.hpp>
 
+#define png_infopp_NULL (png_infopp)0
+#define int_p_NULL (int*)0
+
+#include <boost/gil/extension/io/png_io.hpp>
+
 using namespace j2cpp;
 namespace ucv=baldzarika::ucv;
 
@@ -94,18 +99,42 @@ namespace {
 	public:
 		Native()
 		{
+			ucv::gil::gray8_image_t marker_img;
+			ucv::gil::png_read_and_convert_image("/sdcard/markers/joker.png", marker_img);
+			if(marker_img.width()*marker_img.height())
+			{
+				__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "marker image loaded, size=%dx%d, ...",marker_img.width(), marker_img.height());
 
+				ucv::surf::gray_image_t marker_gray_img(marker_img.width(), marker_img.height());
+
+				ucv::convert_scale(
+					ucv::gil::view(marker_img),
+					ucv::gil::view(marker_gray_img),
+					ucv::surf::integral_t(1.0f/255.0f)
+				);
+				ucv::surf surf_marker(ucv::size2ui(marker_img.width(), marker_img.height()), 2, 4, 2, 1.0e-4f);
+				surf_marker.update(ucv::gil::view(marker_gray_img));
+				surf_marker.detect(m_marker_features);
+				surf_marker.describe(m_marker_features);
+				__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "detected %d marker feature points", m_marker_features.size());
+			}
+			else
+				__android_log_print(ANDROID_LOG_ERROR, J2CPP_NAME, "failed to load marker image!");
 		}
 
 		~Native()
 		{
-
 		}
 
+		//marker stuff
+		std::vector<ucv::surf::feature_point_t> m_marker_features;
+
+		//detection stuff
 		boost::scoped_ptr<ucv::surf> m_surf;
 		ucv::gil::gray8_image_t	m_gil_gray_img;
 		ucv::surf::gray_image_t m_gray_img;
 		std::vector<ucv::surf::feature_point_t> m_features;
+		std::vector< std::pair<std::size_t,std::size_t> > m_feature_matches;
 
 		boost::scoped_ptr<ucv::gles::program> m_features_program;
 
@@ -251,14 +280,15 @@ void UCVActivity::onDrawFrame(local_ref<egl::EGL10> const &gl)
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			std::vector<ucv::surf::feature_point_t> fps(pn->m_features);
+			std::vector< std::pair<std::size_t,std::size_t> > matched_fps(pn->m_feature_matches);
 
-			if(fps.size())
+			if(matched_fps.size())
 			{
-				boost::scoped_array<float> fp_points( new float[4*fps.size()]);
+				boost::scoped_array<float> fp_points( new float[4*matched_fps.size()]);
 				float *p_fpts=fp_points.get();
-				for(std::size_t ifp=0;ifp<fps.size();++ifp)
+				for(std::size_t ifp=0;ifp<matched_fps.size();++ifp)
 				{
-					ucv::surf::feature_point_t const &fp=fps[ifp];
+					ucv::surf::feature_point_t const &fp=fps[matched_fps[ifp].second];
 					p_fpts[0]=2.0f*(static_cast<float>(fp.x)/float(pn->m_gray_img.width())-0.5f);
 					p_fpts[1]=-2.0f*(static_cast<float>(fp.y)/float(pn->m_gray_img.height())-0.5f);
 					p_fpts[2]=0.0;
@@ -353,14 +383,26 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 			boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
 			pn->m_surf->update(ucv::gil::view(pn->m_gray_img));
 			pn->m_surf->detect(pn->m_features);
-			boost::posix_time::ptime finsh=boost::posix_time::microsec_clock::local_time();
+			boost::posix_time::ptime start_describe=boost::posix_time::microsec_clock::local_time();
 			pn->m_surf->describe(pn->m_features);
-			boost::posix_time::ptime finsh_describe=boost::posix_time::microsec_clock::local_time();
+			boost::posix_time::ptime start_match=boost::posix_time::microsec_clock::local_time();
+			ucv::surf::match_feature_points(pn->m_marker_features, pn->m_features, pn->m_feature_matches, ucv::surf::feature_point_t::value_type(0.65f));
+			boost::posix_time::ptime finsh=boost::posix_time::microsec_clock::local_time();
 
-			__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "surf: %d, %d",
+#if 0
+			__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "surf: %d(%d, %d, %d), matches.size()=%d",
 				(finsh-start).total_microseconds(),
-				(finsh_describe-finsh).total_microseconds()
+				(start_describe-start).total_microseconds(),
+				(start_match-start_describe).total_microseconds(),
+				(finsh-start_match).total_microseconds(),
+				pn->m_feature_matches.size()
 			);
+#else
+			__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "matches.size()=%d",pn->m_feature_matches.size());
+
+
+#endif
+
 		}
 	}
 }

@@ -16,12 +16,18 @@ LOCAL_C_INCLUDES	:=	$(ANDROID_CPP_SDK)/j2cpp \
 						$(ANDROID_CPP_SDK)/platforms/android-7 \
 						$(ANDROID_BOOST_DIR) \
 						$(LOCAL_PATH)/../../../lib_ucv/include \
-						$(UCV_DIR)/include
+						$(UCV_DIR)/include \
+						$(OPENCV_ROOT)/3rdparty/libpng \
+						$(OPENCV_ROOT)/3rdparty/include
+						
 
 						
 
 LOCAL_LDLIBS    	:=	-L$(ANDROID_BOOST_DIR)/android/lib \
+						-L$(OPENCV_ROOT)/android/build/obj/local/armeabi \
 						-lGLESv2 \
+						-lpng \
+						-lzlib \
 						-ldl \
 						-llog
 
