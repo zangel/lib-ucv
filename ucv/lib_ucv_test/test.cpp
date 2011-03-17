@@ -228,8 +228,10 @@ BOOST_AUTO_TEST_CASE( test_surf )
 	the_surf.describe(fps);
 	posix_time::ptime finish=posix_time::microsec_clock::local_time();
 	std::vector< std::pair<std::size_t, std::size_t> > matches;
-	ucv::surf::match_feature_points(fps, fps, matches);
+	ucv::surf::match_feature_points(fps, fps, matches, ucv::surf::feature_point_t::value_type(1.0e-3f));
 	posix_time::ptime finish_match=posix_time::microsec_clock::local_time();
+
+	BOOST_CHECK_EQUAL(matches.size(), fps.size());
 
 	std::cout << "surf::(update+detect+describe, match)=(" << (finish-start).total_microseconds() << ", " << (finish_match-finish).total_microseconds() << ")" << std::endl;
 
