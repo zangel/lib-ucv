@@ -46,21 +46,54 @@ namespace baldzarika { namespace ucv {
 			static boost::int64_t const value=1;
 		};
 
+		template < bool, typename T1, typename T2 >
+		struct select {};
+
+		template < typename T1, typename T2 >
+		struct select<true, T1, T2>
+		{
+			typedef T1 type;
+		};
+
+		template < typename T1, typename T2 >
+		struct select<false, T1, T2>
+		{
+			typedef T2 type;
+		};
+
+
+
 		template < bool >
 		struct adjuster { };
 
 		template < >
-		struct adjuster<false>
+		struct adjuster<true>
 		{
-			template < typename T1, typename T2, boost::uint32_t I1, boost::uint32_t I2 >
-			static T1 adjust(T2 v){ return T1(v)<<(I2-I1);  }
+			template < typename T1, typename T2, boost::uint32_t F1, boost::uint32_t F2 >
+			static T1 adjust(T2 v)
+			{
+				typedef typename select<
+					(std::numeric_limits<T1>::digits > std::numeric_limits<T2>::digits),
+					T1,
+					T2
+				>::type greater_type;
+				return static_cast<T1>(greater_type(v)<<(F1-F2));
+			}
 		};
 
 		template < >
-		struct adjuster<true>
+		struct adjuster<false>
 		{
-			template < typename T1, typename T2, boost::uint32_t I1, boost::uint32_t I2 >
-			static T1 adjust(T2 v){ return static_cast<T1>(v>>(I1-I2)); }
+			template < typename T1, typename T2, boost::uint32_t F1, boost::uint32_t F2 >
+			static T1 adjust(T2 v)
+			{
+				typedef typename select<
+					bool(std::numeric_limits<T1>::digits > std::numeric_limits<T2>::digits),
+					T1,
+					T2
+				>::type greater_type;
+				return static_cast<T1>(greater_type(v)>>(F2-F1));
+			}
 		};
 
 		struct fp_explicit_tag {};
@@ -142,8 +175,8 @@ namespace baldzarika { namespace ucv {
 
 		template< boost::uint32_t I2, boost::uint32_t F2 >
 		fixed_point(fixed_point< I2, F2 > const& that)
-			: m_value( detail::adjuster< (I>I2) >::
-				template adjust< value_type, typename fixed_point< I2, F2 >::value_type, I, I2>(that.m_value)
+			: m_value( detail::adjuster< (F>F2) >::
+				template adjust< value_type, typename fixed_point< I2, F2 >::value_type, F, F2>(that.m_value)
 			)
 		{ 
 		}

@@ -14,7 +14,7 @@ namespace baldzarika { namespace ucv {
 	{
 	public:
 
-		typedef feature_point< fixed_point<15, 16>, fixed_point<0, 15> > feature_point_t;
+		typedef feature_point< decimal_t, fixed_point<0, 15> > feature_point_t;
 		
 		typedef fixed_point<7, 24> gray_t;
 		typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
@@ -85,14 +85,17 @@ namespace baldzarika { namespace ucv {
 		bool						compute_orientations(std::vector<feature_point_t> &fps);
 		bool						compute_descriptors(std::vector<feature_point_t> &fps);
 
-		response_t					haar_x(point2i const &p, boost::uint32_t s);
-		response_t					haar_y(point2i const &p, boost::uint32_t s);
-		response_t					get_angle(response_t const &x, response_t const &y);
-		static response_t			gaussian(boost::int32_t x, boost::int32_t y, response_t const &sig);
-		static response_t			gaussian(response_t const &x, response_t const &y, response_t const &sig);
+		template < typename T > T			haar_x(point2i const &p, boost::uint32_t s);
+		template < typename T > T			haar_y(point2i const &p, boost::uint32_t s);
 
+		template < boost::uint32_t I, boost::uint32_t F >
+		fixed_point<I,F>					get_angle(fixed_point<I,F> const &x, fixed_point<I,F> const &y);
 
+		template < boost::uint32_t I, boost::uint32_t F >
+		static fixed_point<I,F>				gaussian(boost::int32_t x, boost::int32_t y, fixed_point<I,F> const &sig);
 
+		template < boost::uint32_t I, boost::uint32_t F >
+		static fixed_point<I,F>				gaussian(fixed_point<I,F> const &x, fixed_point<I,F> const &y, fixed_point<I,F> const &sig);
 
 
 	private:

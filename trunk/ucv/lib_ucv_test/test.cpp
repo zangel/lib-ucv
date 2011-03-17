@@ -21,12 +21,16 @@ BOOST_AUTO_TEST_CASE( create_open_cv_window )
 	cv::namedWindow(OPENCV_WND_NAME);
 }
 
-
+#if 0
 BOOST_AUTO_TEST_CASE( test_fixed_point )
 {
 	using namespace baldzarika::ucv;
 
 	typedef fixed_point<15,16> fixed_t;
+
+
+	BOOST_CHECK_EQUAL(static_cast<float>(fixed_t(fixed_point<0,15>(0.5f))), 0.5f);
+	BOOST_CHECK_EQUAL(static_cast<float>(fixed_point<0,15>(fixed_t(0.5f))), 0.5f);
 	
 	BOOST_CHECK_EQUAL(1, static_cast<int>(fixed_t(3)/fixed_t(2)) );
 	BOOST_CHECK_EQUAL(1.5f, static_cast<float>(fixed_t(3)/fixed_t(2)));
@@ -77,7 +81,7 @@ BOOST_AUTO_TEST_CASE( test_fixed_point )
 	BOOST_CHECK_LT( fabs(static_cast<float>(atan2(fixed_point<15,16>(-y),fixed_point<15,16>(-x)))-atan2(-y, -x)), 7.2e-2f);
 }
 
-#if 0
+
 BOOST_AUTO_TEST_CASE( test_fixed_point_atan2_speed )
 {
 	using namespace baldzarika::ucv;
