@@ -754,7 +754,10 @@ namespace baldzarika { namespace ucv  {
 					d2=dist;
 			}
 
-			if(match!=fps2.end() && d2!=detail::constants::zero<feature_point_t::value_type>() && d1/d2<d)
+			//float d1_=d1;
+			//float d2_=d2;
+
+			if(match!=fps2.end() && (d1==detail::constants::zero<feature_point_t::value_type>() || (d2!=detail::constants::zero<feature_point_t::value_type>() && d1/d2<d)))
 				m.push_back(std::make_pair(i,match-fps2.begin()));
 		}
 	}
