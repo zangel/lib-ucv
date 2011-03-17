@@ -1,7 +1,7 @@
 #ifndef BALDZARIKA_UCV_FEATURE_POINT_H
 #define BALDZARIKA_UCV_FEATURE_POINT_H
 
-#include <baldzarika//ucv/point2.h>
+#include <baldzarika/ucv/point2.h>
 
 
 namespace baldzarika { namespace ucv {
@@ -21,6 +21,17 @@ namespace baldzarika { namespace ucv {
 			, m_scale(that.m_scale)
 			, m_orientation(that.m_orientation)
 		{
+		}
+
+		value_type operator -(feature_point const &rhs) const
+		{
+			value_type sum=0;
+			for(boost::uint32_t d=0;d<64;++d)
+			{
+				value_type diff=m_desc[d]-rhs.m_desc[d];
+				sum+=diff*diff;
+			}
+			return sqrt(sum);
 		}
 
 		value_type		m_scale;
