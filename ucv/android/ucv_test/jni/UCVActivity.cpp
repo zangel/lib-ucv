@@ -386,7 +386,7 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 			boost::posix_time::ptime start_describe=boost::posix_time::microsec_clock::local_time();
 			pn->m_surf->describe(pn->m_features);
 			boost::posix_time::ptime start_match=boost::posix_time::microsec_clock::local_time();
-			ucv::surf::match_feature_points(pn->m_marker_features, pn->m_features, pn->m_feature_matches, ucv::surf::feature_point_t::value_type(0.65f));
+			ucv::surf::match_feature_points(pn->m_marker_features, pn->m_features, pn->m_feature_matches, ucv::surf::feature_point_t::value_type(0.1f));
 			boost::posix_time::ptime finsh=boost::posix_time::microsec_clock::local_time();
 
 #if 0
