@@ -121,6 +121,7 @@ namespace baldzarika { namespace ucv {
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(atan_c2, 0.9817)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(i_255, 0.9817)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(e, 2.7182818284590452353602874713527)
+			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(inv_e, 0.36787944117144232159552377016146)
 
 		} //namespace constants
 	}
@@ -412,7 +413,7 @@ namespace baldzarika { namespace ucv {
 			if(x_int<0)
 			{
 				for(boost::int32_t i=1;i<=-x_int;++i)
-					y/=detail::constants::e<fixed_point>();
+					y*=detail::constants::inv_e<fixed_point>();
 			}
 			else
 			{
