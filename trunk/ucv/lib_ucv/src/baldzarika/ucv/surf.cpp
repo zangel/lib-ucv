@@ -730,5 +730,34 @@ namespace baldzarika { namespace ucv  {
 			exp(-(x*x+y*y)*detail::constants::half< fixed_point<I,F> >()/(sig*sig));
 	}
 
+	void surf::match_feature_points(std::vector<feature_point_t> const &fps1, std::vector<feature_point_t> const &fps2, std::vector< std::pair<std::size_t, std::size_t> > &m, surf::feature_point_t::value_type const &d)
+	{
+		m.clear();
+		for(std::size_t i=0;i<fps1.size();++i) 
+		{
+			feature_point_t::value_type d1=std::numeric_limits<feature_point_t::value_type>::max();
+			feature_point_t::value_type d2=std::numeric_limits<feature_point_t::value_type>::max();
+			
+			std::vector<feature_point_t>::const_iterator match=fps2.end();
+			for(std::size_t j=0;j<fps2.size();++j) 
+			{
+				feature_point_t::value_type dist=fps1[i]-fps2[j];
+				
+				if(dist<d1)
+				{
+					d2=d1;
+					d1=dist;
+					match=fps2.begin()+j;
+				}
+				else
+				if(dist<d2)
+					d2=dist;
+			}
+
+			if(match!=fps2.end() && d2!=detail::constants::zero<feature_point_t::value_type>() && d1/d2<d)
+				m.push_back(std::make_pair(i,match-fps2.begin()));
+		}
+	}
+
 } //namespace ucv
 } //namespace baldzarika

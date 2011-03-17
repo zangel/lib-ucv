@@ -81,6 +81,9 @@ namespace baldzarika { namespace ucv {
 		bool						detect(std::vector<feature_point_t> &fps);
 		bool						describe(std::vector<feature_point_t> &fps);
 
+		static void					match_feature_points(std::vector<feature_point_t> const &fps1, std::vector<feature_point_t> const &fps2, std::vector< std::pair<std::size_t, std::size_t> > &m, feature_point_t::value_type const &d=feature_point_t::value_type(0.65f));
+
+
 	protected:
 		bool						compute_orientations(std::vector<feature_point_t> &fps);
 		bool						compute_descriptors(std::vector<feature_point_t> &fps);
@@ -96,7 +99,6 @@ namespace baldzarika { namespace ucv {
 
 		template < boost::uint32_t I, boost::uint32_t F >
 		static fixed_point<I,F>				gaussian(fixed_point<I,F> const &x, fixed_point<I,F> const &y, fixed_point<I,F> const &sig);
-
 
 	private:
 		integral_image_t			m_integral_img;
