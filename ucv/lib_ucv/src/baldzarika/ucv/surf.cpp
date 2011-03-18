@@ -152,31 +152,33 @@ namespace baldzarika { namespace ucv  {
 		{
 			for(boost::int32_t x=border+1;x<m_response_view.width()-border;++x)
 			{
-				response_t cur_response=ml.get_response(x,y, *this);
-				//float f_cur_response=cur_response;
+				response_t candidate=ml.get_response(x,y, *this);
+				//float f_cur_response=candidate;
 				//float f_treshold=m_surf.m_treshold;
-				if(cur_response<response_treshold) continue;
+				if(candidate<response_treshold) continue;
 				bool fp_detected(true);
 				for(boost::int32_t ry=-1;ry<=1 && fp_detected;++ry)
 				{
 					for(boost::int32_t rx=-1;rx<=1 && fp_detected;++rx)
 					{
 						fp_detected=!
-						(	m_response_view(x+rx,y+ry).operator response_t()>=cur_response ||
-							( (ry!=0||rx!=0) && ml.get_response(x+rx, y+ry, *this)>=cur_response ) ||
-							bl.get_response(x+rx, y+ry, *this)>=cur_response
+						(	m_response_view(x+rx,y+ry).operator response_t()>=candidate ||
+							( (ry!=0||rx!=0) && ml.get_response(x+rx, y+ry, *this)>=candidate ) ||
+							bl.get_response(x+rx, y+ry, *this)>=candidate
 						);
 					}
 				}
 
 				if(fp_detected)
 				{
-					
+					response_t t=m_response_view(x, y).operator response_t();
+					response_t b=bl.get_response(x, y, *this);
+
 					response_t v=ml.get_response(x, y, *this);
 					response_t v_r_2=v*r_2;
 					response_t d_x=prec_s*(ml.get_response(x+1, y, *this)-ml.get_response(x-1, y, *this))*inv_2;
 					response_t d_y=prec_s*(ml.get_response(x, y+1, *this)-ml.get_response(x, y-1, *this))*inv_2;
-					response_t d_s=prec_s*(cur_response-bl.get_response(x, y, *this))*inv_2;
+					response_t d_s=prec_s*(t-b)*inv_2;
 					
 					//H[0][0]
 					response_t d_xx=prec_s*(ml.get_response(x+1, y, *this)+ml.get_response(x-1, y, *this)-v_r_2);
@@ -187,7 +189,7 @@ namespace baldzarika { namespace ucv  {
 					//float f_d_yy=d_yy;
 
 					//H[2][2]			
-					response_t d_ss=prec_s*(cur_response+bl.get_response(x, y, *this)-v_r_2);
+					response_t d_ss=prec_s*(t+b-v_r_2);
 					//float f_d_ss=d_ss;
 					
 					//H[0][1] H[1][0]
@@ -247,7 +249,7 @@ namespace baldzarika { namespace ucv  {
 					//float f_xy=xy;
 					//float f_xi=xi;
 					
-					if(	fabs(xx)<detail::constants::one<response_t>() && fabs(xy)<detail::constants::one<response_t>() && fabs(xi)<detail::constants::one<response_t>())
+					if(	fabs(xx)<detail::constants::half<response_t>() && fabs(xy)<detail::constants::half<response_t>() && fabs(xi)<detail::constants::half<response_t>())
 					{
 						fps.push_back(
 							feature_point_t(
@@ -533,8 +535,6 @@ namespace baldzarika { namespace ucv  {
 			response_t orientation=detail::constants::zero<response_t>();
 			for(boost::uint32_t a=0;a<42;++a)
 			{
-				
-
 				response_t ang1=response_t(a)*r_3i20;
 				response_t ang2=((ang1+detail::constants::pi_i3<response_t>())>detail::constants::pi_2<response_t>()?
 					ang1-detail::constants::pi_5i3<response_t>():
@@ -562,6 +562,9 @@ namespace baldzarika { namespace ucv  {
 				if(this_sum>max_sum) 
 				{
 					max_sum=this_sum;
+					//float sum_x_=sum_x;
+					//float sum_y_=sum_y;
+
 					orientation=get_angle(sum_x, sum_y);
 				}
 			}
@@ -577,8 +580,8 @@ namespace baldzarika { namespace ucv  {
 
 		static dec_t const c_5i2=2.5f;
 		static dec_t const c_3i2=1.5f;
-
-
+		static dec_t const a_coeff=100;
+		static dec_t const a_icoeff=1.0e-2f;
 
 		for(std::size_t ifp=0;ifp<fps.size();++ifp)
 		{
@@ -659,14 +662,30 @@ namespace baldzarika { namespace ucv  {
 						c_3i2
 					);
 
-					float gauss_s2_=gauss_s2;
+					//float gauss_s2_=gauss_s2;
+
+					//float dx_=dx;
+					//float dy_=dy;
+					//float mdx_=mdx;
+					//float mdy_=mdy;
+
+					dx*=a_coeff;
+					dy*=a_coeff;
+					mdx*=a_coeff;
+					mdy*=a_coeff;
+
+					//dx_=dx;
+					//dy_=dy;
+					//mdx_=mdx;
+					//mdy_=mdy;
+
 
 
 					fp.m_desc[count++]=dx*gauss_s2;
 					fp.m_desc[count++]=dy*gauss_s2;
 					fp.m_desc[count++]=mdx*gauss_s2;
 					fp.m_desc[count++]=mdy*gauss_s2;
-					len+=(dx*dx+dy*dy+mdx*mdx+mdy*mdy)*gauss_s2*gauss_s2;
+					len+=((dx*dx+dy*dy+mdx*mdx+mdy*mdy)*gauss_s2)*gauss_s2;
 					j+=9;
 				}
 				i+=9;

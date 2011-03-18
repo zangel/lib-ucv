@@ -25,13 +25,18 @@ namespace baldzarika { namespace ucv {
 
 		value_type operator -(feature_point const &rhs) const
 		{
+			static value_type const s_coeff=1000;
+			static value_type const s_icoeff=1.0e-3f;
 			value_type sum=0;
 			for(boost::uint32_t d=0;d<64;++d)
 			{
 				value_type diff=m_desc[d]-rhs.m_desc[d];
-				sum+=diff*diff;
+				//float diff_=diff;
+				//float diff_diff_=diff*diff;
+				sum+=(s_coeff*diff)*diff;
 			}
-			return sqrt(sum);
+			//float sum_=sum;
+			return sqrt(s_icoeff*sum);
 		}
 
 		value_type		m_scale;
