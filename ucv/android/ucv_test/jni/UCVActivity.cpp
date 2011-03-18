@@ -283,12 +283,17 @@ void UCVActivity::onDrawFrame(local_ref<egl::EGL10> const &gl)
 			std::vector< std::pair<std::size_t,std::size_t> > matched_fps(pn->m_feature_matches);
 
 			if(matched_fps.size())
+			//if(fps.size())
 			{
 				boost::scoped_array<float> fp_points( new float[4*matched_fps.size()]);
+				//boost::scoped_array<float> fp_points( new float[4*fps.size()]);
+
 				float *p_fpts=fp_points.get();
 				for(std::size_t ifp=0;ifp<matched_fps.size();++ifp)
+				//for(std::size_t ifp=0;ifp<fps.size();++ifp)
 				{
 					ucv::surf::feature_point_t const &fp=fps[matched_fps[ifp].second];
+					//ucv::surf::feature_point_t const &fp=fps[ifp];
 					p_fpts[0]=2.0f*(static_cast<float>(fp.x)/float(pn->m_gray_img.width())-0.5f);
 					p_fpts[1]=-2.0f*(static_cast<float>(fp.y)/float(pn->m_gray_img.height())-0.5f);
 					p_fpts[2]=0.0;
@@ -380,14 +385,14 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 				ucv::surf::integral_t(1.0f/255.0f)
 			);
 
-			boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
+			//boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
 			pn->m_surf->update(ucv::gil::view(pn->m_gray_img));
 			pn->m_surf->detect(pn->m_features);
-			boost::posix_time::ptime start_describe=boost::posix_time::microsec_clock::local_time();
+			//boost::posix_time::ptime start_describe=boost::posix_time::microsec_clock::local_time();
 			pn->m_surf->describe(pn->m_features);
-			boost::posix_time::ptime start_match=boost::posix_time::microsec_clock::local_time();
-			ucv::surf::match_feature_points(pn->m_marker_features, pn->m_features, pn->m_feature_matches, ucv::surf::feature_point_t::value_type(0.1f));
-			boost::posix_time::ptime finsh=boost::posix_time::microsec_clock::local_time();
+			//boost::posix_time::ptime start_match=boost::posix_time::microsec_clock::local_time();
+			ucv::surf::match_feature_points(pn->m_marker_features, pn->m_features, pn->m_feature_matches, ucv::surf::feature_point_t::value_type(0.85f));
+			//boost::posix_time::ptime finsh=boost::posix_time::microsec_clock::local_time();
 
 #if 0
 			__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "surf: %d(%d, %d, %d), matches.size()=%d",
@@ -398,7 +403,7 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 				pn->m_feature_matches.size()
 			);
 #else
-			__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "matches.size()=%d",pn->m_feature_matches.size());
+			//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "matches.size()=%d",pn->m_feature_matches.size());
 
 
 #endif
