@@ -13,12 +13,14 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #define OPENCV_WND_NAME  "ucv"
+#define OPENCV_WND_NAME2  "ucv2"
 
 using namespace boost;
 
 BOOST_AUTO_TEST_CASE( create_open_cv_window )
 {
 	cv::namedWindow(OPENCV_WND_NAME);
+	//cv::namedWindow(OPENCV_WND_NAME2);
 }
 
 #if 0
@@ -188,7 +190,7 @@ BOOST_AUTO_TEST_CASE( test_integral )
 	cv::imshow(OPENCV_WND_NAME, cv::Mat(cv_img.rows, cv_img.cols, CV_32SC1, &gil::view(integral_img)[0][0]));
 	cv::waitKey();
 }
-#endif
+
 BOOST_AUTO_TEST_CASE( test_surf )
 {
 	namespace ucv=baldzarika::ucv;
@@ -227,14 +229,9 @@ BOOST_AUTO_TEST_CASE( test_surf )
 	the_surf.detect(fps);
 	the_surf.describe(fps);
 	posix_time::ptime finish=posix_time::microsec_clock::local_time();
-	std::vector< std::pair<std::size_t, std::size_t> > matches;
-	ucv::surf::match_feature_points(fps, fps, matches, ucv::surf::feature_point_t::value_type(1.0e-3f));
-	posix_time::ptime finish_match=posix_time::microsec_clock::local_time();
+	
 
-	BOOST_CHECK_EQUAL(matches.size(), fps.size());
-
-	std::cout << "surf::(update+detect+describe, match)=(" << (finish-start).total_microseconds() << ", " << (finish_match-finish).total_microseconds() << ")" << std::endl;
-
+	std::cout << "surf::(update+detect+describe)=(" << (finish-start).total_microseconds() << ")" << std::endl;
 	for(std::size_t ifp=0;ifp<fps.size();++ifp)
 	{
 		cv::circle(cv_img,
@@ -246,3 +243,106 @@ BOOST_AUTO_TEST_CASE( test_surf )
 	cv::imshow(OPENCV_WND_NAME, cv_img);
 	cv::waitKey();
 }
+#endif
+
+
+#if 1
+BOOST_AUTO_TEST_CASE( test_surf_match )
+{
+	namespace ucv=baldzarika::ucv;
+
+	//img 1
+	cv::Mat cv_img1=cv::imread("test_img.png", CV_LOAD_IMAGE_GRAYSCALE);
+	//cv::imshow(OPENCV_WND_NAME, cv_img1);
+	//cv::waitKey();
+
+	ucv::gil::gray8_image_t gil_gray_img1(cv_img1.cols, cv_img1.rows);
+	ucv::gil::resize_view(
+		ucv::gil::interleaved_view(
+			cv_img1.cols, cv_img1.rows,
+			reinterpret_cast<ucv::gil::gray8_pixel_t*>(cv_img1.data),
+			cv_img1.step
+		),
+		gil::view(gil_gray_img1),
+		gil::bilinear_sampler()
+	);
+
+	cv::Mat cv_gray_img1(gil_gray_img1.height(), gil_gray_img1.width(), CV_8UC1, &ucv::gil::view(gil_gray_img1)[0][0]);
+	//cv::imshow(OPENCV_WND_NAME, cv_gray_img1);
+	//cv::waitKey();
+
+	ucv::surf::gray_image_t gray_img1(gil_gray_img1.width(), gil_gray_img1.height(), 4);
+	ucv::convert_scale(
+		ucv::gil::view(gil_gray_img1),
+		ucv::gil::view(gray_img1),
+		ucv::surf::integral_t(1.0f/255.0f)
+	);
+
+
+	//img2
+	cv::Mat cv_img2=cv::imread("test_img.png", CV_LOAD_IMAGE_GRAYSCALE);
+	//cv::imshow(OPENCV_WND_NAME, cv_img2);
+	//cv::waitKey();
+
+	ucv::gil::gray8_image_t gil_gray_img2(cv_img2.cols/2, cv_img2.rows/2);
+	ucv::gil::resize_view(
+		ucv::gil::interleaved_view(
+			cv_img2.cols, cv_img2.rows,
+			reinterpret_cast<ucv::gil::gray8_pixel_t*>(cv_img2.data),
+			cv_img2.step
+		),
+		gil::view(gil_gray_img2),
+		gil::bilinear_sampler()
+	);
+
+	cv::Mat cv_gray_img2(gil_gray_img2.height(), gil_gray_img2.width(), CV_8UC1, &ucv::gil::view(gil_gray_img2)[0][0]);
+	//cv::imshow(OPENCV_WND_NAME, cv_gray_img2);
+	//cv::waitKey();
+
+	ucv::surf::gray_image_t gray_img2(gil_gray_img2.width(), gil_gray_img2.height(), 4);
+	ucv::convert_scale(
+		ucv::gil::view(gil_gray_img2),
+		ucv::gil::view(gray_img2),
+		ucv::surf::integral_t(1.0f/255.0f)
+	);
+
+	ucv::surf the_surf1(ucv::size2ui(gray_img1.width(), gray_img1.height()), 3, 4, 2, 1.0e-4f);
+
+	the_surf1.update(ucv::gil::view(gray_img1));
+	std::vector<ucv::surf::feature_point_t> fps1;
+	the_surf1.detect(fps1);
+	the_surf1.describe(fps1);
+
+	ucv::surf the_surf2(ucv::size2ui(gray_img2.width(), gray_img2.height()), 3, 4, 2, 1.0e-4f);
+
+	the_surf2.update(ucv::gil::view(gray_img2));
+	std::vector<ucv::surf::feature_point_t> fps2;
+	the_surf2.detect(fps2);
+	the_surf2.describe(fps2);
+
+
+
+	std::vector< std::pair<std::size_t, std::size_t> > matches;
+	ucv::surf::match_feature_points(fps1, fps2, matches, 0.65f);
+
+	cv::Mat cv_img2_rgb=cv::imread("test_img.png");
+
+	for(std::size_t ifp=0;ifp<matches.size();++ifp)
+	{
+		float x=static_cast<float>(fps2[matches[ifp].second].x);
+		float y=static_cast<float>(fps2[matches[ifp].second].y);
+
+		cv::circle(cv_img2_rgb,
+			cv::Point(2.0f*static_cast<float>(fps2[matches[ifp].second].x), 2.0f*static_cast<float>(fps2[matches[ifp].second].y)),
+			3,
+			cv::Scalar(0.0, 255.0, 0.0),
+			-1
+		);
+	}
+	cv::imshow(OPENCV_WND_NAME, cv_img2_rgb);
+
+
+	cv::waitKey();
+}
+
+#endif

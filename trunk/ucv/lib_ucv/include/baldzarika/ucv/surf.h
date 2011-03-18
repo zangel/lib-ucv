@@ -14,7 +14,7 @@ namespace baldzarika { namespace ucv {
 	{
 	public:
 
-		typedef feature_point< decimal_t, fixed_point<0, 15> > feature_point_t;
+		typedef feature_point< decimal_t, fixed_point<0, 31> > feature_point_t;
 		
 		typedef fixed_point<7, 24> gray_t;
 		typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
