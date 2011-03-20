@@ -60,7 +60,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../lib;$(BOOST_DIR)/stage_32/msvc2010/lib;$(BOOST_DIR)/stage/msvc2010/32/lib;$(OPENCV_DIR)/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_ucv_d32.lib;opencv_core220d.lib;opencv_highgui220d.lib;opencv_imgproc220d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_ucv_d32.lib;opencv_core220d.lib;opencv_highgui220d.lib;opencv_imgproc220d.lib;opencv_calib3d220d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

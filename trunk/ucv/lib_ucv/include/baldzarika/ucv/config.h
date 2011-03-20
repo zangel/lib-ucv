@@ -17,6 +17,9 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 
+#include <boost/numeric/ublas/matrix.hpp>
+
+
 #if defined(HAVE_GLES2)
 #include <GLES2/GL2.h>
 #include <GLES2/gl2ext.h>
@@ -28,6 +31,7 @@
 namespace baldzarika { namespace ucv {
 	
 	namespace gil=::boost::gil;
+	namespace nublas=::boost::numeric::ublas;
 
 } //namespace ucv
 } //namespace baldzarika

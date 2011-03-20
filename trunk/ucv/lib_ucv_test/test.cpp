@@ -6,11 +6,13 @@
 #include <baldzarika/ucv/convert_scale.h>
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/surf.h>
+#include <baldzarika/ucv/homography.h>
 #include <boost/date_time.hpp>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
 
 #define OPENCV_WND_NAME  "ucv"
 #define OPENCV_WND_NAME2  "ucv2"
@@ -323,12 +325,18 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 
 	std::vector< std::pair<std::size_t, std::size_t> > matches;
-	ucv::surf::match_feature_points(fps1, fps2, matches, 0.65f);
+	ucv::surf::match_feature_points(fps1, fps2, matches, 0.75f);
 
 	cv::Mat cv_img2_rgb=cv::imread("test_img.png");
 
+
+	std::vector<cv::Point2f> pts1,pts2;
+
 	for(std::size_t ifp=0;ifp<matches.size();++ifp)
 	{
+		pts1.push_back(cv::Point2f(fps1[matches[ifp].first].x,fps1[matches[ifp].first].y));
+		pts2.push_back(cv::Point2f(fps2[matches[ifp].second].x,fps2[matches[ifp].second].y));
+
 		float x=static_cast<float>(fps2[matches[ifp].second].x);
 		float y=static_cast<float>(fps2[matches[ifp].second].y);
 
@@ -339,9 +347,14 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 			-1
 		);
 	}
+
+	ucv::nublas::matrix< ucv::surf::feature_point_t::value_type >  hm;
+
+	ucv::find_homography(fps1, fps2, matches, hm);
+	
+	cv::Mat ocvhm=cv::findHomography(cv::Mat(pts1), cv::Mat(pts2), CV_LMEDS);
+	
 	cv::imshow(OPENCV_WND_NAME, cv_img2_rgb);
-
-
 	cv::waitKey();
 }
 

@@ -94,6 +94,7 @@
     <ClInclude Include="include\baldzarika\ucv\gles\hessian_detector.h" />
     <ClInclude Include="include\baldzarika\ucv\gles\shaders.h" />
     <ClInclude Include="include\baldzarika\ucv\gles\texture.h" />
+    <ClInclude Include="include\baldzarika\ucv\homography.h" />
     <ClInclude Include="include\baldzarika\ucv\integral.h" />
     <ClInclude Include="include\baldzarika\ucv\point2.h" />
     <ClInclude Include="include\baldzarika\ucv\size2.h" />
