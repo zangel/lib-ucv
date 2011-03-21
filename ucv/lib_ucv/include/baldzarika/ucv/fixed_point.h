@@ -490,6 +490,25 @@ namespace baldzarika { namespace ucv {
 			}
 			return fixed_point(static_cast<value_type>(res), detail::fp_explicit_tag());
 		}
+
+		template< typename T >
+		friend T round(fixed_point const &x)
+		{
+			return static_cast<T>(x>=detail::constants::zero<fixed_point>()?
+				x+detail::constants::half<fixed_point>():
+				x-detail::constants::half<fixed_point>()
+			);
+		}
+
+		friend fixed_point log(fixed_point const &x)
+		{
+			return fixed_point(logf(static_cast<float>(x)));
+		}
+
+		friend fixed_point pow(fixed_point const &x, fixed_point const &y)
+		{
+			return fixed_point(::pow(static_cast<float>(x), static_cast<float>(y)));
+		}
 	
 	private:
 		value_type		m_value;
