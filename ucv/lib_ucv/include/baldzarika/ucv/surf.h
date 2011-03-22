@@ -14,7 +14,7 @@ namespace baldzarika { namespace ucv {
 	{
 	public:
 
-		typedef feature_point< decimal_t, fixed_point<0, 31> > feature_point_t;
+		typedef feature_point< decimal_t, decimal_t > feature_point_t;
 		
 		typedef fixed_point<7, 24> gray_t;
 		typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
@@ -22,7 +22,7 @@ namespace baldzarika { namespace ucv {
 		typedef gray_image_t::view_t gray_view_t;
 
 
-		typedef fixed_point<20, 11> integral_t;
+		typedef fixed_point<18, 13> integral_t;
 		typedef gil::pixel<integral_t, ucv::gil::gray_layout_t> integral_pixel_t;
 		typedef gil::image< integral_pixel_t, false, std::allocator<unsigned char> > integral_image_t;
 		typedef integral_image_t::view_t integral_view_t;

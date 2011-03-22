@@ -2,6 +2,8 @@
 #include <baldzarika/ucv/surf.h>
 #include <baldzarika/ucv/integral.h>
 
+//#include <opencv2/core/core.hpp>
+
 namespace baldzarika { namespace ucv  {
 
 	namespace {
@@ -218,12 +220,12 @@ namespace baldzarika { namespace ucv  {
 
 					response_t det=
 						(
-							d_xx*d_yy*d_ss+
-							d_xy*d_ys*d_xs+
-							d_xs*d_xy*d_ys-
-							d_xx*d_ys*d_ys-
-							d_xy*d_xy*d_ss-
-							d_xs*d_yy*d_xs
+						d_xx*d_yy*d_ss+
+						d_xy*d_ys*d_xs+
+						d_xs*d_xy*d_ys-
+						d_xx*d_ys*d_ys-
+						d_xy*d_xy*d_ss-
+						d_xs*d_yy*d_xs
 						);
 					//float f_det=det;
 
@@ -243,12 +245,40 @@ namespace baldzarika { namespace ucv  {
 					response_t xx=-inv_det*(H_inv[0][0]*d_x+H_inv[0][1]*d_y+H_inv[0][2]*d_s);
 					response_t xy=-inv_det*(H_inv[1][0]*d_x+H_inv[1][1]*d_y+H_inv[1][2]*d_s);
 					response_t xi=-inv_det*(H_inv[2][0]*d_x+H_inv[2][1]*d_y+H_inv[2][2]*d_s);
+#if 0
+					double H_[3][3];
 
+					H_[0][0]=d_xx;
+					H_[1][1]=d_yy;
+					H_[2][2]=d_ss;
+					H_[0][1]=H_[1][0]=d_xy;
+					H_[0][2]=H_[2][0]=d_xs;
+					H_[1][2]=H_[2][1]=d_ys;
+
+					double H_inv_[3][3];
+										
+					cv::invert(cv::Mat(3,3, CV_64FC1, &H_[0][0]), cv::Mat(3,3, CV_64FC1, &H_inv_[0][0]), cv::DECOMP_SVD);
+
+					double err=0.0;
+					for(int r=0;r<3;++r)
+					{
+						for(int c=0;c<3;++c)
+						{
+							double d=static_cast<double>(inv_det*H_inv[r][c])-H_inv_[r][c];
+							err+=d*d;
+						}
+					}
+
+					
 
 					//float f_xx=xx;
 					//float f_xy=xy;
 					//float f_xi=xi;
-					
+					// 
+					xx=-(H_inv_[0][0]*static_cast<double>(d_x)+H_inv_[0][1]*static_cast<double>(d_y)+H_inv_[0][2]*static_cast<double>(d_s));
+					xy=-(H_inv_[1][0]*static_cast<double>(d_x)+H_inv_[1][1]*static_cast<double>(d_y)+H_inv_[1][2]*static_cast<double>(d_s));
+					xi=-(H_inv_[2][0]*static_cast<double>(d_x)+H_inv_[2][1]*static_cast<double>(d_y)+H_inv_[2][2]*static_cast<double>(d_s));
+#endif	
 					if(	fabs(xx)<detail::constants::half<response_t>() && fabs(xy)<detail::constants::half<response_t>() && fabs(xi)<detail::constants::half<response_t>())
 					{
 						fps.push_back(
@@ -573,15 +603,22 @@ namespace baldzarika { namespace ucv  {
 		}
 		return true;
 	}
-
+	
 	bool surf::compute_descriptors(std::vector<feature_point_t> &fps)
 	{
 		typedef feature_point_t::value_type dec_t;
 
+		//dec_t min_rrx=std::numeric_limits<dec_t>::max();
+		//dec_t max_rrx=std::numeric_limits<dec_t>::min();
+
+		//dec_t min_rry=std::numeric_limits<dec_t>::max();
+		//dec_t max_rry=std::numeric_limits<dec_t>::min();
+
+
 		static dec_t const c_5i2=2.5f;
 		static dec_t const c_3i2=1.5f;
-		static dec_t const a_coeff=100;
-		static dec_t const a_icoeff=1.0e-2f;
+		static dec_t const a_coeff=32;
+		static dec_t const a_icoeff=1.0e-1f;
 
 		for(std::size_t ifp=0;ifp<fps.size();++ifp)
 		{
@@ -644,8 +681,8 @@ namespace baldzarika { namespace ucv  {
 								2*ui_scale
 							);
 
-							dec_t rrx=gauss_s1*(ry*co-rx*si);
-							dec_t rry=gauss_s1*(rx*co+ry*si);
+							dec_t rrx=(a_coeff*gauss_s1)*(ry*co-rx*si);
+							dec_t rry=(a_coeff*gauss_s1)*(rx*co+ry*si);
 
 							//float rrx_=rrx, rry_=rry;
 							
@@ -653,10 +690,12 @@ namespace baldzarika { namespace ucv  {
 							dy+=rry;
 							mdx+=fabs(rrx);
 							mdy+=fabs(rry);
+
+
 						}
 					}
 
-					dec_t gauss_s2=gaussian(
+					dec_t gauss_s2=a_coeff*gaussian(
 						cx-detail::constants::two<dec_t>(),
 						cy-detail::constants::two<dec_t>(),
 						c_3i2
@@ -669,23 +708,33 @@ namespace baldzarika { namespace ucv  {
 					//float mdx_=mdx;
 					//float mdy_=mdy;
 
-					dx*=a_coeff;
-					dy*=a_coeff;
-					mdx*=a_coeff;
-					mdy*=a_coeff;
+					//dx*=a_coeff;
+					//dy*=a_coeff;
+					//mdx*=a_coeff;
+					//mdy*=a_coeff;
 
 					//dx_=dx;
 					//dy_=dy;
 					//mdx_=mdx;
 					//mdy_=mdy;
 
+					dec_t dxg=dx*gauss_s2;
+					dec_t dyg=dy*gauss_s2;
+					dec_t mdxg=mdx*gauss_s2;
+					dec_t mdyg=mdy*gauss_s2;
 
+					//min_rrx=std::min(fabs(dxg),min_rrx);
+					//min_rry=std::min(fabs(dyg),min_rry);
 
-					fp.m_desc[count++]=dx*gauss_s2;
-					fp.m_desc[count++]=dy*gauss_s2;
-					fp.m_desc[count++]=mdx*gauss_s2;
-					fp.m_desc[count++]=mdy*gauss_s2;
-					len+=((dx*dx+dy*dy+mdx*mdx+mdy*mdy)*gauss_s2)*gauss_s2;
+					//max_rrx=std::max(fabs(mdxg),max_rrx);
+					//max_rry=std::max(fabs(mdyg),max_rry);
+					
+					fp.m_desc[count++]=dxg;
+					fp.m_desc[count++]=dyg;
+					fp.m_desc[count++]=mdxg;
+					fp.m_desc[count++]=mdyg;
+
+					len+=(dxg*dxg+dyg*dyg+mdxg*mdxg+mdyg*mdyg);
 					j+=9;
 				}
 				i+=9;
@@ -693,7 +742,7 @@ namespace baldzarika { namespace ucv  {
 			//float len_=len;
 			len=sqrt(len); //len_=len;
 
-			len=detail::constants::one<dec_t>()/len; //len_=len;
+			len=detail::constants::one<dec_t>()/std::max(len, std::numeric_limits<dec_t>::epsilon()); //len_=len;
 
 			for(boost::uint32_t i=0;i<64;++i)
 			//{
