@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE lib_ucv_test
 
 #include <boost/test/unit_test.hpp>
+//#define BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU
 #include <baldzarika/ucv/config.h>
 #include <baldzarika/ucv/fixed_point.h>
 #include <baldzarika/ucv/convert_scale.h>
@@ -254,7 +255,7 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	namespace ucv=baldzarika::ucv;
 
 	//img 1
-	cv::Mat cv_img1=cv::imread("test_img.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img1=cv::imread("test_img2.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::imshow(OPENCV_WND_NAME, cv_img1);
 	//cv::waitKey();
 
@@ -282,11 +283,11 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 
 	//img2
-	cv::Mat cv_img2=cv::imread("test_img.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img2=cv::imread("test_img2_match.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::imshow(OPENCV_WND_NAME, cv_img2);
 	//cv::waitKey();
 
-	ucv::gil::gray8_image_t gil_gray_img2(cv_img2.cols/2, cv_img2.rows/2);
+	ucv::gil::gray8_image_t gil_gray_img2(cv_img2.cols, cv_img2.rows);
 	ucv::gil::resize_view(
 		ucv::gil::interleaved_view(
 			cv_img2.cols, cv_img2.rows,
@@ -325,9 +326,11 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 
 	std::vector< std::pair<std::size_t, std::size_t> > matches;
-	ucv::surf::match_feature_points(fps1, fps2, matches, 0.75f);
+	ucv::surf::match_feature_points(fps1, fps2, matches, 0.65f);
 
-	cv::Mat cv_img2_rgb=cv::imread("test_img.png");
+	cv::Mat cv_img1_rgb=cv::imread("test_img2.png");
+	cv::Mat cv_img2_rgb=cv::imread("test_img2_match.png");
+	
 
 
 	std::vector<cv::Point2f> pts1,pts2;
@@ -337,24 +340,85 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 		pts1.push_back(cv::Point2f(fps1[matches[ifp].first].x,fps1[matches[ifp].first].y));
 		pts2.push_back(cv::Point2f(fps2[matches[ifp].second].x,fps2[matches[ifp].second].y));
 
-		float x=static_cast<float>(fps2[matches[ifp].second].x);
-		float y=static_cast<float>(fps2[matches[ifp].second].y);
+		cv::circle(cv_img1_rgb,
+			cv::Point(static_cast<float>(fps1[matches[ifp].first].x), static_cast<float>(fps1[matches[ifp].first].y)),
+			3,
+			cv::Scalar(0.0, 255.0, 0.0),
+			-1
+		);
 
 		cv::circle(cv_img2_rgb,
-			cv::Point(2.0f*static_cast<float>(fps2[matches[ifp].second].x), 2.0f*static_cast<float>(fps2[matches[ifp].second].y)),
+			cv::Point(static_cast<float>(fps2[matches[ifp].second].x), static_cast<float>(fps2[matches[ifp].second].y)),
 			3,
 			cv::Scalar(0.0, 255.0, 0.0),
 			-1
 		);
 	}
 
-	ucv::nublas::matrix< ucv::surf::feature_point_t::value_type >  hm;
+	typedef ucv::surf::feature_point_t::value_type value_t;
+	typedef ucv::nublas::matrix< value_t > matrix_t;
+	typedef ucv::nublas::vector< value_t > vector_t;
+	matrix_t hm;
 
 	ucv::find_homography(fps1, fps2, matches, hm);
-	
+#if 0
 	cv::Mat ocvhm=cv::findHomography(cv::Mat(pts1), cv::Mat(pts2), CV_LMEDS);
+
+	float err=0.0f;
+
+	for(std::size_t r=0;r<2;++r)
+	{
+		for(std::size_t c=0;c<2;++c)
+		{
+			float d=float(ocvhm.at<double>(r,c))-static_cast<float>(hm(r,c));
+			err+=d*d;
+		}
+	}
+#endif
+
+	vector_t marker_corners[4];
+
+	vector_t image_corners[4];
+
+	marker_corners[0].resize(3);
+	marker_corners[0](0)=0; marker_corners[0](1)=0;marker_corners[0](2)=1;
+	image_corners[0]=ucv::nublas::prod(hm, marker_corners[0]);
+
+	marker_corners[1].resize(3);
+	marker_corners[1](0)=gil_gray_img1.width(); marker_corners[1](1)=0;marker_corners[1](2)=1;
+	image_corners[1]=ucv::nublas::prod(hm, marker_corners[1]);
+
+	marker_corners[2].resize(3);
+	marker_corners[2](0)=gil_gray_img1.width(); marker_corners[2](1)=gil_gray_img1.height();marker_corners[2](2)=1;
+	image_corners[2]=ucv::nublas::prod(hm, marker_corners[2]);
+
+	marker_corners[3].resize(3);
+	marker_corners[3](0)=0; marker_corners[3](1)=gil_gray_img1.height();marker_corners[3](2)=1;
+	image_corners[3]=ucv::nublas::prod(hm, marker_corners[3]);
+
+	for(int p=0;p<4;++p)
+	{
+		vector_t const &p0=image_corners[p];
+		vector_t const &p1=image_corners[(p+1)%4];
+
+		cv::Point cvp0(
+			ucv::round<int>(p0(0)),
+			ucv::round<int>(p0(1))
+		);
+
+		cv::Point cvp1(
+			ucv::round<int>(p1(0)),
+			ucv::round<int>(p1(1))
+		);
+
+		cv::line(cv_img2_rgb, cvp0, cvp1, cv::Scalar(0.0, 255.0, 0.0));
+	}
+
 	
+	cv::namedWindow(OPENCV_WND_NAME2);
+	cv::imshow(OPENCV_WND_NAME2, cv_img1_rgb);
 	cv::imshow(OPENCV_WND_NAME, cv_img2_rgb);
+	
 	cv::waitKey();
 }
 

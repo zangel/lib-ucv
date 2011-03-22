@@ -37,7 +37,7 @@ namespace baldzarika { namespace ucv {
 			}
 
 			template < typename AS >
-			bool operator()(nublas::matrix< value_t, nublas::row_major, AS> &hm)
+			bool operator()(nublas::matrix< value_t, nublas::row_major, AS> &hm, value_t const &ic)
 			{
 				if(m_oim.size()<4)
 					return false;
@@ -84,7 +84,7 @@ namespace baldzarika { namespace ucv {
 					std::sort(err.begin(), err.end(), std::less<value_t>());
 					value_t median=m_oim.size()%2!=0?
 						err[m_oim.size()/2]:
-						(err[m_oim.size()/2-1]+err[m_oim.size()/2])*detail::constants::half<value_t>();
+					(err[m_oim.size()/2-1]+err[m_oim.size()/2])*detail::constants::half<value_t>();
 					if(median<min_median)
 					{
 						min_median=median;
@@ -92,18 +92,22 @@ namespace baldzarika { namespace ucv {
 					}
 				}
 
-				/*
 				if(min_median<std::numeric_limits<value_t>::max())
 				{
-					static value_t _coeff_1=2.5*1.4826;
-					value_t sigma=_coeff_1*(detail::constants::one<value_t>()+value_t(5)/(count - modelPoints))*sqrt(minMedian);
-					sigma = MAX( sigma, 0.001 );
+					static value_t const _sigma_c=2.5*1.4826;
+					static value_t const _sigma_max=0.001;
+					
+					value_t sigma=_sigma_c*
+						(detail::constants::one<value_t>()+
+							value_t(5)/
+							std::max(detail::constants::one<value_t>(), value_t(m_oim.size()-4))
+						)*
+						sqrt(min_median);
+					sigma=std::max(sigma, _sigma_max);
 
-					count = findInliers( m1, m2, model, err, mask, sigma );
-					result = count >= modelPoints;
+					return inliers_count(hm, sigma)>=ucv::round<boost::uint32_t>(value_t(m_oim.size())*ic);
 				}
-				*/
-				return true;
+				return false;
 			}
 
 		protected:
@@ -171,8 +175,8 @@ namespace baldzarika { namespace ucv {
 				
 				for(std::size_t i=0;i<ms1.size();++i)
 				{
-					cm.x+=ms1[i].x; cm.y+=ms1[i].y;
-					cM.x+=ms2[i].x; cM.y+=ms2[i].y;
+					cm.x+=ms2[i].x; cm.y+=ms2[i].y;
+					cM.x+=ms1[i].x; cM.y+=ms1[i].y;
 				}
 
 				cm.x/=count_; cm.y/=count_;
@@ -180,10 +184,10 @@ namespace baldzarika { namespace ucv {
 				
 				for(std::size_t i=0;i<ms1.size();++i)
 				{
-					sm.x+=fabs(ms1[i].x-cm.x);
-					sm.y+=fabs(ms1[i].y-cm.y);
-					sM.x+=fabs(ms2[i].x-cM.x);
-					sM.y+=fabs(ms2[i].y-cM.y);
+					sm.x+=fabs(ms2[i].x-cm.x);
+					sm.y+=fabs(ms2[i].y-cm.y);
+					sM.x+=fabs(ms1[i].x-cM.x);
+					sM.y+=fabs(ms1[i].y-cM.y);
 				}
 
 				if(	fabs(sm.x)<std::numeric_limits<value_t>::epsilon() || fabs(sm.y)<std::numeric_limits<value_t>::epsilon() ||
@@ -212,8 +216,8 @@ namespace baldzarika { namespace ucv {
 				
 				for(std::size_t i=0;i<ms1.size();++i)
 				{
-					value_t x=(ms1[i].x-cm.x)*sm.x, y=(ms1[i].y-cm.y)*sm.y;
-					value_t X=(ms2[i].x-cM.x)*sM.x, Y=(ms2[i].y-cM.y)*sM.y;
+					value_t x=(ms2[i].x-cm.x)*sm.x, y=(ms2[i].y-cm.y)*sm.y;
+					value_t X=(ms1[i].x-cM.x)*sM.x, Y=(ms1[i].y-cM.y)*sM.y;
 					value_t Lx[9]=
 					{
 						X,									Y,									detail::constants::one<value_t>(),
@@ -245,23 +249,26 @@ namespace baldzarika { namespace ucv {
 					}
 				}
 
-				typedef nublas::matrix<value_t, nublas::row_major, nublas::shallow_array_adaptor<value_t> > shalow_adapted_mat_t;
-				
-				lapack::jacobi(
-					shalow_adapted_mat_t(9, 9, nublas::shallow_array_adaptor<value_t>(9*9, &LtL[0][0]) ),
-					shalow_adapted_mat_t(9, 9, nublas::shallow_array_adaptor<value_t>(9*9, &V[0][0]) ),
-					shalow_adapted_mat_t(9, 9, nublas::shallow_array_adaptor<value_t>(9*9, &W[0][0]) )
-				);
+				{
+					typedef nublas::matrix<value_t, nublas::row_major, nublas::shallow_array_adaptor<value_t> > shalow_adapted_mat_t;
 
-				shalow_adapted_mat_t _H0(3,3, nublas::shallow_array_adaptor<value_t>(3*3, V[8]));
-				shalow_adapted_mat_t _Htemp(3,3, nublas::shallow_array_adaptor<value_t>(3*3, V[7]));
-				shalow_adapted_mat_t _invHnorm(3,3, nublas::shallow_array_adaptor<value_t>(3*3, invHnorm));
-				shalow_adapted_mat_t _Hnorm2(3,3, nublas::shallow_array_adaptor<value_t>(3*3, Hnorm2));
+					shalow_adapted_mat_t LtL_(9, 9, nublas::shallow_array_adaptor<value_t>(9*9, &LtL[0][0]) );
+					shalow_adapted_mat_t W_(9, 9, nublas::shallow_array_adaptor<value_t>(9*9, &W[0][0]) );
+					shalow_adapted_mat_t V_(9, 9, nublas::shallow_array_adaptor<value_t>(9*9, &V[0][0]) );
+
+
+					lapack::jacobi(LtL_, W_, V_);
+
+					shalow_adapted_mat_t _H0(3,3, nublas::shallow_array_adaptor<value_t>(3*3, V[8]));
+					shalow_adapted_mat_t _Htemp(3,3, nublas::shallow_array_adaptor<value_t>(3*3, V[7]));
+					shalow_adapted_mat_t _invHnorm(3,3, nublas::shallow_array_adaptor<value_t>(3*3, invHnorm));
+					shalow_adapted_mat_t _Hnorm2(3,3, nublas::shallow_array_adaptor<value_t>(3*3, Hnorm2));
 				
-				_Htemp=nublas::prod(_invHnorm,_H0);
-				_H0=nublas::prod(_Htemp, _Hnorm2);
-				float d_H0=static_cast<float>(_H0(2,2));
-				models=_H0*(detail::constants::one<value_t>()/_H0(2,2));
+					_Htemp=nublas::prod(_invHnorm,_H0);
+					_H0=nublas::prod(_Htemp, _Hnorm2);
+					//float d_H0=static_cast<float>(_H0(2,2));
+					models=_H0*(detail::constants::one<value_t>()/_H0(2,2));
+				}
 				return true;
 			}
 
@@ -275,6 +282,19 @@ namespace baldzarika { namespace ucv {
 					value_t dy=(H[3]*m_ops[m_oim[i].first].x+H[4]*m_ops[m_oim[i].first].y+H[5])*ww-m_ips[m_oim[i].second].y;
 					err[i]=(dx*dx + dy*dy);
 				}
+			}
+
+			boost::uint32_t inliers_count(matrix_t &models, value_t const &t)
+			{
+				value_t treshold=t*t;
+
+				std::vector<value_t> err(m_oim.size());
+				compute_reproj_error(models, err);
+
+				boost::uint32_t n_inliers=0;
+				for(std::size_t i=0;i<m_oim.size();++i)
+					n_inliers+=err[i]<treshold?1:0;
+				return n_inliers;
 			}
 
 		private:
@@ -300,11 +320,12 @@ namespace baldzarika { namespace ucv {
 		std::vector< feature_point<T,DT> > const &ops,
 		std::vector< feature_point<T,DT> > const &ips,
 		std::vector< std::pair<std::size_t, std::size_t> > const &oim,
-		nublas::matrix< typename feature_point<T,DT>::value_type, nublas::row_major, AS > &hm
+		nublas::matrix< typename feature_point<T,DT>::value_type, nublas::row_major, AS > &hm,
+		T const &ic=0.5
 	)
 	{
 		detail::homography_estimator<T,DT> hest(ops, ips, oim);
-		return hest(hm);
+		return hest(hm, ic);
 	}
 
 } //namespace ucv

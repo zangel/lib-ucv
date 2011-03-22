@@ -44,10 +44,6 @@ namespace baldzarika { namespace ucv  { namespace lapack {
 		boost::int32_t const n=_S0.size1(), max_iters=n*n*30;;
 		boost::int32_t i, j, k, m, it;
 
-		if(ce) matE=nublas::identity_matrix<value_t>(n,n);
-		
-		
-
 		boost::scoped_array<value_t> S(new value_t[n*n]);
 
 		boost::scoped_array<value_t> maxSR(new value_t[n]);
@@ -58,6 +54,13 @@ namespace baldzarika { namespace ucv  { namespace lapack {
 		SAS S0=_S0.data();
 		SAe e=_e.data();
 		SAE E=matE.data();
+
+		if(ce)
+		{
+			for(i=0;i<n;++i)
+				for(j=0;j<n;++j)
+					E[i*n+j]=(i==j)?ucv::detail::constants::one<value_t>():ucv::detail::constants::zero<value_t>();
+		}
 		
 		
 
