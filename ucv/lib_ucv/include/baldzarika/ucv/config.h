@@ -20,6 +20,8 @@
 #define BOOST_UBLAS_SHALLOW_ARRAY_ADAPTOR
 #include <boost/numeric/ublas/matrix.hpp>
 
+#include <boost/random.hpp>
+
 
 #if defined(HAVE_GLES2)
 #include <GLES2/GL2.h>
