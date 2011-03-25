@@ -255,7 +255,7 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	namespace ucv=baldzarika::ucv;
 
 	//img 1
-	cv::Mat cv_img1=cv::imread("test_img2.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img1=cv::imread("test_img.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::imshow(OPENCV_WND_NAME, cv_img1);
 	//cv::waitKey();
 
@@ -283,7 +283,7 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 
 	//img2
-	cv::Mat cv_img2=cv::imread("test_img2_match.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img2=cv::imread("test_img_match.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::imshow(OPENCV_WND_NAME, cv_img2);
 	//cv::waitKey();
 
@@ -328,8 +328,8 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	std::vector< std::pair<std::size_t, std::size_t> > matches;
 	ucv::surf::match_feature_points(fps1, fps2, matches, 0.65f);
 
-	cv::Mat cv_img1_rgb=cv::imread("test_img2.png");
-	cv::Mat cv_img2_rgb=cv::imread("test_img2_match.png");
+	cv::Mat cv_img1_rgb=cv::imread("test_img.png");
+	cv::Mat cv_img2_rgb=cv::imread("test_img_match.png");
 	
 
 
@@ -355,14 +355,11 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 		);
 	}
 
-	typedef ucv::surf::feature_point_t::value_type value_t;
-	typedef ucv::nublas::matrix< value_t > matrix_t;
-	typedef ucv::nublas::vector< value_t > vector_t;
-	matrix_t hm;
+	ucv::homography::matrix_t hm(3,3);
 
-	ucv::find_homography(fps1, fps2, matches, hm);
-#if 0
-	cv::Mat ocvhm=cv::findHomography(cv::Mat(pts1), cv::Mat(pts2), CV_LMEDS);
+	ucv::find_homography_ransac(fps1, fps2, matches, hm);
+#if 1
+	cv::Mat ocvhm=cv::findHomography(cv::Mat(pts1), cv::Mat(pts2), CV_RANSAC);
 
 	float err=0.0f;
 
@@ -374,41 +371,61 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 			err+=d*d;
 		}
 	}
+#if 0
+	hm(0,0)=ocvhm.at<double>(0,0);
+	hm(0,1)=ocvhm.at<double>(0,1);
+	hm(0,2)=ocvhm.at<double>(0,2);
+
+	hm(1,0)=ocvhm.at<double>(1,0);
+	hm(1,1)=ocvhm.at<double>(1,1);
+	hm(1,2)=ocvhm.at<double>(1,2);
+
+	hm(2,0)=ocvhm.at<double>(2,0);
+	hm(2,1)=ocvhm.at<double>(2,1);
+	hm(2,2)=ocvhm.at<double>(2,2);
+
 #endif
 
-	vector_t marker_corners[4];
+#endif
 
-	vector_t image_corners[4];
+	ucv::homography::vector_t marker_corners[4];
+
+	ucv::homography::vector_t image_corners[4];
 
 	marker_corners[0].resize(3);
 	marker_corners[0](0)=0; marker_corners[0](1)=0;marker_corners[0](2)=1;
-	image_corners[0]=ucv::nublas::prod(hm, marker_corners[0]);
+	image_corners[0]=ucv::ublas::prod(hm, marker_corners[0]);
+	image_corners[0](0)/=image_corners[0](2); image_corners[0](1)/=image_corners[0](2);
+
 
 	marker_corners[1].resize(3);
 	marker_corners[1](0)=gil_gray_img1.width(); marker_corners[1](1)=0;marker_corners[1](2)=1;
-	image_corners[1]=ucv::nublas::prod(hm, marker_corners[1]);
+	image_corners[1]=ucv::ublas::prod(hm, marker_corners[1]);
+	image_corners[1](0)/=image_corners[1](2); image_corners[1](1)/=image_corners[1](2);
 
 	marker_corners[2].resize(3);
 	marker_corners[2](0)=gil_gray_img1.width(); marker_corners[2](1)=gil_gray_img1.height();marker_corners[2](2)=1;
-	image_corners[2]=ucv::nublas::prod(hm, marker_corners[2]);
+	image_corners[2]=ucv::ublas::prod(hm, marker_corners[2]);
+	image_corners[2](0)/=image_corners[2](2); image_corners[2](1)/=image_corners[2](2);
 
 	marker_corners[3].resize(3);
 	marker_corners[3](0)=0; marker_corners[3](1)=gil_gray_img1.height();marker_corners[3](2)=1;
-	image_corners[3]=ucv::nublas::prod(hm, marker_corners[3]);
+	image_corners[3]=ucv::ublas::prod(hm, marker_corners[3]);
+	image_corners[3](0)/=image_corners[3](2); image_corners[3](1)/=image_corners[3](2);
 
 	for(int p=0;p<4;++p)
 	{
-		vector_t const &p0=image_corners[p];
-		vector_t const &p1=image_corners[(p+1)%4];
+		ucv::homography::vector_t const &p0=image_corners[p];
+		ucv::homography::vector_t const &p1=image_corners[(p+1)%4];
 
 		cv::Point cvp0(
-			ucv::round<int>(p0(0)),
-			ucv::round<int>(p0(1))
+			boost::math::round<int>(p0(0)),
+			boost::math::round<int>(p0(1))
 		);
 
 		cv::Point cvp1(
-			ucv::round<int>(p1(0)),
-			ucv::round<int>(p1(1))
+			boost::math::round<int>(p1(0)),
+			boost::math::round<int>(p1(1))
 		);
 
 		cv::line(cv_img2_rgb, cvp0, cvp1, cv::Scalar(0.0, 255.0, 0.0));

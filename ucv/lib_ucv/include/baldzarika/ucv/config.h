@@ -2,6 +2,7 @@
 #define BALDZARIKA_UCV_CONFIG_H
 
 #include <boost/config.hpp>
+#include <boost/math/special_functions.hpp>
 #include <boost/gil/image.hpp>
 #include <boost/gil/typedefs.hpp>
 #include <boost/gil/extension/numeric/sampler.hpp>
@@ -35,7 +36,7 @@
 namespace baldzarika { namespace ucv {
 	
 	namespace gil=::boost::gil;
-	namespace nublas=::boost::numeric::ublas;
+	namespace ublas=::boost::numeric::ublas;
 
 } //namespace ucv
 } //namespace baldzarika
