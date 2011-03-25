@@ -81,7 +81,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>../lib;$(BOOST_DIR)/stage_32/msvc2010/lib;$(BOOST_DIR)/stage/msvc2010/32/lib;$(OPENCV_DIR)/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_ucv_32.lib;opencv_core220.lib;opencv_highgui220.lib;opencv_imgproc220.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_ucv_32.lib;opencv_core220.lib;opencv_highgui220.lib;opencv_imgproc220.lib;opencv_calib3d220.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

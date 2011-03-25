@@ -96,7 +96,6 @@
     <ClInclude Include="include\baldzarika\ucv\gles\texture.h" />
     <ClInclude Include="include\baldzarika\ucv\homography.h" />
     <ClInclude Include="include\baldzarika\ucv\integral.h" />
-    <ClInclude Include="include\baldzarika\ucv\lapack\jacobi.h" />
     <ClInclude Include="include\baldzarika\ucv\point2.h" />
     <ClInclude Include="include\baldzarika\ucv\size2.h" />
     <ClInclude Include="include\baldzarika\ucv\surf.h" />
@@ -107,6 +106,7 @@
     <ClCompile Include="src\baldzarika\ucv\gles\hessian_detector.cpp" />
     <ClCompile Include="src\baldzarika\ucv\gles\shaders.cpp" />
     <ClCompile Include="src\baldzarika\ucv\gles\texture.cpp" />
+    <ClCompile Include="src\baldzarika\ucv\homography.cpp" />
     <ClCompile Include="src\baldzarika\ucv\surf.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
