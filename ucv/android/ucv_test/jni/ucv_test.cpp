@@ -8,6 +8,8 @@
 #include <android/graphics/PixelFormat.hpp>
 #include <android/view/ViewGroup.hpp>
 #include <android/view/MotionEvent.hpp>
+#include <java/util/List.hpp>
+#include <java/lang/String.hpp>
 #define J2CPP_INCLUDE_IMPLEMENTATION
 #include <android/app/Activity.hpp>
 #include <android/view/SurfaceView.hpp>
@@ -17,6 +19,8 @@
 #include <android/graphics/PixelFormat.hpp>
 #include <android/view/ViewGroup.hpp>
 #include <android/view/MotionEvent.hpp>
+#include <java/util/List.hpp>
+#include <java/lang/String.hpp>
 
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {

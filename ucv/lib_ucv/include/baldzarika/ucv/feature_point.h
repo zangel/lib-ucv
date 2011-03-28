@@ -25,23 +25,24 @@ namespace baldzarika { namespace ucv {
 
 		value_type operator -(feature_point const &rhs) const
 		{
-			static value_type const s_coeff=1000;
-			static value_type const s_icoeff=1.0e-3f;
-			value_type sum=0;
+			static desc_value_type const s_coeff=10.0f;
+			//static desc_value_type const s_coeff=pow(detail::constants::two<desc_value_type>(), desc_value_type(typename desc_value_type::IS-1));
+			static desc_value_type const s_icoeff=0.1f;//detail::constants::one<desc_value_type>()/s_coeff;
+			desc_value_type sum=0;
 			for(boost::uint32_t d=0;d<64;++d)
 			{
-				value_type diff=m_desc[d]-rhs.m_desc[d];
-				//float diff_=diff;
-				//float diff_diff_=diff*diff;
-				sum+=(s_coeff*diff)*diff;
+				desc_value_type diff=s_coeff*(m_desc[d]-rhs.m_desc[d]);
+				float diff_=diff;
+				float diff_diff_=diff*diff;
+				sum+=diff*diff;
 			}
-			//float sum_=sum;
-			return sqrt(s_icoeff*sum);
+			float sum_=sum;
+			return s_icoeff*sqrt(sum);
 		}
 
-		value_type		m_scale;
-		value_type		m_orientation;
-		desc_value_type	m_desc[64];
+		desc_value_type		m_scale;
+		desc_value_type		m_orientation;
+		desc_value_type		m_desc[64];
 	};
 	
 } //namespace ucv

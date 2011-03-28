@@ -1,6 +1,9 @@
 #ifndef BALDZARIKA_UCV_CONFIG_H
 #define BALDZARIKA_UCV_CONFIG_H
 
+#define BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU
+
+
 #include <boost/config.hpp>
 #include <boost/math/special_functions.hpp>
 #include <boost/gil/image.hpp>

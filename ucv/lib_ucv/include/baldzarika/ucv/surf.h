@@ -14,15 +14,15 @@ namespace baldzarika { namespace ucv {
 	{
 	public:
 
-		typedef feature_point< decimal_t, decimal_t > feature_point_t;
+		typedef feature_point< decimal_t, fixed_point<10, 21> > feature_point_t;
 		
-		typedef fixed_point<7, 24> gray_t;
+		typedef fixed_point<10, 21> gray_t;
 		typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
 		typedef gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
 		typedef gray_image_t::view_t gray_view_t;
 
 
-		typedef fixed_point<18, 13> integral_t;
+		typedef fixed_point<10, 21> integral_t;
 		typedef gil::pixel<integral_t, ucv::gil::gray_layout_t> integral_pixel_t;
 		typedef gil::image< integral_pixel_t, false, std::allocator<unsigned char> > integral_image_t;
 		typedef integral_image_t::view_t integral_view_t;
@@ -93,6 +93,8 @@ namespace baldzarika { namespace ucv {
 
 		template < boost::uint32_t I, boost::uint32_t F >
 		fixed_point<I,F>					get_angle(fixed_point<I,F> const &x, fixed_point<I,F> const &y);
+
+		float								get_angle(float x, float y);
 
 		template < boost::uint32_t I, boost::uint32_t F >
 		static fixed_point<I,F>				gaussian(boost::int32_t x, boost::int32_t y, fixed_point<I,F> const &sig);

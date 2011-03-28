@@ -18,7 +18,6 @@
 using namespace j2cpp;
 namespace ucv=baldzarika::ucv;
 
-
 void Java_baldzarika_ucv_test_UCVActivity_initialize(JNIEnv *, jobject jUCVActivity)
 {
 	UCVActivity(jUCVActivity).initialize();
@@ -92,7 +91,7 @@ namespace {
 		"precision mediump float;\n"
 		"void main()\n"
 		"{\n"
-		"	gl_FragColor=vec4(0.0, 1.0, 0.0, 0.95);\n"
+		"	gl_FragColor=vec4(1.0, 0.0, 0.0, 0.5);\n"
 		"}\n"
 	;
 
@@ -100,8 +99,8 @@ namespace {
 	{
 	public:
 		typedef ucv::surf::feature_point_t::value_type value_t;
-		typedef ucv::nublas::matrix< value_t > matrix_t;
-		typedef ucv::nublas::vector< value_t > vector_t;
+		typedef ucv::homography::matrix_t matrix_t;
+		typedef ucv::homography::vector_t vector_t;
 
 		Native()
 		: m_homography_ok(false)
@@ -262,8 +261,8 @@ void UCVActivity::onSurfaceChanged(local_ref<egl::EGL10> const &gl, int width, i
 	if(Native *pn=reinterpret_cast<Native*>((jlong)(m_Native)))
 	{
 		pn->m_surf.reset(new ucv::surf(ucv::size2ui(width, height), 3, 4, 2, 1.0e-4f));
-		pn->m_gil_gray_img.recreate(width, height, 4);
-		pn->m_gray_img.recreate(width, height, 4);
+		pn->m_gil_gray_img.recreate(width, height);
+		pn->m_gray_img.recreate(width, height);
 
 		pn->m_features_program.reset(new ucv::gles::program());
 		ucv::gles::vertex_shader features_vs;
@@ -290,7 +289,7 @@ void UCVActivity::onDrawFrame(local_ref<egl::EGL10> const &gl)
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-#if 0
+#if 1
 			if(pn->m_homography_ok)
 			{
 				Native::matrix_t hm(pn->m_homography);
@@ -298,19 +297,25 @@ void UCVActivity::onDrawFrame(local_ref<egl::EGL10> const &gl)
 
 				marker_corners[0].resize(3);
 				marker_corners[0](0)=0; marker_corners[0](1)=0;marker_corners[0](2)=1;
-				image_corners[0]=ucv::nublas::prod(hm, marker_corners[0]);
+				image_corners[0]=ucv::ublas::prod(hm, marker_corners[0]);
 
 				marker_corners[1].resize(3);
 				marker_corners[1](0)=pn->m_marker_size.width(); marker_corners[1](1)=0;marker_corners[1](2)=1;
-				image_corners[1]=ucv::nublas::prod(hm, marker_corners[1]);
+				image_corners[1]=ucv::ublas::prod(hm, marker_corners[1]);
 
 				marker_corners[2].resize(3);
-				marker_corners[2](0)=pn->m_marker_size.width(); marker_corners[2](1)=pn->m_marker_size.height();marker_corners[2](2)=1;
-				image_corners[2]=ucv::nublas::prod(hm, marker_corners[2]);
+				marker_corners[2](0)=0; marker_corners[2](1)=pn->m_marker_size.height();marker_corners[2](2)=1;
+				image_corners[2]=ucv::ublas::prod(hm, marker_corners[2]);
 
 				marker_corners[3].resize(3);
-				marker_corners[3](0)=0; marker_corners[3](1)=pn->m_marker_size.height();marker_corners[3](2)=1;
-				image_corners[3]=ucv::nublas::prod(hm, marker_corners[3]);
+				marker_corners[3](0)=pn->m_marker_size.width(); marker_corners[3](1)=pn->m_marker_size.height();marker_corners[3](2)=1;
+				image_corners[3]=ucv::ublas::prod(hm, marker_corners[3]);
+
+				for(std::size_t ic=0;ic<4;++ic)
+				{
+					image_corners[ic](0)/=image_corners[ic](2);
+					image_corners[ic](1)/=image_corners[ic](2);
+				}
 
 				boost::scoped_array<float> corner_pts( new float[4*4]);
 				float *p_cpts=corner_pts.get();
@@ -334,7 +339,7 @@ void UCVActivity::onDrawFrame(local_ref<egl::EGL10> const &gl)
 						corner_pts.get()
 					);
 					glEnableVertexAttribArray(a_vtx_pos.get_location());
-					glDrawArrays(GL_LINE_LOOP,0,4);
+					glDrawArrays(GL_TRIANGLE_STRIP,0,4);
 				}
 			}
 #else
@@ -384,7 +389,20 @@ void UCVActivity::surfaceChanged(local_ref<SurfaceHolder> const &holder, int for
 	if(local_ref<Camera> pCamera=m_Camera)
 	{
 		local_ref<Camera::Parameters> parameters=pCamera->getParameters();
-		parameters->setPreviewSize(width, height);
+		local_ref<java::util::List> previewSizes=parameters->getSupportedPreviewSizes();
+		for(int ps=0;ps<previewSizes->size();++ps)
+		{
+			local_ref<Camera::Size> previewSize(previewSizes->get(ps).get_jobject());
+			__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "supports: %dx%d",
+					static_cast<jint>(previewSize->width),
+					static_cast<jint>(previewSize->height)
+			);
+		}
+
+		//parameters->set(java::lang::String(array<jbyte,1>("orientation")), 180);
+		parameters->setPreviewSize(width,height);
+		//parameters->setPreviewFormat(0x10);
+		//parameters->setPreviewFormat(0x11);
 		pCamera->setParameters(parameters);
 		pCamera->startPreview();
 	}
@@ -405,6 +423,14 @@ bool UCVActivity::onTouchEvent(j2cpp::local_ref<MotionEvent> const &me)
 {
 	if(me->getAction()==MotionEvent::ACTION_DOWN)
 	{
+		if(Native *pn=reinterpret_cast<Native*>((jlong)(m_Native)))
+		{
+			if(pn->m_surf && pn->m_gray_img.width()*pn->m_gray_img.height())
+			{
+				ucv::convert_scale(ucv::gil::view(pn->m_gray_img), ucv::gil::view(pn->m_gil_gray_img), float(255));
+				ucv::gil::png_write_view("/sdcard/markers/capture.png",ucv::gil::view(pn->m_gil_gray_img));
+			}
+		}
 	}
 }
 
@@ -429,6 +455,8 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 			local_ref<Camera::Parameters> parameters=camera->getParameters();
 			ucv::size2ui fs(parameters->getPreviewSize()->width, parameters->getPreviewSize()->height);
 
+
+
 			//ucv::gil::resize_view(
 			//	ucv::gil::interleaved_view(
 			//		fs.width(), fs.height(),
@@ -439,15 +467,31 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 			//	ucv::gil::bilinear_sampler()
 			//);
 
-			ucv::convert_scale(
-				//ucv::gil::view(pn->m_gil_gray_img),
+			//ucv::convert_scale(
+			//	//ucv::gil::view(pn->m_gil_gray_img),
+			//	ucv::gil::interleaved_view(
+			//		fs.width(), fs.height(),
+			//		reinterpret_cast<ucv::gil::gray8_pixel_t*>(data->data()),
+			//		fs.width()
+			//	),
+			//	ucv::gil::view(pn->m_gray_img),
+			//	ucv::surf::integral_t(1.0f/255.0f)
+			//);
+
+			ucv::convert_nv16_to_gray(
+				//y channel
 				ucv::gil::interleaved_view(
 					fs.width(), fs.height(),
 					reinterpret_cast<ucv::gil::gray8_pixel_t*>(data->data()),
 					fs.width()
 				),
-				ucv::gil::view(pn->m_gray_img),
-				ucv::surf::integral_t(1.0f/255.0f)
+				//uv channels
+				ucv::gil::interleaved_view(
+					fs.width()/2, fs.height()/2,
+					reinterpret_cast<ucv::gil::gray16_pixel_t*>(data->data()+fs.width()*fs.height()),
+					(fs.width()/2)*2
+				),
+				ucv::gil::view(pn->m_gray_img)
 			);
 
 			//boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
@@ -456,13 +500,18 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 			//boost::posix_time::ptime start_describe=boost::posix_time::microsec_clock::local_time();
 			pn->m_surf->describe(pn->m_features);
 			//boost::posix_time::ptime start_match=boost::posix_time::microsec_clock::local_time();
-			ucv::surf::match_feature_points(pn->m_marker_features, pn->m_features, pn->m_feature_matches, ucv::surf::feature_point_t::value_type(0.7f));
+			ucv::surf::match_feature_points(pn->m_marker_features, pn->m_features, pn->m_feature_matches, ucv::surf::feature_point_t::value_type(0.65f));
+			//ucv::nublas::matrix< ucv::surf::feature_point_t::value_type, ucv::nublas::row_major > hm;
+			pn->m_homography_ok=ucv::find_homography_ransac(pn->m_marker_features, pn->m_features, pn->m_feature_matches, pn->m_homography);
 			//boost::posix_time::ptime finsh=boost::posix_time::microsec_clock::local_time();
 
-			//ucv::nublas::matrix< ucv::surf::feature_point_t::value_type, ucv::nublas::row_major > hm;
-			//pn->m_homography_ok=ucv::find_homography(pn->m_marker_features, pn->m_features, pn->m_feature_matches, pn->m_homography);
-
-			//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "matches.size()=%d, find_homography=%s",pn->m_feature_matches.size(), pn->m_homography_ok?"true":"false");
+			//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "ps=(%d,%d), ds=%d, matches.size()=%d, find_homography=%s, usecs=%d",
+			//		fs.width(), fs.height(),
+			//		data->size(),
+			//		pn->m_feature_matches.size(),
+			//		pn->m_homography_ok?"true":"false",
+			//		(finsh-start).total_microseconds()
+			//);
 
 
 #if 0

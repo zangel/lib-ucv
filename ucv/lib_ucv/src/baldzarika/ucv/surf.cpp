@@ -1,6 +1,7 @@
 #include <baldzarika/ucv/config.h>
 #include <baldzarika/ucv/surf.h>
 #include <baldzarika/ucv/integral.h>
+//#include <opencv2/core/core.hpp>
 
 //#include <opencv2/core/core.hpp>
 
@@ -8,7 +9,7 @@ namespace baldzarika { namespace ucv  {
 
 	namespace {
 		
-		static surf::response_t const gauss_25[7][7]=
+		static surf::feature_point_t::desc_value_type const gauss_25[7][7]=
 		{
 			{	0.02350693969273,	0.01849121369071,	0.01239503121241,	0.00708015417522,	0.00344628101733,	0.00142945847484,	0.00050524879060	},
 			{	0.02169964028389,	0.01706954162243,	0.01144205592615,	0.00653580605408,	0.00318131834134,	0.00131955648461,	0.00046640341759	},
@@ -163,7 +164,7 @@ namespace baldzarika { namespace ucv  {
 				{
 					for(boost::int32_t rx=-1;rx<=1 && fp_detected;++rx)
 					{
-						fp_detected=!
+						fp_detected=/*(x==50 && y==6) || */!
 						(	m_response_view(x+rx,y+ry).operator response_t()>=candidate ||
 							( (ry!=0||rx!=0) && ml.get_response(x+rx, y+ry, *this)>=candidate ) ||
 							bl.get_response(x+rx, y+ry, *this)>=candidate
@@ -231,6 +232,7 @@ namespace baldzarika { namespace ucv  {
 
 					
 					if(fabs(det)<det_eps) continue;
+#if 1
 					response_t inv_det=detail::constants::one<response_t>()/det;
 
 					//float f_inv_det=inv_det;
@@ -245,8 +247,8 @@ namespace baldzarika { namespace ucv  {
 					response_t xx=-inv_det*(H_inv[0][0]*d_x+H_inv[0][1]*d_y+H_inv[0][2]*d_s);
 					response_t xy=-inv_det*(H_inv[1][0]*d_x+H_inv[1][1]*d_y+H_inv[1][2]*d_s);
 					response_t xi=-inv_det*(H_inv[2][0]*d_x+H_inv[2][1]*d_y+H_inv[2][2]*d_s);
-#if 0
-					double H_[3][3];
+#else
+					float H_[3][3];
 
 					H_[0][0]=d_xx;
 					H_[1][1]=d_yy;
@@ -255,19 +257,24 @@ namespace baldzarika { namespace ucv  {
 					H_[0][2]=H_[2][0]=d_xs;
 					H_[1][2]=H_[2][1]=d_ys;
 
-					double H_inv_[3][3];
+					float H_inv_[3][3];
 										
-					cv::invert(cv::Mat(3,3, CV_64FC1, &H_[0][0]), cv::Mat(3,3, CV_64FC1, &H_inv_[0][0]), cv::DECOMP_SVD);
+					cv::invert(cv::Mat(3,3, CV_32FC1, &H_[0][0]), cv::Mat(3,3, CV_32FC1, &H_inv_[0][0]), cv::DECOMP_SVD);
 
-					double err=0.0;
-					for(int r=0;r<3;++r)
-					{
-						for(int c=0;c<3;++c)
-						{
-							double d=static_cast<double>(inv_det*H_inv[r][c])-H_inv_[r][c];
-							err+=d*d;
-						}
-					}
+					response_t xx=-response_t(H_inv_[0][0]*static_cast<float>(d_x)+H_inv_[1][0]*static_cast<float>(d_y)+H_inv_[2][0]*static_cast<float>(d_s));
+					response_t xy=-response_t(H_inv_[0][1]*static_cast<float>(d_x)+H_inv_[1][1]*static_cast<float>(d_y)+H_inv_[2][1]*static_cast<float>(d_s));
+					response_t xi=-response_t(H_inv_[0][2]*static_cast<float>(d_x)+H_inv_[1][2]*static_cast<float>(d_y)+H_inv_[2][2]*static_cast<float>(d_s));
+
+
+					//double err=0.0;
+					//for(int r=0;r<3;++r)
+					//{
+					//	for(int c=0;c<3;++c)
+					//	{
+					//		double d=static_cast<double>(inv_det*H_inv[r][c])-H_inv_[r][c];
+					//		err+=d*d;
+					//	}
+					//}
 
 					
 
@@ -275,9 +282,9 @@ namespace baldzarika { namespace ucv  {
 					//float f_xy=xy;
 					//float f_xi=xi;
 					// 
-					xx=-(H_inv_[0][0]*static_cast<double>(d_x)+H_inv_[0][1]*static_cast<double>(d_y)+H_inv_[0][2]*static_cast<double>(d_s));
-					xy=-(H_inv_[1][0]*static_cast<double>(d_x)+H_inv_[1][1]*static_cast<double>(d_y)+H_inv_[1][2]*static_cast<double>(d_s));
-					xi=-(H_inv_[2][0]*static_cast<double>(d_x)+H_inv_[2][1]*static_cast<double>(d_y)+H_inv_[2][2]*static_cast<double>(d_s));
+					//xx=-(H_inv_[0][0]*static_cast<double>(d_x)+H_inv_[0][1]*static_cast<double>(d_y)+H_inv_[0][2]*static_cast<double>(d_s));
+					//xy=-(H_inv_[1][0]*static_cast<double>(d_x)+H_inv_[1][1]*static_cast<double>(d_y)+H_inv_[1][2]*static_cast<double>(d_s));
+					//xi=-(H_inv_[2][0]*static_cast<double>(d_x)+H_inv_[2][1]*static_cast<double>(d_y)+H_inv_[2][2]*static_cast<double>(d_s));
 #endif	
 					if(	fabs(xx)<detail::constants::half<response_t>() && fabs(xy)<detail::constants::half<response_t>() && fabs(xi)<detail::constants::half<response_t>())
 					{
@@ -522,8 +529,11 @@ namespace baldzarika { namespace ucv  {
 
 	bool surf::compute_orientations(std::vector<feature_point_t> &fps)
 	{
-		static response_t const r_3i20=0.15f;
-		static response_t const r_2=2.0f;
+		typedef feature_point_t::desc_value_type dec_t;
+		static dec_t const r_3i20=0.15f;
+		static dec_t const r_2=2.0f;
+
+		static dec_t const r_3i2_sq=2.25f;
 
 		for(std::size_t ifp=0;ifp<fps.size();++ifp)
 		{
@@ -531,64 +541,114 @@ namespace baldzarika { namespace ucv  {
 				static_cast<boost::uint32_t>(floor(fps[ifp].x+detail::constants::half<feature_point_t::value_type>())),
 				static_cast<boost::uint32_t>(floor(fps[ifp].y+detail::constants::half<feature_point_t::value_type>()))
 			);
-			response_t scale=fps[ifp].m_scale;
-			boost::uint32_t s=static_cast<boost::uint32_t>(floor(fps[ifp].m_scale+detail::constants::half<feature_point_t::value_type>()));
+			feature_point_t &fp=fps[ifp];
+			//dec_t scale=fps[ifp].m_scale;
+			boost::uint32_t s=static_cast<boost::uint32_t>(floor(fp.m_scale+detail::constants::half<dec_t>()));
+			//dec_t const a_coeff=dec_t(64.0f)/(dec_t(s*s)*r_3i2_sq);
 
-			response_t res_x[109], res_y[109], angle[109];
+			dec_t res_x[109], res_y[109], angle[109];
+
+			//float res_x_[109], res_y_[109], angle_[109];
+			
 			for(boost::uint32_t k=0;k<109;++k)
 			{
-				response_t gauss=gauss_25[std::abs(orientation_indices::get().m_values[k][0])][std::abs(orientation_indices::get().m_values[k][1])];
-				res_x[k]=gauss*haar_x<response_t>(
+				dec_t gauss=dec_t(gauss_25[std::abs(orientation_indices::get().m_values[k][0])][std::abs(orientation_indices::get().m_values[k][1])]);
+				//float gauss_=gauss_25[std::abs(orientation_indices::get().m_values[k][0])][std::abs(orientation_indices::get().m_values[k][1])];
+				
+				res_x[k]=gauss*haar_x<dec_t>(
 					point2i(
 						pt.x+orientation_indices::get().m_values[k][0]*s,
 						pt.y+orientation_indices::get().m_values[k][1]*s
 					),
 					4*s
 				);
-				//float f_res_x=res_x[k];
-
-				res_y[k]=gauss*haar_y<response_t>(
+				res_y[k]=gauss*haar_y<dec_t>(
 					point2i(
 						pt.x+orientation_indices::get().m_values[k][0]*s,
-					pt.y+orientation_indices::get().m_values[k][1]*s
+						pt.y+orientation_indices::get().m_values[k][1]*s
 					),
 					4*s
 				);
+
+
+				//res_x_[k]=gauss_*static_cast<float>(haar_x<response_t>(
+				//	point2i(
+				//		pt.x+orientation_indices::get().m_values[k][0]*s,
+				//		pt.y+orientation_indices::get().m_values[k][1]*s
+				//	),
+				//	4*s
+				//));
+				//res_y_[k]=gauss_*static_cast<float>(haar_y<response_t>(
+				//	point2i(
+				//		pt.x+orientation_indices::get().m_values[k][0]*s,
+				//		pt.y+orientation_indices::get().m_values[k][1]*s
+				//	),
+				//	4*s
+				//));
+				//float f_res_x=res_x[k];
 				//float f_res_y=res_y[k];
 				
 				angle[k]=get_angle(res_x[k],res_y[k]);
+				//angle_[k]=get_angle(res_x_[k],res_y_[k]);
 				//float f_angle=angle[k];
 				//int c=0;
 			}
 
-			response_t max_sum=detail::constants::zero<response_t>();
-			response_t orientation=detail::constants::zero<response_t>();
+			dec_t max_sum=detail::constants::zero<dec_t>();
+			dec_t orientation=detail::constants::zero<dec_t>();
+
+			//float max_sum_=0.0f;
+			//float orientation_=0.0f;
+
 			for(boost::uint32_t a=0;a<42;++a)
 			{
-				response_t ang1=response_t(a)*r_3i20;
-				response_t ang2=((ang1+detail::constants::pi_i3<response_t>())>detail::constants::pi_2<response_t>()?
-					ang1-detail::constants::pi_5i3<response_t>():
-					ang1+detail::constants::pi_i3<response_t>());
+				dec_t ang1=dec_t(a)*r_3i20;
+				//float ang1_=float(a)*0.15f;
+				dec_t ang2=((ang1+detail::constants::pi_i3<dec_t>())>detail::constants::pi_2<dec_t>()?
+					ang1-detail::constants::pi_5i3<dec_t>():
+					ang1+detail::constants::pi_i3<dec_t>());
 
-				response_t sum_x=detail::constants::zero<response_t>();
-				response_t sum_y=detail::constants::zero<response_t>();
+				//float ang2_=((ang1_+detail::constants::pi_i3<float>())>detail::constants::pi_2<float>()?
+				//		ang1_-detail::constants::pi_5i3<float>():
+				//		ang1_+detail::constants::pi_i3<float>());
+
+				dec_t sum_x=detail::constants::zero<dec_t>();
+				dec_t sum_y=detail::constants::zero<dec_t>();
+
+				//float sum_x_=0.0f;
+				//float sum_y_=0.0f;
 
 				for(boost::uint32_t k=0;k<109;++k)
 				{
-					response_t const &ang=angle[k];
+					dec_t const &ang=angle[k];
 					if(ang1<ang2 && ang1<ang && ang<ang2)
 					{
 						sum_x+=res_x[k];  
 						sum_y+=res_y[k];
 					} 
 					else
-					if(ang2<ang1 && ((ang>detail::constants::zero<response_t>() && ang<ang2) || (ang>ang1 && ang<detail::constants::pi_2<response_t>())))
+					if(ang2<ang1 && ((ang>detail::constants::zero<dec_t>() && ang<ang2) || (ang>ang1 && ang<detail::constants::pi_2<dec_t>())))
 					{
-						sum_x+=res_x[k];  
+						sum_x+=res_x[k];
 						sum_y+=res_y[k];
 					}
+
+					//float ang_=angle_[k];
+					//if(ang1_<ang2_ && ang1_<ang_ && ang_<ang2_)
+					//{
+					//	sum_x_+=res_x_[k];  
+					//	sum_y_+=res_y_[k];
+					//} 
+					//else
+					//if(ang2_<ang1_ && ((ang_>0.0f && ang_<ang2_) || (ang_>ang1_ && ang_<detail::constants::pi_2<float>())))
+					//{
+					//	sum_x_+=res_x_[k];  
+					//	sum_y_+=res_y_[k];
+					//}
+
 				}
-				response_t this_sum=sum_x*sum_x+sum_y*sum_y;
+				dec_t this_sum=sum_x*sum_x+sum_y*sum_y;
+				//float this_sum_=sum_x_*sum_x_+sum_y_*sum_y_;
 				if(this_sum>max_sum) 
 				{
 					max_sum=this_sum;
@@ -597,28 +657,46 @@ namespace baldzarika { namespace ucv  {
 
 					orientation=get_angle(sum_x, sum_y);
 				}
+				//if(this_sum_>max_sum_) 
+				//{
+				//	max_sum_=this_sum_;
+					//float sum_x_=sum_x;
+					//float sum_y_=sum_y;
+
+				//	orientation_=get_angle(sum_x_, sum_y_);
+				//}
 			}
 			//float f_orientation=orientation;
-			fps[ifp].m_orientation=orientation;
+			fp.m_orientation=orientation;
 		}
 		return true;
 	}
 	
 	bool surf::compute_descriptors(std::vector<feature_point_t> &fps)
 	{
-		typedef feature_point_t::value_type dec_t;
+		typedef feature_point_t::desc_value_type dec_t;
 
-		//dec_t min_rrx=std::numeric_limits<dec_t>::max();
-		//dec_t max_rrx=std::numeric_limits<dec_t>::min();
+#if defined(DEBUG) || defined(_DEBUG)
+		dec_t min_rrx=std::numeric_limits<dec_t>::max();
+		dec_t max_rrx=std::numeric_limits<dec_t>::min();
 
-		//dec_t min_rry=std::numeric_limits<dec_t>::max();
-		//dec_t max_rry=std::numeric_limits<dec_t>::min();
+		dec_t min_rry=std::numeric_limits<dec_t>::max();
+		dec_t max_rry=std::numeric_limits<dec_t>::min();
+		dec_t min_len=std::numeric_limits<dec_t>::max();
+		dec_t max_len=std::numeric_limits<dec_t>::min();
+
+		dec_t min_gauss=std::numeric_limits<dec_t>::max();
+		dec_t max_gauss=std::numeric_limits<dec_t>::min();
+#endif
+
+		//float decriptors[64];
 
 
 		static dec_t const c_5i2=2.5f;
 		static dec_t const c_3i2=1.5f;
-		static dec_t const a_coeff=32;
-		static dec_t const a_icoeff=1.0e-1f;
+		static dec_t const c_3i2_sq=2.25f;
+		
+		//static dec_t const a_icoeff=1.0e-1f;
 
 		for(std::size_t ifp=0;ifp<fps.size();++ifp)
 		{
@@ -627,18 +705,35 @@ namespace baldzarika { namespace ucv  {
 				static_cast<boost::uint32_t>(floor(fp.x+detail::constants::half<feature_point_t::value_type>())),
 				static_cast<boost::uint32_t>(floor(fp.y+detail::constants::half<feature_point_t::value_type>()))
 			);
-			boost::uint32_t ui_scale=static_cast<boost::uint32_t>(floor(fp.m_scale+detail::constants::half<feature_point_t::value_type>()));
 
+			//dec_t a_coeff=10.0f;
+			boost::uint32_t ui_scale=static_cast<boost::uint32_t>(floor(fp.m_scale+detail::constants::half<dec_t>()));
+			//boost::uint32_t ui_scale=static_cast<boost::uint32_t>(floor(feature_point_t::value_type(2.0738318)+detail::constants::half<feature_point_t::value_type>()));
+			//dec_t const a_coeff=1.0f;
 			
+			//dec_t d_scale=2.0738318;
+			//feature_point_t::value_type d_scale=feature_point_t::value_type(fp.m_scale);
+
+
 			dec_t co=cos(fp.m_orientation);
 			dec_t si=sin(fp.m_orientation);
+			//dec_t co=cos(feature_point_t::value_type(5.0862865)/*fp.m_orientation*/);
+			//dec_t si=sin(feature_point_t::value_type(5.0862865)/*fp.m_orientation*/);
+			//float co=static_cast<float>(cos(fp.m_orientation));
+			//float si=static_cast<float>(sin(fp.m_orientation));
 
+
+			feature_point_t::value_type sco=fp.m_scale*co;
+			feature_point_t::value_type ssi=fp.m_scale*si;
+			
 			boost::int32_t i=-8;
 
 			dec_t len=detail::constants::zero<dec_t>();
+			//float flen=0.0f;
+			
 			boost::uint32_t count=0;
 
-			dec_t cx=-0.5f;
+			dec_t cx=-detail::constants::half<dec_t>();
 			while(i<12)
 			{
 				boost ::int32_t j=-8;
@@ -652,6 +747,8 @@ namespace baldzarika { namespace ucv  {
 							dy=detail::constants::zero<dec_t>(),
 							mdx=detail::constants::zero<dec_t>(),
 							mdy=detail::constants::zero<dec_t>();
+
+					//float dx=0.0f, dy=0.0f, mdx=0.0f, mdy=0.0f;
 					
 					cy+=detail::constants::one<dec_t>();
 					j-=4;
@@ -659,30 +756,79 @@ namespace baldzarika { namespace ucv  {
 					boost::int32_t ix=i+5;
 					boost::int32_t jx=j+5;
 					
-					boost::int32_t xs=static_cast<boost::int32_t>(floor(fp.x+(dec_t(-jx)*fp.m_scale*si+dec_t(ix)*fp.m_scale*co)+detail::constants::half<dec_t>()));
-					boost::int32_t ys=static_cast<boost::int32_t>(floor(fp.y+( dec_t(jx)*fp.m_scale*co+dec_t(ix)*fp.m_scale*si)+detail::constants::half<dec_t>()));
+					boost::int32_t xs=static_cast<boost::int32_t>(
+						floor(fp.x+feature_point_t::value_type(-jx)*ssi+feature_point_t::value_type(ix)*sco+
+							detail::constants::half<feature_point_t::value_type>()
+						)
+					);
+					boost::int32_t ys=static_cast<boost::int32_t>(
+						floor(fp.y+feature_point_t::value_type(jx)*sco+feature_point_t::value_type(ix)*ssi+
+							detail::constants::half<feature_point_t::value_type>()
+						)
+					);
 					
 					for(boost::int32_t k=i;k<i+9;++k) 
 					{
 						for(boost::int32_t l=j;l<j+9;++l) 
 						{
-							boost::int32_t sample_x=static_cast<boost::int32_t>(floor(fp.x+(dec_t(-l)*fp.m_scale*si+dec_t(k)*fp.m_scale*co)+detail::constants::half<dec_t>()));
-							boost::int32_t sample_y=static_cast<boost::int32_t>(floor(fp.y+( dec_t(l)*fp.m_scale*co+dec_t(k)*fp.m_scale*si)+detail::constants::half<dec_t>()));
+							boost::int32_t sample_x=static_cast<boost::int32_t>(
+								floor(fp.x+feature_point_t::value_type(-l)*ssi+feature_point_t::value_type(k)*sco+
+									detail::constants::half<feature_point_t::value_type>()
+								)
+							);
+							boost::int32_t sample_y=static_cast<boost::int32_t>(
+								floor(fp.y+feature_point_t::value_type(l)*sco+feature_point_t::value_type(k)*ssi+
+									detail::constants::half<feature_point_t::value_type>()
+								)
+							);
 							
 							dec_t gauss_s1=gaussian(xs-sample_x, ys-sample_y, c_5i2*fp.m_scale);
+							//float gauss_s1=static_cast<float>(gaussian(xs-sample_x, ys-sample_y, c_5i2*d_scale));
 							//float gauss_s1_=gauss_s1;
+
+#if defined(DEBUG) || defined(_DEBUG)
+							min_gauss=std::min(min_gauss, gauss_s1);
+							max_gauss=std::max(max_gauss, gauss_s1);
+#endif
+
 
 							dec_t rx=haar_x<dec_t>(
 								point2i(sample_x, sample_y),
 								2*ui_scale
 							);
+
+							//float rx=static_cast<float>(
+							//	haar_x<dec_t>(
+							//		point2i(sample_x, sample_y),
+							//		2*ui_scale
+							//	)
+							//);
+							
 							dec_t ry=haar_y<dec_t>(
 								point2i(sample_x, sample_y),
 								2*ui_scale
 							);
 
-							dec_t rrx=(a_coeff*gauss_s1)*(ry*co-rx*si);
-							dec_t rry=(a_coeff*gauss_s1)*(rx*co+ry*si);
+							//float ry=static_cast<float>(
+							//	haar_y<dec_t>(
+							//		point2i(sample_x, sample_y),
+							//		2*ui_scale
+							//	)
+							//);
+#if defined(DEBUG) || defined(_DEBUG)
+							min_rrx=std::min(fabs(rx),min_rrx);
+							min_rry=std::min(fabs(ry),min_rry);
+
+							max_rrx=std::max(fabs(rx),max_rrx);
+							max_rry=std::max(fabs(ry),max_rry);
+#endif
+							dec_t rrx=gauss_s1*(ry*co-rx*si);
+							dec_t rry=gauss_s1*(rx*co+ry*si);
+
+							
+
+							//float rrx=gauss_s1*(ry*co-rx*si);
+							//float rry=gauss_s1*(rx*co+ry*si);
 
 							//float rrx_=rrx, rry_=rry;
 							
@@ -691,15 +837,26 @@ namespace baldzarika { namespace ucv  {
 							mdx+=fabs(rrx);
 							mdy+=fabs(rry);
 
+							//mdx+=std::abs(rrx);
+							//mdy+=std::abs(rry);
+
 
 						}
 					}
 
-					dec_t gauss_s2=a_coeff*gaussian(
+					dec_t gauss_s2=gaussian(
 						cx-detail::constants::two<dec_t>(),
 						cy-detail::constants::two<dec_t>(),
 						c_3i2
 					);
+
+					//float gauss_s2=static_cast<float>(
+					//	gaussian(
+					//		cx-detail::constants::two<dec_t>(),
+					//		cy-detail::constants::two<dec_t>(),
+					//		c_3i2
+					//	)
+					//);
 
 					//float gauss_s2_=gauss_s2;
 
@@ -707,11 +864,6 @@ namespace baldzarika { namespace ucv  {
 					//float dy_=dy;
 					//float mdx_=mdx;
 					//float mdy_=mdy;
-
-					//dx*=a_coeff;
-					//dy*=a_coeff;
-					//mdx*=a_coeff;
-					//mdy*=a_coeff;
 
 					//dx_=dx;
 					//dy_=dy;
@@ -723,33 +875,74 @@ namespace baldzarika { namespace ucv  {
 					dec_t mdxg=mdx*gauss_s2;
 					dec_t mdyg=mdy*gauss_s2;
 
-					//min_rrx=std::min(fabs(dxg),min_rrx);
-					//min_rry=std::min(fabs(dyg),min_rry);
 
-					//max_rrx=std::max(fabs(mdxg),max_rrx);
-					//max_rry=std::max(fabs(mdyg),max_rry);
+
+					
+
+					//float dxg=dx*gauss_s2;
+					//float dyg=dy*gauss_s2;
+					//float mdxg=mdx*gauss_s2;
+					//float mdyg=mdy*gauss_s2;
+
+					
 					
 					fp.m_desc[count++]=dxg;
 					fp.m_desc[count++]=dyg;
 					fp.m_desc[count++]=mdxg;
 					fp.m_desc[count++]=mdyg;
 
+					//decriptors[count++]=dxg;
+					//decriptors[count++]=dyg;
+					//decriptors[count++]=mdxg;
+					//decriptors[count++]=mdyg;
+
+					//float fdxg=static_cast<float>(dxg);
+					//float fdyg=static_cast<float>(dyg);
+					//float fmdxg=static_cast<float>(mdxg);
+					//float fmdyg=static_cast<float>(mdyg);
+
+					
+
+					//flen+=(fdxg*fdxg+fdyg*fdyg+fmdxg*fmdxg+fmdyg*fmdyg);
 					len+=(dxg*dxg+dyg*dyg+mdxg*mdxg+mdyg*mdyg);
 					j+=9;
 				}
 				i+=9;
 			}
+			
 			//float len_=len;
 			len=sqrt(len); //len_=len;
-
 			len=detail::constants::one<dec_t>()/std::max(len, std::numeric_limits<dec_t>::epsilon()); //len_=len;
 
+#if defined(DEBUG) || defined(_DEBUG)
+			min_len=std::min(min_len,len);
+			max_len=std::max(max_len,len);
+#endif
+			//dec_t dec_len=1.0f/std::max(len, std::numeric_limits<float>::epsilon()); //len_=len;
+			//len=1.0f/std::max(len, std::numeric_limits<float>::epsilon());
+
 			for(boost::uint32_t i=0;i<64;++i)
-			//{
+			{
 				fp.m_desc[i]*=len;
-				//float fp_m_desc_i=fp.m_desc[i];
-			//}
+				//fp.m_desc[i]=dec_t(decriptors[i]*len);
+
+			//	float fp_m_desc_i=fp.m_desc[i];
+			}
 		}
+
+#if defined(DEBUG) || defined(_DEBUG)
+		std::cout << "min_rrx=" << static_cast<float>(min_rrx) << std::endl;
+		std::cout << "max_rrx=" << static_cast<float>(max_rrx) << std::endl;
+
+		std::cout << "min_rry=" << static_cast<float>(min_rry) << std::endl;
+		std::cout << "max_rry=" << static_cast<float>(max_rry) << std::endl;
+
+		std::cout << "min_len=" << static_cast<float>(min_len) << std::endl;
+		std::cout << "max_len=" << static_cast<float>(max_len) << std::endl;
+
+		std::cout << "min_gauss=" << static_cast<float>(min_gauss) << std::endl;
+		std::cout << "max_gauss=" << static_cast<float>(max_gauss) << std::endl;
+#endif
 		return true;
 	}
 
@@ -783,19 +976,59 @@ namespace baldzarika { namespace ucv  {
 		return detail::constants::zero< fixed_point<I,F> >();
 	}
 
+	
+	float surf::get_angle(float x, float y)
+	{
+		if(y<0.0f)
+		{
+			if(x<0.0f) return detail::constants::pi<float>()+std::atan2(y,x);
+			if(x>0.0f) return detail::constants::pi_2<float>()-std::atan2(-y,x);
+		}
+		else
+		{
+			if(x<0.0f) return detail::constants::pi<float>()-std::atan2(-y,x);
+			if(x>0.0f) return std::atan2(y,x);
+		}
+		return 0.0f;
+	}
+
 
 	template < boost::uint32_t I, boost::uint32_t F >
 	fixed_point<I,F> surf::gaussian(boost::int32_t x, boost::int32_t y, fixed_point<I,F> const &sig)
 	{
+#if 0
+		fixed_point<I,F> x_=fixed_point<I,F>(x)/(sig*detail::constants::sq_two< fixed_point<I,F> >());
+		fixed_point<I,F> y_=fixed_point<I,F>(y)/(sig*detail::constants::sq_two< fixed_point<I,F> >());
+						
 		return detail::constants::half< fixed_point<I,F> >()/(detail::constants::pi< fixed_point<I,F> >()*sig*sig)*
-			exp( fixed_point<I,F>(-(x*x+y*y))*detail::constants::half< fixed_point<I,F> >()/(sig*sig));
+			exp(-x_*x_)* exp(-y_*y_);
+#else
+		float sig_=static_cast<float>(sig);
+		float x_=static_cast<float>(x);
+		float y_=static_cast<float>(y);
+		
+		return (1.0f/(2.0f*detail::constants::pi<float>()*sig_*sig_))*std::exp(-(x_*x_+y_*y_)/(2.0f*sig_*sig_));
+#endif
 	}
 	
 	template < boost::uint32_t I, boost::uint32_t F >
 	fixed_point<I,F> surf::gaussian(fixed_point<I,F> const &x, fixed_point<I,F> const &y, fixed_point<I,F> const &sig)
 	{
+#if 0
+		fixed_point<I,F> x_=x/(sig*detail::constants::sq_two< fixed_point<I,F> >());
+		fixed_point<I,F> y_=y/(sig*detail::constants::sq_two< fixed_point<I,F> >());
+
 		return detail::constants::half< fixed_point<I,F> >()/(detail::constants::pi< fixed_point<I,F> >()*sig*sig)*
-			exp(-(x*x+y*y)*detail::constants::half< fixed_point<I,F> >()/(sig*sig));
+			exp( -x_*x_)*
+			exp( -y_*y_);
+#else
+		float sig_=static_cast<float>(sig);
+		float x_=static_cast<float>(x);
+		float y_=static_cast<float>(y);
+
+		return (1.0f/(2.0f*detail::constants::pi<float>()*sig_*sig_))*std::exp(-(x_*x_+y_*y_)/(2.0f*sig_*sig_));
+
+#endif
 	}
 
 	void surf::match_feature_points(std::vector<feature_point_t> const &fps1, std::vector<feature_point_t> const &fps2, std::vector< std::pair<std::size_t, std::size_t> > &m, surf::feature_point_t::value_type const &d)

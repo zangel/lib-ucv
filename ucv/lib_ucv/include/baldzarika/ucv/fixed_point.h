@@ -102,13 +102,14 @@ namespace baldzarika { namespace ucv {
 			#define BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(name, v)\
 			template <typename T> inline T const& name()\
 			{\
-				static T const _value=v;\
+				static T const _value=static_cast<T>(v);\
 				return _value;\
 			}\
 
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(zero, 0.0)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(one, 1.0)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(two, 2.0)
+			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(sq_two, 1.4142135623730950488016887242097)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(half, 0.5)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(pi, 3.1415926535897932384626433832795)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(pi_2, 6.283185307179586476925286766559)
@@ -135,6 +136,9 @@ namespace baldzarika { namespace ucv {
 		template <boost::uint32_t, boost::uint32_t> friend class fixed_point;
 	
 	public:
+		static boost::uint32_t const IS=I;
+		static boost::uint32_t const FS=F;
+
 		static boost::uint32_t const int_bits_count=I+F+1;
 		static boost::uint32_t const int_bytes_count=(int_bits_count+7)/8;
 		typedef typename detail::fixed_point_value<int_bytes_count>::type value_type;
@@ -494,6 +498,8 @@ namespace baldzarika { namespace ucv {
 		
 		friend fixed_point sqrt(fixed_point const &x)
 		{
+			return fixed_point(::sqrt(static_cast<float>(x)));
+
 			if(x<detail::constants::zero<fixed_point>())
 				return 0;
 			

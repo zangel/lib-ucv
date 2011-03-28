@@ -8,6 +8,7 @@ LOCAL_SRC_FILES :=	ucv_test.cpp \
 					UCVActivity.cpp \
 					../../../lib_ucv/src/baldzarika/ucv/config.cpp \
 					../../../lib_ucv/src/baldzarika/ucv/surf.cpp \
+					../../../lib_ucv/src/baldzarika/ucv/homography.cpp \
 					../../../lib_ucv/src/baldzarika/ucv/gles/shaders.cpp
 					
 					
