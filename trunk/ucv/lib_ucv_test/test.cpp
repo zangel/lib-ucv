@@ -255,7 +255,8 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	namespace ucv=baldzarika::ucv;
 
 	//img 1
-	cv::Mat cv_img1=cv::imread("test_img.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img1=cv::imread("img4.png", CV_LOAD_IMAGE_GRAYSCALE);
+	//cv::Mat cv_img1=cv::imread("box.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::imshow(OPENCV_WND_NAME, cv_img1);
 	//cv::waitKey();
 
@@ -283,7 +284,8 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 
 	//img2
-	cv::Mat cv_img2=cv::imread("test_img_match.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img2=cv::imread("img4_match.png", CV_LOAD_IMAGE_GRAYSCALE);
+	//cv::Mat cv_img2=cv::imread("box_in_scene.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::imshow(OPENCV_WND_NAME, cv_img2);
 	//cv::waitKey();
 
@@ -324,12 +326,16 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	the_surf2.describe(fps2);
 
 
-
 	std::vector< std::pair<std::size_t, std::size_t> > matches;
 	ucv::surf::match_feature_points(fps1, fps2, matches, 0.65f);
 
-	cv::Mat cv_img1_rgb=cv::imread("test_img.png");
-	cv::Mat cv_img2_rgb=cv::imread("test_img_match.png");
+	std::cout << "found " << matches.size() << " matches!" << std::endl;
+
+	cv::Mat cv_img1_rgb=cv::imread("img4.png");
+	cv::Mat cv_img2_rgb=cv::imread("img4_match.png");
+
+	//cv::Mat cv_img1_rgb=cv::imread("box.png");
+	//cv::Mat cv_img2_rgb=cv::imread("box_in_scene.png");
 	
 
 
@@ -341,14 +347,14 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 		pts2.push_back(cv::Point2f(fps2[matches[ifp].second].x,fps2[matches[ifp].second].y));
 
 		cv::circle(cv_img1_rgb,
-			cv::Point(static_cast<float>(fps1[matches[ifp].first].x), static_cast<float>(fps1[matches[ifp].first].y)),
+			cv::Point(static_cast<boost::int32_t>(fps1[matches[ifp].first].x), static_cast<boost::int32_t>(fps1[matches[ifp].first].y)),
 			3,
 			cv::Scalar(0.0, 255.0, 0.0),
 			-1
 		);
 
 		cv::circle(cv_img2_rgb,
-			cv::Point(static_cast<float>(fps2[matches[ifp].second].x), static_cast<float>(fps2[matches[ifp].second].y)),
+			cv::Point(static_cast<boost::int32_t>(fps2[matches[ifp].second].x), static_cast<boost::int32_t>(fps2[matches[ifp].second].y)),
 			3,
 			cv::Scalar(0.0, 255.0, 0.0),
 			-1
@@ -399,17 +405,17 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 
 	marker_corners[1].resize(3);
-	marker_corners[1](0)=gil_gray_img1.width(); marker_corners[1](1)=0;marker_corners[1](2)=1;
+	marker_corners[1](0)=static_cast<float>(gil_gray_img1.width()); marker_corners[1](1)=0.0f;marker_corners[1](2)=1.0f;
 	image_corners[1]=ucv::ublas::prod(hm, marker_corners[1]);
 	image_corners[1](0)/=image_corners[1](2); image_corners[1](1)/=image_corners[1](2);
 
 	marker_corners[2].resize(3);
-	marker_corners[2](0)=gil_gray_img1.width(); marker_corners[2](1)=gil_gray_img1.height();marker_corners[2](2)=1;
+	marker_corners[2](0)=static_cast<float>(gil_gray_img1.width()); marker_corners[2](1)=static_cast<float>(gil_gray_img1.height()); marker_corners[2](2)=1.0f;
 	image_corners[2]=ucv::ublas::prod(hm, marker_corners[2]);
 	image_corners[2](0)/=image_corners[2](2); image_corners[2](1)/=image_corners[2](2);
 
 	marker_corners[3].resize(3);
-	marker_corners[3](0)=0; marker_corners[3](1)=gil_gray_img1.height();marker_corners[3](2)=1;
+	marker_corners[3](0)=0.0f; marker_corners[3](1)=static_cast<float>(gil_gray_img1.height()); marker_corners[3](2)=1.0f;
 	image_corners[3]=ucv::ublas::prod(hm, marker_corners[3]);
 	image_corners[3](0)/=image_corners[3](2); image_corners[3](1)/=image_corners[3](2);
 
