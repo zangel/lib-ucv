@@ -352,9 +352,28 @@ namespace baldzarika { namespace ucv  {
 
 	surf::~surf()
 	{
-	
 	}
 
+	boost::uint32_t surf::octaves() const
+	{
+		return m_octaves;
+	}
+
+	boost::uint32_t surf::intervals() const
+	{
+		return m_intervals;
+	}
+
+	boost::uint32_t surf::sample_step() const
+	{
+		return m_sample_step;
+	}
+
+	float surf::treshold() const
+	{
+		return m_treshold;
+	}
+	
 	bool surf::resize(size2ui const &is)
 	{
 		if(is.empty())
@@ -486,19 +505,27 @@ namespace baldzarika { namespace ucv  {
 		return true;
 	}
 
+	size2ui surf::size() const
+	{
+		return size2ui(m_integral_img.width(), m_integral_img.height());
+	}
 
 	bool surf::update(gray_view_t gi)
 	{
 		if(!ucv::integral(gi, gil::view(m_integral_img)))
 			return false;
+		return true;
+	}
 
+	bool surf::build_response_layers()
+	{
 		if(m_response_layers.empty())
 			return false;
 
 		for(std::size_t rl=0;rl<m_response_layers.size();++rl)
 			if(!m_response_layers[rl].build())
 				return false;
-		
+
 		return true;
 	}
 
