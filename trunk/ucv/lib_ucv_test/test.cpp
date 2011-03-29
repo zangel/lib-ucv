@@ -1,7 +1,6 @@
 #define BOOST_TEST_MODULE lib_ucv_test
 
 #include <boost/test/unit_test.hpp>
-//#define BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU
 #include <baldzarika/ucv/config.h>
 #include <baldzarika/ucv/fixed_point.h>
 #include <baldzarika/ucv/convert_scale.h>
@@ -20,13 +19,14 @@
 
 using namespace boost;
 
+
 BOOST_AUTO_TEST_CASE( create_open_cv_window )
 {
 	cv::namedWindow(OPENCV_WND_NAME);
 	//cv::namedWindow(OPENCV_WND_NAME2);
 }
-
 #if 0
+
 BOOST_AUTO_TEST_CASE( test_fixed_point )
 {
 	using namespace baldzarika::ucv;
@@ -43,6 +43,9 @@ BOOST_AUTO_TEST_CASE( test_fixed_point )
 	//sqrt
 	BOOST_CHECK_EQUAL(static_cast<int>(sqrt(fixed_t(144))), 12);
 	BOOST_CHECK_LT(fabs(static_cast<float>(sqrt(fixed_t(2)))-sqrt(2.0f)), 1.0e-3f);
+
+	BOOST_CHECK_LT(fabs(static_cast<float>(sqrt(fixed_t(0.00001f)))-sqrt(0.00001f)), 1.0e-6f);
+
 
 	//sin
 	BOOST_CHECK_LT( fabs(static_cast<float>(sin(baldzarika::ucv::detail::constants::zero<fixed_t>()))-sin(0.0f)), 1.0e-3f);
@@ -228,6 +231,7 @@ BOOST_AUTO_TEST_CASE( test_surf )
 
 	posix_time::ptime start=posix_time::microsec_clock::local_time();
 	the_surf.update(ucv::gil::view(gray_img));
+	the_surf.build_response_layers();
 	std::vector<ucv::surf::feature_point_t> fps;
 	the_surf.detect(fps);
 	the_surf.describe(fps);
@@ -255,7 +259,7 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	namespace ucv=baldzarika::ucv;
 
 	//img 1
-	cv::Mat cv_img1=cv::imread("img4.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img1=cv::imread("test_img2.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::Mat cv_img1=cv::imread("box.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::imshow(OPENCV_WND_NAME, cv_img1);
 	//cv::waitKey();
@@ -284,7 +288,7 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 
 	//img2
-	cv::Mat cv_img2=cv::imread("img4_match.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img2=cv::imread("test_img2_match.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::Mat cv_img2=cv::imread("box_in_scene.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::imshow(OPENCV_WND_NAME, cv_img2);
 	//cv::waitKey();
@@ -311,16 +315,18 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 		ucv::surf::integral_t(1.0f/255.0f)
 	);
 
-	ucv::surf the_surf1(ucv::size2ui(gray_img1.width(), gray_img1.height()), 3, 4, 2, 1.0e-4f);
+	ucv::surf the_surf1(ucv::size2ui(gray_img1.width(), gray_img1.height()), 3, 4, 2, 4.0e-4f);
 
 	the_surf1.update(ucv::gil::view(gray_img1));
+	the_surf1.build_response_layers();
 	std::vector<ucv::surf::feature_point_t> fps1;
 	the_surf1.detect(fps1);
 	the_surf1.describe(fps1);
 
-	ucv::surf the_surf2(ucv::size2ui(gray_img2.width(), gray_img2.height()), 3, 4, 2, 1.0e-4f);
+	ucv::surf the_surf2(ucv::size2ui(gray_img2.width(), gray_img2.height()), 3, 4, 2, 4.0e-4f);
 
 	the_surf2.update(ucv::gil::view(gray_img2));
+	the_surf2.build_response_layers();
 	std::vector<ucv::surf::feature_point_t> fps2;
 	the_surf2.detect(fps2);
 	the_surf2.describe(fps2);
@@ -331,8 +337,8 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 	std::cout << "found " << matches.size() << " matches!" << std::endl;
 
-	cv::Mat cv_img1_rgb=cv::imread("img4.png");
-	cv::Mat cv_img2_rgb=cv::imread("img4_match.png");
+	cv::Mat cv_img1_rgb=cv::imread("test_img2.png");
+	cv::Mat cv_img2_rgb=cv::imread("test_img2_match.png");
 
 	//cv::Mat cv_img1_rgb=cv::imread("box.png");
 	//cv::Mat cv_img2_rgb=cv::imread("box_in_scene.png");

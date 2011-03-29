@@ -1,6 +1,16 @@
 #ifndef BALDZARIKA_UCV_FIXED_POINT_H
 #define BALDZARIKA_UCV_FIXED_POINT_H
 
+#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU)
+
+#define BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_ATAN2
+#define BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_EXP
+#define BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_COS
+#define BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_SIN
+#define BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_SQRT
+
+#endif
+
 
 namespace baldzarika { namespace ucv {
 
@@ -337,51 +347,36 @@ namespace baldzarika { namespace ucv {
 			);
 		}
 
-#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU)
+		template< typename T >
+		friend T round(fixed_point const &x)
+		{
+			return static_cast<T>(x>=detail::constants::zero<fixed_point>()?
+				x+detail::constants::half<fixed_point>():
+			x-detail::constants::half<fixed_point>()
+				);
+		}
 
+		friend fixed_point log(fixed_point const &x)
+		{
+			return fixed_point(::logf(static_cast<float>(x)));
+		}
+
+		friend fixed_point pow(fixed_point const &x, fixed_point const &y)
+		{
+			return fixed_point(::pow(static_cast<float>(x), static_cast<float>(y)));
+		}
+
+#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_ATAN2)
+		
 		friend fixed_point atan2(fixed_point const &y, fixed_point const &x)
 		{
 			return fixed_point(::atan2(static_cast<float>(y), static_cast<float>(x)));
 		}
 
-		friend fixed_point exp(fixed_point const &x)
-		{
-			return fixed_point(::exp(static_cast<float>(x)));
-		}
-
-		friend fixed_point cos(fixed_point const &x)
-		{
-			return fixed_point(::cos(static_cast<float>(x)));
-		}
-
-		friend fixed_point sin(fixed_point const &x)
-		{
-			return fixed_point(::sin(static_cast<float>(x)));
-		}
-
-		friend fixed_point sqrt(fixed_point const &x)
-		{
-			return fixed_point(::sqrt(static_cast<float>(x)));
-		}
-
-
-
 #else
-		friend fixed_point atan2(fixed_point const &y, fixed_point const &x)
-		{
-			fixed_point abs_y=fabs(y)+fixed_point(1, detail::fp_explicit_tag());
-			
-			fixed_point angle((
-				x>=detail::constants::zero<fixed_point>()?
-				detail::constants::pi_i4<fixed_point>()-detail::constants::pi_i4<fixed_point>()*
-					(fixed_point(x.m_value-abs_y.m_value, detail::fp_explicit_tag())/fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag())):
-				detail::constants::pi_3i4<fixed_point>()-detail::constants::pi_i4<fixed_point>()*
-					(fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag())/fixed_point(abs_y.m_value-x.m_value, detail::fp_explicit_tag()))
-			));
-			return (y<detail::constants::zero<fixed_point>()?-angle:angle);
-		}
 
-		friend fixed_point atan2_hp(fixed_point const &y, fixed_point const &x)
+#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FIXED_POINT_ATAN2_HIGH_PRECISION)
+		friend fixed_point atan2(fixed_point const &y, fixed_point const &x)
 		{
 			fixed_point abs_y=fabs(y)+fixed_point(1, detail::fp_explicit_tag());
 			fixed_point angle;
@@ -398,7 +393,32 @@ namespace baldzarika { namespace ucv {
 			}
 			return (y<detail::constants::zero<fixed_point>()?-angle:angle);
 		}
+#else
+		friend fixed_point atan2(fixed_point const &y, fixed_point const &x)
+		{
+			fixed_point abs_y=fabs(y)+fixed_point(1, detail::fp_explicit_tag());
 
+			fixed_point angle((
+				x>=detail::constants::zero<fixed_point>()?
+				detail::constants::pi_i4<fixed_point>()-detail::constants::pi_i4<fixed_point>()*
+				(fixed_point(x.m_value-abs_y.m_value, detail::fp_explicit_tag())/fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag())):
+			detail::constants::pi_3i4<fixed_point>()-detail::constants::pi_i4<fixed_point>()*
+				(fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag())/fixed_point(abs_y.m_value-x.m_value, detail::fp_explicit_tag()))
+				));
+			return (y<detail::constants::zero<fixed_point>()?-angle:angle);
+		}
+
+#endif
+#endif
+
+#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_EXP)
+
+		friend fixed_point exp(fixed_point const &x)
+		{
+			return fixed_point(::exp(static_cast<float>(x)));
+		}
+
+#else
 		friend fixed_point exp(fixed_point const &x)
 		{
 			static fixed_point const a[]=
@@ -435,7 +455,7 @@ namespace baldzarika { namespace ucv {
 				1.00000000093132257504915938475,
 				1.00000000046566128741615947508
 			};
-			
+
 			fixed_point y(1);
 			for(boost::int32_t i=F-1; i>=0; --i)
 			{
@@ -456,6 +476,15 @@ namespace baldzarika { namespace ucv {
 			}
 			return y;
 		}
+#endif
+
+#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_COS)
+
+		friend fixed_point cos(fixed_point const &x)
+		{
+			return fixed_point(::cos(static_cast<float>(x)));
+		}
+#else
 
 		friend fixed_point cos(fixed_point const &x)
 		{
@@ -474,19 +503,29 @@ namespace baldzarika { namespace ucv {
 			return y+detail::constants::one<fixed_point>();
 		}
 
+#endif
+
+#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_SIN)
+
+		friend fixed_point sin(fixed_point const &x)
+		{
+			return fixed_point(::sin(static_cast<float>(x)));
+		}
+
+#else
 
 		friend fixed_point sin(fixed_point const &x)
 		{
 			static fixed_point const i_2t3=0.16666666666666666666666666666667;
 			static fixed_point const i_2t3t4t5=0.00833333333333333333333333333333;
 			static fixed_point const i_2t3t4t5t6t7=1.984126984126984126984126984127e-4;
-			
+
 			fixed_point x_=fmod(x, detail::constants::pi_2<fixed_point>());
 			if(x_>detail::constants::pi<fixed_point>())
 				x_-=detail::constants::pi_2<fixed_point>();
 
 			fixed_point xx=x_*x_;
-			
+
 			fixed_point y=-xx*i_2t3t4t5t6t7;
 			y+=i_2t3t4t5;
 			y*=xx;
@@ -495,10 +534,21 @@ namespace baldzarika { namespace ucv {
 			y+=detail::constants::one<fixed_point>();
 			return y*x_;
 		}
-		
+
+#endif
+
+#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_SQRT)
+
 		friend fixed_point sqrt(fixed_point const &x)
 		{
 			return fixed_point(::sqrt(static_cast<float>(x)));
+		}
+
+#else
+		
+		friend fixed_point sqrt(fixed_point const &x)
+		{
+			//return fixed_point(::sqrt(static_cast<float>(x)));
 
 			if(x<detail::constants::zero<fixed_point>())
 				return 0;
@@ -527,24 +577,6 @@ namespace baldzarika { namespace ucv {
 			return fixed_point(static_cast<value_type>(res), detail::fp_explicit_tag());
 		}
 #endif
-		template< typename T >
-		friend T round(fixed_point const &x)
-		{
-			return static_cast<T>(x>=detail::constants::zero<fixed_point>()?
-				x+detail::constants::half<fixed_point>():
-				x-detail::constants::half<fixed_point>()
-			);
-		}
-
-		friend fixed_point log(fixed_point const &x)
-		{
-			return fixed_point(::logf(static_cast<float>(x)));
-		}
-
-		friend fixed_point pow(fixed_point const &x, fixed_point const &y)
-		{
-			return fixed_point(::pow(static_cast<float>(x), static_cast<float>(y)));
-		}
 	
 	private:
 		value_type		m_value;

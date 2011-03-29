@@ -8,6 +8,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_ucv_test", "lib_ucv_tes
 		{D60FD689-2C93-486B-9705-C6BA83BB29FE} = {D60FD689-2C93-486B-9705-C6BA83BB29FE}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_ar", "lib_ar\lib_ar.vcxproj", "{8A45D43B-AF68-4D7B-9516-9AFC823FCE17}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D60FD689-2C93-486B-9705-C6BA83BB29FE} = {D60FD689-2C93-486B-9705-C6BA83BB29FE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_ar_test", "lib_ar_test\lib_ar_test.vcxproj", "{E752FC29-C42F-40E6-961D-99A1FFED318A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8A45D43B-AF68-4D7B-9516-9AFC823FCE17} = {8A45D43B-AF68-4D7B-9516-9AFC823FCE17}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -26,6 +36,14 @@ Global
 		{B1190B83-0454-484D-B6B6-FB950BD97C57}.Debug|Win32.Build.0 = Debug|Win32
 		{B1190B83-0454-484D-B6B6-FB950BD97C57}.Release|Win32.ActiveCfg = Release|Win32
 		{B1190B83-0454-484D-B6B6-FB950BD97C57}.Release|Win32.Build.0 = Release|Win32
+		{8A45D43B-AF68-4D7B-9516-9AFC823FCE17}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8A45D43B-AF68-4D7B-9516-9AFC823FCE17}.Debug|Win32.Build.0 = Debug|Win32
+		{8A45D43B-AF68-4D7B-9516-9AFC823FCE17}.Release|Win32.ActiveCfg = Release|Win32
+		{8A45D43B-AF68-4D7B-9516-9AFC823FCE17}.Release|Win32.Build.0 = Release|Win32
+		{E752FC29-C42F-40E6-961D-99A1FFED318A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E752FC29-C42F-40E6-961D-99A1FFED318A}.Debug|Win32.Build.0 = Debug|Win32
+		{E752FC29-C42F-40E6-961D-99A1FFED318A}.Release|Win32.ActiveCfg = Release|Win32
+		{E752FC29-C42F-40E6-961D-99A1FFED318A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

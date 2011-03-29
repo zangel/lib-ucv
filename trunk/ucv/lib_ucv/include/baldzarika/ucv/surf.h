@@ -75,11 +75,20 @@ namespace baldzarika { namespace ucv {
 		surf(size2ui const &is, boost::uint32_t o, boost::uint32_t i, boost::uint32_t s, float t, boost::uint32_t mf=64);
 		~surf();
 
-
+		boost::uint32_t				octaves() const;
+		boost::uint32_t				intervals() const;
+		boost::uint32_t				sample_step() const;
+		float						treshold() const;
+		
 		bool						resize(size2ui const &is);
+		size2ui						size() const;
 		bool						update(gray_view_t gi);
+		bool						build_response_layers();
 		bool						detect(std::vector<feature_point_t> &fps);
 		bool						describe(std::vector<feature_point_t> &fps);
+
+		
+
 
 		static void					match_feature_points(std::vector<feature_point_t> const &fps1, std::vector<feature_point_t> const &fps2, std::vector< std::pair<std::size_t, std::size_t> > &m, feature_point_t::value_type const &d=feature_point_t::value_type(0.65f));
 
