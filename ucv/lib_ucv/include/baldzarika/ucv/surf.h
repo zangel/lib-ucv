@@ -15,6 +15,7 @@ namespace baldzarika { namespace ucv {
 	public:
 
 		typedef feature_point< decimal_t, fixed_point<10, 21> > feature_point_t;
+		typedef KDTree::KDTree<2, feature_point_t, feature_point_t::accessor> feature_point_tree_t;
 		
 		typedef fixed_point<10, 21> gray_t;
 		typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
@@ -32,6 +33,12 @@ namespace baldzarika { namespace ucv {
 		typedef ucv::gil::image< response_pixel_t, false, std::allocator<unsigned char> > response_image_t;
 		typedef response_image_t::view_t response_view_t;
 
+		typedef boost::function<void (feature_point_t::point2_t const&, feature_point_t::desc_value_type const&)> point_detected_t;
+		typedef std::pair<point2i,size2ui> range_t;
+		typedef std::pair<range_t, point_detected_t> ranged_detect_params_t;
+
+		
+
 		class response_layer
 		{
 			friend class surf;
@@ -43,7 +50,7 @@ namespace baldzarika { namespace ucv {
 			operator bool() const;
 
 			bool				build();
-			bool				detect(response_layer &bl, response_layer &ml, std::vector<feature_point_t> &fps);
+			bool				detect(response_layer &bl, response_layer &ml, ranged_detect_params_t const &rdp);
 						
 			response_t			get_response(boost::int32_t x, boost::int32_t y, response_layer const &src) const;
 			
@@ -85,6 +92,8 @@ namespace baldzarika { namespace ucv {
 		bool						update(gray_view_t gi);
 		bool						build_response_layers();
 		bool						detect(std::vector<feature_point_t> &fps);
+		bool						find(std::vector<feature_point_t::point2_t> const &gp, boost::uint32_t ws, feature_point_tree_t &fps);
+
 		bool						describe(std::vector<feature_point_t> &fps);
 
 		
@@ -94,8 +103,11 @@ namespace baldzarika { namespace ucv {
 
 
 	protected:
+		void						ranged_detect(std::vector< ranged_detect_params_t > const &rdp);
 		bool						compute_orientations(std::vector<feature_point_t> &fps);
 		bool						compute_descriptors(std::vector<feature_point_t> &fps);
+		
+
 
 		template < typename T > T			haar_x(point2i const &p, boost::uint32_t s);
 		template < typename T > T			haar_y(point2i const &p, boost::uint32_t s);

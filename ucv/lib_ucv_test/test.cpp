@@ -320,7 +320,19 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	the_surf1.update(ucv::gil::view(gray_img1));
 	the_surf1.build_response_layers();
 	std::vector<ucv::surf::feature_point_t> fps1;
+	boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
+	//for(int i=0;i<100;++i)
 	the_surf1.detect(fps1);
+	std::vector<ucv::surf::feature_point_t::point2_t> gps;
+	for(std::size_t p=0;p<fps1.size();++p)
+		gps.push_back(fps1[p]);
+	ucv::surf::feature_point_tree_t ffps;
+	the_surf1.find(gps,5,ffps);
+	std::size_t num_points=ffps.size();
+	boost::posix_time::ptime finish=boost::posix_time::microsec_clock::local_time();
+	std::cout << "detect: " << float((finish-start).total_microseconds())/100.0f << std::endl;
+
+
 	the_surf1.describe(fps1);
 
 	ucv::surf the_surf2(ucv::size2ui(gray_img2.width(), gray_img2.height()), 3, 4, 2, 4.0e-4f);

@@ -32,6 +32,9 @@
 
 #include <boost/random.hpp>
 
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
+
 
 #if defined(HAVE_GLES2)
 #include <GLES2/GL2.h>
@@ -40,6 +43,9 @@
 
 
 #include <vector>
+#include <list>
+
+#include <kdtree++/kdtree.hpp>
 
 namespace baldzarika { namespace ucv {
 	

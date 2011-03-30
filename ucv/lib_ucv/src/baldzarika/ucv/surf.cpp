@@ -50,6 +50,31 @@ namespace baldzarika { namespace ucv  {
 			boost::int32_t	m_values[109][2];
 		};
 
+		static void append_feature_point(surf::feature_point_t::point2_t const &p, surf::feature_point_t::desc_value_type const &s, std::vector<surf::feature_point_t> &fps)
+		{
+			fps.push_back(surf::feature_point_t(p,s));
+		}
+
+		static void append_feature_point2(surf::feature_point_t::point2_t const &p, surf::feature_point_t::desc_value_type const &s, surf::feature_point_tree_t &fps)
+		{
+			std::pair<surf::feature_point_tree_t::const_iterator,surf::feature_point_t::accessor::result_type> nearest=
+				fps.find_nearest(p, std::numeric_limits<surf::feature_point_t::accessor::result_type>::epsilon());
+			if(nearest.first==fps.end())
+				fps.insert(surf::feature_point_t(p,s));
+		}
+
+		static inline bool intersects(
+			boost::int32_t min_x1, boost::int32_t max_x1, boost::int32_t min_y1, boost::int32_t max_y1,
+			boost::int32_t min_x2, boost::int32_t max_x2, boost::int32_t min_y2, boost::int32_t max_y2
+		)
+		{
+			boost::int32_t min_x=std::max(min_x1, min_x2); boost::int32_t max_x=std::min(max_x1, max_x2);
+			boost::int32_t min_y=std::max(min_y1, min_y2); boost::int32_t max_y=std::min(max_y1, max_y2);
+
+			return (max_y-min_y)>0 && (max_x-min_x)>0;
+		}
+
+
 	} //namespace anonymous
 
 	
@@ -139,7 +164,7 @@ namespace baldzarika { namespace ucv  {
 		return true;
 	}
 
-	bool surf::response_layer::detect(response_layer &bl, response_layer &ml, std::vector<feature_point_t> &fps)
+	bool surf::response_layer::detect(response_layer &bl, response_layer &ml, ranged_detect_params_t const &rdp)
 	{
 		static const response_t inv_2=detail::constants::one<response_t>()/response_t(2);
 		static const response_t inv_4=detail::constants::one<response_t>()/response_t(4);
@@ -151,9 +176,18 @@ namespace baldzarika { namespace ucv  {
 		response_t const response_treshold(m_surf.m_treshold);
 		boost::int32_t border=(m_filter_size+1)/(2*m_sample_step);
 
-		for(boost::int32_t y=border+1;y<m_response_view.height()-border;++y)
+
+		boost::int32_t min_x=std::max<boost::int32_t>(border+1, rdp.first.first.x/m_sample_step);
+		boost::int32_t max_x=std::min<boost::int32_t>(m_response_view.width()-border, (rdp.first.first.x+rdp.first.second.width())/m_sample_step);
+		boost::int32_t min_y=std::max<boost::int32_t>(border+1, rdp.first.first.y/m_sample_step);
+		boost::int32_t max_y=std::min<boost::int32_t>(m_response_view.height()-border, (rdp.first.first.y+rdp.first.second.height())/m_sample_step);
+
+
+
+
+		for(boost::int32_t y=min_y;y<max_y;++y)
 		{
-			for(boost::int32_t x=border+1;x<m_response_view.width()-border;++x)
+			for(boost::int32_t x=min_x;x<max_x;++x)
 			{
 				response_t candidate=ml.get_response(x,y, *this);
 				//float f_cur_response=candidate;
@@ -288,15 +322,15 @@ namespace baldzarika { namespace ucv  {
 #endif	
 					if(	fabs(xx)<detail::constants::half<response_t>() && fabs(xy)<detail::constants::half<response_t>() && fabs(xi)<detail::constants::half<response_t>())
 					{
-						fps.push_back(
-							feature_point_t(
-								feature_point_t::point2_t(
-									(xx+response_t(x))*response_t(m_sample_step),
-									(xy+response_t(y))*response_t(m_sample_step)
-								),
-								coeff_1*(response_t(ml.m_filter_size)+xi*response_t(ml.m_filter_size-bl.m_filter_size))
-							)
+#if 1
+						rdp.second(
+							feature_point_t::point2_t(
+								(xx+response_t(x))*response_t(m_sample_step),
+								(xy+response_t(y))*response_t(m_sample_step)
+							),
+							coeff_1*(response_t(ml.m_filter_size)+xi*response_t(ml.m_filter_size-bl.m_filter_size))
 						);
+#endif
 					}
 				}
 			}
@@ -532,16 +566,97 @@ namespace baldzarika { namespace ucv  {
 	bool surf::detect(std::vector<feature_point_t> &fps)
 	{
 		fps.clear();
-		for(boost::uint32_t o=0;o<m_octaves;++o)
+		std::vector<ranged_detect_params_t> full_range_detect;
+		full_range_detect.push_back(
+			std::make_pair(
+				std::make_pair(
+					point2i(0,0),
+					size()
+				),
+				boost::bind<void>(&append_feature_point, _1, _2, boost::ref(fps) )
+			)
+		);
+		ranged_detect(full_range_detect);
+		return true;
+	}
+
+	bool surf::find(std::vector<feature_point_t::point2_t> const &gp, boost::uint32_t ws, feature_point_tree_t &fps)
+	{
+		fps.clear();
+		std::vector<ranged_detect_params_t> find_ranged_detect;
+		for(std::size_t gpid=0;gpid<gp.size();++gpid)
 		{
-			for(boost::uint32_t i=0;i<2;++i)
-			{
-				response_layer &bl=m_response_layers[FILTER_MAP[o][i+0]];
-				response_layer &ml=m_response_layers[FILTER_MAP[o][i+1]];
-				response_layer &tl=m_response_layers[FILTER_MAP[o][i+2]];
-				tl.detect(bl, ml, fps);
-			}
+			boost::int32_t x=round<boost::int32_t>(gp[gpid].x);
+			boost::int32_t y=round<boost::int32_t>(gp[gpid].y);
+			find_ranged_detect.push_back(
+				std::make_pair(
+					std::make_pair(
+						point2i(x-ws, y-ws),
+						size2ui(2*ws, 2*ws)
+					),
+					boost::bind<void>(&append_feature_point2, _1, _2, boost::ref(fps))
+				)
+			);
 		}
+#if 0
+		//split intersecting regions
+		std::list<ranged_detect_params_t>::iterator begin_r=find_ranged_detect.begin();
+		std::list<ranged_detect_params_t>::iterator end_r=find_ranged_detect.end();
+		while(begin_r!=end_r)
+		{
+			boost::int32_t min_x1=begin_r->first.first.x;
+			boost::int32_t max_x1=begin_r->first.first.x+begin_r->first.second.width();
+
+			boost::int32_t min_y1=begin_r->first.first.y;
+			boost::int32_t max_y1=begin_r->first.first.y+begin_r->first.second.height();
+			
+			std::list<ranged_detect_params_t>::iterator cmp_r=begin_r; ++cmp_r;
+			bool restarted=false;
+			while(cmp_r!=end_r && !restarted)
+			{
+				boost::int32_t min_x2=cmp_r->first.first.x; boost::int32_t max_x2=cmp_r->first.first.x+cmp_r->first.second.width();
+				boost::int32_t min_y2=cmp_r->first.first.y; boost::int32_t max_y2=cmp_r->first.first.y+cmp_r->first.second.height();
+
+				if(intersects(min_x1,max_x1,min_y1,max_y1,min_x2,max_x2,min_y2,max_y2))
+				{
+					boost::int32_t xvals[4]={ min_x1, max_x1, min_x2, max_x2 }; std::sort(&xvals[0], &xvals[0]+4);
+					boost::int32_t yvals[4]={ min_y1, max_y1, min_y2, max_y2 }; std::sort(&yvals[0], &yvals[0]+4);
+					for(boost::uint32_t y=0;y<3;++y)
+					{
+						for(boost::uint32_t x=0;x<3;++x)
+						{
+							bool wf_intersects=intersects(xvals[x],xvals[x+1],yvals[y],yvals[y+1],min_x1,max_x1,min_y1,max_y1);
+							bool ws_intersects=intersects(xvals[x],xvals[x+1],yvals[y],yvals[y+1],min_x2,max_x2,min_y2,max_y2);
+							if(wf_intersects || ws_intersects)
+							{
+								std::list<ranged_detect_params_t>::iterator rng=find_ranged_detect.insert(
+									find_ranged_detect.end(),
+									std::make_pair(
+										std::make_pair(
+											point2i(xvals[x], yvals[y]),
+											size2ui(xvals[x+1]-xvals[x],yvals[y+1]-yvals[y])
+										),
+										std::vector<point_detected_t>()
+									)
+								);
+								if(wf_intersects) rng->second.insert(rng->second.end(), begin_r->second.begin(), begin_r->second.end());
+								if(ws_intersects) rng->second.insert(rng->second.end(), cmp_r->second.begin(), cmp_r->second.end());
+							}
+						}
+					}
+					find_ranged_detect.erase(cmp_r);
+					begin_r=find_ranged_detect.erase(begin_r);
+					end_r=find_ranged_detect.end();
+					restarted=true;
+					break;
+				}
+				else
+					++cmp_r;
+			}
+			if(!restarted) ++begin_r;
+		}
+#endif
+		ranged_detect(find_ranged_detect);
 		return true;
 	}
 
@@ -552,6 +667,23 @@ namespace baldzarika { namespace ucv  {
 		if(!compute_descriptors(fps))
 			return false;
 		return true;
+	}
+
+	void surf::ranged_detect(std::vector<ranged_detect_params_t> const &rdp)
+	{
+		for(boost::uint32_t o=0;o<m_octaves;++o)
+		{
+			for(boost::uint32_t i=0;i<2;++i)
+			{
+				response_layer &bl=m_response_layers[FILTER_MAP[o][i+0]];
+				response_layer &ml=m_response_layers[FILTER_MAP[o][i+1]];
+				response_layer &tl=m_response_layers[FILTER_MAP[o][i+2]];
+				for(std::size_t rdpi=0;rdpi<rdp.size();++rdpi)
+					tl.detect(bl, ml, rdp[rdpi]);
+			}
+		}
+		//return true;
+		
 	}
 
 	bool surf::compute_orientations(std::vector<feature_point_t> &fps)

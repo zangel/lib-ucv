@@ -12,9 +12,16 @@ namespace baldzarika { namespace ucv {
 	{
 	public:
 		typedef T value_type;
+		typedef point2<value_type> point2_t;
 		typedef DT desc_value_type;
-		typedef point2<T> point2_t;
 
+		struct accessor
+		{
+			typedef value_type result_type;
+			result_type operator()(feature_point const &t, size_t k) const { return t[k]; }
+			result_type operator()(point2_t const &t, size_t k) const { return t[k]; }
+		};
+		
 		feature_point(point2_t const &p, value_type s) : point2_t(p) , m_scale(s) , m_orientation(0.0f) { }
 		feature_point(feature_point const &that)
 			: point2_t(that)

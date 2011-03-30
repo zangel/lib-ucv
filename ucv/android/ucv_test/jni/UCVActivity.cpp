@@ -121,6 +121,7 @@ namespace {
 				);
 				ucv::surf surf_marker(ucv::size2ui(marker_img.width(), marker_img.height()), 3, 4, 2, 1.0e-4f);
 				surf_marker.update(ucv::gil::view(marker_gray_img));
+				surf_marker.build_response_layers();
 				surf_marker.detect(m_marker_features);
 				surf_marker.describe(m_marker_features);
 				__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "detected %d marker feature points", m_marker_features.size());
@@ -260,9 +261,9 @@ void UCVActivity::onSurfaceChanged(local_ref<egl::EGL10> const &gl, int width, i
 	glViewport(0, 0, width, height);
 	if(Native *pn=reinterpret_cast<Native*>((jlong)(m_Native)))
 	{
-		pn->m_surf.reset(new ucv::surf(ucv::size2ui(width, height), 3, 4, 2, 1.0e-4f));
-		pn->m_gil_gray_img.recreate(width, height);
-		pn->m_gray_img.recreate(width, height);
+		pn->m_surf.reset(new ucv::surf(ucv::size2ui(240,160), 3, 4, 2, 1.0e-4f));
+		pn->m_gil_gray_img.recreate(240,160);
+		pn->m_gray_img.recreate(240,160);
 
 		pn->m_features_program.reset(new ucv::gles::program());
 		ucv::gles::vertex_shader features_vs;
@@ -400,7 +401,7 @@ void UCVActivity::surfaceChanged(local_ref<SurfaceHolder> const &holder, int for
 		}
 
 		//parameters->set(java::lang::String(array<jbyte,1>("orientation")), 180);
-		parameters->setPreviewSize(width,height);
+		parameters->setPreviewSize(240,160);
 		//parameters->setPreviewFormat(0x10);
 		//parameters->setPreviewFormat(0x11);
 		pCamera->setParameters(parameters);
