@@ -15,7 +15,8 @@ namespace baldzarika { namespace ucv {
 	public:
 
 		typedef feature_point< decimal_t, fixed_point<10, 21> > feature_point_t;
-		typedef KDTree::KDTree<2, feature_point_t, feature_point_t::accessor> feature_point_tree_t;
+		typedef KDTree::KDTree<2, feature_point_t, feature_point_t::position_accessor> fps_by_pos_tree_t;
+		typedef KDTree::KDTree<feature_point_t::DESCRIPTOR_SIZE, feature_point_t, feature_point_t::description_accessor> fps_by_desc_tree_t;
 		
 		typedef fixed_point<10, 21> gray_t;
 		typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
@@ -49,8 +50,8 @@ namespace baldzarika { namespace ucv {
 
 			operator bool() const;
 
-			bool				build();
-			bool				detect(response_layer &bl, response_layer &ml, ranged_detect_params_t const &rdp);
+			void				build();
+			void				detect(response_layer &bl, response_layer &ml, ranged_detect_params_t const &rdp);
 						
 			response_t			get_response(boost::int32_t x, boost::int32_t y, response_layer const &src) const;
 			
@@ -90,11 +91,17 @@ namespace baldzarika { namespace ucv {
 		bool						resize(size2ui const &is);
 		size2ui						size() const;
 		bool						update(gray_view_t gi);
-		bool						build_response_layers();
-		bool						detect(std::vector<feature_point_t> &fps);
-		bool						find(std::vector<feature_point_t::point2_t> const &gp, boost::uint32_t ws, feature_point_tree_t &fps);
+		void						build_response_layers();
 
-		bool						describe(std::vector<feature_point_t> &fps);
+		void						detect(std::vector<feature_point_t> &fps);
+		void						detect(fps_by_pos_tree_t &fps);
+		void						detect(fps_by_desc_tree_t &fps);
+
+		//bool						find(std::vector<feature_point_t::point2_t> const &gp, boost::uint32_t ws, fps_by_pos_tree_t &fps);
+
+		void						describe(std::vector<feature_point_t> &fps);
+		void						describe(fps_by_pos_tree_t &fps);
+		void						describe(fps_by_desc_tree_t &fps);
 
 		
 
@@ -104,8 +111,8 @@ namespace baldzarika { namespace ucv {
 
 	protected:
 		void						ranged_detect(std::vector< ranged_detect_params_t > const &rdp);
-		bool						compute_orientations(std::vector<feature_point_t> &fps);
-		bool						compute_descriptors(std::vector<feature_point_t> &fps);
+		void						compute_orientation(feature_point_t &fp);
+		void						compute_descriptor(feature_point_t &fp);
 		
 
 

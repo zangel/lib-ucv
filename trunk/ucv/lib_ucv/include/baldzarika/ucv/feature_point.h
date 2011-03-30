@@ -11,15 +11,22 @@ namespace baldzarika { namespace ucv {
 		: public point2<T>
 	{
 	public:
+		static boost::uint32_t const DESCRIPTOR_SIZE=64;
 		typedef T value_type;
 		typedef point2<value_type> point2_t;
 		typedef DT desc_value_type;
 
-		struct accessor
+		struct position_accessor
 		{
 			typedef value_type result_type;
 			result_type operator()(feature_point const &t, size_t k) const { return t[k]; }
 			result_type operator()(point2_t const &t, size_t k) const { return t[k]; }
+		};
+
+		struct description_accessor
+		{
+			typedef desc_value_type result_type;
+			result_type operator()(feature_point const &t, size_t k) const { return t.m_desc[k]; }
 		};
 		
 		feature_point(point2_t const &p, value_type s) : point2_t(p) , m_scale(s) , m_orientation(0.0f) { }
@@ -49,8 +56,9 @@ namespace baldzarika { namespace ucv {
 
 		desc_value_type		m_scale;
 		desc_value_type		m_orientation;
-		desc_value_type		m_desc[64];
+		desc_value_type		m_desc[DESCRIPTOR_SIZE];
 	};
+
 	
 } //namespace ucv
 } //namespace baldzarika
