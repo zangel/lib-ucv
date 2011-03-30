@@ -11,7 +11,6 @@
 
 #endif
 
-
 namespace baldzarika { namespace ucv {
 
 	namespace detail {
@@ -587,6 +586,13 @@ namespace baldzarika { namespace ucv {
 
 namespace std
 {
+	template <boost::uint32_t I, boost::uint32_t F>
+	baldzarika::ucv::fixed_point<I,F> sqrt(baldzarika::ucv::fixed_point<I,F> const &x)
+	{
+		return baldzarika::ucv::fixed_point<I,F>(std::sqrt(static_cast<float>(x)));
+	}
+
+
 	template< boost::uint32_t I, boost::uint32_t F>
 	class numeric_limits< baldzarika::ucv::fixed_point<I, F> >
 	{
