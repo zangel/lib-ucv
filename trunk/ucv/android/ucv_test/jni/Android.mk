@@ -17,6 +17,7 @@ LOCAL_C_INCLUDES	:=	$(ANDROID_CPP_SDK)/j2cpp \
 						$(ANDROID_CPP_SDK)/platforms/android-7 \
 						$(ANDROID_BOOST_DIR) \
 						$(LOCAL_PATH)/../../../lib_ucv/include \
+						$(LOCAL_PATH)/../../../3rd_party/libkdtree \
 						$(UCV_DIR)/include \
 						$(OPENCV_ROOT)/3rdparty/libpng \
 						$(OPENCV_ROOT)/3rdparty/include
