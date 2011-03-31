@@ -515,19 +515,54 @@ namespace KDTree
       {
 	if (_M_get_root())
 	  {
-	    std::pair<const _Node<_Val>*,
-	      std::pair<size_type, typename _Acc::result_type> >
-	      best = _S_node_nearest (__K, 0, __val,
-				      _M_get_root(), &_M_header, _M_get_root(),
-				      std::sqrt(_S_accumulate_node_distance
-				      (__K, _M_dist, _M_acc, _M_get_root()->_M_value, __val)),
+		  distance_type __max=std::sqrt(_S_accumulate_node_distance
+			  (__K, _M_dist, _M_acc, _M_get_root()->_M_value, __val));
+
+		  std::list< std::pair<const _Node<_Val>*,
+			  std::pair<size_type, typename _Acc::result_type> > > best;
+
+	      _S_node_nearest (__K, 0, __val,
+				      _M_get_root(), &_M_header, _M_get_root(),__max,
 				      _M_cmp, _M_acc, _M_dist,
-				      always_true<value_type>());
-	    return std::pair<const_iterator, distance_type>
-	      (best.first, best.second.second);
+				      always_true<value_type>(), best);
+		if(best.empty())
+			return std::pair<const_iterator, distance_type>
+				(_M_get_root(), __max);
+		return std::pair<const_iterator, distance_type>
+			(best.front().first, best.front().second.second);
+				
 	  }
 	  return std::pair<const_iterator, distance_type>(end(), 0);
       }
+
+	  template <class SearchVal>
+	  void find_k_nearest (SearchVal const& __val, std::list< std::pair< const_iterator, distance_type > > &__res, size_t __k=1) const
+	  {
+		  __res.clear();
+		  if (_M_get_root())
+		  {
+			  distance_type __max=std::sqrt(_S_accumulate_node_distance
+				  (__K, _M_dist, _M_acc, _M_get_root()->_M_value, __val));
+
+			  std::list< std::pair<const _Node<_Val>*,
+				  std::pair<size_type, typename _Acc::result_type> > > best;
+
+			  _S_node_nearest (__K, 0, __val,
+				  _M_get_root(), &_M_header, _M_get_root(),__max,
+				  _M_cmp, _M_acc, _M_dist,
+				  always_true<value_type>(), best, __k);
+
+			  for(typename std::list<
+				  std::pair<const _Node<_Val>*,
+					std::pair<size_type, typename _Acc::result_type>
+				  >
+			  >::iterator __i=best.begin();__i!=best.end(); ++__i) __res.push_back(
+				std::pair<const_iterator, distance_type>
+					(__i->first, __i->second.second)
+			  );
+		  }
+	  }
+
 
       template <class SearchVal>
       std::pair<const_iterator, distance_type>
@@ -546,15 +581,16 @@ namespace KDTree
             __max = root_dist;
 	      }
        }
-	    std::pair<const _Node<_Val>*,
-	      std::pair<size_type, typename _Acc::result_type> >
-	      best = _S_node_nearest (__K, 0, __val, _M_get_root(), &_M_header,
+	    std::list< std::pair<const _Node<_Val>*,
+		   std::pair<size_type, typename _Acc::result_type> > > best;
+
+	    _S_node_nearest (__K, 0, __val, _M_get_root(), &_M_header,
 				      node, __max, _M_cmp, _M_acc, _M_dist,
-				      always_true<value_type>());
+				      always_true<value_type>(), best);
        // make sure we didn't just get stuck with the root node...
-       if (root_is_candidate || best.first != _M_get_root())
+       if (!best.empty() && (root_is_candidate || best.front().first != _M_get_root()))
           return std::pair<const_iterator, distance_type>
-            (best.first, best.second.second);
+            (best.front().first, best.front().second.second);
 	  }
 	  return std::pair<const_iterator, distance_type>(end(), __max);
       }
@@ -580,14 +616,14 @@ namespace KDTree
 		  }
             }
 	      }
-	    std::pair<const _Node<_Val>*,
-	      std::pair<size_type, typename _Acc::result_type> >
-	      best = _S_node_nearest (__K, 0, __val, _M_get_root(), &_M_header,
-				      node, __max, _M_cmp, _M_acc, _M_dist, __p);
+		std::list< std::pair<const _Node<_Val>*,
+			std::pair<size_type, typename _Acc::result_type> > > best;
+		_S_node_nearest (__K, 0, __val, _M_get_root(), &_M_header,
+				      node, __max, _M_cmp, _M_acc, _M_dist, __p, best);
        // make sure we didn't just get stuck with the root node...
-       if (root_is_candidate || best.first != _M_get_root())
+       if (!best.empty() && (root_is_candidate || best.front().first != _M_get_root()))
           return std::pair<const_iterator, distance_type>
-            (best.first, best.second.second);
+            (best.front().first, best.front().second.second);
 	  }
 	  return std::pair<const_iterator, distance_type>(end(), __max);
       }

@@ -83,7 +83,7 @@ namespace {
 		"void main()\n"
 		"{\n"
 		"	gl_Position=a_vtx_pos;\n"
-		"	gl_PointSize=3.0;\n"
+		"	gl_PointSize=4.0;\n"
 		"}\n"
 	;
 
@@ -141,6 +141,7 @@ namespace {
 		//detection stuff
 		boost::scoped_ptr<ucv::surf> m_surf;
 		ucv::gil::gray8_image_t	m_gil_gray_img;
+		ucv::gil::gray8_image_t	m_gil_gray_img2;
 		ucv::surf::gray_image_t m_gray_img;
 		std::vector<ucv::surf::feature_point_t> m_features;
 		std::vector< std::pair<std::size_t,std::size_t> > m_feature_matches;
@@ -261,9 +262,10 @@ void UCVActivity::onSurfaceChanged(local_ref<egl::EGL10> const &gl, int width, i
 	glViewport(0, 0, width, height);
 	if(Native *pn=reinterpret_cast<Native*>((jlong)(m_Native)))
 	{
-		pn->m_surf.reset(new ucv::surf(ucv::size2ui(240,160), 3, 4, 2, 1.0e-4f));
-		pn->m_gil_gray_img.recreate(240,160);
-		pn->m_gray_img.recreate(240,160);
+		pn->m_surf.reset(new ucv::surf(ucv::size2ui(width/2,height/2), 3, 4, 2, 1.0e-4f));
+		pn->m_gil_gray_img.recreate(width,height);
+		pn->m_gil_gray_img2.recreate(width/2,height/2);
+		pn->m_gray_img.recreate(width/2,height/2);
 
 		pn->m_features_program.reset(new ucv::gles::program());
 		ucv::gles::vertex_shader features_vs;
@@ -290,7 +292,7 @@ void UCVActivity::onDrawFrame(local_ref<egl::EGL10> const &gl)
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-#if 1
+#if 0
 			if(pn->m_homography_ok)
 			{
 				Native::matrix_t hm(pn->m_homography);
@@ -345,20 +347,20 @@ void UCVActivity::onDrawFrame(local_ref<egl::EGL10> const &gl)
 			}
 #else
 			std::vector<ucv::surf::feature_point_t> fps(pn->m_features);
-			std::vector< std::pair<std::size_t,std::size_t> > matched_fps(pn->m_feature_matches);
+			//std::vector< std::pair<std::size_t,std::size_t> > matched_fps(pn->m_feature_matches);
 
-			if(matched_fps.size())
-			//if(fps.size())
+			//if(matched_fps.size())
+			if(fps.size())
 			{
-				boost::scoped_array<float> fp_points( new float[4*matched_fps.size()]);
-				//boost::scoped_array<float> fp_points( new float[4*fps.size()]);
+				//boost::scoped_array<float> fp_points( new float[4*matched_fps.size()]);
+				boost::scoped_array<float> fp_points( new float[4*fps.size()]);
 
 				float *p_fpts=fp_points.get();
-				for(std::size_t ifp=0;ifp<matched_fps.size();++ifp)
-				//for(std::size_t ifp=0;ifp<fps.size();++ifp)
+				//for(std::size_t ifp=0;ifp<matched_fps.size();++ifp)
+				for(std::size_t ifp=0;ifp<fps.size();++ifp)
 				{
-					ucv::surf::feature_point_t const &fp=fps[matched_fps[ifp].second];
-					//ucv::surf::feature_point_t const &fp=fps[ifp];
+					//ucv::surf::feature_point_t const &fp=fps[matched_fps[ifp].second];
+					ucv::surf::feature_point_t const &fp=fps[ifp];
 					p_fpts[0]=2.0f*(static_cast<float>(fp.x)/float(pn->m_gray_img.width())-0.5f);
 					p_fpts[1]=-2.0f*(static_cast<float>(fp.y)/float(pn->m_gray_img.height())-0.5f);
 					p_fpts[2]=0.0;
@@ -401,7 +403,7 @@ void UCVActivity::surfaceChanged(local_ref<SurfaceHolder> const &holder, int for
 		}
 
 		//parameters->set(java::lang::String(array<jbyte,1>("orientation")), 180);
-		parameters->setPreviewSize(240,160);
+		parameters->setPreviewSize(width,height);
 		//parameters->setPreviewFormat(0x10);
 		//parameters->setPreviewFormat(0x11);
 		pCamera->setParameters(parameters);
@@ -428,8 +430,8 @@ bool UCVActivity::onTouchEvent(j2cpp::local_ref<MotionEvent> const &me)
 		{
 			if(pn->m_surf && pn->m_gray_img.width()*pn->m_gray_img.height())
 			{
-				ucv::convert_scale(ucv::gil::view(pn->m_gray_img), ucv::gil::view(pn->m_gil_gray_img), float(255));
-				ucv::gil::png_write_view("/sdcard/markers/capture.png",ucv::gil::view(pn->m_gil_gray_img));
+				ucv::convert_scale(ucv::gil::view(pn->m_gray_img), ucv::gil::view(pn->m_gil_gray_img2), float(255));
+				ucv::gil::png_write_view("/sdcard/markers/capture.png",ucv::gil::view(pn->m_gil_gray_img2));
 			}
 		}
 	}
@@ -492,18 +494,63 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 					reinterpret_cast<ucv::gil::gray16_pixel_t*>(data->data()+fs.width()*fs.height()),
 					(fs.width()/2)*2
 				),
-				ucv::gil::view(pn->m_gray_img)
+				ucv::gil::view(pn->m_gil_gray_img),
+				255.0f
 			);
 
-			//boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
+			ucv::gil::resize_view(
+				ucv::gil::view(pn->m_gil_gray_img),
+				ucv::gil::view(pn->m_gil_gray_img2),
+				ucv::gil::bilinear_sampler()
+			);
+
+			ucv::convert_scale(
+				ucv::gil::view(pn->m_gil_gray_img2),
+				ucv::gil::view(pn->m_gray_img),
+				ucv::surf::integral_t(1.0f/255.0f)
+			);
+
+			static int update_usecs=0, build_usecs=0, detect_usecs=0, describe_usecs=0, match_usecs=0, homography_usecs=0, counter=10;
+
+
+			boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
 			pn->m_surf->update(ucv::gil::view(pn->m_gray_img));
+			boost::posix_time::ptime finish_update=boost::posix_time::microsec_clock::local_time();
+			pn->m_surf->build_response_layers();
+			boost::posix_time::ptime finish_build=boost::posix_time::microsec_clock::local_time();
 			pn->m_surf->detect(pn->m_features);
-			//boost::posix_time::ptime start_describe=boost::posix_time::microsec_clock::local_time();
-			pn->m_surf->describe(pn->m_features);
-			//boost::posix_time::ptime start_match=boost::posix_time::microsec_clock::local_time();
-			ucv::surf::match_feature_points(pn->m_marker_features, pn->m_features, pn->m_feature_matches, ucv::surf::feature_point_t::value_type(0.65f));
+			boost::posix_time::ptime finish_detect=boost::posix_time::microsec_clock::local_time();
+			//pn->m_surf->describe(pn->m_features);
+			boost::posix_time::ptime finish_describe=boost::posix_time::microsec_clock::local_time();
+			//ucv::surf::match_feature_points(pn->m_marker_features, pn->m_features, pn->m_feature_matches, ucv::surf::feature_point_t::value_type(0.65f));
+			boost::posix_time::ptime finish_match=boost::posix_time::microsec_clock::local_time();
 			//ucv::nublas::matrix< ucv::surf::feature_point_t::value_type, ucv::nublas::row_major > hm;
-			pn->m_homography_ok=ucv::find_homography_ransac(pn->m_marker_features, pn->m_features, pn->m_feature_matches, pn->m_homography);
+			//pn->m_homography_ok=ucv::find_homography_ransac(pn->m_marker_features, pn->m_features, pn->m_feature_matches, pn->m_homography);
+			boost::posix_time::ptime finish_homography=boost::posix_time::microsec_clock::local_time();
+
+			update_usecs+=(finish_update-start).total_microseconds();
+			build_usecs+=(finish_build-finish_update).total_microseconds();
+			detect_usecs+=(finish_detect-finish_build).total_microseconds();
+			describe_usecs+=(finish_describe-finish_detect).total_microseconds();
+			match_usecs+=(finish_match-finish_describe).total_microseconds();
+			homography_usecs+=(finish_homography-finish_match).total_microseconds();
+
+			if(!(--counter))
+			{
+				//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "nf=%d, update=%f, build=%f, detect=%f, describe=%f, match=%f, homography=%f",
+				//		pn->m_features.size(),
+				//		float(update_usecs)/10.0f,
+				//		float(build_usecs)/10.0f,
+				//		float(detect_usecs)/10.0f,
+				//		float(describe_usecs)/10.0f,
+				//		float(match_usecs)/10.0f,
+				//		float(homography_usecs)/10.0f);
+
+				counter=10;
+				update_usecs=build_usecs=detect_usecs=describe_usecs=match_usecs=homography_usecs;
+			}
+
+
 			//boost::posix_time::ptime finsh=boost::posix_time::microsec_clock::local_time();
 
 			//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "ps=(%d,%d), ds=%d, matches.size()=%d, find_homography=%s, usecs=%d",
@@ -524,7 +571,7 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 				pn->m_feature_matches.size()
 			);
 #else
-			__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "matches.size()=%d",pn->m_feature_matches.size());
+			//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "matches.size()=%d",pn->m_feature_matches.size());
 
 
 #endif

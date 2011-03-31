@@ -193,15 +193,15 @@ namespace KDTree
            typename _Acc, typename _Dist,
            typename _Predicate>
   inline
-  std::pair<const NodeType*,
-	    std::pair<size_t, typename _Dist::distance_type> >
+  void
   _S_node_nearest (const size_t __k, size_t __dim, SearchVal const& __val,
 		   const NodeType* __node, const _Node_base* __end,
 		   const NodeType* __best, typename _Dist::distance_type __max,
 		   const _Cmp& __cmp, const _Acc& __acc, const _Dist& __dist,
-		   _Predicate __p)
+		   _Predicate __p, std::list< std::pair<const NodeType*, std::pair<size_t, typename _Dist::distance_type> > > &__result, size_t __n=1 )
   {
      typedef const NodeType* NodePtr;
+	 __result.clear();
     NodePtr pcur = __node;
     NodePtr cur = _S_node_descend(__dim % __k, __cmp, __acc, __val, __node);
     size_t cur_dim = __dim+1;
@@ -220,9 +220,13 @@ namespace KDTree
           // Can't do this optimisation without checking that the current 'best' is not the root AND is not a valid candidate...
           // This is because find_nearest() etc will call this function with the best set to _M_root EVEN IF _M_root is not a valid answer (eg too far away or doesn't pass the predicate test)
 	      {
-		__best = cur;
-		__max = d;
-		__dim = cur_dim;
+			  typename std::list< std::pair<const NodeType*, std::pair<size_t, typename _Dist::distance_type> > >::iterator __it=__result.begin();
+			  while(__it!=__result.end() && __it->second.second>=d) ++__it;
+			  if(!(__result.size()==__n && __it==__result.end()))
+				__result.insert(__result.size()<__n?__it:__result.erase(__it), std::make_pair(cur, std::make_pair(cur_dim, d)));
+		//__best = cur;
+		//__max = d;
+		//__dim = cur_dim;
 	      }
 	  }
 	pcur = cur;
@@ -274,9 +278,13 @@ namespace KDTree
           d = std::sqrt(d);
           if (d <= __max)  // CHANGED, see the above notes ("bad candidate notes")
 		      {
-			__best = probe;
-			__max = d;
-			__dim = probe_dim;
+				  typename std::list< std::pair<const NodeType*, std::pair<size_t, typename _Dist::distance_type> > >::iterator __it=__result.begin();
+				  while(__it!=__result.end() && __it->second.second>=d) ++__it;
+				  if(!(__result.size()==__n && __it==__result.end()))
+					  __result.insert(__result.size()<__n?__it:__result.erase(__it), std::make_pair(cur, std::make_pair(cur_dim, d)));
+			//__best = probe;
+			//__max = d;
+			//__dim = probe_dim;
 		      }
 		  }
 		pprobe = probe;
@@ -337,10 +345,10 @@ namespace KDTree
 	      }
 	  }
       }
-    return std::pair<NodePtr,
-      std::pair<size_t, typename _Dist::distance_type> >
-      (__best, std::pair<size_t, typename _Dist::distance_type>
-       (__dim, __max));
+    //return std::pair<NodePtr,
+    //  std::pair<size_t, typename _Dist::distance_type> >
+    //  (__best, std::pair<size_t, typename _Dist::distance_type>
+    //   (__dim, __max));
   }
 
 
