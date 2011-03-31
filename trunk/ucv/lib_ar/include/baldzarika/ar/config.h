@@ -8,6 +8,7 @@
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/foreach.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/signals2.hpp>
 
 

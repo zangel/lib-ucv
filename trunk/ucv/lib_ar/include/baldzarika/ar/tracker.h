@@ -10,7 +10,7 @@ namespace baldzarika { namespace ar {
 
 	class tracker
 		: public boost::enable_shared_from_this<tracker>
-		, protected boost::noncopyable
+		, public boost::noncopyable
 	{
 	public:
 		typedef ucv::surf::feature_point_t feature_point_t;
