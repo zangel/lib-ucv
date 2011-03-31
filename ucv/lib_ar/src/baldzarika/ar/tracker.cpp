@@ -43,11 +43,10 @@ namespace baldzarika { namespace ar {
 					t->m_surf.sample_step(),
 					t->m_surf.treshold()
 					);
-				if(	surf_.update(m_marker->get_view()) &&
-					surf_.build_response_layers() &&
-					surf_.detect(m_features) &&
-					!m_features.empty())
+				if(surf_.update(m_marker->get_view()))
 				{
+					surf_.build_response_layers();
+					surf_.detect(m_features);
 					surf_.describe(m_features);
 				}
 			}
@@ -186,12 +185,9 @@ namespace baldzarika { namespace ar {
 		boost::mutex::scoped_lock lock_surf(m_surf_sync);
 
 		std::vector<feature_point_t> surf_features;
-		if(	m_surf.build_response_layers() &&
-			m_surf.detect(surf_features) &&
-			m_surf.describe(surf_features) )
-		{
-
-		}
+		m_surf.build_response_layers();
+		m_surf.detect(surf_features);
+		m_surf.describe(surf_features);
 	}
 
 	void tracker::on_stop()

@@ -321,31 +321,42 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	the_surf1.build_response_layers();
 	std::vector<ucv::surf::feature_point_t> fps1;
 	boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
-	for(int i=0;i<100;++i)
+	//for(int i=0;i<100;++i)
 		the_surf1.detect(fps1);
 	boost::posix_time::ptime finish=boost::posix_time::microsec_clock::local_time();
 	std::cout << "detect<vec>: " << float((finish-start).total_microseconds())/100.0f << std::endl;
 
-	{
-		ucv::surf::fps_by_pos_tree_t ffps1;
-		boost::posix_time::ptime start2=boost::posix_time::microsec_clock::local_time();
-		for(int i=0;i<100;++i)
-			the_surf1.detect(ffps1);
-		boost::posix_time::ptime finish2=boost::posix_time::microsec_clock::local_time();
-		std::cout << "detect<pos>: " << float((finish2-start2).total_microseconds())/100.0f << std::endl;
 
-		ucv::surf::fps_by_desc_tree_t ffps2;
-		boost::posix_time::ptime start3=boost::posix_time::microsec_clock::local_time();
-		for(int i=0;i<100;++i)
-			the_surf1.detect(ffps2);
-		boost::posix_time::ptime finish3=boost::posix_time::microsec_clock::local_time();
-		std::cout << "detect<desc>: " << float((finish3-start3).total_microseconds())/100.0f << std::endl;
+	ucv::surf::fps_by_pos_tree_t ffps1;
+	boost::posix_time::ptime start2=boost::posix_time::microsec_clock::local_time();
+	//for(int i=0;i<100;++i)
+		the_surf1.detect(ffps1);
+	boost::posix_time::ptime finish2=boost::posix_time::microsec_clock::local_time();
+	std::cout << "detect<pos>: " << float((finish2-start2).total_microseconds())/100.0f << std::endl;
 
-		//std::size_t num_points=ffps.size();
-		std::cout << "detect<vec>.size()=" << fps1.size() << " detect<pos>.size()=" << ffps1.size() << " detect<desc>.size()=" << ffps2.size() <<std::endl;
-	}
+	ucv::surf::fps_by_desc_tree_t ffps2;
+	boost::posix_time::ptime start3=boost::posix_time::microsec_clock::local_time();
+	//for(int i=0;i<100;++i)
+	the_surf1.detect(ffps2);
+	boost::posix_time::ptime finish3=boost::posix_time::microsec_clock::local_time();
+	std::cout << "detect<desc>: " << float((finish3-start3).total_microseconds())/100.0f << std::endl;
+
+	std::pair<ucv::surf::fps_by_desc_tree_t::iterator, ucv::surf::fps_by_desc_tree_t::distance_type> res=ffps2.find_nearest(*ffps2.begin());
+	std::list< std::pair<ucv::surf::fps_by_desc_tree_t::iterator, ucv::surf::fps_by_desc_tree_t::distance_type> > res2;
+	ffps2.find_k_nearest(*ffps2.begin(),res2, 3);
+
 
 	
+	boost::posix_time::ptime start4=boost::posix_time::microsec_clock::local_time();
+	for(int i=0;i<100;++i)
+		the_surf1.describe(ffps2);
+	boost::posix_time::ptime finish4=boost::posix_time::microsec_clock::local_time();
+	std::cout << "describe<desc>: " << float((finish4-start4).total_microseconds())/100.0f << std::endl;
+
+
+	//std::size_t num_points=ffps.size();
+	std::cout << "detect<vec>.size()=" << fps1.size() << " detect<pos>.size()=" << ffps1.size() << " detect<desc>.size()=" << ffps2.size() <<std::endl;
+
 	
 
 
