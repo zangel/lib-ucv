@@ -37,7 +37,7 @@ namespace baldzarika { namespace ucv {
 
 
 	template <typename SVT, typename DVT>
-	bool integral(SVT const &src, DVT const &dst)
+	bool integral(SVT const &src, DVT const &dst, typename gil::channel_type<typename SVT::value_type>::type const &sm=typename gil::channel_type<typename SVT::value_type>::type(-1))
 	{
 		typedef typename SVT::value_type	src_pixel_t;
 		typedef typename DVT::value_type	dst_pixel_t;
@@ -48,20 +48,24 @@ namespace baldzarika { namespace ucv {
 		if(src.width()!=dst.width() || src.height()!=dst.height() || !src.width()*dst.width())
 			return false;
 
-		typedef fixed_point<10,21> median_t;
-
-		median_t median_sum=detail::constants::zero<median_t>();
-
-		for(std::size_t y=0;y<static_cast<std::size_t>(src.height());++y)
+		src_channel_t src_median=sm;
+		if(src_median<detail::constants::zero<src_channel_t>())
 		{
-			median_t row_sum=detail::constants::zero<median_t>();
-			src_channel_t *src_row=reinterpret_cast<src_channel_t *>(src.row_begin(y));
-			for(std::size_t x=0;x<static_cast<std::size_t>(src.width());++x)
-				row_sum+=median_t(*src_row++);
-			median_sum+=row_sum/median_t(src.width());
+			typedef fixed_point<10,21> median_t;
+
+			median_t median_sum=detail::constants::zero<median_t>();
+
+			for(std::size_t y=0;y<static_cast<std::size_t>(src.height());++y)
+			{
+				median_t row_sum=detail::constants::zero<median_t>();
+				src_channel_t *src_row=reinterpret_cast<src_channel_t *>(src.row_begin(y));
+				for(std::size_t x=0;x<static_cast<std::size_t>(src.width());++x)
+					row_sum+=median_t(*src_row++);
+				median_sum+=row_sum/median_t(src.width());
+			}
+			src_median=src_channel_t(median_sum/median_t(src.height()));
 		}
-		median_sum/=median_t(src.height());
-		src_channel_t src_median=median_sum;
+		
 		
 		src_channel_t *src_row=reinterpret_cast<src_channel_t *>(src.row_begin(0));
 		dst_channel_t *dst_row=reinterpret_cast<dst_channel_t *>(dst.row_begin(0));

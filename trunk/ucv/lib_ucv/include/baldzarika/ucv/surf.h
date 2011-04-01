@@ -15,8 +15,11 @@ namespace baldzarika { namespace ucv {
 	public:
 
 		typedef feature_point< decimal_t, fixed_point<10, 21> > feature_point_t;
+
+		typedef std::vector< feature_point_t > fps_array_t;
 		typedef KDTree::KDTree<2, feature_point_t, feature_point_t::position_accessor> fps_by_pos_tree_t;
 		typedef KDTree::KDTree<feature_point_t::DESCRIPTOR_SIZE, feature_point_t, feature_point_t::description_accessor> fps_by_desc_tree_t;
+		
 		
 		typedef fixed_point<10, 21> gray_t;
 		typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
@@ -90,25 +93,21 @@ namespace baldzarika { namespace ucv {
 		
 		bool						resize(size2ui const &is);
 		size2ui						size() const;
-		bool						update(gray_view_t gi);
+		bool						update(gray_view_t gi, gray_t const &mv=gray_t(-1));
 		void						build_response_layers();
 
-		void						detect(std::vector<feature_point_t> &fps);
+		void						detect(fps_array_t &fps);
 		void						detect(fps_by_pos_tree_t &fps);
 		void						detect(fps_by_desc_tree_t &fps);
 
 		//bool						find(std::vector<feature_point_t::point2_t> const &gp, boost::uint32_t ws, fps_by_pos_tree_t &fps);
 
-		void						describe(std::vector<feature_point_t> &fps);
+		void						describe(fps_array_t &fps);
 		void						describe(fps_by_pos_tree_t &fps);
 		void						describe(fps_by_desc_tree_t &fps);
-
 		
-
-
-		static void					match_feature_points(std::vector<feature_point_t> const &fps1, std::vector<feature_point_t> const &fps2, std::vector< std::pair<std::size_t, std::size_t> > &m, feature_point_t::value_type const &d=feature_point_t::value_type(0.65f));
-
-
+		static void					match_feature_points(fps_array_t const &fps1, fps_array_t const &fps2, std::vector< std::pair<std::size_t,std::size_t> > &m, feature_point_t::value_type const &d=feature_point_t::value_type(0.65f));
+		
 	protected:
 		void						ranged_detect(std::vector< ranged_detect_params_t > const &rdp);
 		void						compute_orientation(feature_point_t &fp);
