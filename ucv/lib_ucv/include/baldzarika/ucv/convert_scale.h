@@ -32,7 +32,7 @@ namespace baldzarika { namespace ucv {
 	}
 
 	template < typename DVT >
-	bool convert_nv16_to_gray(gil::gray8_view_t y, gil::gray16_view_t uv, DVT dst, float scale=1.0f)
+	bool convert_nv16_to_gray(gil::gray8_view_t y, gil::gray16_view_t uv, DVT dst, typename gil::channel_type<typename DVT::value_type>::type &mv, float scale=1.0f)
 	{
 		typedef gil::channel_type<gil::gray8_pixel_t>::type y_channel_t;
 		typedef gil::channel_type<gil::gray16_pixel_t>::type uv_channel_t;
@@ -44,7 +44,8 @@ namespace baldzarika { namespace ucv {
 
 		if(y.width()/2!=uv.width() || y.height()/2!=uv.height() || !uv.width()*uv.height() || y.width()!=dst.width() || y.height()!=dst.height())
 			return false;
-
+		
+		float median_sum=0.0f;
 		for(std::size_t r=0;r<static_cast<std::size_t>(y.height());++r)
 		{
 			y_channel_t *y_row=reinterpret_cast<y_channel_t *>(y.row_begin(r));
@@ -60,13 +61,15 @@ namespace baldzarika { namespace ucv {
 				boost::int32_t G=std::min<boost::int32_t>(262143, std::max<boost::int32_t>(1192*Y-833*V-400*U, 0));
 				boost::int32_t R=std::min<boost::int32_t>(262143, std::max<boost::int32_t>(1192*Y+1634*V, 0));
 
-				*dst_row=dst_channel_t(inv_262143*(0.11f*B+0.59f*G+0.3f*R));
+				float v=inv_262143*(0.11f*B+0.59f*G+0.3f*R);
+				*dst_row=v;
+				median_sum+=v;
 				y_row++;
 				uv_row+=(c%2?1:0);
 				dst_row++;
 			}
 		}
-
+		mv=dst_channel_t(median_sum/float(dst.width()*dst.height()));
 		return true;
 	}
 

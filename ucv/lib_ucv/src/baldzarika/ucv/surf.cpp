@@ -162,28 +162,43 @@ namespace baldzarika { namespace ucv  {
 		boost::int32_t const l=m_filter_size/3;
 		boost::int32_t const w=m_filter_size;
 		response_t const s_coeff=(response_t(1)/response_t(w))/response_t(w);
+
+		boost::int32_t const l1=2*l-1;
 		
 		for(boost::int32_t ry=0;ry<m_response_view.height();++ry) 
 		{
 			response_pixel_t *r_row=m_response_view.row_begin(ry);
 			
 			boost::int32_t iy=ry*m_sample_step;
+			boost::int32_t iy1=iy-l;
+			boost::int32_t iy2=iy1+1;
+			boost::int32_t iy3=iy-l/2;
+			boost::int32_t iy4=iy-b;
+			boost::int32_t iy5=iy+1;
+
+
 			for(boost::int32_t rx=0;rx<m_response_view.width();++rx) 
 			{
 				boost::int32_t ix=rx*m_sample_step;
+				boost::int32_t ix1=ix-l;
+				boost::int32_t ix2=ix1+1;
+				boost::int32_t ix3=ix-l/2;
+				boost::int32_t ix4=ix-b;
+				boost::int32_t ix5=ix+1;
+
 				response_t d_xx=
-					box_integral<integral_view_t,response_t>(iv, point2i(ix-b, iy-l+1), size2ui(w, 2*l-1))-
-					box_integral<integral_view_t,response_t>(iv, point2i(ix-l/2, iy-l+1), size2ui(l, 2*l-1))*three;
+					box_integral<integral_view_t,response_t>(iv, point2i(ix4, iy2), size2ui(w, l1))-
+					box_integral<integral_view_t,response_t>(iv, point2i(ix3, iy2), size2ui(l, l1))*three;
 				
 				response_t d_yy=
-					box_integral<integral_view_t,response_t>(iv, point2i(ix-l+1, iy-b), size2ui(2*l-1, w))-
-					box_integral<integral_view_t,response_t>(iv, point2i(ix-l+1, iy-l/2), size2ui(2*l-1, l))*three;
+					box_integral<integral_view_t,response_t>(iv, point2i(ix2, iy4), size2ui(l1, w))-
+					box_integral<integral_view_t,response_t>(iv, point2i(ix2, iy3), size2ui(l1, l))*three;
 				
 				response_t d_xy=
-					box_integral<integral_view_t,response_t>(iv, point2i(ix+1, iy-l), size2ui(l, l))+
-					box_integral<integral_view_t,response_t>(iv, point2i(ix-l, iy+1), size2ui(l, l))-
-					box_integral<integral_view_t,response_t>(iv, point2i(ix-l, iy-l), size2ui(l, l))-
-					box_integral<integral_view_t,response_t>(iv, point2i(ix+1, iy+1), size2ui(l, l));
+					box_integral<integral_view_t,response_t>(iv, point2i(ix5, iy1), size2ui(l, l))+
+					box_integral<integral_view_t,response_t>(iv, point2i(ix1, iy5), size2ui(l, l))-
+					box_integral<integral_view_t,response_t>(iv, point2i(ix1, iy1), size2ui(l, l))-
+					box_integral<integral_view_t,response_t>(iv, point2i(ix5, iy5), size2ui(l, l));
 	
 				d_xx*=s_coeff;
 				d_yy*=s_coeff;
@@ -519,9 +534,9 @@ namespace baldzarika { namespace ucv  {
 		return size2ui(m_integral_img.width(), m_integral_img.height());
 	}
 
-	bool surf::update(gray_view_t gi)
+	bool surf::update(gray_view_t gi, gray_t const &mv)
 	{
-		if(!ucv::integral(gi, gil::view(m_integral_img)))
+		if(!ucv::integral(gi, gil::view(m_integral_img), mv))
 			return false;
 		return true;
 	}

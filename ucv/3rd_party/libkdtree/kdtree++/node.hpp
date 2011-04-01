@@ -213,7 +213,7 @@ namespace KDTree
 	    typename _Dist::distance_type d = 0;
 	    for (size_t i=0; i != __k; ++i)
 	      d += _S_node_distance(i, __dist, __acc, __val, cur->_M_value);
-       d = std::sqrt(d);
+       d = sqrt(d);
 	    if (d <= __max)
           // ("bad candidate notes")
           // Changed: removed this test: || ( d == __max && cur < __best ))
@@ -221,11 +221,11 @@ namespace KDTree
           // This is because find_nearest() etc will call this function with the best set to _M_root EVEN IF _M_root is not a valid answer (eg too far away or doesn't pass the predicate test)
 	      {
 			  typename std::list< std::pair<const NodeType*, std::pair<size_t, typename _Dist::distance_type> > >::iterator __it=__result.begin();
-			  while(__it!=__result.end() && __it->second.second>=d) ++__it;
+			  while(__it!=__result.end() && d>__it->second.second) ++__it;
 			  if(!(__result.size()==__n && __it==__result.end()))
 				__result.insert(__result.size()<__n?__it:__result.erase(__it), std::make_pair(cur, std::make_pair(cur_dim, d)));
 		//__best = cur;
-		//__max = d;
+		__max = __result.back().second.second;
 		//__dim = cur_dim;
 	      }
 	  }
@@ -249,7 +249,7 @@ namespace KDTree
       near_node = static_cast<NodePtr>(probe->_M_left);
     if (near_node
 	// only visit node's children if node's plane intersect hypersphere
-	&& (std::sqrt(_S_node_distance(probe_dim % __k, __dist, __acc, __val, probe->_M_value)) <= __max))
+	&& (sqrt(_S_node_distance(probe_dim % __k, __dist, __acc, __val, probe->_M_value)) <= __max))
       {
 	probe = near_node;
 	++probe_dim;
@@ -275,15 +275,15 @@ namespace KDTree
 		    typename _Dist::distance_type d = 0;
 		    for (size_t i=0; i < __k; ++i)
 		      d += _S_node_distance(i, __dist, __acc, __val, probe->_M_value);
-          d = std::sqrt(d);
+          d = sqrt(d);
           if (d <= __max)  // CHANGED, see the above notes ("bad candidate notes")
 		      {
 				  typename std::list< std::pair<const NodeType*, std::pair<size_t, typename _Dist::distance_type> > >::iterator __it=__result.begin();
-				  while(__it!=__result.end() && __it->second.second>=d) ++__it;
+				  while(__it!=__result.end() && d>__it->second.second) ++__it;
 				  if(!(__result.size()==__n && __it==__result.end()))
-					  __result.insert(__result.size()<__n?__it:__result.erase(__it), std::make_pair(cur, std::make_pair(cur_dim, d)));
+					  __result.insert(__result.size()<__n?__it:__result.erase(__it), std::make_pair(probe, std::make_pair(probe_dim, d)));
 			//__best = probe;
-			//__max = d;
+			__max = __result.back().second.second;
 			//__dim = probe_dim;
 		      }
 		  }
@@ -295,7 +295,7 @@ namespace KDTree
 		  }
 		else if (far_node &&
 			 // only visit node's children if node's plane intersect hypersphere
-			 std::sqrt(_S_node_distance(probe_dim % __k, __dist, __acc, __val, probe->_M_value)) <= __max)
+			 sqrt(_S_node_distance(probe_dim % __k, __dist, __acc, __val, probe->_M_value)) <= __max)
 		  {
 		    probe = far_node;
 		    ++probe_dim;
@@ -310,7 +310,7 @@ namespace KDTree
 	      {
 		if (pprobe == near_node && far_node
 		    // only visit node's children if node's plane intersect hypersphere
-		    && std::sqrt(_S_node_distance(probe_dim % __k, __dist, __acc, __val, probe->_M_value)) <= __max)
+		    && sqrt(_S_node_distance(probe_dim % __k, __dist, __acc, __val, probe->_M_value)) <= __max)
 		  {
 		    pprobe = probe;
 		    probe = far_node;
@@ -338,7 +338,7 @@ namespace KDTree
 	      near_node = static_cast<NodePtr>(cur->_M_left);
 	    if (near_node
 		// only visit node's children if node's plane intersect hypersphere
-		&& (std::sqrt(_S_node_distance(cur_dim % __k, __dist, __acc, __val, cur->_M_value)) <= __max))
+		&& (sqrt(_S_node_distance(cur_dim % __k, __dist, __acc, __val, cur->_M_value)) <= __max))
 	      {
 		probe = near_node;
 		++probe_dim;

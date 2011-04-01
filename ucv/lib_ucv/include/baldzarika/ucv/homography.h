@@ -79,6 +79,33 @@ namespace baldzarika { namespace ucv {
 		return ransac_homography(obj_pts,img_pts)(hm,rt);
 	}
 
+	template < typename I1, typename I2>
+	bool find_homography_ransac(
+		std::vector< std::pair<I1, I2> > const &oim,
+		homography::matrix_t &hm,
+		bool swap_dir=false,
+		float rt=3.0f
+		)
+	{
+		BOOST_ASSERT(hm.size1()==3 && hm.size2()==3);
+
+		std::vector<homography::point2_t> obj_pts(oim.size()), img_pts(oim.size());
+		for(std::size_t p=0;p<oim.size();++p)
+		{
+			obj_pts[p]=homography::point2_t(
+				static_cast<homography::point2_t::value_type>(swap_dir?oim[p].second->x:oim[p].first->x),
+				static_cast<homography::point2_t::value_type>(swap_dir?oim[p].second->y:oim[p].first->y)
+			);
+
+			img_pts[p]=homography::point2_t(
+				static_cast<homography::point2_t::value_type>(swap_dir?oim[p].first->x:oim[p].second->x),
+				static_cast<homography::point2_t::value_type>(swap_dir?oim[p].first->y:oim[p].second->y)
+			);
+		}
+		return ransac_homography(obj_pts,img_pts)(hm,rt);
+	}
+
+
 } //namespace ucv
 } //namespace baldzarika
 

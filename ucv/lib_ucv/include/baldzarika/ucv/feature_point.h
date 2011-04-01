@@ -35,6 +35,7 @@ namespace baldzarika { namespace ucv {
 			, m_scale(that.m_scale)
 			, m_orientation(that.m_orientation)
 		{
+			::memcpy(m_desc, that.m_desc, sizeof(m_desc));
 		}
 
 		value_type operator -(feature_point const &rhs) const
@@ -45,12 +46,12 @@ namespace baldzarika { namespace ucv {
 			desc_value_type sum=0;
 			for(boost::uint32_t d=0;d<64;++d)
 			{
-				desc_value_type diff=s_coeff*(m_desc[d]-rhs.m_desc[d]);
-				float diff_=diff;
-				float diff_diff_=diff*diff;
+				desc_value_type diff=s_coeff(m_desc[d]-rhs.m_desc[d]);
+				//float diff_=diff;
+				//float diff_diff_=diff*diff;
 				sum+=diff*diff;
 			}
-			float sum_=sum;
+			//float sum_=sum;
 			return s_icoeff*sqrt(sum);
 		}
 

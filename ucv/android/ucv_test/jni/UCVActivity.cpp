@@ -141,7 +141,6 @@ namespace {
 		//detection stuff
 		boost::scoped_ptr<ucv::surf> m_surf;
 		ucv::gil::gray8_image_t	m_gil_gray_img;
-		ucv::gil::gray8_image_t	m_gil_gray_img2;
 		ucv::surf::gray_image_t m_gray_img;
 		std::vector<ucv::surf::feature_point_t> m_features;
 		std::vector< std::pair<std::size_t,std::size_t> > m_feature_matches;
@@ -262,10 +261,9 @@ void UCVActivity::onSurfaceChanged(local_ref<egl::EGL10> const &gl, int width, i
 	glViewport(0, 0, width, height);
 	if(Native *pn=reinterpret_cast<Native*>((jlong)(m_Native)))
 	{
-		pn->m_surf.reset(new ucv::surf(ucv::size2ui(width/2,height/2), 3, 4, 2, 1.0e-4f));
-		pn->m_gil_gray_img.recreate(width,height);
-		pn->m_gil_gray_img2.recreate(width/2,height/2);
-		pn->m_gray_img.recreate(width/2,height/2);
+		pn->m_surf.reset(new ucv::surf(ucv::size2ui(width*2,height*2), 2, 4, 2, 1.0e-3f));
+		pn->m_gil_gray_img.recreate(width*2,height*2);
+		pn->m_gray_img.recreate(width*2,height*2);
 
 		pn->m_features_program.reset(new ucv::gles::program());
 		ucv::gles::vertex_shader features_vs;
@@ -292,7 +290,7 @@ void UCVActivity::onDrawFrame(local_ref<egl::EGL10> const &gl)
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-#if 0
+#if 1
 			if(pn->m_homography_ok)
 			{
 				Native::matrix_t hm(pn->m_homography);
@@ -403,7 +401,7 @@ void UCVActivity::surfaceChanged(local_ref<SurfaceHolder> const &holder, int for
 		}
 
 		//parameters->set(java::lang::String(array<jbyte,1>("orientation")), 180);
-		parameters->setPreviewSize(width,height);
+		parameters->setPreviewSize(width*2,height*2);
 		//parameters->setPreviewFormat(0x10);
 		//parameters->setPreviewFormat(0x11);
 		pCamera->setParameters(parameters);
@@ -430,8 +428,8 @@ bool UCVActivity::onTouchEvent(j2cpp::local_ref<MotionEvent> const &me)
 		{
 			if(pn->m_surf && pn->m_gray_img.width()*pn->m_gray_img.height())
 			{
-				ucv::convert_scale(ucv::gil::view(pn->m_gray_img), ucv::gil::view(pn->m_gil_gray_img2), float(255));
-				ucv::gil::png_write_view("/sdcard/markers/capture.png",ucv::gil::view(pn->m_gil_gray_img2));
+				ucv::convert_scale(ucv::gil::view(pn->m_gray_img), ucv::gil::view(pn->m_gil_gray_img), float(255));
+				ucv::gil::png_write_view("/sdcard/markers/capture.png",ucv::gil::view(pn->m_gil_gray_img));
 			}
 		}
 	}
@@ -459,7 +457,6 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 			ucv::size2ui fs(parameters->getPreviewSize()->width, parameters->getPreviewSize()->height);
 
 
-
 			//ucv::gil::resize_view(
 			//	ucv::gil::interleaved_view(
 			//		fs.width(), fs.height(),
@@ -481,6 +478,7 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 			//	ucv::surf::integral_t(1.0f/255.0f)
 			//);
 
+			ucv::surf::gray_t median_value(-1);
 			ucv::convert_nv16_to_gray(
 				//y channel
 				ucv::gil::interleaved_view(
@@ -494,59 +492,60 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 					reinterpret_cast<ucv::gil::gray16_pixel_t*>(data->data()+fs.width()*fs.height()),
 					(fs.width()/2)*2
 				),
-				ucv::gil::view(pn->m_gil_gray_img),
-				255.0f
-			);
-
-			ucv::gil::resize_view(
-				ucv::gil::view(pn->m_gil_gray_img),
-				ucv::gil::view(pn->m_gil_gray_img2),
-				ucv::gil::bilinear_sampler()
-			);
-
-			ucv::convert_scale(
-				ucv::gil::view(pn->m_gil_gray_img2),
 				ucv::gil::view(pn->m_gray_img),
-				ucv::surf::integral_t(1.0f/255.0f)
+				median_value
 			);
 
-			static int update_usecs=0, build_usecs=0, detect_usecs=0, describe_usecs=0, match_usecs=0, homography_usecs=0, counter=10;
+			//ucv::gil::resize_view(
+			//	ucv::gil::view(pn->m_gil_gray_img),
+			//	ucv::gil::view(pn->m_gil_gray_img2),
+			//	ucv::gil::bilinear_sampler()
+			//);
+
+			//ucv::convert_scale(
+			//	ucv::gil::view(pn->m_gil_gray_img2),
+			//	ucv::gil::view(pn->m_gray_img),
+			//	ucv::surf::integral_t(1.0f/255.0f)
+			//);
+
+			static int update_usecs=0, build_usecs=0, detect_usecs=0, describe_usecs=0, match_usecs=0, homography_usecs=0, counter=1;
 
 
 			boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
-			pn->m_surf->update(ucv::gil::view(pn->m_gray_img));
+			pn->m_surf->update(ucv::gil::view(pn->m_gray_img), median_value);
 			boost::posix_time::ptime finish_update=boost::posix_time::microsec_clock::local_time();
 			pn->m_surf->build_response_layers();
 			boost::posix_time::ptime finish_build=boost::posix_time::microsec_clock::local_time();
 			pn->m_surf->detect(pn->m_features);
 			boost::posix_time::ptime finish_detect=boost::posix_time::microsec_clock::local_time();
-			//pn->m_surf->describe(pn->m_features);
+			pn->m_surf->describe(pn->m_features);
 			boost::posix_time::ptime finish_describe=boost::posix_time::microsec_clock::local_time();
-			//ucv::surf::match_feature_points(pn->m_marker_features, pn->m_features, pn->m_feature_matches, ucv::surf::feature_point_t::value_type(0.65f));
+			ucv::surf::match_feature_points(pn->m_marker_features, pn->m_features, pn->m_feature_matches, ucv::surf::feature_point_t::value_type(0.65f));
 			boost::posix_time::ptime finish_match=boost::posix_time::microsec_clock::local_time();
 			//ucv::nublas::matrix< ucv::surf::feature_point_t::value_type, ucv::nublas::row_major > hm;
-			//pn->m_homography_ok=ucv::find_homography_ransac(pn->m_marker_features, pn->m_features, pn->m_feature_matches, pn->m_homography);
+			pn->m_homography_ok=ucv::find_homography_ransac(pn->m_marker_features, pn->m_features, pn->m_feature_matches, pn->m_homography);
 			boost::posix_time::ptime finish_homography=boost::posix_time::microsec_clock::local_time();
 
-			update_usecs+=(finish_update-start).total_microseconds();
-			build_usecs+=(finish_build-finish_update).total_microseconds();
-			detect_usecs+=(finish_detect-finish_build).total_microseconds();
-			describe_usecs+=(finish_describe-finish_detect).total_microseconds();
-			match_usecs+=(finish_match-finish_describe).total_microseconds();
-			homography_usecs+=(finish_homography-finish_match).total_microseconds();
+			update_usecs+=(finish_update-start).total_milliseconds();
+			build_usecs+=(finish_build-finish_update).total_milliseconds();
+			detect_usecs+=(finish_detect-finish_build).total_milliseconds();
+			describe_usecs+=(finish_describe-finish_detect).total_milliseconds();
+			match_usecs+=(finish_match-finish_describe).total_milliseconds();
+			homography_usecs+=(finish_homography-finish_match).total_milliseconds();
 
 			if(!(--counter))
 			{
-				//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "nf=%d, update=%f, build=%f, detect=%f, describe=%f, match=%f, homography=%f",
-				//		pn->m_features.size(),
-				//		float(update_usecs)/10.0f,
-				//		float(build_usecs)/10.0f,
-				//		float(detect_usecs)/10.0f,
-				//		float(describe_usecs)/10.0f,
-				//		float(match_usecs)/10.0f,
-				//		float(homography_usecs)/10.0f);
-
-				counter=10;
+				__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "nf=%d, nm=%d, u=%f, b=%f, d=%f, des=%f, m=%f, h=%f",
+						pn->m_features.size(),
+						pn->m_feature_matches.size(),
+						float(update_usecs),
+						float(build_usecs),
+						float(detect_usecs),
+						float(describe_usecs),
+						float(match_usecs),
+						float(homography_usecs)
+				);
+				counter=1;
 				update_usecs=build_usecs=detect_usecs=describe_usecs=match_usecs=homography_usecs;
 			}
 

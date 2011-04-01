@@ -7,6 +7,7 @@
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/surf.h>
 #include <baldzarika/ucv/homography.h>
+#include <baldzarika/ucv/match_feature_points.h>
 #include <boost/date_time.hpp>
 
 #include <opencv2/core/core.hpp>
@@ -259,8 +260,8 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	namespace ucv=baldzarika::ucv;
 
 	//img 1
-	cv::Mat cv_img1=cv::imread("test_img2.png", CV_LOAD_IMAGE_GRAYSCALE);
-	//cv::Mat cv_img1=cv::imread("box.png", CV_LOAD_IMAGE_GRAYSCALE);
+	//cv::Mat cv_img1=cv::imread("test_img2.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img1=cv::imread("box.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::imshow(OPENCV_WND_NAME, cv_img1);
 	//cv::waitKey();
 
@@ -288,8 +289,8 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 
 	//img2
-	cv::Mat cv_img2=cv::imread("test_img2_match.png", CV_LOAD_IMAGE_GRAYSCALE);
-	//cv::Mat cv_img2=cv::imread("box_in_scene.png", CV_LOAD_IMAGE_GRAYSCALE);
+	//cv::Mat cv_img2=cv::imread("test_img2_match.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img2=cv::imread("box_in_scene.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::imshow(OPENCV_WND_NAME, cv_img2);
 	//cv::waitKey();
 
@@ -341,14 +342,8 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	boost::posix_time::ptime finish3=boost::posix_time::microsec_clock::local_time();
 	std::cout << "detect<desc>: " << float((finish3-start3).total_microseconds())/100.0f << std::endl;
 
-	std::pair<ucv::surf::fps_by_desc_tree_t::iterator, ucv::surf::fps_by_desc_tree_t::distance_type> res=ffps2.find_nearest(*ffps2.begin());
-	std::list< std::pair<ucv::surf::fps_by_desc_tree_t::iterator, ucv::surf::fps_by_desc_tree_t::distance_type> > res2;
-	ffps2.find_k_nearest(*ffps2.begin(),res2, 3);
-
-
-	
 	boost::posix_time::ptime start4=boost::posix_time::microsec_clock::local_time();
-	for(int i=0;i<100;++i)
+	//for(int i=0;i<100;++i)
 		the_surf1.describe(ffps2);
 	boost::posix_time::ptime finish4=boost::posix_time::microsec_clock::local_time();
 	std::cout << "describe<desc>: " << float((finish4-start4).total_microseconds())/100.0f << std::endl;
@@ -356,6 +351,10 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 	//std::size_t num_points=ffps.size();
 	std::cout << "detect<vec>.size()=" << fps1.size() << " detect<pos>.size()=" << ffps1.size() << " detect<desc>.size()=" << ffps2.size() <<std::endl;
+
+	std::pair<ucv::surf::fps_by_desc_tree_t::iterator, ucv::surf::fps_by_desc_tree_t::distance_type> res=ffps2.find_nearest(*ffps2.begin());
+	std::list< std::pair<ucv::surf::fps_by_desc_tree_t::iterator, ucv::surf::fps_by_desc_tree_t::distance_type> > res2;
+	ffps2.find_k_nearest(*ffps2.begin(),res2, 3);
 
 	
 
@@ -371,16 +370,41 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	the_surf2.describe(fps2);
 
 
-	std::vector< std::pair<std::size_t, std::size_t> > matches;
-	ucv::surf::match_feature_points(fps1, fps2, matches, 0.65f);
+	//std::vector< std::pair<std::size_t, std::size_t> > matches;
+	//ucv::surf::match_feature_points(fps1, fps2, matches, 0.65f);
 
+	boost::posix_time::ptime match_vec_start=boost::posix_time::microsec_clock::local_time();
+	for(std::size_t i=0;i<10;++i)
+	{
+		std::vector< std::pair< std::vector< ucv::surf::feature_point_t >::const_iterator, std::vector< ucv::surf::feature_point_t >::const_iterator > > matches_vec_vec;
+		ucv::match_feature_points<ucv::surf::feature_point_t, std::vector<ucv::surf::feature_point_t>, std::vector< ucv::surf::feature_point_t> >(fps1, fps2, matches_vec_vec);
+	}
+	boost::posix_time::ptime match_vec_finish=boost::posix_time::microsec_clock::local_time();
+	std::cout << "matches_vec_vec: " << float((match_vec_finish-match_vec_start).total_microseconds())/10.0f << std::endl;
+
+	ffps2.optimise();
+	boost::posix_time::ptime match_kdtree_start=boost::posix_time::microsec_clock::local_time();
+	for(std::size_t i=0;i<10;++i)
+	{
+		std::vector< std::pair< std::vector< ucv::surf::feature_point_t >::const_iterator, ucv::surf::fps_by_desc_tree_t::const_iterator > > matches_vec_tree;
+		ucv::match_feature_points(fps2, ffps2, matches_vec_tree);
+	}
+	boost::posix_time::ptime match_kdtree_finish=boost::posix_time::microsec_clock::local_time();
+	std::cout << "matches_vec_tree: " << float((match_kdtree_finish-match_kdtree_start).total_microseconds())/10.0f << std::endl;
+
+
+
+	std::vector< std::pair< std::vector< ucv::surf::feature_point_t >::const_iterator, ucv::surf::fps_by_desc_tree_t::const_iterator > > matches;
+	ucv::match_feature_points(fps2, ffps2, matches);
+
+	
 	std::cout << "found " << matches.size() << " matches!" << std::endl;
 
-	cv::Mat cv_img1_rgb=cv::imread("test_img2.png");
-	cv::Mat cv_img2_rgb=cv::imread("test_img2_match.png");
+	//cv::Mat cv_img1_rgb=cv::imread("test_img2.png");
+	//cv::Mat cv_img2_rgb=cv::imread("test_img2_match.png");
 
-	//cv::Mat cv_img1_rgb=cv::imread("box.png");
-	//cv::Mat cv_img2_rgb=cv::imread("box_in_scene.png");
+	cv::Mat cv_img1_rgb=cv::imread("box.png");
+	cv::Mat cv_img2_rgb=cv::imread("box_in_scene.png");
 	
 
 
@@ -388,18 +412,18 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 	for(std::size_t ifp=0;ifp<matches.size();++ifp)
 	{
-		pts1.push_back(cv::Point2f(fps1[matches[ifp].first].x,fps1[matches[ifp].first].y));
-		pts2.push_back(cv::Point2f(fps2[matches[ifp].second].x,fps2[matches[ifp].second].y));
+		pts1.push_back(cv::Point2f(matches[ifp].second->x,matches[ifp].second->y));
+		pts2.push_back(cv::Point2f(matches[ifp].first->x,matches[ifp].first->y));
 
 		cv::circle(cv_img1_rgb,
-			cv::Point(static_cast<boost::int32_t>(fps1[matches[ifp].first].x), static_cast<boost::int32_t>(fps1[matches[ifp].first].y)),
+			cv::Point(static_cast<boost::int32_t>(matches[ifp].second->x), static_cast<boost::int32_t>(matches[ifp].second->y)),
 			3,
 			cv::Scalar(0.0, 255.0, 0.0),
 			-1
 		);
 
 		cv::circle(cv_img2_rgb,
-			cv::Point(static_cast<boost::int32_t>(fps2[matches[ifp].second].x), static_cast<boost::int32_t>(fps2[matches[ifp].second].y)),
+			cv::Point(static_cast<boost::int32_t>(matches[ifp].first->x), static_cast<boost::int32_t>(matches[ifp].first->y)),
 			3,
 			cv::Scalar(0.0, 255.0, 0.0),
 			-1
@@ -408,7 +432,12 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 	ucv::homography::matrix_t hm(3,3);
 
-	ucv::find_homography_ransac(fps1, fps2, matches, hm);
+	//ucv::find_homography_ransac(fps1, fps2, matches, hm);
+
+	ucv::find_homography_ransac(matches,hm,true);
+
+
+	
 #if 1
 	cv::Mat ocvhm=cv::findHomography(cv::Mat(pts1), cv::Mat(pts2), CV_RANSAC);
 
