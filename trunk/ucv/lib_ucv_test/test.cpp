@@ -8,7 +8,11 @@
 #include <baldzarika/ucv/surf.h>
 #include <baldzarika/ucv/homography.h>
 #include <baldzarika/ucv/match_feature_points.h>
+#include <baldzarika/ucv/klt_tracker.h>
 #include <boost/date_time.hpp>
+#define png_infopp_NULL (png_infopp)0
+#define int_p_NULL (int*)0
+#include <boost/gil/extension/io/png_io.hpp>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -254,7 +258,7 @@ BOOST_AUTO_TEST_CASE( test_surf )
 #endif
 
 
-#if 1
+#if 0
 BOOST_AUTO_TEST_CASE( test_surf_match )
 {
 	namespace ucv=baldzarika::ucv;
@@ -520,3 +524,68 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 }
 
 #endif
+
+BOOST_AUTO_TEST_CASE( test_klt_tracker )
+{
+	namespace ucv=baldzarika::ucv;
+
+	ucv::gil::gray8_image_t marker_img;
+	ucv::gil::png_read_and_convert_image("test_img2.png", marker_img);
+
+	ucv::gil::gray8_image_t shifted_marker_img(marker_img.width(),marker_img.height());
+	
+	{
+		ucv::gil::matrix3x2<float> shift_mat=ucv::gil::matrix3x2<float>::get_translate(ucv::gil::point2<float>(3.0f,3.0f));
+		ucv::gil::resample_pixels(
+			ucv::gil::const_view(marker_img),
+			ucv::gil::view(shifted_marker_img),
+			shift_mat,
+			ucv::gil::bilinear_sampler()
+		);
+	}
+
+	std::vector<cv::Point2f> good_features;
+	cv::goodFeaturesToTrack(
+		cv::Mat(
+			marker_img.height(),
+			marker_img.width(),
+			CV_8UC1,
+			ucv::gil::view(marker_img).row_begin(0)
+		),
+		good_features,
+		3,
+		0.25f,
+		5.0f
+	);
+
+	ucv::surf::gray_image_t gray_img(marker_img.width(), marker_img.height()), shifted_gray_img(marker_img.width(), marker_img.height());
+	ucv::convert_scale(ucv::gil::view(marker_img), ucv::gil::view(gray_img), 1.0f/255.0f);
+	ucv::convert_scale(ucv::gil::view(shifted_marker_img), ucv::gil::view(shifted_gray_img), 1.0f/255.0f);
+	
+	ucv::surf::integral_image_t integral_img(marker_img.width(), marker_img.height()), shifted_integral_img(marker_img.width(), marker_img.height());
+	ucv::integral(ucv::gil::view(gray_img), ucv::gil::view(integral_img));
+	ucv::integral(ucv::gil::view(shifted_gray_img), ucv::gil::view(shifted_integral_img));
+
+	std::vector<ucv::surf::feature_point_t::point2_t> prev_pts, next_pts;
+	for(std::size_t ifp=0;ifp<good_features.size();++ifp)
+		prev_pts.push_back(
+			ucv::surf::feature_point_t::point2_t(
+				good_features[ifp].x,
+				good_features[ifp].y
+			)
+		);
+
+	typedef ucv::klt_tracker<ucv::surf::integral_t::IS,ucv::surf::integral_t::FS> klt_tracker_t;
+	klt_tracker_t feature_point_tracker(ucv::gil::view(integral_img), ucv::gil::view(shifted_integral_img),ucv::size2ui(15,15), 4, 100);
+	std::vector<bool> status;
+	feature_point_tracker(prev_pts, next_pts, status);
+
+
+	for(std::size_t ifp=0;ifp<good_features.size();++ifp)
+	{
+		float dx=static_cast<float>(next_pts[ifp].x)-good_features[ifp].x;
+		float dy=static_cast<float>(next_pts[ifp].y)-good_features[ifp].y;
+
+		int c=0;
+	}
+}
