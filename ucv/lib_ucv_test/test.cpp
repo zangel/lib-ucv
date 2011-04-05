@@ -258,7 +258,7 @@ BOOST_AUTO_TEST_CASE( test_surf )
 #endif
 
 
-#if 0
+#if 1
 BOOST_AUTO_TEST_CASE( test_surf_match )
 {
 	namespace ucv=baldzarika::ucv;
@@ -326,7 +326,7 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	the_surf1.build_response_layers();
 	std::vector<ucv::surf::feature_point_t> fps1;
 	boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
-	//for(int i=0;i<100;++i)
+	for(int i=0;i<100;++i)
 		the_surf1.detect(fps1);
 	boost::posix_time::ptime finish=boost::posix_time::microsec_clock::local_time();
 	std::cout << "detect<vec>: " << float((finish-start).total_microseconds())/100.0f << std::endl;
@@ -535,7 +535,7 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 	ucv::gil::gray8_image_t shifted_marker_img(marker_img.width(),marker_img.height());
 	
 	{
-		ucv::gil::matrix3x2<float> shift_mat=ucv::gil::matrix3x2<float>::get_translate(ucv::gil::point2<float>(1.0f,0.0f));
+		ucv::gil::matrix3x2<float> shift_mat=ucv::gil::matrix3x2<float>::get_translate(ucv::gil::point2<float>(3.0f,-3.0f));
 		ucv::gil::resample_pixels(
 			ucv::gil::const_view(marker_img),
 			ucv::gil::view(shifted_marker_img),
@@ -553,7 +553,7 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 			ucv::gil::view(marker_img).row_begin(0)
 		),
 		good_features,
-		3,
+		50,
 		0.25f,
 		5.0f
 	);
@@ -576,16 +576,22 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 		);
 
 	typedef ucv::klt_tracker<ucv::surf::integral_t::IS,ucv::surf::integral_t::FS> klt_tracker_t;
-	klt_tracker_t feature_point_tracker(ucv::gil::view(integral_img), ucv::gil::view(shifted_integral_img),ucv::size2ui(10,10), 4, 100);
+	klt_tracker_t feature_point_tracker(ucv::gil::view(integral_img), ucv::gil::view(shifted_integral_img),ucv::size2ui(7,7), 3, 2);
+	
 	std::vector<bool> status;
-	feature_point_tracker(prev_pts, next_pts, status);
-
-
+	
+	boost::posix_time::ptime klt_track_start=boost::posix_time::microsec_clock::local_time();
+	for(int i=0;i<100;++i)
+		feature_point_tracker(prev_pts, next_pts, status);
+	boost::posix_time::ptime klt_track_finish=boost::posix_time::microsec_clock::local_time();
+	std::cout << "klt_tracker: " << float((klt_track_finish-klt_track_start).total_microseconds())/(100.0f*prev_pts.size()) << std::endl;
+	
 	for(std::size_t ifp=0;ifp<good_features.size();++ifp)
 	{
-		float dx=static_cast<float>(next_pts[ifp].x)-good_features[ifp].x;
-		float dy=static_cast<float>(next_pts[ifp].y)-good_features[ifp].y;
+		float dx=std::abs((static_cast<float>(next_pts[ifp].x)-good_features[ifp].x)+3.0f);
+		float dy=std::abs((static_cast<float>(next_pts[ifp].y)-good_features[ifp].y)-3.0f);
 
-		int c=0;
+		BOOST_CHECK_LT(dx, 5.0e-2f);
+		BOOST_CHECK_LT(dy, 5.0e-2f);
 	}
 }

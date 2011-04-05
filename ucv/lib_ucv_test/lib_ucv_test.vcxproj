@@ -81,7 +81,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>../lib;$(BOOST_STAGE_DIR)/vc100/32/lib;$(OPENCV_DIR)/lib;$(LIBPNG_DIR)/projects/vstudio/Release Library</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_ucv_32.lib;opencv_core220.lib;opencv_highgui220.lib;opencv_imgproc220.lib;opencv_calib3d220.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_ucv_32.lib;opencv_core220.lib;opencv_highgui220.lib;opencv_imgproc220.lib;opencv_calib3d220.lib;libpng15.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
