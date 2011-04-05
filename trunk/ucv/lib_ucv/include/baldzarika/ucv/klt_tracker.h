@@ -13,7 +13,7 @@ namespace baldzarika { namespace ucv {
 		typedef gil::image< integral_pixel_t, false, std::allocator<unsigned char> > integral_image_t;
 		typedef typename integral_image_t::view_t integral_view_t;
 		
-		klt_tracker(integral_view_t prev, integral_view_t curr, size2ui const &ws=ucv::size2ui(10,10), boost::uint32_t nl=3, boost::uint32_t mi=5, integral_t const &e=integral_t(1.0e-3f), integral_t const &sd=integral_t(1.0e-2f))
+		klt_tracker(integral_view_t prev, integral_view_t curr, size2ui const &ws=ucv::size2ui(10,10), boost::uint32_t nl=3, boost::uint32_t mi=5, integral_t const &e=integral_t(1.0e-3f), integral_t const &sd=integral_t(1.0e-3f))
 			: m_prev(prev)
 			, m_curr(curr)
 			, m_win_size(ws.width()/2, ws.height()/2)
@@ -44,7 +44,7 @@ namespace baldzarika { namespace ucv {
 		bool operator()(point2< fixed_point<I2,F2> > const &prev_fp, point2< fixed_point<I2,F2> > &curr_fp)
 		{
 			integral_t const range_corr=detail::constants::one<integral_t>()/integral_t((2*m_win_size.width()+1)*(2*m_win_size.height()+1));
-			integral_t const step_factor=1.5f;
+			integral_t const step_factor=1.0f;
 			curr_fp=prev_fp;
 			for(boost::uint32_t l=0;l<m_num_levels;++l)
 			{
@@ -56,13 +56,11 @@ namespace baldzarika { namespace ucv {
 					compute_gradient_sum_and_img_diff(prev_fp, curr_fp, ls);
 					integral_t gxx, gyy, gxy, ex, ey;
 					compute_gradient_matrix_and_err_vector(gxx,gyy, gxy, ex, ey);
-					gxx*=range_corr;
-					gyy*=range_corr;
-					gxy*=range_corr;
-					ex*=range_corr*step_factor;
-					ey*=range_corr*step_factor;
-
-					
+					//gxx*=range_corr;
+					//gyy*=range_corr;
+					//gxy*=range_corr;
+					//ex*=range_corr*step_factor;
+					//ey*=range_corr*step_factor;
 
 					integral_t det=gxx*gyy-gxy*gxy;
 					if(fabs(det)<m_small_det)
@@ -133,8 +131,9 @@ namespace baldzarika { namespace ucv {
 			typedef fixed_point<I,F> real_t;
 			typedef point2<real_t> point2_t;
 
-			integral_t inv_s=detail::constants::one<integral_t>()/integral_t(s);
-			integral_t inv_area=inv_s*inv_s;
+			integral_t const sobel_scale=1.0f/4.0f;
+			integral_t const inv_s=1.0f/float(s);
+			integral_t const inv_area=1.0f/float(s*s);
 
 
 			integral_t prev_ax=integral_t(prev_pt.x-real_t(static_cast<boost::int32_t>(prev_pt.x)))*inv_s;
@@ -199,13 +198,13 @@ namespace baldzarika { namespace ucv {
 				for(boost::uint32_t x=1;x<(2*m_win_size.width()+1)+2+1;++x)
 				{
 					point2i prev_pos(
-						static_cast<boost::int32_t>(prev_pt.x)+(x-m_win_size.width()-3)*s,
-						static_cast<boost::int32_t>(prev_pt.y)+(y-m_win_size.height()-3)*s
+						static_cast<boost::int32_t>(prev_pt.x)+(x-m_win_size.width()-2)*s,
+						static_cast<boost::int32_t>(prev_pt.y)+(y-m_win_size.height()-2)*s
 					);
 
 					point2i curr_pos(
-						static_cast<point2i::value_type>(curr_pt.x)+(x-m_win_size.width()-3)*s,
-						static_cast<point2i::value_type>(curr_pt.y)+(y-m_win_size.height()-3)*s
+						static_cast<point2i::value_type>(curr_pt.x)+(x-m_win_size.width()-2)*s,
+						static_cast<point2i::value_type>(curr_pt.y)+(y-m_win_size.height()-2)*s
 					);
 
 					integral_t prev_val=box_integral<integral_view_t,integral_t>(m_prev, prev_pos, size2ui(s,s))*inv_area;
@@ -218,10 +217,10 @@ namespace baldzarika { namespace ucv {
 					img_diff_rows[2][1]+=prev_val*prev_c11-curr_val*curr_c11;
 
 
-					integral_t sum_00=prev_val*prev_c00+curr_val*curr_c00;
-					integral_t sum_01=prev_val*prev_c01+curr_val*curr_c01;
-					integral_t sum_10=prev_val*prev_c10+curr_val*curr_c10;
-					integral_t sum_11=prev_val*prev_c11+curr_val*curr_c11;
+					integral_t sum_00=sobel_scale*(prev_val*prev_c00+curr_val*curr_c00);
+					integral_t sum_01=sobel_scale*(prev_val*prev_c01+curr_val*curr_c01);
+					integral_t sum_10=sobel_scale*(prev_val*prev_c10+curr_val*curr_c10);
+					integral_t sum_11=sobel_scale*(prev_val*prev_c11+curr_val*curr_c11);
 
 					//gradient x sum
 					//[-1][-1]
