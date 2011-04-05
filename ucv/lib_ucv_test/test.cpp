@@ -535,12 +535,12 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 	ucv::gil::gray8_image_t shifted_marker_img(marker_img.width(),marker_img.height());
 	
 	{
-		ucv::gil::matrix3x2<float> shift_mat=ucv::gil::matrix3x2<float>::get_translate(ucv::gil::point2<float>(3.0f,3.0f));
+		ucv::gil::matrix3x2<float> shift_mat=ucv::gil::matrix3x2<float>::get_translate(ucv::gil::point2<float>(1.0f,0.0f));
 		ucv::gil::resample_pixels(
 			ucv::gil::const_view(marker_img),
 			ucv::gil::view(shifted_marker_img),
 			shift_mat,
-			ucv::gil::bilinear_sampler()
+			ucv::gil::nearest_neighbor_sampler()
 		);
 	}
 
@@ -576,7 +576,7 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 		);
 
 	typedef ucv::klt_tracker<ucv::surf::integral_t::IS,ucv::surf::integral_t::FS> klt_tracker_t;
-	klt_tracker_t feature_point_tracker(ucv::gil::view(integral_img), ucv::gil::view(shifted_integral_img),ucv::size2ui(15,15), 4, 100);
+	klt_tracker_t feature_point_tracker(ucv::gil::view(integral_img), ucv::gil::view(shifted_integral_img),ucv::size2ui(10,10), 4, 100);
 	std::vector<bool> status;
 	feature_point_tracker(prev_pts, next_pts, status);
 
