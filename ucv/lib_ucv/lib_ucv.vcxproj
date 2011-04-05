@@ -88,6 +88,7 @@
     <ClInclude Include="include\baldzarika\ucv\config.h" />
     <ClInclude Include="include\baldzarika\ucv\convert_scale.h" />
     <ClInclude Include="include\baldzarika\ucv\feature_point.h" />
+    <ClInclude Include="include\baldzarika\ucv\good_features_detector.h" />
     <ClInclude Include="include\baldzarika\ucv\klt_tracker.h" />
     <ClInclude Include="include\baldzarika\ucv\match_feature_points.h" />
     <ClInclude Include="include\baldzarika\ucv\fixed_point.h" />

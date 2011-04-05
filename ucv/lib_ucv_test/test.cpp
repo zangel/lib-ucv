@@ -9,6 +9,7 @@
 #include <baldzarika/ucv/homography.h>
 #include <baldzarika/ucv/match_feature_points.h>
 #include <baldzarika/ucv/klt_tracker.h>
+#include <baldzarika/ucv/good_features_detector.h>
 #include <boost/date_time.hpp>
 #define png_infopp_NULL (png_infopp)0
 #define int_p_NULL (int*)0
@@ -544,7 +545,47 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 		);
 	}
 
+
+	ucv::surf::gray_image_t gray_img(marker_img.width(), marker_img.height()), shifted_gray_img(marker_img.width(), marker_img.height());
+	ucv::convert_scale(ucv::gil::view(marker_img), ucv::gil::view(gray_img), 1.0f/255.0f);
+	ucv::convert_scale(ucv::gil::view(shifted_marker_img), ucv::gil::view(shifted_gray_img), 1.0f/255.0f);
+	
+	ucv::surf::integral_image_t integral_img(marker_img.width(), marker_img.height()), shifted_integral_img(marker_img.width(), marker_img.height());
+	ucv::integral(ucv::gil::view(gray_img), ucv::gil::view(integral_img));
+	ucv::integral(ucv::gil::view(shifted_gray_img), ucv::gil::view(shifted_integral_img));
+
+	typedef ucv::good_features_detector<ucv::surf::integral_t::IS,ucv::surf::integral_t::FS> good_features_detector_t;
+
+	good_features_detector_t gfd(
+		ucv::size2ui(marker_img.width(), marker_img.height())
+	);
+
+
+	std::vector<ucv::surf::feature_point_t::point2_t> gf_points;
 	std::vector<cv::Point2f> good_features;
+	boost::posix_time::ptime gf_detect_start=boost::posix_time::microsec_clock::local_time();
+	for(int i=0;i<100;++i)
+	{
+#if 0
+		cv::goodFeaturesToTrack(
+			cv::Mat(
+				marker_img.height(),
+				marker_img.width(),
+				CV_8UC1,
+				ucv::gil::view(marker_img).row_begin(0)
+			),
+			good_features,
+			50,
+			0.25f,
+			5.0f
+		);
+#else
+		gfd(ucv::gil::view(integral_img), gf_points);
+#endif
+	}
+	boost::posix_time::ptime gf_detect_finish=boost::posix_time::microsec_clock::local_time();
+	std::cout << "good_features_detect: " << float((gf_detect_finish-gf_detect_start).total_microseconds())/(100.0f) << std::endl;
+
 	cv::goodFeaturesToTrack(
 		cv::Mat(
 			marker_img.height(),
@@ -558,13 +599,6 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 		5.0f
 	);
 
-	ucv::surf::gray_image_t gray_img(marker_img.width(), marker_img.height()), shifted_gray_img(marker_img.width(), marker_img.height());
-	ucv::convert_scale(ucv::gil::view(marker_img), ucv::gil::view(gray_img), 1.0f/255.0f);
-	ucv::convert_scale(ucv::gil::view(shifted_marker_img), ucv::gil::view(shifted_gray_img), 1.0f/255.0f);
-	
-	ucv::surf::integral_image_t integral_img(marker_img.width(), marker_img.height()), shifted_integral_img(marker_img.width(), marker_img.height());
-	ucv::integral(ucv::gil::view(gray_img), ucv::gil::view(integral_img));
-	ucv::integral(ucv::gil::view(shifted_gray_img), ucv::gil::view(shifted_integral_img));
 
 	std::vector<ucv::surf::feature_point_t::point2_t> prev_pts, next_pts;
 	for(std::size_t ifp=0;ifp<good_features.size();++ifp)
