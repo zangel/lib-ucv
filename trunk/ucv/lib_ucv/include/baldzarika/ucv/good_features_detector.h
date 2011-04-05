@@ -57,7 +57,7 @@ namespace baldzarika { namespace ucv {
 
 			dps.clear();
 			compute_gradients(im);
-#if 0
+#if 1
 			integral_t max_eigen_value=compute_min_eigen_values();
 
 			std::vector< std::pair< integral_t, point2_t> > points;
