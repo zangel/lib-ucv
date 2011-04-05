@@ -19,6 +19,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/features2d/features2d.hpp>
 
 #define OPENCV_WND_NAME  "ucv"
 #define OPENCV_WND_NAME2  "ucv2"
@@ -259,7 +260,7 @@ BOOST_AUTO_TEST_CASE( test_surf )
 #endif
 
 
-#if 1
+#if 0
 BOOST_AUTO_TEST_CASE( test_surf_match )
 {
 	namespace ucv=baldzarika::ucv;
@@ -564,7 +565,7 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 	std::vector<ucv::surf::feature_point_t::point2_t> gf_points;
 	std::vector<cv::Point2f> good_features;
 	boost::posix_time::ptime gf_detect_start=boost::posix_time::microsec_clock::local_time();
-	for(int i=0;i<100;++i)
+	for(int i=0;i<10;++i)
 	{
 #if 0
 		cv::goodFeaturesToTrack(
@@ -584,48 +585,127 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 #endif
 	}
 	boost::posix_time::ptime gf_detect_finish=boost::posix_time::microsec_clock::local_time();
-	std::cout << "good_features_detect: " << float((gf_detect_finish-gf_detect_start).total_microseconds())/(100.0f) << std::endl;
-
-	cv::goodFeaturesToTrack(
-		cv::Mat(
-			marker_img.height(),
-			marker_img.width(),
-			CV_8UC1,
-			ucv::gil::view(marker_img).row_begin(0)
-		),
-		good_features,
-		50,
-		0.25f,
-		5.0f
-	);
+	std::cout << "good_features_detect: " << float((gf_detect_finish-gf_detect_start).total_microseconds())/(10.0f) << std::endl;
 
 
-	std::vector<ucv::surf::feature_point_t::point2_t> prev_pts, next_pts;
-	for(std::size_t ifp=0;ifp<good_features.size();++ifp)
-		prev_pts.push_back(
-			ucv::surf::feature_point_t::point2_t(
-				good_features[ifp].x,
-				good_features[ifp].y
-			)
-		);
-
-	typedef ucv::klt_tracker<ucv::surf::integral_t::IS,ucv::surf::integral_t::FS> klt_tracker_t;
-	klt_tracker_t feature_point_tracker(ucv::gil::view(integral_img), ucv::gil::view(shifted_integral_img),ucv::size2ui(7,7), 3, 2);
-	
-	std::vector<bool> status;
-	
-	boost::posix_time::ptime klt_track_start=boost::posix_time::microsec_clock::local_time();
-	for(int i=0;i<100;++i)
-		feature_point_tracker(prev_pts, next_pts, status);
-	boost::posix_time::ptime klt_track_finish=boost::posix_time::microsec_clock::local_time();
-	std::cout << "klt_tracker: " << float((klt_track_finish-klt_track_start).total_microseconds())/(100.0f*prev_pts.size()) << std::endl;
-	
-	for(std::size_t ifp=0;ifp<good_features.size();++ifp)
+	for(int fd=0;fd<9;++fd)
 	{
-		float dx=std::abs((static_cast<float>(next_pts[ifp].x)-good_features[ifp].x)+3.0f);
-		float dy=std::abs((static_cast<float>(next_pts[ifp].y)-good_features[ifp].y)-3.0f);
+		boost::posix_time::ptime detect_start,detect_finish;
+		std::string detector_name;
+		std::vector<ucv::surf::feature_point_t::point2_t> prev_pts, next_pts;
+		if(fd<7)
+		{
+			boost::scoped_ptr<cv::FeatureDetector> feature_detector;
 
-		BOOST_CHECK_LT(dx, 5.0e-2f);
-		BOOST_CHECK_LT(dy, 5.0e-2f);
+			switch(fd)
+			{
+			case 0: feature_detector.reset( new cv::FastFeatureDetector() ); detector_name="FAST"; break;
+			case 1: feature_detector.reset( new cv::GoodFeaturesToTrackDetector() ); detector_name="GFTT"; break;
+			case 2: feature_detector.reset( new cv::MserFeatureDetector() ); detector_name="MSER"; break;
+			case 3: feature_detector.reset( new cv::StarFeatureDetector() ); detector_name="STAR"; break;
+			case 4: feature_detector.reset( new cv::SiftFeatureDetector() ); detector_name="SIFT"; break;
+			case 5: feature_detector.reset( new cv::SurfFeatureDetector() ); detector_name="SURF"; break;
+			case 6: feature_detector.reset( new cv::DenseFeatureDetector() ); detector_name="DENSE"; break;
+			}
+
+			std::vector<cv::KeyPoint> key_points;
+			detect_start=boost::posix_time::microsec_clock::local_time();
+			for(int i=0;i<10;++i)
+			{
+				feature_detector->detect(
+					cv::Mat(
+						marker_img.height(),
+						marker_img.width(),
+						CV_8UC1,
+						ucv::gil::view(marker_img).row_begin(0)
+					),
+					key_points
+				);
+			}
+			detect_finish=boost::posix_time::microsec_clock::local_time();
+				
+
+			for(std::size_t ifp=0;ifp<key_points.size();++ifp)
+				prev_pts.push_back(
+					ucv::surf::feature_point_t::point2_t(
+						key_points[ifp].pt.x,
+						key_points[ifp].pt.y
+					)
+				);
+		}
+		else
+		if(fd==7)
+		{
+			
+			detector_name="fpSURF";
+			ucv::surf surf_detector(ucv::size2ui(integral_img.width(), integral_img.height()), 3, 4, 2, 1.0e-4f);
+			std::vector<ucv::surf::feature_point_t> key_points;
+
+			detect_start=boost::posix_time::microsec_clock::local_time();
+			for(int i=0;i<10;++i)
+			{
+				surf_detector.update(ucv::gil::view(gray_img));
+				surf_detector.build_response_layers();
+			
+				surf_detector.detect(key_points);
+			}
+			detect_finish=boost::posix_time::microsec_clock::local_time();
+
+			for(std::size_t ifp=0;ifp<key_points.size();++ifp)
+				prev_pts.push_back(
+					ucv::surf::feature_point_t::point2_t(
+						key_points[ifp].x,
+						key_points[ifp].y
+					)
+				);
+		}
+		else
+		if(fd==8)
+		{
+			detector_name="fpGFTT";
+			good_features_detector_t gfd(
+				ucv::size2ui(marker_img.width(), marker_img.height())
+			);
+
+
+			std::vector<ucv::surf::feature_point_t::point2_t> key_points;
+			std::vector<cv::Point2f> good_features;
+			detect_start=boost::posix_time::microsec_clock::local_time();
+			for(int i=0;i<10;++i)
+				gfd(ucv::gil::view(integral_img), key_points);
+			detect_finish=boost::posix_time::microsec_clock::local_time();
+			for(std::size_t ifp=0;ifp<key_points.size();++ifp)
+				prev_pts.push_back(
+					ucv::surf::feature_point_t::point2_t(
+						key_points[ifp].x,
+						key_points[ifp].y
+					)
+				);
+		}
+
+		typedef ucv::klt_tracker<ucv::surf::integral_t::IS,ucv::surf::integral_t::FS> klt_tracker_t;
+		klt_tracker_t feature_point_tracker(ucv::gil::view(integral_img), ucv::gil::view(shifted_integral_img),ucv::size2ui(5,5), 3, 100);
+		std::vector<bool> status;
+
+		boost::posix_time::ptime klt_track_start=boost::posix_time::microsec_clock::local_time();
+		for(int i=0;i<10;++i)
+			feature_point_tracker(prev_pts, next_pts, status);
+		boost::posix_time::ptime klt_track_finish=boost::posix_time::microsec_clock::local_time();
+
+		float er=0.0f;
+		for(std::size_t ifp=0;ifp<next_pts.size();++ifp)
+		{
+			float dx=std::abs(static_cast<float>(next_pts[ifp].x-prev_pts[ifp].x)+3.0f);
+			float dy=std::abs(static_cast<float>(next_pts[ifp].y-prev_pts[ifp].y)-3.0f);
+
+			er+=dx*dx+dy*dy;
+		}
+
+		std::cout << detector_name<< ": " << "n=" << prev_pts.size() <<
+			" dt=" <<float((detect_finish-detect_start).total_microseconds())/(10.0f) <<
+			" (" << float((detect_finish-detect_start).total_microseconds())/(10.0f*prev_pts.size()) << ")" <<
+			" tt=" << float((klt_track_finish-klt_track_start).total_microseconds())/(10.0f) <<
+			" (" << float((klt_track_finish-klt_track_start).total_microseconds())/(10.0f*prev_pts.size()) << ")" <<
+			" e=" << er/float(prev_pts.size()) << std::endl;
 	}
 }
