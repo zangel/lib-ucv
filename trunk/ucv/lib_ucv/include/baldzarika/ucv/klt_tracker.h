@@ -25,26 +25,11 @@ namespace baldzarika { namespace ucv {
 		{
 		}
 
-		integral_view_t img_diff()
-		{
-			return gil::subimage_view(gil::view(m_window), 0*(2*m_win_size.width()+1+5), 0, 2*m_win_size.width()+1+5, 2*m_win_size.height()+1+5);
-		}
-
-		integral_view_t grad_sum_x()
-		{
-			return gil::subimage_view(gil::view(m_window), 1*(2*m_win_size.width()+1+5), 0, 2*m_win_size.width()+1+5, 2*m_win_size.height()+1+5);
-		}
-
-		integral_view_t grad_sum_y()
-		{
-			return gil::subimage_view(gil::view(m_window), 2*(2*m_win_size.width()+1+5), 0, 2*m_win_size.width()+1+5, 2*m_win_size.height()+1+5);
-		}
-
 		template < boost::uint32_t I2, boost::uint32_t F2 >
 		bool operator()(point2< fixed_point<I2,F2> > const &prev_fp, point2< fixed_point<I2,F2> > &curr_fp)
 		{
 			integral_t const range_corr=detail::constants::one<integral_t>()/integral_t((2*m_win_size.width()+1)*(2*m_win_size.height()+1));
-			integral_t const step_factor=1.0f;
+			integral_t const step_factor=2.0f;
 			curr_fp=prev_fp;
 			for(boost::uint32_t l=0;l<m_num_levels;++l)
 			{
@@ -56,19 +41,24 @@ namespace baldzarika { namespace ucv {
 					compute_gradient_sum_and_img_diff(prev_fp, curr_fp, ls);
 					integral_t gxx, gyy, gxy, ex, ey;
 					compute_gradient_matrix_and_err_vector(gxx,gyy, gxy, ex, ey);
-					//gxx*=range_corr;
-					//gyy*=range_corr;
-					//gxy*=range_corr;
-					//ex*=range_corr*step_factor;
-					//ey*=range_corr*step_factor;
 
+					ex*=step_factor;
+					ey*=step_factor;
+					
 					integral_t det=gxx*gyy-gxy*gxy;
+					
+					//float gxx_=gxx, gyy_=gyy, gxy_=gxy, ex_=ex, ey_=ey, det_=det;
 					if(fabs(det)<m_small_det)
 						return false;
 
 					integral_t dx=(gyy*ex-gxy*ey)/det;
 					integral_t dy=(gxx*ey-gxy*ex)/det;
 
+					//float dx_=dx, dy_=dy;
+
+					//dx_*=ls;
+					//dy_*=ls;
+										
 					curr_fp.x+=dx*level_scale;
 					curr_fp.y+=dy*level_scale;
 
@@ -89,6 +79,22 @@ namespace baldzarika { namespace ucv {
 		}
 
 	protected:
+
+		integral_view_t img_diff()
+		{
+			return gil::subimage_view(gil::view(m_window), 0*(2*m_win_size.width()+1+5), 0, 2*m_win_size.width()+1+5, 2*m_win_size.height()+1+5);
+		}
+
+		integral_view_t grad_sum_x()
+		{
+			return gil::subimage_view(gil::view(m_window), 1*(2*m_win_size.width()+1+5), 0, 2*m_win_size.width()+1+5, 2*m_win_size.height()+1+5);
+		}
+
+		integral_view_t grad_sum_y()
+		{
+			return gil::subimage_view(gil::view(m_window), 2*(2*m_win_size.width()+1+5), 0, 2*m_win_size.width()+1+5, 2*m_win_size.height()+1+5);
+		}
+
 
 		template < boost::uint32_t I, boost::uint32_t F >
 		void compute_gradient_matrix_and_err_vector(fixed_point<I,F> &gxx, fixed_point<I,F> &gyy, fixed_point<I,F> &gxy, fixed_point<I,F> &ex, fixed_point<I,F> &ey)
@@ -131,14 +137,15 @@ namespace baldzarika { namespace ucv {
 			typedef fixed_point<I,F> real_t;
 			typedef point2<real_t> point2_t;
 
-			integral_t const sobel_scale=1.0f/4.0f;
+			static integral_t const sobel_scale=0.5f/4.0f;
+			static integral_t const gauss_scale=1.0f/16.0f;
+			
 			integral_t const inv_s=1.0f/float(s);
 			integral_t const inv_area=1.0f/float(s*s);
 
 
 			integral_t prev_ax=integral_t(prev_pt.x-real_t(static_cast<boost::int32_t>(prev_pt.x)))*inv_s;
 			integral_t prev_ay=integral_t(prev_pt.y-real_t(static_cast<boost::int32_t>(prev_pt.y)))*inv_s;
-
 			integral_t prev_c00=(detail::constants::one<integral_t>()-prev_ax)*(detail::constants::one<integral_t>()-prev_ay);
 			integral_t prev_c01=prev_ax*(detail::constants::one<integral_t>()-prev_ay);
 			integral_t prev_c10=(detail::constants::one<integral_t>()-prev_ax)*prev_ay;
@@ -211,18 +218,82 @@ namespace baldzarika { namespace ucv {
 					integral_t curr_val=box_integral<integral_view_t,integral_t>(m_curr, curr_pos, size2ui(s,s))*inv_area;
 
 					//intensity difference
-					img_diff_rows[1][0]+=prev_val*prev_c00-curr_val*curr_c00;
-					img_diff_rows[1][1]+=prev_val*prev_c01-curr_val*curr_c01;
-					img_diff_rows[2][0]+=prev_val*prev_c10-curr_val*curr_c10;
-					img_diff_rows[2][1]+=prev_val*prev_c11-curr_val*curr_c11;
+					integral_t diff_00=gauss_scale*(prev_val*prev_c11-curr_val*curr_c11);
+					integral_t diff_01=gauss_scale*(prev_val*prev_c10-curr_val*curr_c10);
+					integral_t diff_10=gauss_scale*(prev_val*prev_c01-curr_val*curr_c01);
+					integral_t diff_11=gauss_scale*(prev_val*prev_c00-curr_val*curr_c00);
+
+					integral_t diff_00_2=detail::constants::two<integral_t>()*diff_00;
+					integral_t diff_01_2=detail::constants::two<integral_t>()*diff_01;
+					integral_t diff_10_2=detail::constants::two<integral_t>()*diff_10;
+					integral_t diff_11_2=detail::constants::two<integral_t>()*diff_11;
+
+					//[-1][-1]
+					img_diff_rows[0][-1]+=diff_00;
+					img_diff_rows[0][+0]+=diff_01;
+					img_diff_rows[1][-1]+=diff_10;
+					img_diff_rows[1][+0]+=diff_11;
+
+					//[-1][+0]
+					img_diff_rows[0][+0]+=diff_00_2;
+					img_diff_rows[0][+1]+=diff_01_2;
+					img_diff_rows[1][+0]+=diff_10_2;
+					img_diff_rows[1][+1]+=diff_11_2;
+
+					//[-1][+1]
+					img_diff_rows[0][+1]+=diff_00;
+					img_diff_rows[0][+2]+=diff_01;
+					img_diff_rows[1][+1]+=diff_10;
+					img_diff_rows[1][+2]+=diff_11;
+
+					//[+0][-1]
+					img_diff_rows[1][-1]+=diff_00_2;
+					img_diff_rows[1][+0]+=diff_01_2;
+					img_diff_rows[2][-1]+=diff_10_2;
+					img_diff_rows[2][+0]+=diff_11_2;
+
+					//[+0][+0]
+					img_diff_rows[1][+0]+=detail::constants::four<integral_t>()*diff_00;
+					img_diff_rows[1][+1]+=detail::constants::four<integral_t>()*diff_01;
+					img_diff_rows[2][+0]+=detail::constants::four<integral_t>()*diff_10;
+					img_diff_rows[2][+1]+=detail::constants::four<integral_t>()*diff_11;
+
+					//[+0][+1]
+					img_diff_rows[1][+1]+=diff_00_2;
+					img_diff_rows[1][+2]+=diff_01_2;
+					img_diff_rows[2][+1]+=diff_10_2;
+					img_diff_rows[2][+2]+=diff_11_2;
 
 
-					integral_t sum_00=sobel_scale*(prev_val*prev_c00+curr_val*curr_c00);
-					integral_t sum_01=sobel_scale*(prev_val*prev_c01+curr_val*curr_c01);
-					integral_t sum_10=sobel_scale*(prev_val*prev_c10+curr_val*curr_c10);
-					integral_t sum_11=sobel_scale*(prev_val*prev_c11+curr_val*curr_c11);
+					//[+1][-1]
+					img_diff_rows[2][-1]+=diff_00;
+					img_diff_rows[2][+0]+=diff_01;
+					img_diff_rows[3][-1]+=diff_10;
+					img_diff_rows[3][+0]+=diff_11;
 
+					//[+1][+0]
+					img_diff_rows[2][+0]+=diff_00_2;
+					img_diff_rows[2][+1]+=diff_01_2;
+					img_diff_rows[3][+0]+=diff_10_2;
+					img_diff_rows[3][+1]+=diff_11_2;
+
+					//[+1][+1]
+					img_diff_rows[2][+1]+=diff_00;
+					img_diff_rows[2][+2]+=diff_01;
+					img_diff_rows[3][+1]+=diff_10;
+					img_diff_rows[3][+2]+=diff_11;
+					
 					//gradient x sum
+					integral_t sum_00=sobel_scale*(prev_val*prev_c11+curr_val*curr_c11);
+					integral_t sum_01=sobel_scale*(prev_val*prev_c10+curr_val*curr_c10);
+					integral_t sum_10=sobel_scale*(prev_val*prev_c01+curr_val*curr_c01);
+					integral_t sum_11=sobel_scale*(prev_val*prev_c00+curr_val*curr_c00);
+
+					integral_t sum_00_2=detail::constants::two<integral_t>()*sum_00;
+					integral_t sum_01_2=detail::constants::two<integral_t>()*sum_01;
+					integral_t sum_10_2=detail::constants::two<integral_t>()*sum_10;
+					integral_t sum_11_2=detail::constants::two<integral_t>()*sum_11;
+
 					//[-1][-1]
 					grad_sum_x_rows[0][-1]+=sum_00;
 					grad_sum_x_rows[0][+0]+=sum_01;
@@ -234,15 +305,15 @@ namespace baldzarika { namespace ucv {
 					grad_sum_x_rows[1][+1]-=sum_10;
 					grad_sum_x_rows[1][+2]-=sum_11;
 					//[+0][-1]
-					grad_sum_x_rows[1][-1]+=detail::constants::two<integral_t>()*sum_00;
-					grad_sum_x_rows[1][+0]+=detail::constants::two<integral_t>()*sum_01;
-					grad_sum_x_rows[2][-1]+=detail::constants::two<integral_t>()*sum_10;
-					grad_sum_x_rows[2][+0]+=detail::constants::two<integral_t>()*sum_11;
+					grad_sum_x_rows[1][-1]+=sum_00_2;
+					grad_sum_x_rows[1][+0]+=sum_01_2;
+					grad_sum_x_rows[2][-1]+=sum_10_2;
+					grad_sum_x_rows[2][+0]+=sum_11_2;
 					//[+0][+1]
-					grad_sum_x_rows[1][+1]-=detail::constants::two<integral_t>()*sum_00;
-					grad_sum_x_rows[1][+2]-=detail::constants::two<integral_t>()*sum_01;
-					grad_sum_x_rows[2][+1]-=detail::constants::two<integral_t>()*sum_10;
-					grad_sum_x_rows[2][+2]-=detail::constants::two<integral_t>()*sum_11;
+					grad_sum_x_rows[1][+1]-=sum_00_2;
+					grad_sum_x_rows[1][+2]-=sum_01_2;
+					grad_sum_x_rows[2][+1]-=sum_10_2;
+					grad_sum_x_rows[2][+2]-=sum_11_2;
 					//[+1][-1]
 					grad_sum_x_rows[2][-1]+=sum_00;
 					grad_sum_x_rows[2][+0]+=sum_01;
@@ -261,10 +332,10 @@ namespace baldzarika { namespace ucv {
 					grad_sum_y_rows[1][-1]+=sum_10;
 					grad_sum_y_rows[1][+0]+=sum_11;
 					//[-1][+0]
-					grad_sum_y_rows[0][+0]+=detail::constants::two<integral_t>()*sum_00;
-					grad_sum_y_rows[0][+1]+=detail::constants::two<integral_t>()*sum_01;
-					grad_sum_y_rows[1][+0]+=detail::constants::two<integral_t>()*sum_10;
-					grad_sum_y_rows[1][+1]+=detail::constants::two<integral_t>()*sum_11;
+					grad_sum_y_rows[0][+0]+=sum_00_2;
+					grad_sum_y_rows[0][+1]+=sum_01_2;
+					grad_sum_y_rows[1][+0]+=sum_10_2;
+					grad_sum_y_rows[1][+1]+=sum_11_2;
 					//[-1][+1]
 					grad_sum_y_rows[0][+1]+=sum_00;
 					grad_sum_y_rows[0][+2]+=sum_01;
@@ -276,10 +347,10 @@ namespace baldzarika { namespace ucv {
 					grad_sum_y_rows[3][-1]-=sum_10;
 					grad_sum_y_rows[3][+0]-=sum_11;
 					//[+1][+0]
-					grad_sum_y_rows[2][+0]-=detail::constants::two<integral_t>()*sum_00;
-					grad_sum_y_rows[2][+1]-=detail::constants::two<integral_t>()*sum_01;
-					grad_sum_y_rows[3][+0]-=detail::constants::two<integral_t>()*sum_10;
-					grad_sum_y_rows[3][+1]-=detail::constants::two<integral_t>()*sum_11;
+					grad_sum_y_rows[2][+0]-=sum_00_2;
+					grad_sum_y_rows[2][+1]-=sum_01_2;
+					grad_sum_y_rows[3][+0]-=sum_10_2;
+					grad_sum_y_rows[3][+1]-=sum_11_2;
 					//[+1][+1]
 					grad_sum_y_rows[2][+1]-=sum_00;
 					grad_sum_y_rows[2][+2]-=sum_01;
