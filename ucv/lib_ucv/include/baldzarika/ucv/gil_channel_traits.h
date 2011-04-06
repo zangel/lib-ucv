@@ -20,8 +20,8 @@ namespace boost { namespace gil {
 
 			BOOST_STATIC_CONSTANT(bool, is_mutable=true);
 
-			static value_type min_value() { return std::numeric_limits<fp_type>::max(); }
-			static value_type max_value() { return std::numeric_limits<fp_type>::min(); }
+			static value_type min_value() { return std::numeric_limits<fp_type>::lowest(); }
+			static value_type max_value() { return std::numeric_limits<fp_type>::max(); }
 		};
 
 	} //namespace detail

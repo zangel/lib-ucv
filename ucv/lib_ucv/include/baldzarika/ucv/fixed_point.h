@@ -153,8 +153,16 @@ namespace baldzarika { namespace ucv {
 		static boost::uint32_t const int_bytes_count=(int_bits_count+7)/8;
 		typedef typename detail::fixed_point_value<int_bytes_count>::type value_type;
 
-
-		fixed_point() {}
+#if defined (NDEBUG)
+		fixed_point()
+		{
+		}
+#else
+		fixed_point()
+			: m_value(0)
+		{
+		}
+#endif
 
 		explicit fixed_point(value_type v, detail::fp_explicit_tag)
 			: m_value(v)
@@ -641,7 +649,8 @@ namespace std
 		static const int radix=0;
 		static fp_type (min)()
 		{
-			return fp_type((std::numeric_limits<typename fp_type::value_type>::min)(), baldzarika::ucv::detail::fp_explicit_tag());
+			//return fp_type((std::numeric_limits<typename fp_type::value_type>::min)(), baldzarika::ucv::detail::fp_explicit_tag());
+			return fp_type(1, baldzarika::ucv::detail::fp_explicit_tag());
 		}
 
 		static fp_type (max)()
@@ -652,6 +661,11 @@ namespace std
 		static fp_type epsilon()
 		{
 			return fp_type(1, baldzarika::ucv::detail::fp_explicit_tag());
+		}
+
+		static fp_type (lowest)()
+		{
+			return fp_type((std::numeric_limits<typename fp_type::value_type>::min)(), baldzarika::ucv::detail::fp_explicit_tag());
 		}
 
 		static fp_type round_error()
