@@ -55,12 +55,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(BOOST_DIR);$(OPENCV_DIR)/include;../3rd_party/libkdtree;../lib_ucv/include;$(LIBPNG_DIR)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4244</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../lib;$(BOOST_STAGE_DIR)/vc100/32/lib;$(OPENCV_DIR)/lib;$(LIBPNG_DIR)/projects/vstudio/Debug Library</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_ucv_d32.lib;opencv_core220d.lib;opencv_highgui220d.lib;opencv_imgproc220d.lib;opencv_calib3d220d.lib;libpng15.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_ucv_d32.lib;opencv_core220d.lib;opencv_highgui220d.lib;opencv_imgproc220d.lib;opencv_calib3d220d.lib;opencv_features2d220d.lib;libpng15.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -73,6 +74,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(BOOST_DIR);$(OPENCV_DIR)/include;../3rd_party/libkdtree;../lib_ucv/include;$(LIBPNG_DIR)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4244</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -3,6 +3,8 @@
 #include <boost/test/unit_test.hpp>
 #include <baldzarika/ucv/config.h>
 #include <baldzarika/ucv/fixed_point.h>
+#include <baldzarika/ucv/matrix.h>
+#include <baldzarika/ucv/vector.h>
 #include <baldzarika/ucv/convert_scale.h>
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/surf.h>
@@ -527,6 +529,7 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 #endif
 
+#if 0
 BOOST_AUTO_TEST_CASE( test_klt_tracker )
 {
 	namespace ucv=baldzarika::ucv;
@@ -708,4 +711,49 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 			" (" << float((klt_track_finish-klt_track_start).total_microseconds())/(10.0f*prev_pts.size()) << ")" <<
 			" e=" << er/float(prev_pts.size()) << std::endl;
 	}
+}
+
+#endif
+
+BOOST_AUTO_TEST_CASE( test_matrix )
+{
+	namespace ucv=baldzarika::ucv;
+
+	ucv::matrix33f h1, h2, h3;
+	h1(0,0)=1.0f;
+
+	h2=ucv::matrix33f::identity();
+	h3=ucv::matrix33f::identity();
+	h1*=h3;
+	h1=h2*h3;
+	h1*=2.0f;
+
+	h1=ucv::matrix<int, 3, 3>::identity()*3.0f;
+
+	ucv::matrix< ucv::fixed_point<15,16>, 3, 3 > m1,m2;
+	m1=ucv::matrix< ucv::fixed_point<15,16>, 3, 3 >::identity()*ucv::fixed_point<15,16>(3.0f);
+	m1=m1.inverse();
+
+	h1=h1.inverse();
+}
+
+BOOST_AUTO_TEST_CASE( test_vector )
+{
+	namespace ucv=baldzarika::ucv;
+
+	ucv::vector3f axes[3]=
+	{
+		ucv::vector3f::unit<0>(),
+		ucv::vector3f::unit<1>(),
+		ucv::vector3f::unit<2>()
+	};
+
+	float d1=axes[0].dot(axes[1]), d2=axes[1].dot(axes[2]), d3=axes[2].dot(axes[0]);
+	float d11=axes[0].dot(axes[0]);
+	float d22=axes[1].dot(axes[1]);
+	float d33=axes[2].dot(axes[2]);
+
+
+	ucv::vector< ucv::fixed_point<15,16>, 2> v1=ucv::vector< ucv::fixed_point<15,16>, 2 >::zero();
+	ucv::vector< ucv::fixed_point<15,16>, 2> v2=ucv::vector< ucv::fixed_point<15,16>, 2 >::unit<1>();
 }
