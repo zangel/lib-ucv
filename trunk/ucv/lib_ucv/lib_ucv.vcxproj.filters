@@ -87,6 +87,12 @@
     <ClInclude Include="include\baldzarika\ucv\good_features_detector.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\matrix.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\vector.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ucv\config.cpp">

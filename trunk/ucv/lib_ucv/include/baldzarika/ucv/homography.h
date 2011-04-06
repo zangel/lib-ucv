@@ -79,7 +79,7 @@ namespace baldzarika { namespace ucv {
 		return ransac_homography(obj_pts,img_pts)(hm,rt);
 	}
 
-	template < typename I1, typename I2>
+	template < typename I1, typename I2 >
 	bool find_homography_ransac(
 		std::vector< std::pair<I1, I2> > const &oim,
 		homography::matrix_t &hm,

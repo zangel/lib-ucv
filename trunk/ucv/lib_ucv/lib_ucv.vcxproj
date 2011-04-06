@@ -99,9 +99,11 @@
     <ClInclude Include="include\baldzarika\ucv\gles\texture.h" />
     <ClInclude Include="include\baldzarika\ucv\homography.h" />
     <ClInclude Include="include\baldzarika\ucv\integral.h" />
+    <ClInclude Include="include\baldzarika\ucv\matrix.h" />
     <ClInclude Include="include\baldzarika\ucv\point2.h" />
     <ClInclude Include="include\baldzarika\ucv\size2.h" />
     <ClInclude Include="include\baldzarika\ucv\surf.h" />
+    <ClInclude Include="include\baldzarika\ucv\vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ucv\config.cpp" />

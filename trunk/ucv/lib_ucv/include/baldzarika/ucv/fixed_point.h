@@ -161,12 +161,24 @@ namespace baldzarika { namespace ucv {
 		{
 		}
 
-		template < typename T >
-		fixed_point(T v)
-			: m_value(static_cast<value_type>(v)<<F)
-		{ 
-			BOOST_CONCEPT_ASSERT((boost::Integer<T>));
+
+#define BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(T)\
+		fixed_point(boost::##T v)\
+			: m_value(static_cast<value_type>(v)<<F)\
+		{\
 		}
+		
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(uint8_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(uint16_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(uint32_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(uint64_t)
+
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(int8_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(int16_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(int32_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(int64_t)
+	
+		
 
 		fixed_point(float v)
 			: m_value(static_cast<value_type>(v*detail::pow2<F>::value+(v>=0.0f?0.5f:-0.5f)))
@@ -311,6 +323,11 @@ namespace baldzarika { namespace ucv {
 
 
 		friend fixed_point fabs(fixed_point const &x)
+		{
+			return x<detail::constants::zero<fixed_point>()?-x:x;
+		}
+
+		friend fixed_point abs(fixed_point const &x)
 		{
 			return x<detail::constants::zero<fixed_point>()?-x:x;
 		}
