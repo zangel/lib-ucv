@@ -165,7 +165,7 @@ namespace baldzarika { namespace ucv {
 
 		integral_t compute_min_eigen_values()
 		{
-			integral_t max_eigen_value=std::numeric_limits<integral_t>::min();
+			integral_t max_eigen_value=std::numeric_limits<integral_t>::lowest();
 			
 			boost::uint32_t half_bs=m_block_size/2;
 			

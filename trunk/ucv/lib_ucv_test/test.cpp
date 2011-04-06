@@ -540,7 +540,7 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 	ucv::gil::gray8_image_t shifted_marker_img(marker_img.width(),marker_img.height());
 	
 	{
-		ucv::gil::matrix3x2<float> shift_mat=ucv::gil::matrix3x2<float>::get_translate(ucv::gil::point2<float>(3.0f,-3.0f));
+		ucv::gil::matrix3x2<float> shift_mat=ucv::gil::matrix3x2<float>::get_translate(ucv::gil::point2<float>(5.0f,-2.0f));
 		ucv::gil::resample_pixels(
 			ucv::gil::const_view(marker_img),
 			ucv::gil::view(shifted_marker_img),
@@ -687,7 +687,7 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 		}
 
 		typedef ucv::klt_tracker<ucv::surf::integral_t::IS,ucv::surf::integral_t::FS> klt_tracker_t;
-		klt_tracker_t feature_point_tracker(ucv::gil::view(integral_img), ucv::gil::view(shifted_integral_img),ucv::size2ui(5,5), 3, 100);
+		klt_tracker_t feature_point_tracker(ucv::gil::view(integral_img), ucv::gil::view(shifted_integral_img), ucv::size2ui(7,7), 4, 100);
 		std::vector<bool> status;
 
 		boost::posix_time::ptime klt_track_start=boost::posix_time::microsec_clock::local_time();
@@ -698,8 +698,8 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 		float er=0.0f;
 		for(std::size_t ifp=0;ifp<next_pts.size();++ifp)
 		{
-			float dx=std::abs(static_cast<float>(next_pts[ifp].x-prev_pts[ifp].x)+3.0f);
-			float dy=std::abs(static_cast<float>(next_pts[ifp].y-prev_pts[ifp].y)-3.0f);
+			float dx=std::abs(static_cast<float>(next_pts[ifp].x-prev_pts[ifp].x)+5.0f);
+			float dy=std::abs(static_cast<float>(next_pts[ifp].y-prev_pts[ifp].y)-2.0f);
 
 			er+=dx*dx+dy*dy;
 		}
@@ -752,7 +752,6 @@ BOOST_AUTO_TEST_CASE( test_vector )
 	float d11=axes[0].dot(axes[0]);
 	float d22=axes[1].dot(axes[1]);
 	float d33=axes[2].dot(axes[2]);
-
 
 	ucv::vector< ucv::fixed_point<15,16>, 2> v1=ucv::vector< ucv::fixed_point<15,16>, 2 >::zero();
 	ucv::vector< ucv::fixed_point<15,16>, 2> v2=ucv::vector< ucv::fixed_point<15,16>, 2 >::unit<1>();
