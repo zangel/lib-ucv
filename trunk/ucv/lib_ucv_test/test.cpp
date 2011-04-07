@@ -741,6 +741,8 @@ BOOST_AUTO_TEST_CASE( test_vector )
 {
 	namespace ucv=baldzarika::ucv;
 
+	typedef ucv::vector< ucv::fixed_point<15,16>, 2> vector_fp2;
+
 	ucv::vector3f axes[3]=
 	{
 		ucv::vector3f::unit<0>(),
@@ -753,6 +755,9 @@ BOOST_AUTO_TEST_CASE( test_vector )
 	float d22=axes[1].dot(axes[1]);
 	float d33=axes[2].dot(axes[2]);
 
-	ucv::vector< ucv::fixed_point<15,16>, 2> v1=ucv::vector< ucv::fixed_point<15,16>, 2 >::zero();
-	ucv::vector< ucv::fixed_point<15,16>, 2> v2=ucv::vector< ucv::fixed_point<15,16>, 2 >::unit<1>();
+	vector_fp2 v1=vector_fp2::zero();
+	vector_fp2 v2=vector_fp2::unit<0>();
+	vector_fp2 v3=vector_fp2::unit<1>();
+	vector_fp2 v4=v2*v3;
+
 }
