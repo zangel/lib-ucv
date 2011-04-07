@@ -22,7 +22,7 @@ namespace baldzarika { namespace ar {
 	{
 	}
 
-	marker::marker(image_t const &img)
+	marker::marker(gray_image_t const &img)
 		: m_img(img)
 	{
 	}
@@ -46,14 +46,15 @@ namespace baldzarika { namespace ar {
 		return ucv::size2ui(m_img.width(), m_img.height());
 	}
 
-	marker::image_t const& marker::get_image() const
+	marker::gray_image_t const& marker::get_image() const
 	{
 		return m_img;
 	}
 
-	marker::view_t marker::get_view()
+	marker::gray_image_t& marker::get_image()
 	{
-		return ucv::gil::view(m_img);
+		return m_img;
 	}
+
 } //namespace ar
 } //namespace baldzarika

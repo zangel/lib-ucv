@@ -49,16 +49,16 @@ namespace baldzarika { namespace ucv {
 			return false;
 
 		src_channel_t src_median=sm;
-		if(src_median<detail::constants::zero<src_channel_t>())
+		if(src_median<detail::constant::zero<src_channel_t>())
 		{
 			typedef fixed_point<10,21> median_t;
 
-			median_t median_sum=detail::constants::zero<median_t>();
+			median_t median_sum=detail::constant::zero<median_t>();
 
 			for(std::size_t y=0;y<static_cast<std::size_t>(src.height());++y)
 			{
-				median_t row_sum=detail::constants::zero<median_t>();
-				src_channel_t *src_row=reinterpret_cast<src_channel_t *>(src.row_begin(y));
+				median_t row_sum=detail::constant::zero<median_t>();
+				src_channel_t const *src_row=reinterpret_cast<src_channel_t const *>(src.row_begin(y));
 				for(std::size_t x=0;x<static_cast<std::size_t>(src.width());++x)
 					row_sum+=median_t(*src_row++);
 				median_sum+=row_sum/median_t(src.width());
@@ -67,7 +67,7 @@ namespace baldzarika { namespace ucv {
 		}
 		
 		
-		src_channel_t *src_row=reinterpret_cast<src_channel_t *>(src.row_begin(0));
+		src_channel_t const *src_row=reinterpret_cast<src_channel_t const *>(src.row_begin(0));
 		dst_channel_t *dst_row=reinterpret_cast<dst_channel_t *>(dst.row_begin(0));
 		dst_channel_t sum=0;
 		for(std::size_t x=0;x<static_cast<std::size_t>(src.width());++x)
@@ -78,7 +78,7 @@ namespace baldzarika { namespace ucv {
 
 		for(std::size_t y=1;y<static_cast<std::size_t>(src.height());++y)
 		{
-			src_row=reinterpret_cast<src_channel_t *>(src.row_begin(y));
+			src_row=reinterpret_cast<src_channel_t const *>(src.row_begin(y));
 			dst_row=reinterpret_cast<dst_channel_t *>(dst.row_begin(y));
 			dst_channel_t *prev_dst_row=reinterpret_cast<dst_channel_t *>(dst.row_begin(y-1));
 

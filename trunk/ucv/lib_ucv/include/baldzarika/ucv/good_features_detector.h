@@ -107,8 +107,8 @@ namespace baldzarika { namespace ucv {
 				integral_t *grad_y_row=reinterpret_cast<integral_t *>(grad_y_view.row_begin(y));
 				for(boost::uint32_t x=0;x<m_frame_size.width()+2;++x)
 				{
-					*grad_x_row++=detail::constants::zero<integral_t>();
-					*grad_y_row++=detail::constants::zero<integral_t>();
+					*grad_x_row++=detail::constant::zero<integral_t>();
+					*grad_y_row++=detail::constant::zero<integral_t>();
 				}
 			}
 
@@ -135,7 +135,7 @@ namespace baldzarika { namespace ucv {
 						point2i(x-1, y-1),
 						size2ui(1,1)
 					);
-					integral_t pixel_val_2=pixel_val*detail::constants::two<integral_t>();
+					integral_t pixel_val_2=pixel_val*detail::constant::two<integral_t>();
 
 					//grad_x
 					grad_x_rows[0][-1]+=pixel_val;
@@ -179,9 +179,9 @@ namespace baldzarika { namespace ucv {
 				for(boost::uint32_t x=half_bs;x<m_frame_size.width()-half_bs;++x)
 				{
 					integral_t
-						gxx=detail::constants::zero<integral_t>(),
-						gyy=detail::constants::zero<integral_t>(),
-						gxy=detail::constants::zero<integral_t>();
+						gxx=detail::constant::zero<integral_t>(),
+						gyy=detail::constant::zero<integral_t>(),
+						gxy=detail::constant::zero<integral_t>();
 
 					for(boost::uint32_t yy=y-half_bs;yy<=y+half_bs;++yy)
 					{
@@ -200,9 +200,9 @@ namespace baldzarika { namespace ucv {
 					}
 					
 					integral_t min_eigen_value=(
-							gxx+gyy-sqrt((gxx-gyy)*(gxx-gyy)+detail::constants::four<integral_t>()*gxy*gxy)
+							gxx+gyy-sqrt((gxx-gyy)*(gxx-gyy)+detail::constant::four<integral_t>()*gxy*gxy)
 						)*
-						detail::constants::half<integral_t>();
+						detail::constant::half<integral_t>();
 
 					max_eigen_value=std::max(max_eigen_value,min_eigen_value);
 					*eigen_row++=min_eigen_value;

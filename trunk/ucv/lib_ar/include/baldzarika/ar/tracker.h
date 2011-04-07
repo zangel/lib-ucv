@@ -2,7 +2,7 @@
 #define BALDZARIKA_AR_TRACKER_H
 
 #include <baldzarika/ucv/surf.h>
-#include <baldzarika/ucv/homography.h>
+#include <baldzarika/ucv/matrix.h>
 
 namespace baldzarika { namespace ar {
 	
@@ -14,14 +14,18 @@ namespace baldzarika { namespace ar {
 	{
 	public:
 		typedef ucv::surf::feature_point_t feature_point_t;
-		typedef ucv::homography::matrix_t hmatrix_t;
+		
+		typedef ucv::fixed_point<10, 21> gray_t;
+		typedef ucv::gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
+		typedef ucv::gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
+		typedef gray_image_t::view_t gray_view_t;
 
+		
 		static boost::uint32_t const	DEFAULT_SURF_OCTAVES;
 		static boost::uint32_t const	DEFAULT_SURF_INTERVALS;
 		static boost::uint32_t const	DEFAULT_SURF_SAMPLE_STEPS;
 		static float const				DEFAULT_SURF_TRESHOLD;
 		
-				
 		class marker_state
 			: public boost::enable_shared_from_this<marker_state>
 			, protected boost::noncopyable
@@ -56,7 +60,7 @@ namespace baldzarika { namespace ar {
 			boost::shared_ptr<marker>		m_marker;
 			std::vector<feature_point_t>	m_features;
 			bool							m_detected;
-			hmatrix_t						m_hmatrix;
+			ucv::matrix33f					m_hmatrix;
 		};
 
 		typedef boost::multi_index_container
@@ -104,7 +108,7 @@ namespace baldzarika { namespace ar {
 		bool								is_started() const;
 		bool								stop();
 
-		bool								update(ucv::surf::gray_view_t gv);
+		bool								update(gray_view_t gv);
 
 	protected:
 		void								on_start();

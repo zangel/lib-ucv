@@ -8,24 +8,26 @@ namespace baldzarika { namespace ar {
 	class marker
 	{
 	public:
-		typedef ucv::surf::gray_pixel_t pixel_t;
-		typedef ucv::surf::gray_image_t image_t;
-		typedef ucv::surf::gray_view_t view_t;
-
+		typedef ucv::fixed_point<10, 21> gray_t;
+		typedef ucv::gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
+		typedef ucv::gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
+		typedef gray_image_t::view_t gray_view_t;
+		
 		marker();
 		marker(marker const &that);
 		marker(ucv::size2ui const &sz);
-		marker(image_t const &img);
+		marker(gray_image_t const &img);
 		marker(ucv::gil::gray8_view_t gv);
 		marker(ucv::gil::rgb8_view_t rgbv);
 		~marker();
 
 		ucv::size2ui		get_size() const;
-		image_t const&		get_image() const;
-		view_t				get_view();
+
+		gray_image_t const&	get_image() const;
+		gray_image_t&		get_image();
 
 	private:
-		image_t				m_img;
+		gray_image_t		m_img;
 	};
 
 } //namespace ar

@@ -107,7 +107,7 @@ namespace baldzarika { namespace ucv {
 
 		struct fp_explicit_tag {};
 
-		namespace constants {
+		namespace constant {
 			#define BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(name, v)\
 			template <typename T> inline T const& name()\
 			{\
@@ -134,7 +134,7 @@ namespace baldzarika { namespace ucv {
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(e, 2.7182818284590452353602874713527)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(inv_e, 0.36787944117144232159552377016146)
 
-		} //namespace constants
+		} //namespace constant
 	}
 
 	template < boost::uint32_t I, boost::uint32_t F >
@@ -169,22 +169,21 @@ namespace baldzarika { namespace ucv {
 		{
 		}
 
-
 #define BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(T)\
-		fixed_point(boost::##T v)\
+		fixed_point(T v)\
 			: m_value(static_cast<value_type>(v)<<F)\
 		{\
 		}
 		
-		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(uint8_t)
-		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(uint16_t)
-		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(uint32_t)
-		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(uint64_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(boost::uint8_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(boost::uint16_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(boost::uint32_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(boost::uint64_t)
 
-		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(int8_t)
-		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(int16_t)
-		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(int32_t)
-		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(int64_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(boost::int8_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(boost::int16_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(boost::int32_t)
+		BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(boost::int64_t)
 	
 		
 
@@ -332,18 +331,18 @@ namespace baldzarika { namespace ucv {
 
 		friend fixed_point fabs(fixed_point const &x)
 		{
-			return x<detail::constants::zero<fixed_point>()?-x:x;
+			return x<detail::constant::zero<fixed_point>()?-x:x;
 		}
 
 		friend fixed_point abs(fixed_point const &x)
 		{
-			return x<detail::constants::zero<fixed_point>()?-x:x;
+			return x<detail::constant::zero<fixed_point>()?-x:x;
 		}
 
 		friend fixed_point ceil(fixed_point const &x)
 		{
 			return fixed_point(x.m_value & ~(detail::pow2<F>::value-1), detail::fp_explicit_tag())+
-				((x.m_value & (detail::pow2<F>::value-1))?detail::constants::one<fixed_point>():detail::constants::zero<fixed_point>());
+				((x.m_value & (detail::pow2<F>::value-1))?detail::constant::one<fixed_point>():detail::constant::zero<fixed_point>());
 		}
 
 
@@ -360,11 +359,11 @@ namespace baldzarika { namespace ucv {
 		friend fixed_point modf(fixed_point const &x, fixed_point *ptr)
 		{
 			*ptr=fixed_point(x.m_value & ~(detail::pow2<F>::value-1), detail::fp_explicit_tag());
-			if(x<detail::constants::zero<fixed_point>()) *ptr+=detail::constants::one<fixed_point>();
+			if(x<detail::constant::zero<fixed_point>()) *ptr+=detail::constant::one<fixed_point>();
 
 			return fixed_point(
 				(
-					x<detail::constants::zero<fixed_point>()?
+					x<detail::constant::zero<fixed_point>()?
 					-(x.m_value & (detail::pow2<F>::value-1)):
 					(x.m_value & (detail::pow2<F>::value-1))
 				),
@@ -375,9 +374,9 @@ namespace baldzarika { namespace ucv {
 		template< typename T >
 		friend T round(fixed_point const &x)
 		{
-			return static_cast<T>(x>=detail::constants::zero<fixed_point>()?
-				x+detail::constants::half<fixed_point>():
-			x-detail::constants::half<fixed_point>()
+			return static_cast<T>(x>=detail::constant::zero<fixed_point>()?
+				x+detail::constant::half<fixed_point>():
+			x-detail::constant::half<fixed_point>()
 				);
 		}
 
@@ -406,17 +405,17 @@ namespace baldzarika { namespace ucv {
 			fixed_point abs_y=fabs(y)+fixed_point(1, detail::fp_explicit_tag());
 			fixed_point angle;
 
-			if(x>=detail::constants::zero<fixed_point>())
+			if(x>=detail::constant::zero<fixed_point>())
 			{
 				fixed_point r=fixed_point(x.m_value-abs_y.m_value, detail::fp_explicit_tag())/fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag());
-				angle=detail::constants::atan_c1<fixed_point>()*r*r*r-detail::constants::atan_c2<fixed_point>()*r+detail::constants::pi_i4<fixed_point>();
+				angle=detail::constant::atan_c1<fixed_point>()*r*r*r-detail::constant::atan_c2<fixed_point>()*r+detail::constant::pi_i4<fixed_point>();
 			}
 			else
 			{
 				fixed_point r=fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag())/fixed_point(abs_y.m_value-x.m_value, detail::fp_explicit_tag());
-				angle=detail::constants::atan_c1<fixed_point>()*r*r*r-detail::constants::atan_c2<fixed_point>()*r+detail::constants::pi_3i4<fixed_point>();
+				angle=detail::constant::atan_c1<fixed_point>()*r*r*r-detail::constant::atan_c2<fixed_point>()*r+detail::constant::pi_3i4<fixed_point>();
 			}
-			return (y<detail::constants::zero<fixed_point>()?-angle:angle);
+			return (y<detail::constant::zero<fixed_point>()?-angle:angle);
 		}
 #else
 		friend fixed_point atan2(fixed_point const &y, fixed_point const &x)
@@ -424,13 +423,13 @@ namespace baldzarika { namespace ucv {
 			fixed_point abs_y=fabs(y)+fixed_point(1, detail::fp_explicit_tag());
 
 			fixed_point angle((
-				x>=detail::constants::zero<fixed_point>()?
-				detail::constants::pi_i4<fixed_point>()-detail::constants::pi_i4<fixed_point>()*
+				x>=detail::constant::zero<fixed_point>()?
+				detail::constant::pi_i4<fixed_point>()-detail::constant::pi_i4<fixed_point>()*
 				(fixed_point(x.m_value-abs_y.m_value, detail::fp_explicit_tag())/fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag())):
-			detail::constants::pi_3i4<fixed_point>()-detail::constants::pi_i4<fixed_point>()*
+			detail::constant::pi_3i4<fixed_point>()-detail::constant::pi_i4<fixed_point>()*
 				(fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag())/fixed_point(abs_y.m_value-x.m_value, detail::fp_explicit_tag()))
 				));
-			return (y<detail::constants::zero<fixed_point>()?-angle:angle);
+			return (y<detail::constant::zero<fixed_point>()?-angle:angle);
 		}
 
 #endif
@@ -492,12 +491,12 @@ namespace baldzarika { namespace ucv {
 			if(x_int<0)
 			{
 				for(boost::int32_t i=1;i<=-x_int;++i)
-					y*=detail::constants::inv_e<fixed_point>();
+					y*=detail::constant::inv_e<fixed_point>();
 			}
 			else
 			{
 				for(boost::int32_t i=1;i<=x_int;++i)
-					y*=detail::constants::e<fixed_point>();
+					y*=detail::constant::e<fixed_point>();
 			}
 			return y;
 		}
@@ -516,16 +515,16 @@ namespace baldzarika { namespace ucv {
 			static fixed_point const i_2t3t4=0.04166666666666666666666666666667;
 			static fixed_point const i_2t3t4t5t6=0.00138888888888888888888888888889;
 
-			fixed_point x_=fmod(x, detail::constants::pi_2<fixed_point>());
-			if(x_>detail::constants::pi<fixed_point>())
-				x_-=detail::constants::pi_2<fixed_point>();
+			fixed_point x_=fmod(x, detail::constant::pi_2<fixed_point>());
+			if(x_>detail::constant::pi<fixed_point>())
+				x_-=detail::constant::pi_2<fixed_point>();
 			fixed_point xx=x_*x_;
 			fixed_point y=-xx*i_2t3t4t5t6;
 			y+=i_2t3t4;
 			y*=xx;
-			y-=detail::constants::half<fixed_point>();
+			y-=detail::constant::half<fixed_point>();
 			y*=xx;
-			return y+detail::constants::one<fixed_point>();
+			return y+detail::constant::one<fixed_point>();
 		}
 
 #endif
@@ -545,9 +544,9 @@ namespace baldzarika { namespace ucv {
 			static fixed_point const i_2t3t4t5=0.00833333333333333333333333333333;
 			static fixed_point const i_2t3t4t5t6t7=1.984126984126984126984126984127e-4;
 
-			fixed_point x_=fmod(x, detail::constants::pi_2<fixed_point>());
-			if(x_>detail::constants::pi<fixed_point>())
-				x_-=detail::constants::pi_2<fixed_point>();
+			fixed_point x_=fmod(x, detail::constant::pi_2<fixed_point>());
+			if(x_>detail::constant::pi<fixed_point>())
+				x_-=detail::constant::pi_2<fixed_point>();
 
 			fixed_point xx=x_*x_;
 
@@ -556,7 +555,7 @@ namespace baldzarika { namespace ucv {
 			y*=xx;
 			y-=i_2t3;
 			y*=xx;
-			y+=detail::constants::one<fixed_point>();
+			y+=detail::constant::one<fixed_point>();
 			return y*x_;
 		}
 
@@ -575,7 +574,7 @@ namespace baldzarika { namespace ucv {
 		{
 			//return fixed_point(::sqrt(static_cast<float>(x)));
 
-			if(x<detail::constants::zero<fixed_point>())
+			if(x<detail::constant::zero<fixed_point>())
 				return 0;
 			
 			typename fixed_point<2*I, 2*F>::value_type op=
