@@ -48,8 +48,16 @@ namespace baldzarika { namespace ucv {
 
 
 		inline vector(T const &v)
-			: base_t(D, v)
+			: base_t(ublas::scalar_vector<T>(D,v))
 		{
+		}
+
+		template < typename RT >
+		inline vector(RT(&a)[D])
+			: base_t(D)
+		{
+			for(std::size_t d=0;d<D;++d)
+				data()[d]=a[d];
 		}
 
 		template < typename RT >
@@ -63,11 +71,16 @@ namespace baldzarika { namespace ucv {
 			: base_t(D)
 		{
 			BOOST_STATIC_ASSERT(D==2);
-			typename base_t::pointer pd=data();
-			pd[0]=p2.x;
-			pd[1]=p2.y;
+			data()[0]=p2.x;
+			data()[1]=p2.y;
 		}
 
+		inline operator point2<T> () const
+		{
+			BOOST_STATIC_ASSERT(D>=2);
+			return point2<T>(data()[0], data()[1]);
+		}
+		
 		template < typename RT >
 		inline vector& operator =(vector< RT, D > const &rhs)
 		{
@@ -76,9 +89,17 @@ namespace baldzarika { namespace ucv {
 		}
 
 		template < typename RT >
+		inline vector& operator =(RT(&a)[D])
+		{
+			for(std::size_t d=0;d<D;++d)
+				data()[d]=a[d];
+			return *this;
+		}
+
+		template < typename RT >
 		inline vector& operator+=(vector< RT, D > const &rhs)
 		{
-			base_t::operator+=(rhs)
+			base_t::operator+=(rhs);
 			return *this;
 		}
 
@@ -91,7 +112,7 @@ namespace baldzarika { namespace ucv {
 		template < typename RT >
 		inline vector& operator-=(vector< RT, D > const &rhs)
 		{
-			base_t::operator-=(rhs)
+			base_t::operator-=(rhs);
 			return *this;
 		}
 
@@ -153,9 +174,24 @@ namespace baldzarika { namespace ucv {
 			return ublas::norm_2(*this);
 		}
 
+		inline vector& homogenize()
+		{
+			for(std::size_t d=0;d<D;++d)
+				data()[d]/=data()[D-1];
+			return *this;
+			
+		}
+
+		inline vector homogenized() const
+		{
+			return vector(*this).homogenize();		
+		}
+
+
 		inline vector& normalize()
 		{
 			*this/=std::max<T>(std::numeric_limits<T>::epsilon(), norm_2());
+			return *this;
 		}
 
 		inline vector normalized() const
@@ -166,11 +202,8 @@ namespace baldzarika { namespace ucv {
 		template < typename RT >
 		inline vector& operator*=(vector< RT, D > const &rhs)
 		{
-			typename base_t::pointer td=data();
-			typename vector< RT, D >::base_t::const_pointer rd=rhs.data();
-
 			for(std::size_t d=0;d<D;++d)
-				td[d]*=rd[d];
+				data()[d]*=rhs.data()[d];
 			return *this;
 		}
 
@@ -183,11 +216,8 @@ namespace baldzarika { namespace ucv {
 		template < typename RT >
 		inline vector& operator/=(vector< RT, D > const &rhs)
 		{
-			typename base_t::pointer td=data();
-			typename vector< RT, D >::base_t::const_pointer rd=rhs.data();
-
 			for(std::size_t d=0;d<D;++d)
-				td[d]/=rd[d];
+				data()[d]/=rhs.data()[d];
 			return *this;
 		}
 
@@ -201,6 +231,7 @@ namespace baldzarika { namespace ucv {
 
 	typedef vector<float, 2> vector2f;
 	typedef vector<float, 3> vector3f;
+	typedef vector<float, 9> vector9f;
 
 } //namespace ucv
 } //namespace baldzarika

@@ -24,7 +24,7 @@ namespace baldzarika { namespace ucv {
 
 
 
-	homography::homography(std::vector<point2_t> const &obj_pts, std::vector<point2_t> const &img_pts)
+	homography::homography(std::vector<point2f> const &obj_pts, std::vector<point2f> const &img_pts)
 		: m_obj_pts(obj_pts)
 		, m_img_pts(img_pts)
 		, m_rng()
@@ -38,7 +38,7 @@ namespace baldzarika { namespace ucv {
 	}
 
 
-	bool homography::get_sub_set(std::vector<point2_t> &obj_pts, std::vector<point2_t> &img_pts, std::size_t ma)
+	bool homography::get_sub_set(std::vector<point2f> &obj_pts, std::vector<point2f> &img_pts, std::size_t ma)
 	{
 		BOOST_ASSERT(obj_pts.size()==img_pts.size());
 		
@@ -67,7 +67,7 @@ namespace baldzarika { namespace ucv {
 		return i==4 && it<ma;
 	}
 
-	bool homography::check_sub_set(std::vector<point2_t> const &pts, std::size_t n)
+	bool homography::check_sub_set(std::vector<point2f> const &pts, std::size_t n)
 	{
 		std::size_t i=0;
 		for(;i<=(n-1);++i)
@@ -94,10 +94,10 @@ namespace baldzarika { namespace ucv {
 		return i>=n-1;
 	}
 
-	void homography::compute_reproj_error(matrix_t &ms, std::vector<float> &err)
+	void homography::compute_reproj_error(matrix33f &ms, std::vector<float> &err)
 	{
 		BOOST_ASSERT(m_obj_pts.size()==m_img_pts.size());
-		matrix_t::array_type const &H=ms.data();
+		matrix33f::const_pointer H=ms.data();
 		for(std::size_t i=0;i<m_obj_pts.size();++i)
 		{
 			float ww=1.0f/(H[6]*m_obj_pts[i].x+H[7]*m_obj_pts[i].y+1.0f);
@@ -107,7 +107,7 @@ namespace baldzarika { namespace ucv {
 		}
 	}
 
-	std::size_t homography::inliers_count(matrix_t &ms, float t)
+	std::size_t homography::inliers_count(matrix33f &ms, float t)
 	{
 		BOOST_ASSERT(m_obj_pts.size()==m_img_pts.size());
 		
@@ -122,20 +122,20 @@ namespace baldzarika { namespace ucv {
 		return n_inliers;
 	}
 
-	bool homography::run_kernel(std::vector<point2_t> const &obj_pts, std::vector<point2_t> const &img_pts, matrix_t &h)
+	bool homography::run_kernel(std::vector<point2f> const &obj_pts, std::vector<point2f> const &img_pts, matrix33f &h)
 	{
 		BOOST_ASSERT(obj_pts.size()==img_pts.size());
 		BOOST_ASSERT(obj_pts.size()>=4);
 
-		point2_t obj_translate, obj_scale;
-		matrix_t obj_correct(3,3);
+		point2f obj_translate, obj_scale;
+		matrix33f obj_correct;
 		normalize_points(obj_pts, obj_translate, obj_scale, obj_correct, true);
 
-		point2_t img_translate, img_scale;
-		matrix_t img_correct(3,3);
+		point2f img_translate, img_scale;
+		matrix33f img_correct;
 		normalize_points(img_pts, img_translate, img_scale, img_correct, false);
 
-		matrix_t LtL=ublas::zero_matrix<float>(9,9);
+		matrix99f LtL=matrix99f::zero();
 
 		for(std::size_t i=0;i<obj_pts.size();++i)
 		{
@@ -172,28 +172,27 @@ namespace baldzarika { namespace ucv {
 			}
 		}
 
-		matrix_t V(9,9);
-		vector_t W(9);
+		matrix99f V;
+		vector9f W;
 		jacobi(LtL, W, V);
 
-		matrix_t H(3,3);
+		matrix33f H;
 		H(0,0)=V(8,0);H(0,1)=V(8,1);H(0,2)=V(8,2);
 		H(1,0)=V(8,3);H(1,1)=V(8,4);H(1,2)=V(8,5);
 		H(2,0)=V(8,6);H(2,1)=V(8,7);H(2,2)=V(8,8);
 
 		// reverse normalization
-		matrix_t Htemp(ublas::prod(img_correct,H));
-		ublas::noalias(H)=ublas::prod(Htemp,obj_correct);
+		matrix33f Htemp=img_correct*H;
+		H=Htemp*obj_correct;
 		h=H*(1.0f/H(2,2));
 		return true;
-
 	}
 
-	bool homography::normalize_points(std::vector<homography::point2_t> const &pts, homography::point2_t &tra, homography::point2_t &sca, homography::matrix_t &m33, bool inv)
+	bool homography::normalize_points(std::vector<point2f> const &pts, point2f &tra, point2f &sca, matrix33f &m33, bool inv)
 	{
 		float const inv_size=1.0f/static_cast<float>(pts.size());
 
-		point2_t translate(0.0f,0.0f), scale(0.0f,0.0f);
+		point2f translate(0.0f,0.0f), scale(0.0f,0.0f);
 
 		for(std::size_t p=0;p<pts.size();++p)
 		{
@@ -215,7 +214,7 @@ namespace baldzarika { namespace ucv {
 		if(std::abs(scale.x)<std::numeric_limits<float>::epsilon() || std::abs(scale.y)<std::numeric_limits<float>::epsilon())
 			return false;
 
-		m33=ublas::zero_matrix<float>(3,3);
+		m33=matrix33f::zero();
 		m33(2,2)=1.0f;
 
 		m33(0,0)=inv?1.0f/scale.x:scale.x;
@@ -228,21 +227,17 @@ namespace baldzarika { namespace ucv {
 		return true;
 	}
 
-	bool homography::jacobi(homography::matrix_t const &S0, homography::vector_t &e, homography::matrix_t &E, bool ce, float eps)
+	bool homography::jacobi(matrix99f const &S0, vector9f &e, matrix99f &E, bool ce, float eps)
 	{
-		BOOST_ASSERT(S0.size1()==S0.size2() && S0.size1()==9);
-		BOOST_ASSERT(e.size()==9);
-		BOOST_ASSERT(E.size1()==E.size2() && E.size1()==9);
-
 		boost::int32_t max_iters=9*9*30;;
 		boost::int32_t i, j, k, m, it;
 
-		vector_t maxSR(9), maxSC(9);
+		vector9f maxSR, maxSC;
 		boost::int32_t indR[9], indC[9];
 
-		matrix_t S=S0;
+		matrix99f S(S0);
 
-		if(ce) E=ublas::identity_matrix<float>(9,9);
+		if(ce) E=matrix99f::identity();
 
 		float mv;
 
@@ -372,7 +367,7 @@ namespace baldzarika { namespace ucv {
 	}
 
 
-	ransac_homography::ransac_homography(std::vector<point2_t> const &obj_pts, std::vector<point2_t> const &img_pts)
+	ransac_homography::ransac_homography(std::vector<point2f> const &obj_pts, std::vector<point2f> const &img_pts)
 		: homography(obj_pts,img_pts)
 	{
 
@@ -401,12 +396,12 @@ namespace baldzarika { namespace ucv {
 			static_cast<std::size_t>(boost::math::round(num/denom));
 	}
 
-	bool ransac_homography::operator()(homography::matrix_t &h, float t, float c, std::size_t mi)
+	bool ransac_homography::operator()(matrix33f &h, float t, float c, std::size_t mi)
 	{
 		if(m_obj_pts.size()<4 || m_obj_pts.size()!=m_img_pts.size())
 			return false;
 		
-		std::vector<point2_t> obj_pts(4), img_pts(4);
+		std::vector<point2f> obj_pts(4), img_pts(4);
 		std::size_t n_iters=m_img_pts.size()==4?1:mi;
 
 		if(m_obj_pts.size()==4)
@@ -419,7 +414,7 @@ namespace baldzarika { namespace ucv {
 			}
 		}
 
-		matrix_t ms(3,3);
+		matrix33f ms;
 
 		std::size_t max_good_count=0;
 		for(std::size_t it=0;it<n_iters;++it)

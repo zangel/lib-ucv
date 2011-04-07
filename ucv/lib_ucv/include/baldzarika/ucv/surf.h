@@ -21,16 +21,17 @@ namespace baldzarika { namespace ucv {
 		typedef KDTree::KDTree<feature_point_t::DESCRIPTOR_SIZE, feature_point_t, feature_point_t::description_accessor> fps_by_desc_tree_t;
 		
 		
-		typedef fixed_point<10, 21> gray_t;
-		typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
-		typedef gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
-		typedef gray_image_t::view_t gray_view_t;
-
+		//typedef fixed_point<10, 21> gray_t;
+		//typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
+		//typedef gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
+		//typedef gray_image_t::view_t gray_view_t;
+		
 
 		typedef fixed_point<10, 21> integral_t;
 		typedef gil::pixel<integral_t, ucv::gil::gray_layout_t> integral_pixel_t;
 		typedef gil::image< integral_pixel_t, false, std::allocator<unsigned char> > integral_image_t;
 		typedef integral_image_t::view_t integral_view_t;
+		typedef integral_image_t::const_view_t const_integral_view_t;
 
 		typedef fixed_point<10, 21>	response_t;
 		typedef gil::pixel<response_t, ucv::gil::gray_layout_t> response_pixel_t;
@@ -83,7 +84,7 @@ namespace baldzarika { namespace ucv {
 		static boost::uint32_t const 	FILTER_MAP[MAX_OCTAVES][MAX_INTERVALS];
 		
 
-		surf(size2ui const &is, boost::uint32_t o, boost::uint32_t i, boost::uint32_t s, float t, boost::uint32_t mf=64);
+		surf(size2ui const &fs, boost::uint32_t o, boost::uint32_t i, boost::uint32_t s, float t, boost::uint32_t mf=64);
 		~surf();
 
 		boost::uint32_t				octaves() const;
@@ -91,9 +92,9 @@ namespace baldzarika { namespace ucv {
 		boost::uint32_t				sample_step() const;
 		float						treshold() const;
 		
-		bool						resize(size2ui const &is);
-		size2ui						size() const;
-		bool						update(gray_view_t gi, gray_t const &mv=gray_t(-1));
+		bool						resize(size2ui const &fs);
+		size2ui	const&				size() const;
+		bool						set_integral_view(const_integral_view_t iv);
 		void						build_response_layers();
 
 		void						detect(fps_array_t &fps);
@@ -130,15 +131,16 @@ namespace baldzarika { namespace ucv {
 		static fixed_point<I,F>				gaussian(fixed_point<I,F> const &x, fixed_point<I,F> const &y, fixed_point<I,F> const &sig);
 
 	private:
-		integral_image_t			m_integral_img;
-		boost::uint32_t				m_octaves;
-		boost::uint32_t				m_intervals;
-		boost::uint32_t				m_sample_step;
-		float						m_treshold;
-		boost::uint32_t				m_max_features;
+		size2ui					m_frame_size;
+		const_integral_view_t	m_integral_view;
+		boost::uint32_t			m_octaves;
+		boost::uint32_t			m_intervals;
+		boost::uint32_t			m_sample_step;
+		float					m_treshold;
+		boost::uint32_t			m_max_features;
 
-		response_image_t			m_response_img;
-		response_layers_t			m_response_layers;
+		response_image_t		m_response_img;
+		response_layers_t		m_response_layers;
 	};
 
 } //namespace ucv

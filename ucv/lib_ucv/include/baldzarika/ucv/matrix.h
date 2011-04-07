@@ -3,9 +3,23 @@
 
 #include <baldzarika/ucv/point2.h>
 #include <baldzarika/ucv/vector.h>
+#include <baldzarika/ucv/fixed_point.h>
 
 
 namespace baldzarika { namespace ucv {
+
+	template < typename T, boost::uint32_t R, boost::uint32_t C > class matrix;
+
+	namespace detail {
+
+		template < typename T, boost::uint32_t R, boost::uint32_t C>
+		static inline matrix< T, R, C > invert_matrix( matrix< T, R, C > const &);
+
+		template < typename T, boost::uint32_t R, boost::uint32_t C, typename PT>
+		static inline point2<PT> transform_point2( matrix< T, R, C > const &, point2<PT> const &);
+
+	} //namespace details
+
 
 	template < typename T, boost::uint32_t R, boost::uint32_t C >
 	class matrix
@@ -16,8 +30,13 @@ namespace baldzarika { namespace ucv {
 		template < typename T2, boost::uint32_t R2, boost::uint32_t C2> friend class matrix;
 		template < typename T2, boost::uint32_t R2, boost::uint32_t C2> friend matrix<T2,R2,C2> invert_matrix(matrix<T2,R2,C2> const &);
 	
+		using base_t::size1;
+		using base_t::size2;
 		using base_t::operator();
 		using base_t::data;
+
+		typedef typename base_t::pointer pointer;
+		typedef typename base_t::const_pointer const_pointer;
 
 	protected:
 		template < class AE >
@@ -59,7 +78,7 @@ namespace baldzarika { namespace ucv {
 		template < typename RT >
 		inline matrix& operator +=(matrix<RT,R,C> const &rhs)
 		{
-			base_t::operator+=(rhs)
+			base_t::operator+=(rhs);
 			return *this;
 		}
 
@@ -72,7 +91,7 @@ namespace baldzarika { namespace ucv {
 		template < typename RT >
 		inline matrix& operator -=(matrix<RT,R,C> const &rhs)
 		{
-			base_t::operator-=(rhs)
+			base_t::operator-=(rhs);
 				return *this;
 		}
 
@@ -122,56 +141,71 @@ namespace baldzarika { namespace ucv {
 
 		inline matrix inverse() const
 		{
-			return details::invert_matrix(*this);
+			return detail::invert_matrix(*this);
 		}
 
 		template < typename VT >
-		inline vector< VT, R > operator *(vector< VT, C > const &rhs)
+		inline vector< VT, R > operator *(vector< VT, C > const &v)
 		{
-			return vector< VT, R >(ublas::prod(*this, rhs));
+			return vector< VT, R >(ublas::prod(*this, v));
+		}
+
+		template < typename PT >
+		inline point2<PT> operator *(point2< PT > const &p)
+		{
+			return detail::transform_point2(*this, p);
 		}
 	};
 
 
-	namespace details {
+	namespace detail {
 
 		template < typename T, boost::uint32_t R, boost::uint32_t C>
-		static inline matrix< T, R, C > invert_matrix( matrix< T, R, C > const &m) { BOOST_STATIC_ASSERT(false); return matrix< T, R, C >; }
+		static inline matrix< T, R, C > invert_matrix( matrix< T, R, C > const &m) { BOOST_ASSERT(false); return matrix< T, R, C >(); }
 
 		template < typename T >
 		static inline matrix< T, 3, 3 > invert_matrix( matrix< T, 3, 3 > const &m)
 		{
-			typename matrix< T, 3, 3 >::base_t::const_pointer md=m.data();
-					
 			T det=
-					md[0]*(md[4]*md[8]-md[5]*md[7])-
-					md[1]*(md[3]*md[8]-md[5]*md[6])+
-					md[2]*(md[3]*md[7]-md[4]*md[6]);
+					m.data()[0]*(m.data()[4]*m.data()[8]-m.data()[5]*m.data()[7])-
+					m.data()[1]*(m.data()[3]*m.data()[8]-m.data()[5]*m.data()[6])+
+					m.data()[2]*(m.data()[3]*m.data()[7]-m.data()[4]*m.data()[6]);
 
-			det=detail::constants::one<T>()/det;
+			det=detail::constant::one<T>()/det;
 
 			matrix<T,3,3> tmp;
 			typename matrix< T, 3, 3 >::base_t::pointer mt=tmp.data();
 
-			mt[0]=(md[4]*md[8]-md[5]*md[7])*det;
-			mt[1]=(md[2]*md[7]-md[1]*md[8])*det;
-			mt[2]=(md[1]*md[5]-md[2]*md[4])*det;
+			tmp.data()[0]=(m.data()[4]*m.data()[8]-m.data()[5]*m.data()[7])*det;
+			tmp.data()[1]=(m.data()[2]*m.data()[7]-m.data()[1]*m.data()[8])*det;
+			tmp.data()[2]=(m.data()[1]*m.data()[5]-m.data()[2]*m.data()[4])*det;
 
-			mt[3]=(md[5]*md[6]-md[3]*md[8])*det;
-			mt[4]=(md[0]*md[8]-md[2]*md[6])*det;
-			mt[5]=(md[2]*md[3]-md[0]*md[5])*det;
+			tmp.data()[3]=(m.data()[5]*m.data()[6]-m.data()[3]*m.data()[8])*det;
+			tmp.data()[4]=(m.data()[0]*m.data()[8]-m.data()[2]*m.data()[6])*det;
+			tmp.data()[5]=(m.data()[2]*m.data()[3]-m.data()[0]*m.data()[5])*det;
 
-			mt[6]=(md[3]*md[7]-md[4]*md[6])*det;
-			mt[7]=(md[1]*md[6]-md[0]*md[7])*det;
-			mt[8]=(md[0]*md[4]-md[1]*md[3])*det;
+			tmp.data()[6]=(m.data()[3]*m.data()[7]-m.data()[4]*m.data()[6])*det;
+			tmp.data()[7]=(m.data()[1]*m.data()[6]-m.data()[0]*m.data()[7])*det;
+			tmp.data()[8]=(m.data()[0]*m.data()[4]-m.data()[1]*m.data()[3])*det;
 			
 			return tmp;
 		}
 
-	} //namespace details
+		template < typename T, boost::uint32_t R, boost::uint32_t C, typename PT>
+		static inline point2<PT> transform_point2( matrix< T, R, C > const &m, point2<PT> const &p) { BOOST_ASSERT(false); return point2<PT>(); }
+
+		template < typename T, typename PT >
+		static inline point2<PT> transform_point2( matrix< T, 3, 3 > const &m, point2<PT> const &p)
+		{
+			return (m*vector<PT, 3>(p)).homogenized();
+		}
+
+
+	} //namespace detail
 	
 
 	typedef matrix<float, 3, 3> matrix33f;
+	typedef matrix<float, 9, 9> matrix99f;
 
 
 
