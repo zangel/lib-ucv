@@ -36,6 +36,7 @@ namespace baldzarika { namespace ucv {
 		template < boost::uint32_t A >
 		static inline vector const& unit()
 		{
+			BOOST_STATIC_ASSERT(A<D);
 			static vector unit_=ublas::unit_vector<T>(D,A);
 			return unit_;
 		}
@@ -61,8 +62,10 @@ namespace baldzarika { namespace ucv {
 		inline vector(point2<RT> const &p2)
 			: base_t(D)
 		{
-			for(std::size_t d=0;d<std::min<std::size_t>(2,D);++d)
-				data()[d]=p2[d];
+			BOOST_STATIC_ASSERT(D==2);
+			typename base_t::pointer pd=data();
+			pd[0]=p2.x;
+			pd[1]=p2.y;
 		}
 
 		template < typename RT >
@@ -144,6 +147,56 @@ namespace baldzarika { namespace ucv {
 		{
 			return ublas::inner_prod(*this, rhs);
 		}
+
+		inline T length() const
+		{
+			return ublas::norm_2(*this);
+		}
+
+		inline vector& normalize()
+		{
+			*this/=std::max<T>(std::numeric_limits<T>::epsilon(), norm_2());
+		}
+
+		inline vector normalized() const
+		{
+			return vector(*this)/=norm_2();
+		}
+
+		template < typename RT >
+		inline vector& operator*=(vector< RT, D > const &rhs)
+		{
+			typename base_t::pointer td=data();
+			typename vector< RT, D >::base_t::const_pointer rd=rhs.data();
+
+			for(std::size_t d=0;d<D;++d)
+				td[d]*=rd[d];
+			return *this;
+		}
+
+		template < typename RT >
+		inline vector operator *(vector< RT, D > const &rhs) const
+		{
+			return vector(*this)*=rhs;
+		}
+
+		template < typename RT >
+		inline vector& operator/=(vector< RT, D > const &rhs)
+		{
+			typename base_t::pointer td=data();
+			typename vector< RT, D >::base_t::const_pointer rd=rhs.data();
+
+			for(std::size_t d=0;d<D;++d)
+				td[d]/=rd[d];
+			return *this;
+		}
+
+		template < typename RT >
+		inline vector operator /(vector< RT, D > const &rhs) const
+		{
+			return vector(*this)/=rhs;
+		}
+
 	};
 
 	typedef vector<float, 2> vector2f;

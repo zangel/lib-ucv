@@ -1,6 +1,10 @@
 #ifndef BALDZARIKA_UCV_MATRIX_H
 #define BALDZARIKA_UCV_MATRIX_H
 
+#include <baldzarika/ucv/point2.h>
+#include <baldzarika/ucv/vector.h>
+
+
 namespace baldzarika { namespace ucv {
 
 	template < typename T, boost::uint32_t R, boost::uint32_t C >
@@ -116,7 +120,16 @@ namespace baldzarika { namespace ucv {
 			return matrix(*this)/=v;
 		}
 
-		inline matrix inverse() const { return details::invert_matrix(*this); }
+		inline matrix inverse() const
+		{
+			return details::invert_matrix(*this);
+		}
+
+		template < typename VT >
+		inline vector< VT, R > operator *(vector< VT, C > const &rhs)
+		{
+			return vector< VT, R >(ublas::prod(*this, rhs));
+		}
 	};
 
 
