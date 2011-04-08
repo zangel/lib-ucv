@@ -6,11 +6,10 @@
 #include <baldzarika/ucv/size2.h>
 #include <baldzarika/ucv/gil_channel_traits.h>
 
-
 namespace baldzarika { namespace ucv {
 
 	template <typename SVT, typename DVT, typename PT>
-	bool convert_scale(SVT src, DVT dst, PT scale=1.0f)
+	bool convert_scale(SVT src, DVT dst, PT scale=1.0f, typename gil::channel_type<typename DVT::value_type>::type &mv=typename gil::channel_type<typename DVT::value_type>::type())
 	{
 		typedef typename SVT::value_type	src_pixel_t;
 		typedef typename DVT::value_type	dst_pixel_t;
@@ -21,12 +20,23 @@ namespace baldzarika { namespace ucv {
 		if(src.width()!=dst.width() || src.height()!=dst.height() || !src.width()*dst.width())
 			return false;
 
+		dst_channel_t const inv_width=detail::constant::one<dst_channel_t>()/dst_channel_t(dst.width());
+		dst_channel_t const inv_height=detail::constant::one<dst_channel_t>()/dst_channel_t(dst.height());
+
+		mv=detail::constant::zero<dst_channel_t>();
+
 		for(std::size_t y=0;y<static_cast<std::size_t>(src.height());++y)
 		{
-			src_channel_t *src_row=reinterpret_cast<src_channel_t *>(src.row_begin(y));
+			dst_channel_t row_median=detail::constant::zero<dst_channel_t>();
+			src_channel_t const *src_row=reinterpret_cast<src_channel_t const *>(src.row_begin(y));
 			dst_channel_t *dst_row=reinterpret_cast<dst_channel_t *>(dst.row_begin(y));
 			for(std::size_t x=0;x<static_cast<std::size_t>(src.width());++x, ++src_row, ++dst_row)
-				*dst_row=PT(*src_row)*scale;
+			{
+				dst_channel_t v=PT(*src_row)*scale;
+				*dst_row=v;
+				row_median+=v*inv_width;
+			}
+			mv+=row_median*inv_height;
 		}
 		return true;
 	}

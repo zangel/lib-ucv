@@ -5,15 +5,7 @@
 
 
 namespace baldzarika { namespace ucv {
-
-	//template <typename FPS1>
-	//struct feature_point_matcher
-	//{
-	//	feature_point_matcher(FPS1 const &fps1)
-	//		: m_fps1()
-//
-	//};
-
+	
 	template < typename FP, typename FPS1, typename FPS2 >
 	void match_feature_points(FPS1 const &fps1, FPS2 const &fps2, std::vector< std::pair<typename FPS1::const_iterator, typename FPS2::const_iterator> > &m, typename FP::value_type const &d=FP::value_type(0.65f))
 	{

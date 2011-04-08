@@ -10,6 +10,8 @@
 #include <boost/foreach.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/signals2.hpp>
+#include <boost/circular_buffer.hpp>
+
 
 
 namespace baldzarika { namespace ar {
