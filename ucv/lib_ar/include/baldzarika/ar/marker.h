@@ -17,17 +17,23 @@ namespace baldzarika { namespace ar {
 		marker(marker const &that);
 		marker(ucv::size2ui const &sz);
 		marker(gray_image_t const &img);
-		marker(ucv::gil::gray8_view_t gv);
-		marker(ucv::gil::rgb8_view_t rgbv);
+		marker(ucv::gil::gray8c_view_t gv);
+		marker(ucv::gil::rgb8c_view_t rgbv);
 		~marker();
 
-		ucv::size2ui		get_size() const;
+		static boost::shared_ptr<marker>	load(std::string const &fn);
 
-		gray_image_t const&	get_image() const;
-		gray_image_t&		get_image();
 
+		ucv::size2ui						get_size() const;
+
+		gray_image_t const&					get_image() const;
+		gray_image_t&						get_image();
+		gray_t const&						get_median() const;
+
+		
 	private:
 		gray_image_t		m_img;
+		gray_t				m_median;
 	};
 
 } //namespace ar

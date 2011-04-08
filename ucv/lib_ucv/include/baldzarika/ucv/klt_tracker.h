@@ -25,6 +25,16 @@ namespace baldzarika { namespace ucv {
 		{
 		}
 
+		size2ui const& get_frame_size() const
+		{
+			return m_frame_size;
+		}
+
+		void set_frame_size(size2ui const &fs)
+		{
+			m_frame_size=fs;
+		}
+
 
 		bool set_integral_views(const_integral_view_t prev_view, const_integral_view_t curr_view)
 		{
