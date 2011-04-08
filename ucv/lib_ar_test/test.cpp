@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE( tracker_detect_marker )
 
 	boost::shared_ptr<ar::tracker::marker_state> pms=ar_tracker->add_marker(pmarker);
 
-	struct _
+	struct _anonymous
 	{
 		void on_marker_state_changed_signal(boost::shared_ptr<ar::tracker::marker_state> const &ms, ar::tracker::marker_state::eSC sc)
 		{
@@ -71,12 +71,12 @@ BOOST_AUTO_TEST_CASE( tracker_detect_marker )
 		}
 		
 		boost::shared_ptr<ar::tracker::marker_state> pdms;
-	} __;
+	} anonymous;
 	
-	ar_tracker->marker_state_changed().connect(boost::bind(&_::on_marker_state_changed_signal, &__, _1, _2));
+	ar_tracker->marker_state_changed().connect(boost::bind(&_anonymous::on_marker_state_changed_signal, &anonymous, _1, _2));
 	ar_tracker->start();
 	ar_tracker->update(ucv::gil::const_view(pmarker->get_image()), pmarker->get_median());
 	ar_tracker->stop();
 
-	BOOST_CHECK_EQUAL(__.pdms, pms);
+	BOOST_CHECK_EQUAL(anonymous.pdms, pms);
 }
