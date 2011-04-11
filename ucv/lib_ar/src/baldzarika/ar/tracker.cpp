@@ -15,7 +15,7 @@ namespace baldzarika { namespace ar {
 	boost::uint32_t const tracker::DEFAULT_KLT_WIN_SIZE=7;
 	boost::uint32_t const tracker::DEFAULT_KLT_LEVELS=4;
 	boost::uint32_t const tracker::DEFAULT_KLT_MAX_ITERATIONS=10;
-	float const	tracker::DEFAULT_KLT_EPSILON=1.0e-3f;
+	float const	tracker::DEFAULT_KLT_EPSILON=1.0e-4f;
 
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=8;
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=16;
@@ -39,6 +39,11 @@ namespace baldzarika { namespace ar {
 	boost::shared_ptr<marker> const& tracker::marker_state::get_marker() const
 	{
 		return m_marker;
+	}
+
+	tracker::marker_state::points2_t const& tracker::marker_state::get_frame_features() const
+	{
+		return m_frame_features;
 	}
 
 	void tracker::marker_state::collect_features()
@@ -82,6 +87,12 @@ namespace baldzarika { namespace ar {
 		m_detected=d;
 		if(boost::shared_ptr<tracker> t=m_tracker.lock())
 			t->m_marker_state_changed(shared_from_this(), SC_DETECTION);
+	}
+
+	void tracker::marker_state::update_pose()
+	{
+		if(boost::shared_ptr<tracker> t=m_tracker.lock())
+			t->m_marker_state_changed(shared_from_this(), SC_POSE);
 	}
 
 	tracker::tracker(ucv::size2ui const &fs)
@@ -259,23 +270,29 @@ namespace baldzarika { namespace ar {
 
 			if(any_detected_markers.first!=any_detected_markers.second)
 			{
-				if(m_integral_views.size()>=2)
+				if(m_integral_views.full())
 				{
 					integral_view_buffer_t::iterator prev_frame_it=m_integral_views.begin();
-					integral_view_buffer_t::iterator curr_frame_it=++prev_frame_it;
-					if(m_klt_tracker.set_integral_views(*prev_frame_it, *curr_frame_it))
-					{
-						for(marker_states_t::index<marker_state::detected_tag>::type::iterator itdm=any_detected_markers.first;
-							itdm!=any_detected_markers.second; itdm++)
-						{
+					integral_view_buffer_t::iterator curr_frame_it=prev_frame_it;
+					curr_frame_it++;
+					
+					m_klt_tracker.set_integral_views(*prev_frame_it, *curr_frame_it);
 
-						}
-					}
+					std::vector<marker_states_t::iterator> detected_markers;
+
+					for(marker_states_t::index<marker_state::detected_tag>::type::iterator itdm=any_detected_markers.first;
+						itdm!=any_detected_markers.second; itdm++)
+						detected_markers.push_back(m_marker_states.project<marker_state::order_tag>(itdm));
+					
+					track_markers(detected_markers);
+
+					m_integral_views.pop_back();
 				}
 			}
 			else
+			{
 				detect_markers();
-			m_integral_views.pop_back();
+			}
 		}
 	}
 
@@ -350,6 +367,77 @@ namespace baldzarika { namespace ar {
 							);
 						}
 					}
+				}
+			}
+		}
+	}
+
+	void tracker::track_markers(std::vector<marker_states_t::iterator> const &dms)
+	{
+		marker_states_t::index<marker_state::detected_tag>::type &marker_states_by_detected=
+			m_marker_states.get<marker_state::detected_tag>();
+
+		for(std::size_t m=0;m<dms.size();++m)
+		{
+			boost::shared_ptr<marker_state> const &pdms=*dms[m];
+			
+			std::vector<feature_point_t::point2_t> curr_pts;
+			std::vector<bool> status;
+			m_klt_tracker(pdms->m_frame_features, curr_pts, status);
+			BOOST_ASSERT(pdms->m_frame_features.size()==curr_pts.size() && pdms->m_frame_features.size()==status.size());
+
+			marker_state::feature_to_point2_matches_t f2p2_matches;
+			for(std::size_t p=0;p<pdms->m_frame_features.size();++p)
+			{
+				if(!status[p])
+					continue;
+				f2p2_matches.push_back(
+					marker_state::feature_to_point2_match_t(
+						pdms->m_tracking_features[p],
+						curr_pts.begin()+p
+					)
+				);
+			}
+			
+			if(f2p2_matches.size()<m_min_marker_features)
+			{
+				marker_states_by_detected.modify(
+					m_marker_states.project<marker_state::detected_tag>(dms[m]),
+					boost::bind(
+						&marker_state::set_detected,
+						_1,
+						false
+					)
+				);
+			}
+			else
+			{
+				if(	ucv::find_homography_ransac(
+						f2p2_matches,
+						pdms->m_hmatrix
+					)
+				)
+				{
+					pdms->m_frame_features.clear();
+					pdms->m_tracking_features.clear();
+
+					for(std::size_t m=0;m<f2p2_matches.size();++m)
+					{
+						pdms->m_tracking_features.push_back(f2p2_matches[m].first);
+						pdms->m_frame_features.push_back(*f2p2_matches[m].second);
+					}
+					pdms->update_pose();
+				}
+				else
+				{
+					marker_states_by_detected.modify(
+						m_marker_states.project<marker_state::detected_tag>(dms[m]),
+						boost::bind(
+							&marker_state::set_detected,
+							_1,
+							false
+						)
+					);
 				}
 			}
 		}

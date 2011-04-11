@@ -1,4 +1,5 @@
 <RCC>
-    <qresource prefix="ArTestDlg">
+    <qresource prefix="/ArTestDlg">
+        <file>lib_ar_gui_test.ico</file>
     </qresource>
 </RCC>
