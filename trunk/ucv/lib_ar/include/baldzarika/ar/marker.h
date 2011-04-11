@@ -22,6 +22,8 @@ namespace baldzarika { namespace ar {
 		~marker();
 
 		static boost::shared_ptr<marker>	load(std::string const &fn);
+		static bool							can_load(std::string const &fn);
+
 
 
 		ucv::size2ui						get_size() const;

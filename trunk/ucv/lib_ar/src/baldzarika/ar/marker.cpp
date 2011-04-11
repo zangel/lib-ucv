@@ -27,6 +27,11 @@ namespace baldzarika { namespace ar {
 		return boost::shared_ptr<marker>();
 	}
 
+	bool marker::can_load(std::string const &fn)
+	{
+		return boost::algorithm::iends_with(fn, ".png");
+	}
+
 
 	marker::marker()
 		: m_median(-1)

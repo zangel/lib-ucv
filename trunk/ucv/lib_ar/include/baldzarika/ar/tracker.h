@@ -27,7 +27,6 @@ namespace baldzarika { namespace ar {
 		typedef ucv::klt_tracker<ucv::surf::integral_t::IS, ucv::surf::integral_t::FS> klt_tracker_t;
 		typedef boost::circular_buffer<ucv::surf::const_integral_view_t> integral_view_buffer_t;
 
-		
 		static boost::uint32_t const	DEFAULT_SURF_OCTAVES;
 		static boost::uint32_t const	DEFAULT_SURF_INTERVALS;
 		static boost::uint32_t const	DEFAULT_SURF_SAMPLE_STEPS;
@@ -49,6 +48,10 @@ namespace baldzarika { namespace ar {
 		public:
 			typedef std::vector<feature_points_t::const_iterator> feature_point_handles_t;
 			typedef std::vector<feature_point_t::point2_t> points2_t;
+			typedef std::pair<feature_points_t::const_iterator, points2_t::const_iterator> feature_to_point2_match_t;
+			typedef std::vector<feature_to_point2_match_t> feature_to_point2_matches_t;
+
+
 
 			friend class tracker;
 
@@ -70,17 +73,19 @@ namespace baldzarika { namespace ar {
 
 			bool									is_detected() const;
 			boost::shared_ptr<marker> const&		get_marker() const;
+			points2_t const&						get_frame_features() const;
 
 		protected:
-			void									set_detected(bool d);
 			void									collect_features();
+			void									set_detected(bool d);
+			void									update_pose();
 		
 		private:
 			boost::weak_ptr<tracker>				m_tracker;
 			boost::shared_ptr<marker>				m_marker;
 			feature_points_t						m_features;
 			feature_point_handles_t					m_tracking_features;
-			std::vector<feature_point_t::point2_t>	m_frame_features;
+			points2_t								m_frame_features;
 			bool									m_detected;
 			ucv::matrix33f							m_hmatrix;
 		};
@@ -139,6 +144,7 @@ namespace baldzarika { namespace ar {
 
 	private:
 		void									detect_markers();
+		void									track_markers(std::vector<marker_states_t::iterator> const &dms);
 
 
 	private:
