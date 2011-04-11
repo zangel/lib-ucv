@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ArTestDlg.ui'
 **
-** Created: Mon 11. Apr 15:21:28 2011
+** Created: Mon 11. Apr 23:31:05 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -16,6 +16,8 @@
 #include <QtGui/QButtonGroup>
 #include <QtGui/QComboBox>
 #include <QtGui/QDialog>
+#include <QtGui/QGridLayout>
+#include <QtGui/QGroupBox>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
@@ -30,30 +32,32 @@ QT_BEGIN_NAMESPACE
 class Ui_ArTestDlgClass
 {
 public:
-    QHBoxLayout *horizontalLayout_5;
+    QGridLayout *gridLayout_3;
+    QGroupBox *m_gbSettings;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
     QLabel *label;
-    QSpacerItem *horizontalSpacer_3;
     QComboBox *m_PreviewSize;
     QHBoxLayout *horizontalLayout_4;
     QLabel *label_3;
-    QSpacerItem *horizontalSpacer_4;
     QSpinBox *m_PreviewRate;
-    QLabel *m_MarkerPreview;
-    QSpacerItem *verticalSpacer;
-    QHBoxLayout *horizontalLayout_3;
-    QSpacerItem *horizontalSpacer_2;
-    QPushButton *m_StartStop;
-    QSpacerItem *horizontalSpacer;
+    QGroupBox *m_gbVideoPreview;
+    QGridLayout *gridLayout_2;
     PreviewWidget *m_VideoPreview;
-    QSpacerItem *horizontalSpacer_5;
+    QGroupBox *m_gbMarkerImage;
+    QGridLayout *gridLayout;
+    QLabel *label_2;
+    QLabel *m_MarkerPreview;
+    QSpacerItem *horizontalSpacer;
+    QPushButton *m_StartStop;
+    QSpacerItem *horizontalSpacer_2;
+    QSpacerItem *verticalSpacer;
 
     void setupUi(QDialog *ArTestDlgClass)
     {
         if (ArTestDlgClass->objectName().isEmpty())
             ArTestDlgClass->setObjectName(QString::fromUtf8("ArTestDlgClass"));
-        ArTestDlgClass->resize(417, 279);
+        ArTestDlgClass->resize(533, 378);
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -63,28 +67,30 @@ public:
         icon.addFile(QString::fromUtf8(":/ArTestDlg/lib_ar_gui_test.ico"), QSize(), QIcon::Normal, QIcon::Off);
         ArTestDlgClass->setWindowIcon(icon);
         ArTestDlgClass->setSizeGripEnabled(true);
-        horizontalLayout_5 = new QHBoxLayout(ArTestDlgClass);
-        horizontalLayout_5->setSpacing(6);
-        horizontalLayout_5->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
-        horizontalLayout_5->setSizeConstraint(QLayout::SetDefaultConstraint);
-        verticalLayout = new QVBoxLayout();
+        gridLayout_3 = new QGridLayout(ArTestDlgClass);
+        gridLayout_3->setSpacing(6);
+        gridLayout_3->setContentsMargins(11, 11, 11, 11);
+        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
+        m_gbSettings = new QGroupBox(ArTestDlgClass);
+        m_gbSettings->setObjectName(QString::fromUtf8("m_gbSettings"));
+        QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(m_gbSettings->sizePolicy().hasHeightForWidth());
+        m_gbSettings->setSizePolicy(sizePolicy1);
+        verticalLayout = new QVBoxLayout(m_gbSettings);
         verticalLayout->setSpacing(6);
+        verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        verticalLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(6);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        label = new QLabel(ArTestDlgClass);
+        label = new QLabel(m_gbSettings);
         label->setObjectName(QString::fromUtf8("label"));
 
         horizontalLayout->addWidget(label);
 
-        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        horizontalLayout->addItem(horizontalSpacer_3);
-
-        m_PreviewSize = new QComboBox(ArTestDlgClass);
+        m_PreviewSize = new QComboBox(m_gbSettings);
         m_PreviewSize->setObjectName(QString::fromUtf8("m_PreviewSize"));
         m_PreviewSize->setEnabled(false);
         m_PreviewSize->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -97,16 +103,12 @@ public:
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setSpacing(6);
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
-        label_3 = new QLabel(ArTestDlgClass);
+        label_3 = new QLabel(m_gbSettings);
         label_3->setObjectName(QString::fromUtf8("label_3"));
 
         horizontalLayout_4->addWidget(label_3);
 
-        horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        horizontalLayout_4->addItem(horizontalSpacer_4);
-
-        m_PreviewRate = new QSpinBox(ArTestDlgClass);
+        m_PreviewRate = new QSpinBox(m_gbSettings);
         m_PreviewRate->setObjectName(QString::fromUtf8("m_PreviewRate"));
         m_PreviewRate->setMinimum(1);
         m_PreviewRate->setMaximum(100);
@@ -117,60 +119,81 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_4);
 
-        m_MarkerPreview = new QLabel(ArTestDlgClass);
+
+        gridLayout_3->addWidget(m_gbSettings, 0, 0, 1, 3);
+
+        m_gbVideoPreview = new QGroupBox(ArTestDlgClass);
+        m_gbVideoPreview->setObjectName(QString::fromUtf8("m_gbVideoPreview"));
+        sizePolicy1.setHeightForWidth(m_gbVideoPreview->sizePolicy().hasHeightForWidth());
+        m_gbVideoPreview->setSizePolicy(sizePolicy1);
+        gridLayout_2 = new QGridLayout(m_gbVideoPreview);
+        gridLayout_2->setSpacing(6);
+        gridLayout_2->setContentsMargins(11, 11, 11, 11);
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
+        m_VideoPreview = new PreviewWidget(m_gbVideoPreview);
+        m_VideoPreview->setObjectName(QString::fromUtf8("m_VideoPreview"));
+        m_VideoPreview->setMinimumSize(QSize(320, 240));
+
+        gridLayout_2->addWidget(m_VideoPreview, 0, 0, 1, 1);
+
+
+        gridLayout_3->addWidget(m_gbVideoPreview, 0, 3, 4, 1);
+
+        m_gbMarkerImage = new QGroupBox(ArTestDlgClass);
+        m_gbMarkerImage->setObjectName(QString::fromUtf8("m_gbMarkerImage"));
+        sizePolicy1.setHeightForWidth(m_gbMarkerImage->sizePolicy().hasHeightForWidth());
+        m_gbMarkerImage->setSizePolicy(sizePolicy1);
+        gridLayout = new QGridLayout(m_gbMarkerImage);
+        gridLayout->setSpacing(6);
+        gridLayout->setContentsMargins(11, 11, 11, 11);
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+        label_2 = new QLabel(m_gbMarkerImage);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setWordWrap(true);
+
+        gridLayout->addWidget(label_2, 0, 0, 1, 1);
+
+        m_MarkerPreview = new QLabel(m_gbMarkerImage);
         m_MarkerPreview->setObjectName(QString::fromUtf8("m_MarkerPreview"));
-        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(m_MarkerPreview->sizePolicy().hasHeightForWidth());
-        m_MarkerPreview->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(m_MarkerPreview->sizePolicy().hasHeightForWidth());
+        m_MarkerPreview->setSizePolicy(sizePolicy2);
+        m_MarkerPreview->setMinimumSize(QSize(128, 128));
+        m_MarkerPreview->setSizeIncrement(QSize(0, 0));
         m_MarkerPreview->setFrameShape(QFrame::Panel);
         m_MarkerPreview->setFrameShadow(QFrame::Sunken);
         m_MarkerPreview->setTextFormat(Qt::PlainText);
 
-        verticalLayout->addWidget(m_MarkerPreview);
+        gridLayout->addWidget(m_MarkerPreview, 1, 0, 1, 1);
 
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        verticalLayout->addItem(verticalSpacer);
+        gridLayout_3->addWidget(m_gbMarkerImage, 1, 0, 1, 3);
 
-        horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setSpacing(6);
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer = new QSpacerItem(28, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-        horizontalLayout_3->addItem(horizontalSpacer_2);
+        gridLayout_3->addItem(horizontalSpacer, 2, 0, 1, 1);
 
         m_StartStop = new QPushButton(ArTestDlgClass);
         m_StartStop->setObjectName(QString::fromUtf8("m_StartStop"));
         m_StartStop->setEnabled(false);
-        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(m_StartStop->sizePolicy().hasHeightForWidth());
-        m_StartStop->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy3(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(m_StartStop->sizePolicy().hasHeightForWidth());
+        m_StartStop->setSizePolicy(sizePolicy3);
         m_StartStop->setFlat(false);
 
-        horizontalLayout_3->addWidget(m_StartStop);
+        gridLayout_3->addWidget(m_StartStop, 2, 1, 1, 1);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(48, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-        horizontalLayout_3->addItem(horizontalSpacer);
+        gridLayout_3->addItem(horizontalSpacer_2, 2, 2, 1, 1);
 
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        verticalLayout->addLayout(horizontalLayout_3);
-
-
-        horizontalLayout_5->addLayout(verticalLayout);
-
-        m_VideoPreview = new PreviewWidget(ArTestDlgClass);
-        m_VideoPreview->setObjectName(QString::fromUtf8("m_VideoPreview"));
-
-        horizontalLayout_5->addWidget(m_VideoPreview);
-
-        horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        horizontalLayout_5->addItem(horizontalSpacer_5);
+        gridLayout_3->addItem(verticalSpacer, 3, 1, 1, 1);
 
 
         retranslateUi(ArTestDlgClass);
@@ -181,8 +204,12 @@ public:
     void retranslateUi(QDialog *ArTestDlgClass)
     {
         ArTestDlgClass->setWindowTitle(QApplication::translate("ArTestDlgClass", "ArTestDlg", 0, QApplication::UnicodeUTF8));
+        m_gbSettings->setTitle(QApplication::translate("ArTestDlgClass", "Settings :", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("ArTestDlgClass", "Preview size:", 0, QApplication::UnicodeUTF8));
         label_3->setText(QApplication::translate("ArTestDlgClass", "Preview rate (fps):", 0, QApplication::UnicodeUTF8));
+        m_gbVideoPreview->setTitle(QApplication::translate("ArTestDlgClass", "Camera view:", 0, QApplication::UnicodeUTF8));
+        m_gbMarkerImage->setTitle(QApplication::translate("ArTestDlgClass", "Marker image:", 0, QApplication::UnicodeUTF8));
+        label_2->setText(QApplication::translate("ArTestDlgClass", "drop an image file to be used as marker:", 0, QApplication::UnicodeUTF8));
         m_MarkerPreview->setText(QString());
         m_StartStop->setText(QApplication::translate("ArTestDlgClass", "Start", 0, QApplication::UnicodeUTF8));
     } // retranslateUi

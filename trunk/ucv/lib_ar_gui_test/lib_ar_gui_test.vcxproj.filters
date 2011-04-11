@@ -88,4 +88,9 @@
   <ItemGroup>
     <ResourceCompile Include="lib_ar_gui_test.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="lib_ar_gui_test.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>
