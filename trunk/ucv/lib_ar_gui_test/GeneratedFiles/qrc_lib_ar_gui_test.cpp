@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Resource object code
 **
-** Created: Mon 11. Apr 21:28:10 2011
+** Created: Mon 11. Apr 15:21:28 2011
 **      by: The Resource Compiler for Qt version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost!
@@ -10,7 +10,7 @@
 #include <QtCore/qglobal.h>
 
 static const unsigned char qt_resource_data[] = {
-  // D:/Development/Projects/MyProjects/ucv/ucv/lib_ar_gui_test/lib_ar_gui_test.ico
+  // D:/Development/Projects/ucv/ucv/lib_ar_gui_test/lib_ar_gui_test.ico
   0x0,0x2,0xdd,0xd4,
   0x0,
   0x0,0x1,0x0,0x8,0x0,0x0,0x0,0x0,0x0,0x1,0x0,0x20,0x0,0xf6,0x69,0x0,

@@ -725,12 +725,12 @@ BOOST_AUTO_TEST_CASE( test_matrix )
 	h3=ucv::matrix33f::identity();
 	h1*=h3;
 	h1=h2*h3;
-	h1*=2.0f;
+	h1.scale(2.0f);
 
-	h1=ucv::matrix<int, 3, 3>::identity()*3.0f;
+	h1=ucv::matrix<int, 3, 3>::identity().scaled(3.0f);
 
 	ucv::matrix< ucv::fixed_point<15,16>, 3, 3 > m1,m2;
-	m1=ucv::matrix< ucv::fixed_point<15,16>, 3, 3 >::identity()*ucv::fixed_point<15,16>(3.0f);
+	m1=ucv::matrix< ucv::fixed_point<15,16>, 3, 3 >::identity().scaled(ucv::fixed_point<15,16>(3.0f));
 	m1=m1.inverse();
 
 	h1=h1.inverse();
@@ -741,6 +741,7 @@ BOOST_AUTO_TEST_CASE( test_vector )
 	namespace ucv=baldzarika::ucv;
 
 	typedef ucv::vector< ucv::fixed_point<15,16>, 2> vector_fp2;
+	typedef ucv::vector< ucv::fixed_point<15,16>, 3> vector_fp3;
 
 	ucv::vector3f axes[3]=
 	{
@@ -758,4 +759,10 @@ BOOST_AUTO_TEST_CASE( test_vector )
 	vector_fp2 v2=vector_fp2::unit<0>();
 	vector_fp2 v3=vector_fp2::unit<1>();
 	vector_fp2 v4=v2*v3;
+
+	ucv::matrix33f m1=ucv::matrix33f::identity(), m2=ucv::matrix33f::identity(), m3=m1*m2;
+
+
+	vector_fp3 v5;
+	vector_fp3 v6=m1*v5;
 }
