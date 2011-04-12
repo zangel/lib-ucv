@@ -30,7 +30,6 @@ private:
 
 	boost::mutex							m_TrackingFeaturesSync;
 	ar::tracker::marker_state::points2_t	m_TrackingFeatures;
-
 };
 
 #endif //PREVIEW_WIDGET_H

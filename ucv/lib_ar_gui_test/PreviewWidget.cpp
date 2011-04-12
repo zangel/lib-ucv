@@ -142,10 +142,17 @@ void PreviewWidget::paintGL()
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glDisable(GL_TEXTURE_2D);
 
-			glColor4ub(0, 255, 0, 127);
+			
 			glPointSize(4.0f);
 			glVertexPointer(3, GL_FLOAT, 0, feature_coords.get());
+
+			glColor4ub(255, 0, 0, 127);
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+			glColor4ub(0, 255, 0, 127);
 			glDrawArrays(GL_POINTS, 0, m_TrackingFeatures.size());
+
+			
 		}
 	}
 }

@@ -184,7 +184,7 @@ namespace baldzarika { namespace ucv {
 		// reverse normalization
 		matrix33f Htemp=img_correct*H;
 		H=Htemp*obj_correct;
-		h=H*(1.0f/H(2,2));
+		h=H.scaled(1.0f/H(2,2));
 		return true;
 	}
 

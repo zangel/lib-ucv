@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ArTestDlg.ui'
 **
-** Created: Mon 11. Apr 23:31:05 2011
+** Created: Tue 12. Apr 08:39:21 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

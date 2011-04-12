@@ -260,7 +260,45 @@ void ArTestDlg::onMarkerStateChanged(boost::shared_ptr<ar::tracker::marker_state
 		case ar::tracker::marker_state::SC_POSE:
 			{
 				if(ms->is_detected())
-					m_VideoPreview->setTrackingFeatures(ms->get_frame_features());
+				{
+					ucv::matrix33f const &hm=ms->get_homography_matrix();
+					ar::tracker::marker_state::points2_t marker_points(ms->get_frame_points());
+					
+					marker_points.insert(
+						marker_points.begin(),
+						hm*ar::tracker::feature_point_t::point2_t(
+							ms->get_marker()->get_size().width(),
+							ms->get_marker()->get_size().height()
+						)
+					);
+
+					marker_points.insert(
+						marker_points.begin(),
+						hm*ar::tracker::feature_point_t::point2_t(
+							0,
+							ms->get_marker()->get_size().height()
+						)
+					);
+
+					marker_points.insert(
+						marker_points.begin(),
+						hm*ar::tracker::feature_point_t::point2_t(
+							ms->get_marker()->get_size().width(),
+							0
+						)
+					);
+
+					marker_points.insert(
+						marker_points.begin(),
+						hm*ar::tracker::feature_point_t::point2_t(
+							0,
+							0
+						)
+					);
+					
+					m_VideoPreview->setTrackingFeatures(marker_points);
+
+				}
 				else
 					m_VideoPreview->setTrackingFeatures(ar::tracker::marker_state::points2_t());
 			}

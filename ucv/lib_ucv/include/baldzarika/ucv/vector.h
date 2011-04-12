@@ -11,7 +11,10 @@ namespace baldzarika { namespace ucv {
 	{
 	public:
 		typedef ublas::c_vector< T, D > base_t;
+
+		template < typename T2, boost::uint32_t D2 > friend class vector;
 		template < typename T2, boost::uint32_t R2, boost::uint32_t C2> friend class matrix;
+		
 
 		using base_t::operator();
 		using base_t::operator[];
@@ -70,15 +73,20 @@ namespace baldzarika { namespace ucv {
 		inline vector(point2<RT> const &p2)
 			: base_t(D)
 		{
-			BOOST_STATIC_ASSERT(D==2);
-			data()[0]=p2.x;
-			data()[1]=p2.y;
+			BOOST_STATIC_ASSERT(D>=2);
+			data()[0]=static_cast<T>(p2.x);
+			data()[1]=static_cast<T>(p2.y);
+			for(std::size_t d=2;d<D-1;++d)
+				data()[d]=detail::constant::zero<T>();
+			data()[D-1]=detail::constant::one<T>();
+
 		}
 
-		inline operator point2<T> () const
+		template < typename RT >
+		inline operator point2<RT> () const
 		{
 			BOOST_STATIC_ASSERT(D>=2);
-			return point2<T>(data()[0], data()[1]);
+			return point2<RT>(data()[0], data()[1]);
 		}
 		
 		template < typename RT >

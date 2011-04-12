@@ -39,6 +39,8 @@ namespace baldzarika { namespace ar {
 
 		static boost::uint32_t const	DEFAULT_TRACKER_MIN_MARKER_FEATURES;
 		static boost::uint32_t const	DEFAULT_TRACKER_MAX_MARKER_FEATURES;
+		static float const				DEFAULT_TRACKER_SELECT_FP_SCALE;
+		static float const				DEFAULT_TRACKER_SELECT_FP_MIN_AREA;
 
 
 		class marker_state
@@ -46,13 +48,8 @@ namespace baldzarika { namespace ar {
 			, public boost::noncopyable
 		{
 		public:
-			typedef std::vector<feature_points_t::const_iterator> feature_point_handles_t;
 			typedef std::vector<feature_point_t::point2_t> points2_t;
-			typedef std::pair<feature_points_t::const_iterator, points2_t::const_iterator> feature_to_point2_match_t;
-			typedef std::vector<feature_to_point2_match_t> feature_to_point2_matches_t;
-
-
-
+			
 			friend class tracker;
 
 			typedef enum
@@ -73,19 +70,18 @@ namespace baldzarika { namespace ar {
 
 			bool									is_detected() const;
 			boost::shared_ptr<marker> const&		get_marker() const;
-			points2_t const&						get_frame_features() const;
+			points2_t const&						get_frame_points() const;
+			ucv::matrix33f const&					get_homography_matrix() const;
 
 		protected:
-			void									collect_features();
 			void									set_detected(bool d);
-			void									update_pose();
 		
 		private:
 			boost::weak_ptr<tracker>				m_tracker;
 			boost::shared_ptr<marker>				m_marker;
 			feature_points_t						m_features;
-			feature_point_handles_t					m_tracking_features;
-			points2_t								m_frame_features;
+			points2_t								m_marker_points;
+			points2_t								m_frame_points;
 			bool									m_detected;
 			ucv::matrix33f							m_hmatrix;
 		};
@@ -143,13 +139,22 @@ namespace baldzarika { namespace ar {
 		void									on_stop();
 
 	private:
+		void									describe_marker(marker_state &ms);
+		
+		
+		
+		bool									detect_marker(marker_state &ms, feature_points_t const &ffs);
 		void									detect_markers();
+
+		bool									track_marker(marker_state &dms);
 		void									track_markers(std::vector<marker_states_t::iterator> const &dms);
 
 
 	private:
 		boost::uint32_t							m_min_marker_features;
 		boost::uint32_t							m_max_marker_features;
+		float									m_select_fp_scale;
+		float									m_select_fp_min_area;
 		
 		mutable boost::asio::io_service			m_ios;
 		boost::asio::io_service::work			m_ios_work;

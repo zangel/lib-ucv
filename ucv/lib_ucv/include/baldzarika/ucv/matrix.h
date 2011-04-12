@@ -114,29 +114,16 @@ namespace baldzarika { namespace ucv {
 		}
 
 		template < typename RT >
-		inline matrix& operator*=(RT const &v)
+		inline matrix& scale(RT const &v)
 		{
 			base_t::operator*=(v);
 			return *this;
 		}
 
 		template < typename RT >
-		inline matrix operator *(RT const &v) const
+		inline matrix scaled(RT const &v) const
 		{
-			return matrix(*this)*=v;
-		}
-
-		template < typename RT >
-		inline matrix& operator /=(RT const &v)
-		{
-			base_t::operator/=(v);
-			return *this;
-		}
-
-		template < typename RT >
-		inline matrix operator /(RT const &v) const
-		{
-			return matrix(*this)/=v;
+			return matrix(*this).scale(v);
 		}
 
 		inline matrix inverse() const
@@ -145,13 +132,13 @@ namespace baldzarika { namespace ucv {
 		}
 
 		template < typename VT >
-		inline vector< VT, R > operator *(vector< VT, C > const &v)
+		inline vector< VT, R > operator *(vector< VT, C > const &v) const
 		{
-			return vector< VT, R >(ublas::prod(*this, v));
+			return vector< VT, R >(ublas::prod(*this, vector<T,C>(v)));
 		}
 
 		template < typename PT >
-		inline point2<PT> operator *(point2< PT > const &p)
+		inline point2<PT> operator *(point2< PT > const &p) const
 		{
 			return detail::transform_point2(*this, p);
 		}
@@ -197,7 +184,7 @@ namespace baldzarika { namespace ucv {
 		template < typename T, typename PT >
 		static inline point2<PT> transform_point2( matrix< T, 3, 3 > const &m, point2<PT> const &p)
 		{
-			return (m*vector<PT, 3>(p)).homogenized();
+			return (m*vector<T, 3>(p)).homogenized();
 		}
 
 
