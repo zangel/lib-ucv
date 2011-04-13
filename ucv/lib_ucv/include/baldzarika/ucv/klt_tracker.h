@@ -1,6 +1,8 @@
 #ifndef BALDZARIKA_UCV_KLT_TRACKER_H
 #define BALDZARIKA_UCV_KLT_TRACKER_H
 
+#include <baldzarika/ucv/integral.h>
+
 namespace baldzarika { namespace ucv {
 
 	template < boost::uint32_t I, boost::uint32_t F >

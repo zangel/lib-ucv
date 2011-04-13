@@ -36,6 +36,9 @@ namespace baldzarika { namespace ar {
 	private:
 		gray_image_t		m_img;
 		gray_t				m_median;
+
+	public:
+		mutable boost::any	m_any_data;
 	};
 
 } //namespace ar
