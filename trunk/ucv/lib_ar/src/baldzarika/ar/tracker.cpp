@@ -147,6 +147,11 @@ namespace baldzarika { namespace ar {
 	{
 		return m_marker_state_changed;
 	}
+
+	tracker::start_stop_signal_t& tracker::start_stop() const
+	{
+		return m_start_stop;
+	}
 	
 	bool tracker::start()
 	{
@@ -215,6 +220,8 @@ namespace baldzarika { namespace ar {
 
 	void tracker::on_start()
 	{
+		m_start_stop(shared_from_this(), true);
+
 		marker_states_t::index<marker_state::detected_tag>::type &markers_by_detected=m_marker_states.get<marker_state::detected_tag>();
 		for(marker_states_t::iterator it_marker=m_marker_states.begin();it_marker!=m_marker_states.end();++it_marker)
 		{
@@ -231,6 +238,7 @@ namespace baldzarika { namespace ar {
 			m_marker_state_changed(ms, marker_state::SC_DETECTION);
 			describe_marker(*ms);
 		}
+		
 	}
 
 	void tracker::on_update()
@@ -278,6 +286,7 @@ namespace baldzarika { namespace ar {
 					m_integral_views.pop_back();
 			}
 		}
+		m_start_stop(shared_from_this(), false);
 	}
 
 	void tracker::on_stop()

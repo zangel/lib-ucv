@@ -1,0 +1,162 @@
+#include <config.h>
+#include <com_baldzarika_ar_Frame.h>
+#include <com/baldzarika/ar/Frame.h>
+#include <com/baldzarika/ar/Size2.h>
+#include <baldzarika/ucv/convert_scale.h>
+
+void Java_com_baldzarika_ar_Frame_create__Lcom_baldzarika_ar_Size2_2(JNIEnv */*e*/, jobject f, jobject fs)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+
+	Frame(f).create(local_ref<Size2>(fs));
+}
+
+void Java_com_baldzarika_ar_Frame_destroy(JNIEnv */*e*/, jobject f)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	Frame(f).destroy();
+}
+
+jobject Java_com_baldzarika_ar_Frame_getSize(JNIEnv */*e*/, jobject f)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Frame(f).getSize().get_jobject();
+}
+
+jdouble Java_com_baldzarika_ar_Frame_getMedianPixelValue(JNIEnv */*e*/, jobject f)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Frame(f).getMedianPixelValue();
+}
+
+jboolean Java_com_baldzarika_ar_Frame_setPixels(JNIEnv */*e*/, jobject f, jbyteArray data, jint pfmt)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Frame(f).setPixels(local_ref< array< jbyte,1> >(data),pfmt);
+}
+
+namespace com { namespace baldzarika { namespace ar {
+
+	J2CPP_DEFINE_CLASS(Frame,"com/baldzarika/ar/Frame")
+	J2CPP_DEFINE_METHOD(Frame,0,"<init>","()V")
+	J2CPP_DEFINE_METHOD(Frame,1,"<init>","(Lcom/baldzarika/ar/Size2;)V")
+	J2CPP_DEFINE_METHOD(Frame,2,"create","(Lcom/baldzarika/ar/Size2;)V")
+	J2CPP_DEFINE_METHOD(Frame,3,"destroy","()V")
+	J2CPP_DEFINE_METHOD(Frame,4,"getSize","()Lcom/baldzarika/ar/Size2;")
+	J2CPP_DEFINE_METHOD(Frame,5,"getMedianPixelValue","()D")
+	J2CPP_DEFINE_METHOD(Frame,6,"setPixels","([BI)Z")
+	J2CPP_DEFINE_FIELD(Frame,0,"m_px","J")
+
+	Frame::Frame(jobject jobj)
+		: j2cpp::object<Frame>(jobj)
+		, m_px(get_jobject())
+	{
+	}
+
+	Frame::Frame()
+		: j2cpp::object<Frame>(
+			j2cpp::call_new_object<
+				J2CPP_CLASS_NAME,
+				J2CPP_METHOD_NAME(0),
+				J2CPP_METHOD_SIGNATURE(0)
+			>())
+		, m_px(get_jobject())
+	{
+	}
+
+	Frame::Frame(j2cpp::local_ref<Size2> const &fs)
+		: j2cpp::object<Frame>(
+			j2cpp::call_new_object<
+				J2CPP_CLASS_NAME,
+				J2CPP_METHOD_NAME(1),
+				J2CPP_METHOD_SIGNATURE(1)
+			>(fs))
+		, m_px(get_jobject())
+	{
+	}
+
+	void Frame::create(j2cpp::local_ref<Size2> const &fs)
+	{
+		jint width=fs->m_Width;
+		jint height=fs->m_Height;
+		m_px=reinterpret_cast<jlong>( new px_t(
+				::baldzarika::ar::tracker::gray_t(-1),
+				::baldzarika::ar::tracker::gray_image_t(width,height)
+			)
+		);
+	}
+
+	void Frame::destroy()
+	{
+		px_t *p_px=reinterpret_cast<px_t*>(
+				static_cast<jlong>(m_px)
+		);
+		delete p_px;
+		m_px=0;
+	}
+
+	j2cpp::local_ref<Size2> Frame::getSize()
+	{
+		if(px_t *p_px=reinterpret_cast<px_t*>(
+				static_cast<jlong>(m_px)
+			)
+		)
+		{
+			return j2cpp::local_ref<Size2>(
+				Size2(p_px->second.width(),p_px->second.height())
+			);
+		}
+		return j2cpp::local_ref<Size2>(Size2(0,0));
+	}
+
+	jdouble Frame::getMedianPixelValue()
+	{
+		if(px_t *p_px=reinterpret_cast<px_t*>(
+				static_cast<jlong>(m_px)
+			)
+		)
+		{
+			return static_cast<jdouble>(p_px->first);
+		}
+		return -1.0;
+	}
+
+	jboolean Frame::setPixels(j2cpp::local_ref< j2cpp::array<jbyte,1> > const &data, jint pfmt)
+	{
+		if(px_t *p_px=reinterpret_cast<px_t*>(
+				static_cast<jlong>(m_px)
+			)
+		)
+		{
+			if(pfmt==17 && data->size()==(p_px->second.width()*p_px->second.height()+p_px->second.width()*p_px->second.height()/2))
+			{
+				return ::baldzarika::ucv::convert_nv16_to_gray(
+					//y channel
+					::baldzarika::ucv::gil::interleaved_view(
+						p_px->second.width(), p_px->second.height(),
+						reinterpret_cast< ::baldzarika::ucv::gil::gray8_pixel_t * >(data->data()),
+						p_px->second.width()
+					),
+					//uv channels
+					::baldzarika::ucv::gil::interleaved_view(
+						p_px->second.width()/2, p_px->second.height()/2,
+						reinterpret_cast< ::baldzarika::ucv::gil::gray16_pixel_t * >(data->data()+p_px->second.width()*p_px->second.height()),
+						(p_px->second.width()/2)*2
+					),
+					::baldzarika::ucv::gil::view(p_px->second),
+					p_px->first
+				)?JNI_TRUE:JNI_FALSE;
+			}
+		}
+		return JNI_FALSE;
+	}
+
+
+} //namespace ar
+} //namespace baldzarika
+} //namespace com

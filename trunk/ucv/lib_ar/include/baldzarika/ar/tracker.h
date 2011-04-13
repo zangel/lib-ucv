@@ -43,6 +43,9 @@ namespace baldzarika { namespace ar {
 		static float const				DEFAULT_TRACKER_SELECT_FP_MIN_AREA;
 
 
+		typedef boost::signals2::signal<void (boost::shared_ptr<tracker> const &, bool)> start_stop_signal_t;
+
+
 		class marker_state
 			: public boost::enable_shared_from_this<marker_state>
 			, public boost::noncopyable
@@ -84,6 +87,9 @@ namespace baldzarika { namespace ar {
 			points2_t								m_frame_points;
 			bool									m_detected;
 			ucv::matrix33f							m_hmatrix;
+
+		public:
+			mutable boost::any						m_any_data;
 		};
 
 		typedef boost::multi_index_container
@@ -125,6 +131,8 @@ namespace baldzarika { namespace ar {
 		bool									remove_marker_state(boost::shared_ptr<marker_state> const &ms);
 
 		marker_state::changed_signal_t&			marker_state_changed() const;
+		start_stop_signal_t&					start_stop() const;
+
 
 
 		bool									start();
@@ -169,7 +177,12 @@ namespace baldzarika { namespace ar {
 		klt_tracker_t							m_klt_tracker;
 
 		marker_states_t							m_marker_states;
+		
 		mutable marker_state::changed_signal_t	m_marker_state_changed;
+		mutable start_stop_signal_t				m_start_stop;
+
+	public:
+		mutable boost::any						m_any_data;
 	};
 
 } //namespace ar
