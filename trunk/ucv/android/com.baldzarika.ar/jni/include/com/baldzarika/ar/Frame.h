@@ -14,8 +14,13 @@ namespace com { namespace baldzarika { namespace ar {
 			::baldzarika::ar::tracker::gray_image_t
 		> px_t;
 
+		typedef j2cpp::local_ref<Frame> jx_t;
+
+
 		J2CPP_DECLARE_CLASS
 		J2CPP_DECLARE_FIELD(0)
+
+		static px_t*			get(jx_t const &jx);
 
 		explicit Frame(jobject jobj);
 

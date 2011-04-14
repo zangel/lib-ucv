@@ -18,12 +18,18 @@ LOCAL_SRC_FILES :=	src/support.cpp \
 					src/com/baldzarika/ar/Size2.cpp \
 					src/com/baldzarika/ar/Frame.cpp \
 					src/com/baldzarika/ar/Marker.cpp \
-					../../../lib_ar/src/baldzarika/ar/marker.cpp
+					src/com/baldzarika/ar/Tracker.cpp \
+					../../../lib_ar/src/baldzarika/ar/marker.cpp \
+					../../../lib_ar/src/baldzarika/ar/tracker.cpp \
+					../../../lib_ucv/src/baldzarika/ucv/surf.cpp \
+					../../../lib_ucv/src/baldzarika/ucv/homography.cpp
+					
 					
 					
 LOCAL_LDLIBS    	:=	-L$(ANDROID_BOOST_DIR)/android/lib \
 						-L$(OPENCV_ROOT)/android/build/obj/local/armeabi \
 						-lboost_system \
+						-l boost_thread \
 						-lpng \
 						-lzlib \
 						-ldl \

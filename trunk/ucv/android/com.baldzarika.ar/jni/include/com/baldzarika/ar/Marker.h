@@ -13,17 +13,23 @@ namespace com { namespace baldzarika { namespace ar {
 			::baldzarika::ar::marker
 		> px_t;
 
+		typedef j2cpp::local_ref<Marker> jx_t;
+
 		J2CPP_DECLARE_CLASS
 		J2CPP_DECLARE_FIELD(0)
 
+		static jx_t				get(px_t const &px);
+		static px_t				get(jx_t const &jx);
+
+
 		explicit Marker(jobject jobj);
+
+		j2cpp::local_ref<Size2>	getSize();
+		jboolean 				load(j2cpp::local_ref<j2cpp::java::lang::String> const &fileName);
 
 		void					create();
 		void					create(j2cpp::local_ref<Size2> const &ms);
 		void					destroy();
-
-		j2cpp::local_ref<Size2>	getSize();
-		jboolean 				load(j2cpp::local_ref<j2cpp::java::lang::String> const &fileName);
 
 		j2cpp::field<
 			J2CPP_CLASS_NAME,
