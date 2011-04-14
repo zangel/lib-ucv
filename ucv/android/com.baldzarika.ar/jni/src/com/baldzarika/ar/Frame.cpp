@@ -55,6 +55,13 @@ namespace com { namespace baldzarika { namespace ar {
 	J2CPP_DEFINE_CLASS(Frame,"com/baldzarika/ar/Frame")
 	J2CPP_DEFINE_FIELD(Frame,0,"m_px","J")
 
+	Frame::px_t* Frame::get(jx_t const &jx)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(jx->m_px)))
+			return ppx;
+		return 0;
+	}
+
 	Frame::Frame(jobject jobj)
 		: j2cpp::object<Frame>(jobj)
 		, m_px(get_jobject())
@@ -79,19 +86,16 @@ namespace com { namespace baldzarika { namespace ar {
 
 	void Frame::destroy()
 	{
-		px_t *p_px=reinterpret_cast<px_t*>(
-			static_cast<jlong>(m_px)
-		);
-		delete p_px;
-		m_px=0;
+		if(px_t *p_px=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+		{
+			delete p_px;
+			m_px=0;
+		}
 	}
 
 	j2cpp::local_ref<Size2> Frame::getSize()
 	{
-		if(	px_t *p_px=reinterpret_cast<px_t*>(
-				static_cast<jlong>(m_px)
-			)
-		)
+		if(px_t *p_px=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
 		{
 			return j2cpp::local_ref<Size2>(
 				Size2(p_px->second.width(),p_px->second.height())
@@ -102,22 +106,14 @@ namespace com { namespace baldzarika { namespace ar {
 
 	jdouble Frame::getMedianPixelValue()
 	{
-		if(	px_t *p_px=reinterpret_cast<px_t*>(
-				static_cast<jlong>(m_px)
-			)
-		)
-		{
+		if(px_t *p_px=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
 			return static_cast<jdouble>(p_px->first);
-		}
 		return -1.0;
 	}
 
 	jboolean Frame::setPixels(j2cpp::local_ref< j2cpp::array<jbyte,1> > const &data, jint pfmt)
 	{
-		if(	px_t *p_px=reinterpret_cast<px_t*>(
-				static_cast<jlong>(m_px)
-			)
-		)
+		if(px_t *p_px=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
 		{
 			if(pfmt==17 && data->size()==(p_px->second.width()*p_px->second.height()+p_px->second.width()*p_px->second.height()/2))
 			{
@@ -141,7 +137,6 @@ namespace com { namespace baldzarika { namespace ar {
 		}
 		return JNI_FALSE;
 	}
-
 
 } //namespace ar
 } //namespace baldzarika

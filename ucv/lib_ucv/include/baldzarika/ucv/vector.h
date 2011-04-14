@@ -2,6 +2,7 @@
 #define BALDZARIKA_UCV_VECTOR_H
 
 #include <baldzarika/ucv/point2.h>
+#include <baldzarika/ucv/fixed_point.h>
 
 namespace baldzarika { namespace ucv {
 

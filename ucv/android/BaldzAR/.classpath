@@ -3,10 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="src" path="com.baldzarika.ar_src">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="com.baldzarika.ar/libs/armeabi"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="src" path="com.baldzarika.ar_src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

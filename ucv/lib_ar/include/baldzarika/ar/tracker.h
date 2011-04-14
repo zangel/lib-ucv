@@ -71,11 +71,13 @@ namespace baldzarika { namespace ar {
 			marker_state(boost::shared_ptr<tracker> const &t, boost::shared_ptr<marker> const &m);
 			~marker_state();
 
+			boost::shared_ptr<tracker>				get_tracker() const;
 			bool									is_detected() const;
 			boost::shared_ptr<marker> const&		get_marker() const;
 			points2_t const&						get_frame_points() const;
 			ucv::matrix33f const&					get_homography_matrix() const;
-
+			
+		
 		protected:
 			void									set_detected(bool d);
 		

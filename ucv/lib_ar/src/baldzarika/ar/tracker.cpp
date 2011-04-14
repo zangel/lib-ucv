@@ -49,6 +49,11 @@ namespace baldzarika { namespace ar {
 	{
 	}
 
+	boost::shared_ptr<tracker> tracker::marker_state::get_tracker() const
+	{
+		return m_tracker.lock();
+	}
+
 	bool tracker::marker_state::is_detected() const
 	{
 		return m_detected;
@@ -182,7 +187,7 @@ namespace baldzarika { namespace ar {
 		m_ios.post( boost::bind(&tracker::on_stop, this) );
 		m_ios.stop();
 		m_worker.join();
-		if(!is_started() && m_ios.stopped())
+		if(!is_started()/* && m_ios.stopped()*/)
 		{
 			m_ios.reset();
 			return true;
@@ -340,7 +345,7 @@ namespace baldzarika { namespace ar {
 		ucv::match_feature_points<
 			ucv::surf::feature_point_t,
 			std::vector<ucv::surf::feature_point_t>,
-			std::vector< ucv::surf::feature_point_t>
+			std::vector<ucv::surf::feature_point_t>
 		>(ms.m_features, ffs, marker_matches);
 
 		if(marker_matches.size()>=m_min_marker_features)

@@ -11,25 +11,12 @@
 namespace baldzarika { namespace ar {
 
 
-	boost::shared_ptr<marker> marker::load(std::string const &fn)
+	boost::shared_ptr<marker> marker::create_from_file(std::string const &fn)
 	{
-		if(boost::algorithm::iends_with(fn, ".png"))
-		{
-			ucv::gil::gray8_image_t marker_img;
-			ucv::gil::png_read_and_convert_image(fn, marker_img);
-			if(marker_img.width()*marker_img.height())
-			{
-				return boost::shared_ptr<marker>(
-					new marker(ucv::gil::const_view(marker_img))
-				);
-			}
-		}
+		boost::shared_ptr<marker> new_marker(new marker());
+		if(new_marker->load(fn))
+			return new_marker;
 		return boost::shared_ptr<marker>();
-	}
-
-	bool marker::can_load(std::string const &fn)
-	{
-		return boost::algorithm::iends_with(fn, ".png");
 	}
 
 
@@ -76,6 +63,27 @@ namespace baldzarika { namespace ar {
 
 	marker::~marker()
 	{
+	}
+
+	bool marker::load(std::string const &fn)
+	{
+		if(boost::algorithm::iends_with(fn, ".png"))
+		{
+			ucv::gil::gray8_image_t marker_img;
+			ucv::gil::png_read_and_convert_image(fn, marker_img);
+			if(marker_img.width()*marker_img.height())
+			{
+				m_img.recreate(marker_img.width(),marker_img.height());
+				ucv::convert_scale(
+					ucv::gil::const_view(marker_img),
+					ucv::gil::view(m_img),
+					1.0f/255.0f,
+					m_median
+				);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	ucv::size2ui marker::get_size() const 

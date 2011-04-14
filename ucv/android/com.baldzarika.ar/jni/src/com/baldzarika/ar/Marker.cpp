@@ -43,6 +43,20 @@ namespace com { namespace baldzarika { namespace ar {
 	J2CPP_DEFINE_CLASS(Marker,"com/baldzarika/ar/Marker")
 	J2CPP_DEFINE_FIELD(Marker,0,"m_px","J")
 
+	Marker::jx_t Marker::get(Marker::px_t const &px)
+	{
+		if(px->m_any_data.type()==typeid(jx_t))
+			return boost::any_cast<jx_t>(px->m_any_data);
+		return jx_t();
+	}
+
+	Marker::px_t Marker::get(Marker::jx_t const &jx)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(jx->m_px)))
+			return *ppx;
+		return px_t();
+	}
+
 	Marker::Marker(jobject jobj)
 		: j2cpp::object<Marker>(jobj)
 		, m_px(get_jobject())
@@ -51,46 +65,54 @@ namespace com { namespace baldzarika { namespace ar {
 
 	void Marker::create()
 	{
-		m_px=reinterpret_cast<jlong>( new px_t(
-			new ::baldzarika::ar::marker()
-		));
+		px_t *ppx=new px_t(new ::baldzarika::ar::marker());
+		(*ppx)->m_any_data=jx_t(get_jobject());
+		m_px=reinterpret_cast<jlong>(ppx);
 	}
 
 	void Marker::create(j2cpp::local_ref<Size2> const &ms)
 	{
-		m_px=reinterpret_cast<jlong>( new px_t(
+		px_t *ppx=new px_t(
 			new ::baldzarika::ar::marker(
 				::baldzarika::ucv::size2ui(
 					jint(ms->m_Width), jint(ms->m_Height)
 				)
 			)
-		));
+		);
+		(*ppx)->m_any_data=jx_t(get_jobject());
+		m_px=reinterpret_cast<jlong>(ppx);
 	}
 
 	void Marker::destroy()
 	{
-		px_t *p_px=reinterpret_cast<px_t*>(
-			static_cast<jlong>(m_px)
-		);
-		delete p_px;
-		m_px=0;
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+		{
+			(*ppx)->m_any_data=boost::any();
+			delete ppx;
+			m_px=0;
+		}
 	}
 
 	j2cpp::local_ref<Size2>	Marker::getSize()
 	{
-		if(	px_t *p_px=reinterpret_cast<px_t*>(
-				static_cast<jlong>(m_px)
-			)
-		)
-		{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
 			return j2cpp::local_ref<Size2>(
-				Size2((*p_px)->get_size().width(),(*p_px)->get_size().height())
+				Size2((*ppx)->get_size().width(),(*ppx)->get_size().height())
 			);
-		}
+		return j2cpp::local_ref<Size2>(Size2(0,0));
 	}
 
 	jboolean Marker::load(j2cpp::local_ref<j2cpp::java::lang::String> const &fileName)
 	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+		{
+			j2cpp::local_ref< j2cpp::array<jbyte,1> > str_bytes=fileName->getBytes();
+			return (*ppx)->load(std::string(
+					str_bytes->data(),
+					str_bytes->data()+str_bytes->size()
+				)
+			)?JNI_TRUE:JNI_FALSE;
+		}
 		return JNI_FALSE;
 	}
 

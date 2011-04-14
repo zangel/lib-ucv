@@ -21,10 +21,10 @@ namespace baldzarika { namespace ar {
 		marker(ucv::gil::rgb8c_view_t rgbv);
 		~marker();
 
-		static boost::shared_ptr<marker>	load(std::string const &fn);
-		static bool							can_load(std::string const &fn);
 
-
+		static boost::shared_ptr<marker>	create_from_file(std::string const &fn);
+		bool								load(std::string const &fn);
+		
 
 		ucv::size2ui						get_size() const;
 
