@@ -14,6 +14,8 @@ namespace com { namespace baldzarika { namespace ar {
 		> px_t;
 
 		typedef j2cpp::local_ref<Marker> jx_t;
+		typedef j2cpp::global_ref<Marker> jref_t;
+
 
 		J2CPP_DECLARE_CLASS
 		J2CPP_DECLARE_FIELD(0)

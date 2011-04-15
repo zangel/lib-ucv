@@ -20,6 +20,8 @@ namespace com { namespace baldzarika { namespace ar {
 		Size2();
 		Size2(jint width, jint height);
 
+		operator j2cpp::local_ref<j2cpp::java::lang::Object>() const;
+
 		j2cpp::field<
 			J2CPP_CLASS_NAME,
 			J2CPP_FIELD_NAME(0),

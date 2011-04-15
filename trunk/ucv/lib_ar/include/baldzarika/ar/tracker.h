@@ -149,6 +149,9 @@ namespace baldzarika { namespace ar {
 		void									on_stop();
 
 	private:
+		void									run();
+
+	private:
 		void									describe_marker(marker_state &ms);
 		
 		

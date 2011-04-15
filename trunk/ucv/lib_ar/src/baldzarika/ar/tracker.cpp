@@ -166,12 +166,9 @@ namespace baldzarika { namespace ar {
 		m_integral_frame_seq=0;
 		m_integral_views.clear();
 
-		m_worker=boost::thread(boost::bind(&boost::asio::io_service::run, &m_ios)).move();
+		m_worker=boost::thread(boost::bind(&tracker::run, this)).move();
 		if(is_started())
-		{
-			m_ios.post( boost::bind(&tracker::on_start, this) );
 			return true;
-		}
 		return false;
 	}
 
@@ -184,7 +181,6 @@ namespace baldzarika { namespace ar {
 	{
 		if(!is_started())
 			return false;
-		m_ios.post( boost::bind(&tracker::on_stop, this) );
 		m_ios.stop();
 		m_worker.join();
 		if(!is_started()/* && m_ios.stopped()*/)
@@ -291,11 +287,18 @@ namespace baldzarika { namespace ar {
 					m_integral_views.pop_back();
 			}
 		}
-		m_start_stop(shared_from_this(), false);
 	}
 
 	void tracker::on_stop()
 	{
+		m_start_stop(shared_from_this(), false);
+	}
+
+	void tracker::run()
+	{
+		on_start();
+		m_ios.run();
+		on_stop();
 	}
 
 
