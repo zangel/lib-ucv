@@ -42,6 +42,11 @@ namespace com { namespace baldzarika { namespace ar {
 	{
 	}
 
+	Size2::operator j2cpp::local_ref<j2cpp::java::lang::Object>() const
+	{
+		return j2cpp::local_ref<j2cpp::java::lang::Object>(get_jobject());
+	}
+
 } //namespace ar
 } //namespace baldzarika
 } //namespace com

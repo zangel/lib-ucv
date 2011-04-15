@@ -45,8 +45,8 @@ namespace com { namespace baldzarika { namespace ar {
 
 	Marker::jx_t Marker::get(Marker::px_t const &px)
 	{
-		if(px->m_any_data.type()==typeid(jx_t))
-			return boost::any_cast<jx_t>(px->m_any_data);
+		if(px->m_any_data.type()==typeid(jref_t))
+			return jx_t(boost::any_cast<jref_t>(px->m_any_data));
 		return jx_t();
 	}
 
@@ -66,7 +66,7 @@ namespace com { namespace baldzarika { namespace ar {
 	void Marker::create()
 	{
 		px_t *ppx=new px_t(new ::baldzarika::ar::marker());
-		(*ppx)->m_any_data=jx_t(get_jobject());
+		(*ppx)->m_any_data=jref_t(get_jobject());
 		m_px=reinterpret_cast<jlong>(ppx);
 	}
 
@@ -79,7 +79,7 @@ namespace com { namespace baldzarika { namespace ar {
 				)
 			)
 		);
-		(*ppx)->m_any_data=jx_t(get_jobject());
+		(*ppx)->m_any_data=jref_t(get_jobject());
 		m_px=reinterpret_cast<jlong>(ppx);
 	}
 
