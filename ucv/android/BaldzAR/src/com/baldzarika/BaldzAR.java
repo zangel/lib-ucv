@@ -25,7 +25,6 @@ public class BaldzAR extends Activity implements Tracker.MarkerStateCallback {
     	ClassLoader system_cl=ClassLoader.getSystemClassLoader();
     	ClassLoader size2_cl=new Size2().getClass().getClassLoader();
     	
-    	
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
