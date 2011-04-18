@@ -17,9 +17,8 @@ public class BaldzAR extends Activity implements Tracker.MarkerStateCallback {
 			Log.i("BaldzAR", "onStateChanged(" + ms.toString() + "," + Integer.toString(sc) + ")" );
 	}
 	
-    @Override
+	@Override
     public void onCreate(Bundle savedInstanceState) {
-    	
     	ClassLoader this_cl=this.getClass().getClassLoader();
     	ClassLoader thread_cl=Thread.currentThread().getClass().getClassLoader();
     	ClassLoader system_cl=ClassLoader.getSystemClassLoader();
