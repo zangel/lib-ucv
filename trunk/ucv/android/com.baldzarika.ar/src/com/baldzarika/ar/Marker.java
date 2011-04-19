@@ -27,7 +27,9 @@ public class Marker {
 	}
 	
 	public native Size2 getSize();
-	public native boolean load(String fileName);
+	public native boolean loadImage(String fileName);
+	public native boolean setImage(android.graphics.Bitmap bitmap);
+	public native boolean saveImage(String fileName);
 		
 	private long m_px=0;
 }

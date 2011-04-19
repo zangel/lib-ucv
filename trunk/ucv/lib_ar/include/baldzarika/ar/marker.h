@@ -24,6 +24,8 @@ namespace baldzarika { namespace ar {
 
 		static boost::shared_ptr<marker>	create_from_file(std::string const &fn);
 		bool								load(std::string const &fn);
+		bool								save(std::string const &fn);
+		bool								set(ucv::gil::gray8c_view_t gv);
 		
 
 		ucv::size2ui						get_size() const;

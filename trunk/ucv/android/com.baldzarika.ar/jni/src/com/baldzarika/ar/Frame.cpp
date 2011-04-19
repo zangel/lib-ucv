@@ -115,7 +115,7 @@ namespace com { namespace baldzarika { namespace ar {
 	{
 		if(px_t *p_px=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
 		{
-			if(pfmt==17 && data->size()==(p_px->second.width()*p_px->second.height()+p_px->second.width()*p_px->second.height()/2))
+			if(pfmt==17 && data->size()>=(p_px->second.width()*p_px->second.height()+p_px->second.width()*p_px->second.height()/2))
 			{
 				return ::baldzarika::ucv::convert_nv16_to_gray(
 					//y channel

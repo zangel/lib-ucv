@@ -44,8 +44,7 @@ namespace baldzarika { namespace ar {
 
 
 		typedef boost::signals2::signal<void (boost::shared_ptr<tracker> const &, bool)> start_stop_signal_t;
-
-
+		
 		class marker_state
 			: public boost::enable_shared_from_this<marker_state>
 			, public boost::noncopyable
@@ -58,11 +57,12 @@ namespace baldzarika { namespace ar {
 			typedef enum
 			{
 				SC_DETECTION=0,
-				SC_POSE
+				SC_POSE,
+				SC_DETECT_NOTIFY
 			} eSC;
 
 			typedef boost::signals2::signal<void (boost::shared_ptr<marker_state> const &, eSC)> changed_signal_t;
-
+			
 			struct order_tag {};
 			struct identity_tag {};
 			struct marker_identity_tag {};

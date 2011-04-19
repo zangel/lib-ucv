@@ -86,6 +86,44 @@ namespace baldzarika { namespace ar {
 		return false;
 	}
 
+	bool marker::save(std::string const &fn)
+	{
+		if(boost::algorithm::iends_with(fn, ".png"))
+		{
+			if(m_img.width()*m_img.height())
+			{
+				ucv::gil::gray8_image_t save_img(m_img.width(),m_img.height());
+				unsigned char mv(0);
+				ucv::convert_scale(
+					ucv::gil::const_view(m_img),
+					ucv::gil::view(save_img),
+					255.0f,
+					mv
+				);
+				
+				ucv::gil::png_write_view(fn, ucv::gil::const_view(save_img));
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool marker::set(ucv::gil::gray8c_view_t gv)
+	{
+		if(gv.width()*gv.height())
+		{
+			m_img.recreate(gv.width(),gv.height());
+			ucv::convert_scale(
+				gv,
+				ucv::gil::view(m_img),
+				1.0f/255.0f,
+				m_median
+			);
+			return true;
+		}
+		return false;
+	}
+
 	ucv::size2ui marker::get_size() const 
 	{
 		return ucv::size2ui(m_img.width(), m_img.height());
