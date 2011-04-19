@@ -27,7 +27,9 @@ namespace com { namespace baldzarika { namespace ar {
 		explicit Marker(jobject jobj);
 
 		j2cpp::local_ref<Size2>	getSize();
-		jboolean 				load(j2cpp::local_ref<j2cpp::java::lang::String> const &fileName);
+		jboolean 				loadImage(j2cpp::local_ref<j2cpp::java::lang::String> const &fileName);
+		jboolean 				setImage(j2cpp::local_ref<j2cpp::android::graphics::Bitmap> const &bitmap);
+		jboolean 				saveImage(j2cpp::local_ref<j2cpp::java::lang::String> const &fileName);
 
 		void					create();
 		void					create(j2cpp::local_ref<Size2> const &ms);

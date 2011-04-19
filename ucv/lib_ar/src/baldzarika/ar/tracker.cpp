@@ -7,17 +7,17 @@
 
 namespace baldzarika { namespace ar {
 
-	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=3;
+	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=2;
 	boost::uint32_t const tracker::DEFAULT_SURF_INTERVALS=4;
 	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=2;
-	float const tracker::DEFAULT_SURF_TRESHOLD=4.0e-4f;
+	float const tracker::DEFAULT_SURF_TRESHOLD=1.0e-3f;
 
-	boost::uint32_t const tracker::DEFAULT_KLT_WIN_SIZE=7;
+	boost::uint32_t const tracker::DEFAULT_KLT_WIN_SIZE=5;
 	boost::uint32_t const tracker::DEFAULT_KLT_LEVELS=4;
 	boost::uint32_t const tracker::DEFAULT_KLT_MAX_ITERATIONS=10;
-	float const	tracker::DEFAULT_KLT_EPSILON=1.0e-4f;
+	float const	tracker::DEFAULT_KLT_EPSILON=1.0e-3f;
 
-	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=10;
+	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=8;
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=16;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=2.0f;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=2.0e-2f;
@@ -308,10 +308,10 @@ namespace baldzarika { namespace ar {
 		{
 			ucv::surf marker_surf(
 				ms.m_marker->get_size(),
-				m_surf.octaves(),
-				m_surf.intervals(),
-				m_surf.sample_step(),
-				m_surf.treshold()
+				3, //m_surf.octaves(),
+				4, //m_surf.intervals(),
+				2, //m_surf.sample_step(),
+				1.0e-4f//m_surf.treshold()
 			);
 
 			ucv::surf::integral_image_t marker_integral_img(
@@ -472,6 +472,8 @@ namespace baldzarika { namespace ar {
 						);
 						m_marker_state_changed(pms, marker_state::SC_DETECTION);
 					}
+					else
+						m_marker_state_changed(pms, marker_state::SC_DETECT_NOTIFY);
 				}
 			}
 		}

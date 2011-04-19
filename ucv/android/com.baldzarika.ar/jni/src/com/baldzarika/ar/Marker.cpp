@@ -31,11 +31,25 @@ jobject Java_com_baldzarika_ar_Marker_getSize(JNIEnv */*e*/, jobject m)
 	return Marker(m).getSize().get_jobject();
 }
 
-jboolean Java_com_baldzarika_ar_Marker_load(JNIEnv */*e*/, jobject m, jstring fileName)
+jboolean Java_com_baldzarika_ar_Marker_loadImage(JNIEnv */*e*/, jobject m, jstring fileName)
 {
 	using namespace com::baldzarika::ar;
 	using namespace j2cpp;
-	return Marker(m).load(local_ref<java::lang::String>(fileName));
+	return Marker(m).loadImage(local_ref<java::lang::String>(fileName));
+}
+
+jboolean Java_com_baldzarika_ar_Marker_setImage(JNIEnv */*e*/, jobject m, jobject bitmap)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Marker(m).setImage(local_ref<android::graphics::Bitmap>(bitmap));
+}
+
+jboolean Java_com_baldzarika_ar_Marker_saveImage(JNIEnv */*e*/, jobject m, jstring fileName)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Marker(m).saveImage(local_ref<java::lang::String>(fileName));
 }
 
 namespace com { namespace baldzarika { namespace ar {
@@ -102,7 +116,7 @@ namespace com { namespace baldzarika { namespace ar {
 		return j2cpp::local_ref<Size2>(Size2(0,0));
 	}
 
-	jboolean Marker::load(j2cpp::local_ref<j2cpp::java::lang::String> const &fileName)
+	jboolean Marker::loadImage(j2cpp::local_ref<j2cpp::java::lang::String> const &fileName)
 	{
 		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
 		{
@@ -112,6 +126,65 @@ namespace com { namespace baldzarika { namespace ar {
 					str_bytes->data()+str_bytes->size()
 				)
 			)?JNI_TRUE:JNI_FALSE;
+		}
+		return JNI_FALSE;
+	}
+
+	jboolean Marker::saveImage(j2cpp::local_ref<j2cpp::java::lang::String> const &fileName)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+		{
+			j2cpp::local_ref< j2cpp::array<jbyte,1> > str_bytes=fileName->getBytes();
+			return (*ppx)->save(std::string(
+					str_bytes->data(),
+					str_bytes->data()+str_bytes->size()
+				)
+			)?JNI_TRUE:JNI_FALSE;
+		}
+		return JNI_FALSE;
+	}
+
+
+	jboolean Marker::setImage(j2cpp::local_ref<j2cpp::android::graphics::Bitmap> const &bitmap)
+	{
+		using namespace j2cpp;
+		using namespace j2cpp::android::graphics;
+		using namespace j2cpp::java::lang;
+
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+		{
+			if(bitmap)
+			{
+				::baldzarika::ucv::size2ui bm_size(bitmap->getWidth(), bitmap->getHeight());
+				if(bm_size.area())
+				{
+					if(local_ref<Bitmap::Config> bm_cfg=bitmap->getConfig())
+					{
+						if(0==static_cast< local_ref< Comparable > >(bm_cfg)->compareTo(local_ref<Bitmap::Config>(Bitmap::Config::ARGB_8888)))
+						{
+							local_ref< array<jint,1> > bm_buffer(bm_size.area());
+							if(bm_buffer->length()==bm_size.area())
+							{
+								::baldzarika::ucv::gil::gray8_image_t bm_gray(bm_size.width(), bm_size.height());
+
+								bitmap->getPixels(bm_buffer, 0, bm_size.width(), 0, 0, bm_size.width(), bm_size.height());
+								::baldzarika::ucv::gil::copy_and_convert_pixels(
+									::baldzarika::ucv::gil::interleaved_view(
+										bm_size.width(), bm_size.height(),
+										reinterpret_cast< ::baldzarika::ucv::gil::argb8_pixel_t * >( bm_buffer->data() ),
+										bm_size.width()*4
+									),
+									::baldzarika::ucv::gil::view(bm_gray)
+								);
+
+								return (*ppx)->set(
+										::baldzarika::ucv::gil::const_view(bm_gray)
+								)?JNI_TRUE:JNI_FALSE;
+							}
+						}
+					}
+				}
+			}
 		}
 		return JNI_FALSE;
 	}

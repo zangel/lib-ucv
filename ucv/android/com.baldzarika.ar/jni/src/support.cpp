@@ -1,12 +1,15 @@
 #include <config.h>
+#include <j2cpp/raw_environment.hpp>
 #include <com/baldzarika/ar/Size2.h>
 
 #define J2CPP_INCLUDE_IMPLEMENTATION
 #include <java/lang/Class.hpp>
 #include <java/lang/Object.hpp>
+#include <java/lang/Comparable.hpp>
 #include <java/lang/String.hpp>
 #include <java/lang/ClassLoader.hpp>
 #include <java/lang/Thread.hpp>
+#include <android/graphics/Bitmap.hpp>
 
 namespace {
 
@@ -28,18 +31,18 @@ namespace {
 
 		bool init()
 		{
-			__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "init().0");
+			//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "init().0");
 			if(local_ref<Thread> currThread=Thread::currentThread())
 			{
-				__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "init().1");
+				//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "init().1");
 				if(local_ref<ClassLoader> cler=currThread->getContextClassLoader())
 				{
-					__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "init().2");
+					//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "init().2");
 					//load any class to cache loadClass method
 					currThread->setContextClassLoader(cler);
 					if(local_ref<Class> dummyClass=cler->loadClass(local_ref<String>(jenv()->NewStringUTF("java/lang/String"))))
 					{
-						__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "init().3");
+						//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "init().3");
 						m_class_loader=cler;
 					}
 				}
@@ -65,17 +68,17 @@ namespace {
 
 		jclass find_class(char const *cn)
 		{
-			__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "custom_environment::find_class(%s) ...", cn);
+			//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "custom_environment::find_class(%s) ...", cn);
 			if(m_class_loader)
 			{
-				__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "custom_environment::find_class(%s) from m_class_loader ...", cn);
+				//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "custom_environment::find_class(%s) from m_class_loader ...", cn);
 				if(local_ref<Class> found_class=m_class_loader->loadClass(local_ref<String>(jenv()->NewStringUTF(cn))))
 				{
-					__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "custom_environment::find_class(%s) [OK]", cn);
+					//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "custom_environment::find_class(%s) [OK]", cn);
 					return reinterpret_cast<jclass>(found_class->get_jobject());
 				}
 			}
-			__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "custom_environment::find_class(%s) from raw_environment", cn);
+			//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "custom_environment::find_class(%s) from raw_environment", cn);
 			return raw_environment::find_class(cn);
 		}
 		global_ref<ClassLoader> m_class_loader;

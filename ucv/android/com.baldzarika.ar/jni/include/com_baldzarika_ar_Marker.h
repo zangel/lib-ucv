@@ -41,10 +41,26 @@ JNIEXPORT jobject JNICALL Java_com_baldzarika_ar_Marker_getSize
 
 /*
  * Class:     com_baldzarika_ar_Marker
- * Method:    load
+ * Method:    loadImage
  * Signature: (Ljava/lang/String;)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Marker_load
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Marker_loadImage
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     com_baldzarika_ar_Marker
+ * Method:    setImage
+ * Signature: (Landroid/graphics/Bitmap;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Marker_setImage
+  (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_Marker
+ * Method:    saveImage
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Marker_saveImage
   (JNIEnv *, jobject, jstring);
 
 #ifdef __cplusplus
