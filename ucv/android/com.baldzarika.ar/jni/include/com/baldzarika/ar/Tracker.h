@@ -6,6 +6,7 @@ namespace com { namespace baldzarika { namespace ar {
 	class Size2;
 	class Frame;
 	class Marker;
+	class Tracker;
 
 	namespace _Tracker {
 
@@ -47,18 +48,24 @@ namespace com { namespace baldzarika { namespace ar {
 			> m_px;
 		};
 
-		class MarkerStateCallback
-			: public j2cpp::object<MarkerStateCallback>
+		class Callback
+			: public j2cpp::object<Callback>
 		{
 		public:
 
 			J2CPP_DECLARE_CLASS
 
 			J2CPP_DECLARE_METHOD(0)
+			J2CPP_DECLARE_METHOD(1)
+			J2CPP_DECLARE_METHOD(2)
+			J2CPP_DECLARE_METHOD(3)
 
-			explicit MarkerStateCallback(jobject jobj);
+			explicit Callback(jobject jobj);
 
-			void	onStateChanged(j2cpp::local_ref<MarkerState> const &ms, jint sc);
+			void	onMarkerStateChanged(j2cpp::local_ref<MarkerState> const &ms, jint sc);
+			void	onTrackerStart(j2cpp::local_ref<Tracker> const &t);
+			void	onTrackerStop(j2cpp::local_ref<Tracker> const &t);
+			void	onTrackerStats(j2cpp::local_ref<Tracker> const &t, jint nff);
 		};
 
 	} //namespace _Tracker
@@ -76,7 +83,7 @@ namespace com { namespace baldzarika { namespace ar {
 		typedef j2cpp::global_ref<Tracker>	jref_t;
 
 		typedef _Tracker::MarkerState MarkerState;
-		typedef _Tracker::MarkerStateCallback MarkerStateCallback;
+		typedef _Tracker::Callback Callback;
 
 
 		J2CPP_DECLARE_CLASS
@@ -89,6 +96,7 @@ namespace com { namespace baldzarika { namespace ar {
 
 		static void 					onTrackerStartStop(px_t const &t, bool ss);
 		static void 					onMarkerStateChanged(MarkerState::px_t const &ms, ::baldzarika::ar::tracker::marker_state::eSC sc);
+		static void 					onTrackerStats(px_t const &t, boost::uint32_t nff);
 
 		explicit Tracker(jobject jobj);
 
@@ -100,6 +108,7 @@ namespace com { namespace baldzarika { namespace ar {
 
 		jboolean						start();
 		jboolean						isStarted();
+		jboolean						isActive();
 		jboolean						stop();
 		jboolean						update(j2cpp::local_ref<Frame> const &frame);
 
@@ -118,8 +127,8 @@ namespace com { namespace baldzarika { namespace ar {
 			J2CPP_CLASS_NAME,
 			J2CPP_FIELD_NAME(1),
 			J2CPP_FIELD_SIGNATURE(1),
-			j2cpp::local_ref< MarkerStateCallback >
-		> m_MSCB;
+			j2cpp::local_ref< Callback >
+		> m_cb;
 	};
 
 } //namespace ar
