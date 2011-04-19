@@ -6,7 +6,6 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
@@ -25,43 +24,15 @@ import com.baldzarika.ar.*;
 
 
 public class BaldzAR extends Activity
-	implements Tracker.MarkerStateCallback, GLSurfaceView.Renderer,
+	implements Tracker.Callback, GLSurfaceView.Renderer,
 		SurfaceHolder.Callback, Camera.PreviewCallback {
 	
 	public static final int 	SET_MARKER=0;
 	public static final Size2 	TRACKER_SIZE=new Size2(640,480);
 	
-	
+	//com.baldzarika.ar.Tracker.Callback
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		
-		switch(requestCode) {
-			case SET_MARKER: {
-				if(resultCode==Activity.RESULT_OK) {
-					try {
-						BitmapFactory.Options bmfo=new BitmapFactory.Options();
-						bmfo.inScaled=false;
-						bmfo.inPreferredConfig=Bitmap.Config.ARGB_8888;
-						Bitmap markerBitmap=BitmapFactory.decodeStream(
-							getContentResolver().openInputStream(data.getData()),
-							null,
-							bmfo
-						);
-						m_Marker.setImage(markerBitmap);
-					}
-					catch (FileNotFoundException e) {
-						e.printStackTrace();
-					}
-					updateMenu();
-				}
-			}
-			break;
-		}
-	}
-	
-	@Override
-	public void onStateChanged(Tracker.MarkerState ms, int sc) {
+	public void onMarkerStateChanged(Tracker.MarkerState ms, int sc) {
 		Log.i("BaldzAR", "onStateChanged(" + ms.toString() + ", "+ Integer.toString(sc) + ")");
 		
 		if(ms!=null) {
@@ -72,6 +43,21 @@ public class BaldzAR extends Activity
 		}
 	}
 	
+	@Override
+	public void onTrackerStart(Tracker t) {
+		updateMenu();
+	}
+	
+	@Override
+	public void onTrackerStop(Tracker t) {
+		updateMenu();
+	}
+	
+	@Override
+	public void onTrackerStats(Tracker t, int nff) {
+		Log.i("BaldzAR", "onTrackerStats(" + t.toString() + ", "+ Integer.toString(nff) + ")");
+	}
+		
 	protected void updateMenu() {
 		
 		if(m_SetMarkerMI!=null)
@@ -80,15 +66,15 @@ public class BaldzAR extends Activity
 				m_Tracker!=null && !m_Tracker.isStarted()
 			);
 		
-		if(m_StartTrackingMI!=null)
-			m_StartTrackingMI.setEnabled(
+		if(m_StartTrackerMI!=null)
+			m_StartTrackerMI.setEnabled(
 				m_Camera!=null && 
 				m_Tracker!=null && !m_Tracker.isStarted() &&
 				m_Marker!=null && m_Marker.getSize().m_Width*m_Marker.getSize().m_Height!=0
 			);
 		
-		if(m_StopTrackingMI!=null)
-			m_StopTrackingMI.setEnabled(
+		if(m_StopTrackerMI!=null)
+			m_StopTrackerMI.setEnabled(
 				m_Camera!=null &&
 				m_Tracker!=null && m_Tracker.isStarted()
 			);
@@ -103,7 +89,7 @@ public class BaldzAR extends Activity
 		m_Marker=new Marker();
 		m_Frame=new Frame(TRACKER_SIZE);
 		m_Tracker=new Tracker(TRACKER_SIZE);
-		m_Tracker.m_MSCB=this;
+		m_Tracker.setCallback(this);
 		m_MarkerState=m_Tracker.addMarker(m_Marker);
 		
     	m_GLView=new GLSurfaceView(this);
@@ -139,12 +125,12 @@ public class BaldzAR extends Activity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.baldzar, menu);
+	    inflater.inflate(R.menu.baldzar_menu, menu);
 	    m_Menu=menu;
 	    if(m_Menu!=null) {
 	    	m_SetMarkerMI=m_Menu.findItem(R.id.set_marker);
-	    	m_StartTrackingMI=m_Menu.findItem(R.id.start_tracking);
-	    	m_StopTrackingMI=m_Menu.findItem(R.id.stop_tracking);
+	    	m_StartTrackerMI=m_Menu.findItem(R.id.start_tracker);
+	    	m_StopTrackerMI=m_Menu.findItem(R.id.stop_tracker);
 	    }
 	    updateMenu();
 	    return true;
@@ -158,13 +144,13 @@ public class BaldzAR extends Activity
 	        }
 	    	break;
 	    	
-	    	case R.id.start_tracking: {
+	    	case R.id.start_tracker: {
 	    		m_Tracker.start();
 	    		updateMenu();
 	    	}
 	    	break;
 	    	
-	    	case R.id.stop_tracking: {
+	    	case R.id.stop_tracker: {
 	    		m_Tracker.stop();
 	    		updateMenu();
 	    	}
@@ -176,6 +162,33 @@ public class BaldzAR extends Activity
 	    return true;
 	}
 	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		switch(requestCode) {
+			case SET_MARKER: {
+				if(resultCode==Activity.RESULT_OK) {
+					try {
+						BitmapFactory.Options bmfo=new BitmapFactory.Options();
+						bmfo.inScaled=false;
+						bmfo.inPreferredConfig=Bitmap.Config.ARGB_8888;
+						Bitmap markerBitmap=BitmapFactory.decodeStream(
+							getContentResolver().openInputStream(data.getData()),
+							null,
+							bmfo
+						);
+						m_Marker.setImage(markerBitmap);
+					}
+					catch (FileNotFoundException e) {
+						e.printStackTrace();
+					}
+					updateMenu();
+				}
+			}
+			break;
+		}
+	}
 	
 	
 	//android.opengl.GLSurfaceView.Renderer
@@ -205,7 +218,7 @@ public class BaldzAR extends Activity
 		{
 			Camera.Parameters cameraParams=m_Camera.getParameters();
 			cameraParams.setPreviewSize(TRACKER_SIZE.m_Width,TRACKER_SIZE.m_Height);
-			int pfmt=cameraParams.getPreviewFormat();
+			//int pfmt=cameraParams.getPreviewFormat();
 			//parameters->setPreviewFormat(0x10);
 			//parameters->setPreviewFormat(0x11);
 			m_Camera.setParameters(cameraParams);
@@ -265,8 +278,8 @@ public class BaldzAR extends Activity
 	
 	private Menu				m_Menu=null;
 	private MenuItem			m_SetMarkerMI=null;
-	private MenuItem			m_StartTrackingMI=null;
-	private MenuItem			m_StopTrackingMI=null;
+	private MenuItem			m_StartTrackerMI=null;
+	private MenuItem			m_StopTrackerMI=null;
 	
 	
 	private Marker				m_Marker=null;

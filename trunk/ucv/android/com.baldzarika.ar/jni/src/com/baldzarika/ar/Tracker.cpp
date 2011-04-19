@@ -1,7 +1,7 @@
 #include <config.h>
 #include <com_baldzarika_ar_Tracker.h>
 #include <com_baldzarika_ar_Tracker_MarkerState.h>
-#include <com_baldzarika_ar_Tracker_MarkerStateCallback.h>
+#include <com_baldzarika_ar_Tracker_Callback.h>
 
 #include <com/baldzarika/ar/Size2.h>
 #include <com/baldzarika/ar/Marker.h>
@@ -84,6 +84,13 @@ jboolean Java_com_baldzarika_ar_Tracker_isStarted(JNIEnv */*e*/, jobject t)
 	using namespace com::baldzarika::ar;
 	using namespace j2cpp;
 	return Tracker(t).isStarted();
+}
+
+jboolean Java_com_baldzarika_ar_Tracker_isActive(JNIEnv */*e*/, jobject t)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).isActive();
 }
 
 jboolean Java_com_baldzarika_ar_Tracker_stop(JNIEnv */*e*/, jobject t)
@@ -174,15 +181,18 @@ namespace com { namespace baldzarika { namespace ar {
 			}
 		}
 
-		J2CPP_DEFINE_CLASS(MarkerStateCallback,"com/baldzarika/ar/Tracker$MarkerStateCallback")
-		J2CPP_DEFINE_METHOD(MarkerStateCallback,0,"onStateChanged","(Lcom/baldzarika/ar/Tracker$MarkerState;I)V")
+		J2CPP_DEFINE_CLASS(Callback,"com/baldzarika/ar/Tracker$Callback")
+		J2CPP_DEFINE_METHOD(Callback,0,"onMarkerStateChanged","(Lcom/baldzarika/ar/Tracker$MarkerState;I)V")
+		J2CPP_DEFINE_METHOD(Callback,1,"onTrackerStart","(Lcom/baldzarika/ar/Tracker;)V")
+		J2CPP_DEFINE_METHOD(Callback,2,"onTrackerStop","(Lcom/baldzarika/ar/Tracker;)V")
+		J2CPP_DEFINE_METHOD(Callback,3,"onTrackerStats","(Lcom/baldzarika/ar/Tracker;I)V")
 
-		MarkerStateCallback::MarkerStateCallback(jobject jobj)
-			: j2cpp::object<MarkerStateCallback>(jobj)
+		Callback::Callback(jobject jobj)
+			: j2cpp::object<Callback>(jobj)
 		{
 		}
 
-		void MarkerStateCallback::onStateChanged(j2cpp::local_ref<MarkerState> const &ms, jint sc)
+		void Callback::onMarkerStateChanged(j2cpp::local_ref<MarkerState> const &ms, jint sc)
 		{
 			j2cpp::call_method<
 				J2CPP_CLASS_NAME,
@@ -191,11 +201,42 @@ namespace com { namespace baldzarika { namespace ar {
 				void
 			>(get_jobject(), ms, sc);
 		}
+
+		void Callback::onTrackerStart(j2cpp::local_ref<Tracker> const &t)
+		{
+			j2cpp::call_method<
+				J2CPP_CLASS_NAME,
+				J2CPP_METHOD_NAME(1),
+				J2CPP_METHOD_SIGNATURE(1),
+				void
+			>(get_jobject(), t);
+		}
+
+		void Callback::onTrackerStop(j2cpp::local_ref<Tracker> const &t)
+		{
+			j2cpp::call_method<
+				J2CPP_CLASS_NAME,
+				J2CPP_METHOD_NAME(2),
+				J2CPP_METHOD_SIGNATURE(2),
+				void
+			>(get_jobject(), t);
+		}
+
+		void Callback::onTrackerStats(j2cpp::local_ref<Tracker> const &t, jint nff)
+		{
+			j2cpp::call_method<
+				J2CPP_CLASS_NAME,
+				J2CPP_METHOD_NAME(3),
+				J2CPP_METHOD_SIGNATURE(3),
+				void
+			>(get_jobject(), t, nff);
+		}
+
 	} //namespace _Tracker
 
 	J2CPP_DEFINE_CLASS(Tracker,"com/baldzarika/ar/Tracker")
 	J2CPP_DEFINE_FIELD(Tracker,0,"m_px","J")
-	J2CPP_DEFINE_FIELD(Tracker,1,"m_MSCB","Lcom/baldzarika/ar/Tracker$MarkerStateCallback;")
+	J2CPP_DEFINE_FIELD(Tracker,1,"m_cb","Lcom/baldzarika/ar/Tracker$Callback;")
 
 
 	Tracker::jx_t Tracker::get(Tracker::px_t const &px)
@@ -220,27 +261,39 @@ namespace com { namespace baldzarika { namespace ar {
 	void Tracker::onTrackerStartStop(Tracker::px_t const &t, bool ss)
 	{
 		if(ss)
+		{
 			j2cpp::environment::get()->attach_current_thread();
+			if(Tracker::jx_t jx=Tracker::get(t))
+				if(j2cpp::local_ref< Tracker::Callback > cb=jx->m_cb)
+					cb->onTrackerStart(jx);
+		}
 		else
+		{
+			if(Tracker::jx_t jx=Tracker::get(t))
+				if(j2cpp::local_ref< Tracker::Callback > cb=jx->m_cb)
+					cb->onTrackerStop(jx);
 			j2cpp::environment::get()->detach_current_thread();
+		}
+	}
 
+	void Tracker::onTrackerStats(px_t const &t, boost::uint32_t nff)
+	{
+		if(Tracker::jx_t jx=Tracker::get(t))
+			if(j2cpp::local_ref< Tracker::Callback > cb=jx->m_cb)
+				cb->onTrackerStats(jx, nff);
 	}
 
 	void Tracker::onMarkerStateChanged(Tracker::MarkerState::px_t const &ms, ::baldzarika::ar::tracker::marker_state::eSC sc)
 	{
 		if(Tracker::jx_t jx=Tracker::get(ms->get_tracker()))
-		{
-			if(j2cpp::local_ref< Tracker::MarkerStateCallback > mscb=jx->m_MSCB)
-			{
-				mscb->onStateChanged(Tracker::MarkerState::get(ms), static_cast<jint>(sc));
-			}
-		}
+			if(j2cpp::local_ref< Tracker::Callback > mscb=jx->m_cb)
+				mscb->onMarkerStateChanged(Tracker::MarkerState::get(ms), static_cast<jint>(sc));
 	}
 
 	Tracker::Tracker(jobject jobj)
 		: j2cpp::object<Tracker>(jobj)
 		, m_px(get_jobject())
-		, m_MSCB(get_jobject())
+		, m_cb(get_jobject())
 	{
 	}
 
@@ -295,6 +348,13 @@ namespace com { namespace baldzarika { namespace ar {
 		return JNI_FALSE;
 	}
 
+	jboolean Tracker::isActive()
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->is_active()?JNI_TRUE:JNI_FALSE;
+		return JNI_FALSE;
+	}
+
 	jboolean Tracker::stop()
 	{
 		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
@@ -338,6 +398,12 @@ namespace com { namespace baldzarika { namespace ar {
 		(*ppx)->start_stop().connect(
 			boost::bind(
 				&Tracker::onTrackerStartStop, _1, _2
+			)
+		);
+
+		(*ppx)->stats().connect(
+			boost::bind(
+				&Tracker::onTrackerStats, _1, _2
 			)
 		);
 

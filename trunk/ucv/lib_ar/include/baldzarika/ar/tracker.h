@@ -44,6 +44,7 @@ namespace baldzarika { namespace ar {
 
 
 		typedef boost::signals2::signal<void (boost::shared_ptr<tracker> const &, bool)> start_stop_signal_t;
+		typedef boost::signals2::signal<void (boost::shared_ptr<tracker> const &, boost::uint32_t)> stats_signal_t;
 		
 		class marker_state
 			: public boost::enable_shared_from_this<marker_state>
@@ -134,10 +135,13 @@ namespace baldzarika { namespace ar {
 
 		marker_state::changed_signal_t&			marker_state_changed() const;
 		start_stop_signal_t&					start_stop() const;
+		stats_signal_t&							stats() const;
+
 
 
 
 		bool									start();
+		bool									is_active() const;
 		bool									is_started() const;
 		bool									stop();
 
@@ -172,6 +176,7 @@ namespace baldzarika { namespace ar {
 		mutable boost::asio::io_service			m_ios;
 		boost::asio::io_service::work			m_ios_work;
 		boost::thread							m_worker;
+		bool									m_is_started;
 
 		boost::mutex							m_update_sync;
 		ucv::surf::integral_image_t				m_integral_frame_stg[2];
@@ -185,6 +190,7 @@ namespace baldzarika { namespace ar {
 		
 		mutable marker_state::changed_signal_t	m_marker_state_changed;
 		mutable start_stop_signal_t				m_start_stop;
+		mutable stats_signal_t					m_stats;
 
 	public:
 		mutable boost::any						m_any_data;

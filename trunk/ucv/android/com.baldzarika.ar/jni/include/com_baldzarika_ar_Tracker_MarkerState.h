@@ -11,6 +11,8 @@ extern "C" {
 #define com_baldzarika_ar_Tracker_MarkerState_SC_DETECTION 0L
 #undef com_baldzarika_ar_Tracker_MarkerState_SC_POSE
 #define com_baldzarika_ar_Tracker_MarkerState_SC_POSE 1L
+#undef com_baldzarika_ar_Tracker_MarkerState_SC_DETECT_NOTIFY
+#define com_baldzarika_ar_Tracker_MarkerState_SC_DETECT_NOTIFY 2L
 /*
  * Class:     com_baldzarika_ar_Tracker_MarkerState
  * Method:    create

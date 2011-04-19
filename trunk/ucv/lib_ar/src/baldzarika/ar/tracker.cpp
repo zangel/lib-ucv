@@ -87,6 +87,7 @@ namespace baldzarika { namespace ar {
 		, m_ios()
 		, m_ios_work(m_ios)
 		, m_worker()
+		, m_is_started(false)
 		, m_integral_frame_seq(0)
 		, m_integral_views(2)
 		, m_surf(fs,
@@ -108,7 +109,11 @@ namespace baldzarika { namespace ar {
 
 	tracker::~tracker()
 	{
-		stop();
+		if(is_active())
+		{
+			stop();
+			m_worker.join();
+		}
 	}
 
 	ucv::size2ui tracker::get_frame_size() const
@@ -118,7 +123,7 @@ namespace baldzarika { namespace ar {
 
 	bool tracker::set_frame_size(ucv::size2ui const &fs)
 	{
-		if(is_started())
+		if(is_active())
 			return false;
 		
 		m_surf.resize(fs);
@@ -130,7 +135,7 @@ namespace baldzarika { namespace ar {
 
 	boost::shared_ptr<tracker::marker_state> tracker::add_marker(boost::shared_ptr<marker> const &m)
 	{
-		if(is_started())
+		if(is_active())
 			return boost::shared_ptr<marker_state>();
 		boost::shared_ptr<marker_state> new_marker_state( new marker_state(shared_from_this(), m) );
 		if(m_marker_states.push_back(new_marker_state).second)
@@ -158,42 +163,47 @@ namespace baldzarika { namespace ar {
 		return m_start_stop;
 	}
 	
+	tracker::stats_signal_t& tracker::stats() const
+	{
+		return m_stats;
+	}
+
 	bool tracker::start()
 	{
-		if(is_started())
-			return true;
+		if(is_active())
+			return false;
+
+		m_worker.join();
+		m_ios.reset();
 
 		m_integral_frame_seq=0;
 		m_integral_views.clear();
 
 		m_worker=boost::thread(boost::bind(&tracker::run, this)).move();
-		if(is_started())
-			return true;
-		return false;
+		return is_active();
 	}
 
-	bool tracker::is_started() const
+	bool tracker::is_active() const
 	{
 		return m_worker.get_id()!=boost::thread::id();
 	}
 
+	bool tracker::is_started() const
+	{
+		return m_is_started;
+	}
+
 	bool tracker::stop()
 	{
-		if(!is_started())
+		if(!is_active())
 			return false;
 		m_ios.stop();
-		m_worker.join();
-		if(!is_started()/* && m_ios.stopped()*/)
-		{
-			m_ios.reset();
-			return true;
-		}
-		return false;
+		return true;
 	}
 
 	bool tracker::update(tracker::gray_const_view_t gv, tracker::gray_t const &sm)
 	{
-		if(!is_started())
+		if(!is_active())
 			return false;
 		{
 			boost::mutex::scoped_try_lock try_lock_update(m_update_sync);
@@ -296,8 +306,10 @@ namespace baldzarika { namespace ar {
 
 	void tracker::run()
 	{
+		m_is_started=true;
 		on_start();
 		m_ios.run();
+		m_is_started=false;
 		on_stop();
 	}
 
@@ -311,7 +323,7 @@ namespace baldzarika { namespace ar {
 				3, //m_surf.octaves(),
 				4, //m_surf.intervals(),
 				2, //m_surf.sample_step(),
-				1.0e-4f//m_surf.treshold()
+				1.0e-3f//m_surf.treshold()
 			);
 
 			ucv::surf::integral_image_t marker_integral_img(
@@ -350,6 +362,8 @@ namespace baldzarika { namespace ar {
 			std::vector<ucv::surf::feature_point_t>,
 			std::vector<ucv::surf::feature_point_t>
 		>(ms.m_features, ffs, marker_matches);
+
+		m_stats(shared_from_this(), marker_matches.size());
 
 		if(marker_matches.size()>=m_min_marker_features)
 		{
@@ -422,6 +436,7 @@ namespace baldzarika { namespace ar {
 
 				std::sort(marker_inliers.begin(), marker_inliers.end(), compare_relative_fp_scales());
 				BOOST_ASSERT(marker_inliers.size()>=m_min_marker_features);
+				m_stats(shared_from_this(), marker_inliers.size());
 				if(marker_inliers.size()>=m_min_marker_features)
 				{
 					std::size_t select_n_inliers=std::min(marker_inliers.size(), m_max_marker_features);
@@ -450,6 +465,8 @@ namespace baldzarika { namespace ar {
 			m_surf.detect(frame_features);
 			m_surf.describe(frame_features);
 			
+			m_stats(shared_from_this(), frame_features.size());
+
 			if(frame_features.size()>=m_min_marker_features)
 			{
 				marker_states_t::index<marker_state::detected_tag>::type &marker_states_by_detected=

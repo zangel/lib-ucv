@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Set Marker" android:id="@+id/set_marker"></item>
+    <item android:title="Start Tracker" android:id="@+id/start_tracker"></item>
+    <item android:title="Stop Tracker" android:id="@+id/stop_tracker"></item>
+</menu>

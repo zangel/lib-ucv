@@ -58,12 +58,21 @@ namespace {
 				{
 					if(local_ref<Thread> currThread=Thread::currentThread())
 					{
-						currThread->setContextClassLoader(m_class_loader);
+						//currThread->setContextClassLoader(m_class_loader);
+						currThread->setPriority(10);
+						__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "attach_current_thread(): currentThread()->getPriority()=%d", currThread->getPriority());
 						return true;
 					}
 				}
 			}
 			return false;
+		}
+
+		bool detach_current_thread()
+		{
+			if(local_ref<Thread> currThread=Thread::currentThread())
+				__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "detach_current_thread(): currentThread()->getPriority()=%d", currThread->getPriority());
+			return raw_environment::detach_current_thread();
 		}
 
 		jclass find_class(char const *cn)

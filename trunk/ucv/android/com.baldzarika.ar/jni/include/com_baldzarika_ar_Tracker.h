@@ -65,6 +65,14 @@ JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_isStarted
 
 /*
  * Class:     com_baldzarika_ar_Tracker
+ * Method:    isActive
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_isActive
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_Tracker
  * Method:    stop
  * Signature: ()Z
  */
