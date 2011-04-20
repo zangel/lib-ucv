@@ -2,6 +2,10 @@ package com.baldzarika;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import android.app.Activity;
@@ -35,6 +39,7 @@ public class BaldzAR extends Activity
 	public void onMarkerStateChanged(Tracker.MarkerState ms, int sc) {
 		Log.i("BaldzAR", "onStateChanged(" + ms.toString() + ", "+ Integer.toString(sc) + ")");
 		
+		
 		if(ms!=null) {
 			m_CameraPreview.performHapticFeedback(
 					ms.isDetected()?HapticFeedbackConstants.KEYBOARD_TAP:HapticFeedbackConstants.LONG_PRESS,
@@ -55,7 +60,7 @@ public class BaldzAR extends Activity
 	
 	@Override
 	public void onTrackerStats(Tracker t, int nff) {
-		Log.i("BaldzAR", "onTrackerStats(" + t.toString() + ", "+ Integer.toString(nff) + ")");
+		//Log.i("BaldzAR", "onTrackerStats(" + t.toString() + ", "+ Integer.toString(nff) + ")");
 	}
 		
 	protected void updateMenu() {
@@ -92,11 +97,14 @@ public class BaldzAR extends Activity
 		m_Tracker.setCallback(this);
 		m_MarkerState=m_Tracker.addMarker(m_Marker);
 		
+		m_MarkerVBuffer=ByteBuffer.allocateDirect(4*3*4).order(ByteOrder.nativeOrder()).asFloatBuffer();
+		
+		
     	m_GLView=new GLSurfaceView(this);
-    	//m_GLView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+    	m_GLView.setEGLConfigChooser(8,8,8,8,16,0);
     	m_GLView.setRenderer(this);
-    	m_GLView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     	m_GLView.getHolder().setFormat(PixelFormat.TRANSPARENT);
+    	m_GLView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     	addContentView(m_GLView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
     	
     	m_CameraPreview=new SurfaceView(this);
@@ -120,6 +128,8 @@ public class BaldzAR extends Activity
 		m_Frame=null;
 		m_Marker.dispose();
 		m_Marker=null;
+		
+		m_MarkerVBuffer=null;
 	}
 	
 	@Override
@@ -206,8 +216,57 @@ public class BaldzAR extends Activity
 	@Override
 	public void onDrawFrame(GL10 gl)
 	{
+		gl.glMatrixMode(GL10.GL_MODELVIEW);
+		gl.glLoadIdentity();
+		gl.glMatrixMode(GL10.GL_PROJECTION);
+		gl.glLoadIdentity();
+		
 		gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+		if(m_MarkerState!=null && m_MarkerState.isDetected())
+		{
+			android.graphics.Matrix homography=m_MarkerState.getHomography();
+			
+			gl.glDisable(GL10.GL_CULL_FACE);
+			gl.glDisable(GL10.GL_DEPTH_TEST);
+			gl.glDisable(GL10.GL_BLEND);
+			gl.glDisable(GL10.GL_LIGHTING);
+			
+			Size2 ms=m_Marker.getSize();
+			float[] marker_points={
+				0.0f,			0.0f,
+				ms.m_Width,		0.0f,
+				0.0f,			ms.m_Height,
+				ms.m_Width, 	ms.m_Height
+			};
+			
+			//float[] marker_points={
+			//	0.0f,					0.0f,
+			//	TRACKER_SIZE.m_Width,	0.0f,
+			//	0.0f,					TRACKER_SIZE.m_Height,
+			//	TRACKER_SIZE.m_Width, 	TRACKER_SIZE.m_Height
+			//};
+			
+			homography.mapPoints(marker_points);
+			m_MarkerVBuffer.position(0);
+			for(int c=0;c<4;++c) {
+				float[] vertex= {
+					(marker_points[c*2+0]/TRACKER_SIZE.m_Width-0.5f)*2.0f,
+					(marker_points[c*2+1]/TRACKER_SIZE.m_Height-0.5f)*(-2.0f),
+					0.0f
+				};
+				Log.i("BaldzAR", "c.x=" + Float.toString(vertex[0]) + " c.y=" + Float.toString(vertex[1]) );
+				
+				m_MarkerVBuffer.put(vertex);
+			}
+			m_MarkerVBuffer.position(0);
+			gl.glColor4f(1.0f, 0.0f, 0.0f, 0.33f);
+			gl.glVertexPointer(3, GL10.GL_FLOAT, 0, m_MarkerVBuffer);
+			gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+			gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+			gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		}
 	}
 	
 	//android.view.SurfaceHolder.Callback
@@ -282,8 +341,10 @@ public class BaldzAR extends Activity
 	private MenuItem			m_StopTrackerMI=null;
 	
 	
-	private Marker				m_Marker=null;
-	private Frame				m_Frame=null;
-	private Tracker				m_Tracker=null;
-	private Tracker.MarkerState	m_MarkerState=null;
+	private Marker					m_Marker=null;
+	private Frame					m_Frame=null;
+	private Tracker					m_Tracker=null;
+	private Tracker.MarkerState		m_MarkerState=null;
+	
+	private FloatBuffer				m_MarkerVBuffer=null;
 }

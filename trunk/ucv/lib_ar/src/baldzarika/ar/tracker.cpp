@@ -4,6 +4,7 @@
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/match_feature_points.h>
 #include <baldzarika/ucv/homography.h>
+#include <j2cpp/config.hpp>
 
 namespace baldzarika { namespace ar {
 
@@ -12,15 +13,15 @@ namespace baldzarika { namespace ar {
 	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=2;
 	float const tracker::DEFAULT_SURF_TRESHOLD=1.0e-3f;
 
-	boost::uint32_t const tracker::DEFAULT_KLT_WIN_SIZE=5;
+	boost::uint32_t const tracker::DEFAULT_KLT_WIN_SIZE=7;
 	boost::uint32_t const tracker::DEFAULT_KLT_LEVELS=4;
 	boost::uint32_t const tracker::DEFAULT_KLT_MAX_ITERATIONS=10;
-	float const	tracker::DEFAULT_KLT_EPSILON=1.0e-3f;
+	float const	tracker::DEFAULT_KLT_EPSILON=1.0e-4f;
 
-	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=8;
-	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=16;
+	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=5;
+	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=10;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=2.0f;
-	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=2.0e-2f;
+	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=1.0e-4f;
 
 	namespace {
 
@@ -323,7 +324,7 @@ namespace baldzarika { namespace ar {
 				3, //m_surf.octaves(),
 				4, //m_surf.intervals(),
 				2, //m_surf.sample_step(),
-				1.0e-3f//m_surf.treshold()
+				1.0e-4f//m_surf.treshold()
 			);
 
 			ucv::surf::integral_image_t marker_integral_img(
@@ -363,7 +364,13 @@ namespace baldzarika { namespace ar {
 			std::vector<ucv::surf::feature_point_t>
 		>(ms.m_features, ffs, marker_matches);
 
-		m_stats(shared_from_this(), marker_matches.size());
+		//m_stats(shared_from_this(), marker_matches.size());
+
+		__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "tracker::detect_marker(): mfs=%d, ffs=%d, mms=%d",
+			ms.m_features.size(),
+			ffs.size(),
+			marker_matches.size()
+		);
 
 		if(marker_matches.size()>=m_min_marker_features)
 		{
@@ -373,10 +380,10 @@ namespace baldzarika { namespace ar {
 				)
 			)
 			{
+
 				feature_point_t::desc_value_type const select_scale=m_select_fp_scale;
 				feature_point_t::value_type const inv_select_fp_min_distance=1.0f/sqrt(m_surf.size().area()*m_select_fp_min_area);
-	
-				
+
 				feature_point_t::value_type const marker_left=ucv::detail::constant::zero<feature_point_t::value_type>();
 				feature_point_t::value_type const marker_right=ms.get_marker()->get_size().width();
 				feature_point_t::value_type const marker_top=ucv::detail::constant::zero<feature_point_t::value_type>();
@@ -396,10 +403,12 @@ namespace baldzarika { namespace ar {
 				for(std::size_t f=0;f<ffs.size();++f)
 				{
 					marker_points[f]=inv_hm*static_cast<feature_point_t::point2_t const &>(ffs[f]);
+
 					if(	marker_points[f].x>marker_left && marker_points[f].x<marker_right &&
 						marker_points[f].y>marker_top && marker_points[f].y<marker_bottom
 					)
 					{
+#if 0
 						boost::uint32_t fp_g_x=static_cast<boost::uint32_t>(ffs[f].x*inv_select_fp_min_distance);
 						boost::uint32_t fp_g_y=static_cast<boost::uint32_t>(ffs[f].y*inv_select_fp_min_distance);
 						feature_point_t::desc_value_type fp_sel_scale=fabs(ffs[f].m_scale-select_scale);
@@ -424,7 +433,7 @@ namespace baldzarika { namespace ar {
 
 						if(si<marker_inliers.size())
 							continue;
-						
+#endif
 						marker_inliers.push_back(
 							std::make_pair(
 								fabs(ffs[f].m_scale-select_scale),
@@ -434,9 +443,11 @@ namespace baldzarika { namespace ar {
 					}
 				}
 
+				__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "tracker::detect_marker(): marker_inliers.size()=%d", marker_inliers.size());
+
 				std::sort(marker_inliers.begin(), marker_inliers.end(), compare_relative_fp_scales());
 				BOOST_ASSERT(marker_inliers.size()>=m_min_marker_features);
-				m_stats(shared_from_this(), marker_inliers.size());
+				//m_stats(shared_from_this(), marker_inliers.size());
 				if(marker_inliers.size()>=m_min_marker_features)
 				{
 					std::size_t select_n_inliers=std::min(marker_inliers.size(), m_max_marker_features);
@@ -465,7 +476,7 @@ namespace baldzarika { namespace ar {
 			m_surf.detect(frame_features);
 			m_surf.describe(frame_features);
 			
-			m_stats(shared_from_this(), frame_features.size());
+			//m_stats(shared_from_this(), frame_features.size());
 
 			if(frame_features.size()>=m_min_marker_features)
 			{
