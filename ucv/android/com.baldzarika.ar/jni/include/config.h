@@ -9,6 +9,7 @@
 #include <java/lang/ClassLoader.hpp>
 #include <java/lang/Thread.hpp>
 #include <android/graphics/Bitmap.hpp>
+#include <android/graphics/Matrix.hpp>
 
 #include <baldzarika/ar/config.h>
 #include <baldzarika/ar/tracker.h>

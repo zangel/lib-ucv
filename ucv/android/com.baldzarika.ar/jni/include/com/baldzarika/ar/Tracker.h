@@ -37,6 +37,9 @@ namespace com { namespace baldzarika { namespace ar {
 			jboolean					isDetected();
 			j2cpp::local_ref<Marker>	getMarker();
 
+			j2cpp::local_ref<j2cpp::android::graphics::Matrix>
+										getHomography();
+
 			void						create(jlong px);
 			void						destroy();
 

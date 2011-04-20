@@ -45,6 +45,14 @@ JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_isDet
 JNIEXPORT jobject JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_getMarker
   (JNIEnv *, jobject);
 
+/*
+ * Class:     com_baldzarika_ar_Tracker_MarkerState
+ * Method:    getHomography
+ * Signature: ()Landroid/graphics/Matrix;
+ */
+JNIEXPORT jobject JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_getHomography
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

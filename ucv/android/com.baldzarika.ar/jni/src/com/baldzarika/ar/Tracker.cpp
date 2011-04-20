@@ -37,6 +37,13 @@ jobject Java_com_baldzarika_ar_Tracker_00024MarkerState_getMarker(JNIEnv */*e*/,
 	return Tracker::MarkerState(ms).getMarker().get_jobject();
 }
 
+jobject Java_com_baldzarika_ar_Tracker_00024MarkerState_getHomography(JNIEnv */*e*/, jobject ms)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker::MarkerState(ms).getHomography().get_jobject();
+}
+
 void Java_com_baldzarika_ar_Tracker_create(JNIEnv */*e*/, jobject t, jobject fs)
 {
 	using namespace com::baldzarika::ar;
@@ -162,6 +169,18 @@ namespace com { namespace baldzarika { namespace ar {
 			if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
 				return Marker::get((*ppx)->get_marker());
 			return j2cpp::local_ref<Marker>();
+		}
+
+		j2cpp::local_ref<j2cpp::android::graphics::Matrix> MarkerState::getHomography()
+		{
+			if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			{
+				::baldzarika::ucv::matrix33f const &hm=(*ppx)->get_homography_matrix();
+				j2cpp::android::graphics::Matrix ret_val;
+				ret_val.setValues(j2cpp::array<jfloat, 1>(hm.data(), 9));
+				return ret_val;
+			}
+			return j2cpp::local_ref<j2cpp::android::graphics::Matrix>();
 		}
 
 		void MarkerState::create(jlong px)

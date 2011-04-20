@@ -140,7 +140,7 @@ namespace baldzarika { namespace ucv {
 		template < typename PT >
 		inline point2<PT> operator *(point2< PT > const &p) const
 		{
-			return detail::transform_point2(*this, p);
+			return vector< PT, R >(ublas::prod(*this, vector<T,C>(p))).homogenized();
 		}
 	};
 
@@ -177,16 +177,6 @@ namespace baldzarika { namespace ucv {
 			
 			return tmp;
 		}
-
-		template < typename T, boost::uint32_t R, boost::uint32_t C, typename PT>
-		static inline point2<PT> transform_point2( matrix< T, R, C > const &m, point2<PT> const &p) { BOOST_ASSERT(false); return point2<PT>(); }
-
-		template < typename T, typename PT >
-		static inline point2<PT> transform_point2( matrix< T, 3, 3 > const &m, point2<PT> const &p)
-		{
-			return (m*vector<T, 3>(p)).homogenized();
-		}
-
 
 	} //namespace detail
 	
