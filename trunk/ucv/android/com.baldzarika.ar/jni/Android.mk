@@ -16,6 +16,7 @@ LOCAL_C_INCLUDES	:=	$(ANDROID_CPP_SDK)/j2cpp \
 
 LOCAL_SRC_FILES :=	src/support.cpp \
 					src/com/baldzarika/ar/Size2.cpp \
+					src/com/baldzarika/ar/Point2.cpp \
 					src/com/baldzarika/ar/Frame.cpp \
 					src/com/baldzarika/ar/Marker.cpp \
 					src/com/baldzarika/ar/Tracker.cpp \

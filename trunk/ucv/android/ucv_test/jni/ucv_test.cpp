@@ -1,4 +1,5 @@
 #include <j2cpp/j2cpp.hpp>
+#include <j2cpp/raw_environment.hpp>
 
 #include <android/app/Activity.hpp>
 #include <android/view/SurfaceView.hpp>
@@ -24,7 +25,9 @@
 
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
-	if(!j2cpp::environment::get().init(vm))
-		return JNI_ERR;
+	j2cpp::shared_ptr<j2cpp::raw_environment> raw_env(new j2cpp::raw_environment(vm));
+	if(j2cpp::environment::init(raw_env))
+		return JNI_VERSION_1_4;
+
 	return JNI_VERSION_1_6;
 }

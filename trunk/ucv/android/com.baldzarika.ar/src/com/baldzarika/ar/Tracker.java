@@ -31,6 +31,7 @@ public class Tracker {
 		public native boolean isDetected();
 		public native Marker getMarker();
 		public native android.graphics.Matrix getHomography();
+		public native Point2[] getMarkerCorners();
 		
 		private long m_px;
 	}

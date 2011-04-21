@@ -122,10 +122,12 @@ namespace {
 
 				gray_image_t marker_gray_img(marker_img.width(), marker_img.height());
 
+				gray_t marker_median;
 				ucv::convert_scale(
 					ucv::gil::view(marker_img),
 					ucv::gil::view(marker_gray_img),
-					ucv::surf::integral_t(1.0f/255.0f)
+					ucv::surf::integral_t(1.0f/255.0f),
+					marker_median
 				);
 				ucv::surf::integral_image_t marker_integral_img(marker_img.width(), marker_img.height());
 				ucv::integral(
@@ -278,7 +280,7 @@ void UCVActivity::onSurfaceChanged(local_ref<egl::EGL10> const &gl, int width, i
 	if(Native *pn=reinterpret_cast<Native*>((jlong)(m_Native)))
 	{
 		pn->m_surf.reset(new ucv::surf(ucv::size2ui(width*2,height*2), 2, 4, 2, 1.0e-3f));
-		pn->m_tracker.reset(new Native::klt_tracker_t(ucv::size2ui(width*2, height*2), ucv::size2ui(5,5), 4, 10));
+		pn->m_tracker.reset(new Native::klt_tracker_t(ucv::size2ui(width*2, height*2), ucv::size2ui(7,7), 4, 10));
 
 		//pn->m_gil_gray_img.recreate(width*2,height*2);
 		pn->m_gray_img.recreate(width*2,height*2);
@@ -484,6 +486,13 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 		{
 			local_ref<Camera::Parameters> parameters=camera->getParameters();
 			ucv::size2ui fs(parameters->getPreviewSize()->width, parameters->getPreviewSize()->height);
+
+			jint pfmt=parameters->getPreviewFormat();
+
+			__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "onPreviewFrame(%d,%d)",
+				pfmt,
+				data->size()
+			);
 
 			//ucv::gil::resize_view(
 			//	ucv::gil::interleaved_view(
