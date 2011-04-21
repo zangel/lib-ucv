@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'ArTestDlg.h'
 **
-** Created: Mon 11. Apr 14:06:46 2011
+** Created: Thu 21. Apr 09:07:58 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!

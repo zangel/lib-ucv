@@ -12,11 +12,8 @@ namespace baldzarika { namespace ucv {
 
 	namespace detail {
 
-		template < typename T, boost::uint32_t R, boost::uint32_t C>
-		static inline matrix< T, R, C > invert_matrix( matrix< T, R, C > const &);
-
-		template < typename T, boost::uint32_t R, boost::uint32_t C, typename PT>
-		static inline point2<PT> transform_point2( matrix< T, R, C > const &, point2<PT> const &);
+		template < typename T >
+		static inline matrix< T, 3, 3 > invert_matrix( matrix< T, 3, 3 > const &);
 
 	} //namespace details
 
@@ -128,7 +125,7 @@ namespace baldzarika { namespace ucv {
 
 		inline matrix inverse() const
 		{
-			return detail::invert_matrix(*this);
+			return detail::invert_matrix<T>(*this);
 		}
 
 		template < typename VT >
@@ -140,15 +137,12 @@ namespace baldzarika { namespace ucv {
 		template < typename PT >
 		inline point2<PT> operator *(point2< PT > const &p) const
 		{
-			return vector< PT, R >(ublas::prod(*this, vector<T,C>(p))).homogenized();
+			return vector< T, R >(ublas::prod(*this, vector< T, C >(p))).homogenized();
 		}
 	};
 
 
 	namespace detail {
-
-		template < typename T, boost::uint32_t R, boost::uint32_t C>
-		static inline matrix< T, R, C > invert_matrix( matrix< T, R, C > const &m) { BOOST_ASSERT(false); return matrix< T, R, C >(); }
 
 		template < typename T >
 		static inline matrix< T, 3, 3 > invert_matrix( matrix< T, 3, 3 > const &m)

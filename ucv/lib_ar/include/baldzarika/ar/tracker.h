@@ -77,6 +77,8 @@ namespace baldzarika { namespace ar {
 			boost::shared_ptr<marker> const&		get_marker() const;
 			points2_t const&						get_frame_points() const;
 			ucv::matrix33f const&					get_homography_matrix() const;
+			void									get_marker_corners(points2_t &mc) const;
+
 			
 		
 		protected:
@@ -144,6 +146,7 @@ namespace baldzarika { namespace ar {
 		bool									is_active() const;
 		bool									is_started() const;
 		bool									stop();
+		bool									wait_to_stop();
 
 		bool									update(gray_const_view_t gv, gray_t const &sm=gray_t(-1));
 
