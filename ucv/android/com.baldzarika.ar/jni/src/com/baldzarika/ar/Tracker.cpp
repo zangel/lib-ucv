@@ -4,6 +4,7 @@
 #include <com_baldzarika_ar_Tracker_Callback.h>
 
 #include <com/baldzarika/ar/Size2.h>
+#include <com/baldzarika/ar/Point2.h>
 #include <com/baldzarika/ar/Marker.h>
 #include <com/baldzarika/ar/Frame.h>
 
@@ -42,6 +43,15 @@ jobject Java_com_baldzarika_ar_Tracker_00024MarkerState_getHomography(JNIEnv */*
 	using namespace com::baldzarika::ar;
 	using namespace j2cpp;
 	return Tracker::MarkerState(ms).getHomography().get_jobject();
+}
+
+jobjectArray Java_com_baldzarika_ar_Tracker_00024MarkerState_getMarkerCorners(JNIEnv */*e*/, jobject ms)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return reinterpret_cast<jobjectArray>(
+			Tracker::MarkerState(ms).getMarkerCorners().get_jobject()
+	);
 }
 
 void Java_com_baldzarika_ar_Tracker_create(JNIEnv */*e*/, jobject t, jobject fs)
@@ -181,6 +191,26 @@ namespace com { namespace baldzarika { namespace ar {
 				return ret_val;
 			}
 			return j2cpp::local_ref<j2cpp::android::graphics::Matrix>();
+		}
+
+		j2cpp::local_ref< j2cpp::array< j2cpp::local_ref< Point2 >, 1 > >
+		MarkerState::getMarkerCorners()
+		{
+			if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			{
+				::baldzarika::ar::tracker::marker_state::points2_t mcs;
+				(*ppx)->get_marker_corners(mcs);
+
+				j2cpp::array< j2cpp::local_ref< Point2 >, 1 > ret_val(mcs.size());
+
+				for(std::size_t mc=0;mc<mcs.size();++mc)
+					ret_val[mc]=Point2(
+							static_cast<jfloat>(mcs[mc].x),
+							static_cast<jfloat>(mcs[mc].y)
+					);
+				return ret_val;
+			}
+			return j2cpp::local_ref< j2cpp::array< j2cpp::local_ref< Point2 >, 1 > >();
 		}
 
 		void MarkerState::create(jlong px)

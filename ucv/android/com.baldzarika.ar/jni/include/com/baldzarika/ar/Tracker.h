@@ -4,6 +4,7 @@
 namespace com { namespace baldzarika { namespace ar {
 
 	class Size2;
+	class Point2;
 	class Frame;
 	class Marker;
 	class Tracker;
@@ -39,6 +40,9 @@ namespace com { namespace baldzarika { namespace ar {
 
 			j2cpp::local_ref<j2cpp::android::graphics::Matrix>
 										getHomography();
+
+			j2cpp::local_ref< j2cpp::array< j2cpp::local_ref< Point2 >, 1 > >
+										getMarkerCorners();
 
 			void						create(jlong px);
 			void						destroy();
