@@ -185,8 +185,9 @@ namespace baldzarika { namespace ucv {
 
 		inline vector& homogenize()
 		{
+			T inv_last=detail::constant::one<T>()/data()[D-1];
 			for(std::size_t d=0;d<D;++d)
-				data()[d]/=data()[D-1];
+				data()[d]*=inv_last;
 			return *this;
 			
 		}

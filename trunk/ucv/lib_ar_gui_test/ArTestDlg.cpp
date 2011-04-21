@@ -104,7 +104,7 @@ void ArTestDlg::start()
 
 			if(boost::shared_ptr<ar::tracker::marker_state> pms=new_tracker->add_marker(m_marker))
 			{
-				if(new_tracker->start() && new_tracker->is_started())
+				if(new_tracker->start())
 				{
 					m_tracker=new_tracker;
 					m_marker_state=pms;
@@ -153,7 +153,9 @@ void ArTestDlg::stop()
 	BOOST_ASSERT(m_fg_ios.stopped());
 	m_fg_ios.reset();
 	m_tracker->stop();
-	BOOST_ASSERT(!m_tracker->is_started());
+	m_tracker->wait_to_stop();
+
+	BOOST_ASSERT(!m_tracker->is_active());
 	m_marker_state.reset();
 	m_tracker.reset();
 	m_vi.stopDevice(0);
@@ -206,7 +208,7 @@ void ArTestDlg::dropEvent(QDropEvent *e)
 
 				if(ar::marker::can_load(str_marker_fname))
 				{
-					if(boost::shared_ptr<ar::marker> p_new_marker=ar::marker::load(str_marker_fname))
+					if(boost::shared_ptr<ar::marker> p_new_marker=ar::marker::create_from_file(str_marker_fname))
 					{
 						m_marker=p_new_marker;
 						m_MarkerPreview->setPixmap(QPixmap(qstr_marker_fname));

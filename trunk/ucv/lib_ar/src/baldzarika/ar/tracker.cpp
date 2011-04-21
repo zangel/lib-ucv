@@ -4,24 +4,26 @@
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/match_feature_points.h>
 #include <baldzarika/ucv/homography.h>
+#if defined(ANDROID)
 #include <j2cpp/config.hpp>
+#endif
 
 namespace baldzarika { namespace ar {
 
 	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=2;
 	boost::uint32_t const tracker::DEFAULT_SURF_INTERVALS=4;
 	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=2;
-	float const tracker::DEFAULT_SURF_TRESHOLD=1.0e-3f;
+	float const tracker::DEFAULT_SURF_TRESHOLD=1.5e-3f;
 
 	boost::uint32_t const tracker::DEFAULT_KLT_WIN_SIZE=7;
 	boost::uint32_t const tracker::DEFAULT_KLT_LEVELS=4;
 	boost::uint32_t const tracker::DEFAULT_KLT_MAX_ITERATIONS=10;
 	float const	tracker::DEFAULT_KLT_EPSILON=1.0e-4f;
 
-	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=5;
-	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=10;
+	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=8;
+	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=16;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=2.0f;
-	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=1.0e-4f;
+	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=1.3e-3f;
 
 	namespace {
 
@@ -75,6 +77,36 @@ namespace baldzarika { namespace ar {
 		return m_hmatrix;
 	}
 
+	void tracker::marker_state::get_marker_corners(tracker::marker_state::points2_t &mcs) const
+	{
+		ucv::size2ui ms=m_marker->get_size();
+		mcs.clear();
+		mcs.push_back(
+			m_hmatrix*feature_point_t::point2_t(
+				0,
+				0
+			)
+		);
+		mcs.push_back(
+			m_hmatrix*feature_point_t::point2_t(
+				ms.width(),
+				0
+			)
+		);
+		mcs.push_back(
+			m_hmatrix*feature_point_t::point2_t(
+				0,
+				ms.height()
+			)
+		);
+		mcs.push_back(
+			m_hmatrix*feature_point_t::point2_t(
+				ms.width(),
+				ms.height()
+			)
+		);
+	}
+
 	void tracker::marker_state::set_detected(bool d)
 	{
 		m_detected=d;
@@ -104,8 +136,8 @@ namespace baldzarika { namespace ar {
 			DEFAULT_KLT_EPSILON
 		)
 	{
-		m_integral_frame_stg[0].recreate(fs.width(), fs.height(), 4);
-		m_integral_frame_stg[1].recreate(fs.width(), fs.height(), 4);
+		m_integral_frame_stg[0].recreate(fs.width(), fs.height());
+		m_integral_frame_stg[1].recreate(fs.width(), fs.height());
 	}
 
 	tracker::~tracker()
@@ -129,8 +161,8 @@ namespace baldzarika { namespace ar {
 		
 		m_surf.resize(fs);
 		m_klt_tracker.set_frame_size(fs);
-		m_integral_frame_stg[0].recreate(fs.width(), fs.height(), 4);
-		m_integral_frame_stg[1].recreate(fs.width(), fs.height(), 4);
+		m_integral_frame_stg[0].recreate(fs.width(), fs.height());
+		m_integral_frame_stg[1].recreate(fs.width(), fs.height());
 		return true;
 	}
 
@@ -200,6 +232,15 @@ namespace baldzarika { namespace ar {
 			return false;
 		m_ios.stop();
 		return true;
+	}
+
+	bool tracker::wait_to_stop()
+	{
+		if(!is_active())
+			return false;
+		
+		m_worker.join();
+		return is_active();
 	}
 
 	bool tracker::update(tracker::gray_const_view_t gv, tracker::gray_t const &sm)
@@ -324,13 +365,12 @@ namespace baldzarika { namespace ar {
 				3, //m_surf.octaves(),
 				4, //m_surf.intervals(),
 				2, //m_surf.sample_step(),
-				1.0e-4f//m_surf.treshold()
+				1.0e-3f//m_surf.treshold()
 			);
 
 			ucv::surf::integral_image_t marker_integral_img(
 				ms.m_marker->get_size().width(),
-				ms.m_marker->get_size().height(),
-				4
+				ms.m_marker->get_size().height()
 			);
 
 			ucv::integral(
@@ -365,12 +405,14 @@ namespace baldzarika { namespace ar {
 		>(ms.m_features, ffs, marker_matches);
 
 		//m_stats(shared_from_this(), marker_matches.size());
-
+#if defined(ANDROID)
 		__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "tracker::detect_marker(): mfs=%d, ffs=%d, mms=%d",
+
 			ms.m_features.size(),
 			ffs.size(),
 			marker_matches.size()
 		);
+#endif
 
 		if(marker_matches.size()>=m_min_marker_features)
 		{
@@ -399,7 +441,20 @@ namespace baldzarika { namespace ar {
 				marker_state::points2_t marker_points(ffs.size());
 
 				ucv::matrix33f inv_hm(ms.m_hmatrix.inverse());
-				
+#if defined(ANDROID)
+				//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "h_matrix=[%f,%f,%f][%f,%f,%f][%f,%f,%f]",
+				//	ms.m_hmatrix.data()[0], ms.m_hmatrix.data()[1], ms.m_hmatrix.data()[2],
+				//	ms.m_hmatrix.data()[3], ms.m_hmatrix.data()[3], ms.m_hmatrix.data()[5],
+				//	ms.m_hmatrix.data()[6], ms.m_hmatrix.data()[7], ms.m_hmatrix.data()[8]
+				//);
+
+				//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "inv_h_matrix=[%f,%f,%f][%f,%f,%f][%f,%f,%f]",
+				//	inv_hm.data()[0], inv_hm.data()[1], inv_hm.data()[2],
+				//	inv_hm.data()[3], inv_hm.data()[3], inv_hm.data()[5],
+				//	inv_hm.data()[6], inv_hm.data()[7], inv_hm.data()[8]
+				//);
+#endif
+
 				for(std::size_t f=0;f<ffs.size();++f)
 				{
 					marker_points[f]=inv_hm*static_cast<feature_point_t::point2_t const &>(ffs[f]);
@@ -408,7 +463,6 @@ namespace baldzarika { namespace ar {
 						marker_points[f].y>marker_top && marker_points[f].y<marker_bottom
 					)
 					{
-#if 0
 						boost::uint32_t fp_g_x=static_cast<boost::uint32_t>(ffs[f].x*inv_select_fp_min_distance);
 						boost::uint32_t fp_g_y=static_cast<boost::uint32_t>(ffs[f].y*inv_select_fp_min_distance);
 						feature_point_t::desc_value_type fp_sel_scale=fabs(ffs[f].m_scale-select_scale);
@@ -433,7 +487,7 @@ namespace baldzarika { namespace ar {
 
 						if(si<marker_inliers.size())
 							continue;
-#endif
+
 						marker_inliers.push_back(
 							std::make_pair(
 								fabs(ffs[f].m_scale-select_scale),
@@ -442,8 +496,9 @@ namespace baldzarika { namespace ar {
 						);
 					}
 				}
-
+#if defined(ANDROID)
 				__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "tracker::detect_marker(): marker_inliers.size()=%d", marker_inliers.size());
+#endif
 
 				std::sort(marker_inliers.begin(), marker_inliers.end(), compare_relative_fp_scales());
 				BOOST_ASSERT(marker_inliers.size()>=m_min_marker_features);

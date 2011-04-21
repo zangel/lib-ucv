@@ -16,7 +16,7 @@ namespace baldzarika { namespace ucv {
 		typedef typename integral_image_t::view_t integral_view_t;
 		typedef typename integral_image_t::const_view_t const_integral_view_t;
 		
-		klt_tracker(size2ui const &fs, size2ui const &ws=ucv::size2ui(10,10), boost::uint32_t nl=3, boost::uint32_t mi=5, integral_t const &e=integral_t(1.0e-3f), integral_t const &sd=integral_t(1.0e-3f))
+		klt_tracker(size2ui const &fs, size2ui const &ws=ucv::size2ui(10,10), boost::uint32_t nl=3, boost::uint32_t mi=5, integral_t const &e=integral_t(1.0e-4f), integral_t const &sd=integral_t(1.0e-3f))
 			: m_frame_size(fs)
 			, m_win_size(ws.width()/2, ws.height()/2)
 			, m_window((2*m_win_size.width()+1+5)*3, 2*m_win_size.height()+1+5)

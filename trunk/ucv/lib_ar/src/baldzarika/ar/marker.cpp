@@ -10,6 +10,12 @@
 
 namespace baldzarika { namespace ar {
 
+	bool marker::can_load(std::string const &fn)
+	{
+		if(boost::algorithm::iends_with(fn, ".png"))
+			return true;
+		return false;
+	}
 
 	boost::shared_ptr<marker> marker::create_from_file(std::string const &fn)
 	{
@@ -77,7 +83,7 @@ namespace baldzarika { namespace ar {
 				ucv::convert_scale(
 					ucv::gil::const_view(marker_img),
 					ucv::gil::view(m_img),
-					1.0f/255.0f,
+					gray_t(1.0f/255.0f),
 					m_median
 				);
 				return true;

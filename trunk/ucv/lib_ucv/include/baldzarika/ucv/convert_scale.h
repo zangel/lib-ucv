@@ -32,7 +32,7 @@ namespace baldzarika { namespace ucv {
 			dst_channel_t *dst_row=reinterpret_cast<dst_channel_t *>(dst.row_begin(y));
 			for(std::size_t x=0;x<static_cast<std::size_t>(src.width());++x, ++src_row, ++dst_row)
 			{
-				dst_channel_t v=PT(*src_row)*scale;
+				dst_channel_t v=static_cast<dst_channel_t>(PT(*src_row)*scale);
 				*dst_row=v;
 				row_median+=v*inv_width;
 			}
