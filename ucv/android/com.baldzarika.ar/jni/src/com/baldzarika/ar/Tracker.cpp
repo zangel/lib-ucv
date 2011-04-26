@@ -54,6 +54,13 @@ jobjectArray Java_com_baldzarika_ar_Tracker_00024MarkerState_getMarkerCorners(JN
 	);
 }
 
+jint Java_com_baldzarika_ar_Tracker_00024MarkerState_getFeatureMatchesSize(JNIEnv */*e*/, jobject ms)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker::MarkerState(ms).getFeatureMatchesSize();
+}
+
 void Java_com_baldzarika_ar_Tracker_create(JNIEnv */*e*/, jobject t, jobject fs)
 {
 	using namespace com::baldzarika::ar;
@@ -211,6 +218,15 @@ namespace com { namespace baldzarika { namespace ar {
 				return ret_val;
 			}
 			return j2cpp::local_ref< j2cpp::array< j2cpp::local_ref< Point2 >, 1 > >();
+		}
+
+		jint MarkerState::getFeatureMatchesSize()
+		{
+			if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			{
+				return (*ppx)->get_frame_points().size();
+			}
+			return 0;
 		}
 
 		void MarkerState::create(jlong px)

@@ -1,10 +1,9 @@
 package com.baldzarika.ar;
 
-public class Frame {
+public class Frame
+{
 	
-	static {
-		System.loadLibrary("com.baldzarika.ar");
-	}
+	static { System.loadLibrary("com.baldzarika.ar"); }
 	
 	public static final int PFMT_NV16=16;
 	public static final int PFMT_NV21=17;
@@ -13,19 +12,23 @@ public class Frame {
 	private native void create(Size2 is);
 	private native void destroy();
 	
-	public Frame(){
+	public Frame()
+	{
 		create();
 	}
 	
-	public Frame(Size2 is){
+	public Frame(Size2 is)
+	{
 		create(is);
 	}
 	
-	public void dispose(){
+	public void dispose()
+	{
 		destroy();
 	}
 	
-	protected void finalize() {
+	protected void finalize()
+	{
 		destroy();
 	}
 	

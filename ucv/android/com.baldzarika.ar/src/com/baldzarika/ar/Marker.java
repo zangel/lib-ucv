@@ -1,28 +1,30 @@
 package com.baldzarika.ar;
 
-public class Marker {
-	
-	static {
-		System.loadLibrary("com.baldzarika.ar");
-	}
+public class Marker
+{
+	static { System.loadLibrary("com.baldzarika.ar"); }
 	
 	private native void create();
 	private native void create(Size2 ms);
 	private native void destroy();
 		
-	public Marker(){
+	public Marker()
+	{
 		create();
 	}
 
-	public Marker(Size2 ms){
+	public Marker(Size2 ms)
+	{
 		create(ms);
 	}
 	
-	public void dispose(){
+	public void dispose()
+	{
 		destroy();
 	}
 	
-	protected void finalize() {
+	protected void finalize()
+	{
 		destroy();
 	}
 	

@@ -43,6 +43,8 @@ namespace com { namespace baldzarika { namespace ar {
 
 			j2cpp::local_ref< j2cpp::array< j2cpp::local_ref< Point2 >, 1 > >
 										getMarkerCorners();
+			jint						getFeatureMatchesSize();
+
 
 			void						create(jlong px);
 			void						destroy();
