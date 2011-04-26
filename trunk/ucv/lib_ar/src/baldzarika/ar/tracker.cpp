@@ -203,11 +203,14 @@ namespace baldzarika { namespace ar {
 
 	bool tracker::start()
 	{
+		if(is_active() && !m_is_started)
+		{
+			m_worker.join();
+			m_ios.reset();
+		}
+
 		if(is_active())
 			return false;
-
-		m_worker.join();
-		m_ios.reset();
 
 		m_integral_frame_seq=0;
 		m_integral_views.clear();
@@ -519,6 +522,15 @@ namespace baldzarika { namespace ar {
 				}
 			}
 		}
+		ms.m_marker_points.resize(marker_matches.size());
+		ms.m_frame_points.resize(marker_matches.size());
+		for(std::size_t m=0;m<marker_matches.size();++m)
+		{
+			ms.m_marker_points[m]=*marker_matches[m].first;
+			ms.m_frame_points[m]=*marker_matches[m].second;
+		}
+
+
 		return false;
 	}
 
@@ -608,6 +620,8 @@ namespace baldzarika { namespace ar {
 				return true;
 			}
 		}
+		dms.m_marker_points.resize(0);
+		dms.m_frame_points.resize(0);
 		return false;
 	}
 
