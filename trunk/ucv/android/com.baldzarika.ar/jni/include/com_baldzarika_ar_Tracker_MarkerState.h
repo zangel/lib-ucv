@@ -61,6 +61,14 @@ JNIEXPORT jobject JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_getHom
 JNIEXPORT jobjectArray JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_getMarkerCorners
   (JNIEnv *, jobject);
 
+/*
+ * Class:     com_baldzarika_ar_Tracker_MarkerState
+ * Method:    getFeatureMatchesSize
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_getFeatureMatchesSize
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

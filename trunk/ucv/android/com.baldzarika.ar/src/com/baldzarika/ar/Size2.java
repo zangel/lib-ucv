@@ -1,8 +1,9 @@
 package com.baldzarika.ar;
 
-public class Size2 {
-	
-	public Size2() {
+public class Size2
+{
+	public Size2()
+	{
 		m_Width=m_Height=0;
 	}
 	
