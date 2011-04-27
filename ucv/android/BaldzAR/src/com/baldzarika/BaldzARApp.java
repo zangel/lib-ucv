@@ -62,7 +62,7 @@ public class BaldzARApp extends Application
 	}
 	
 	private static BaldzARApp s_Instance;
-	public static final Size2 DEFAULT_TRACKER_SIZE=new Size2(640,480);
+	public static final Size2 DEFAULT_TRACKER_SIZE=new Size2(320,240);
 	
 	private Tracker m_Tracker=new Tracker(DEFAULT_TRACKER_SIZE);
 	private Marker m_Marker=new Marker();
