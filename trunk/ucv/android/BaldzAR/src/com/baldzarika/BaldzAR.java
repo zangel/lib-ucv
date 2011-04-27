@@ -2,14 +2,19 @@ package com.baldzarika;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.baldzarika.ar.Frame;
 import com.baldzarika.ar.Marker;
+import com.baldzarika.ar.Point2;
 import com.baldzarika.ar.Size2;
 import com.baldzarika.ar.Tracker;
+import com.baldzarika.ar.Tracker.MarkerState;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -43,6 +48,8 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     public void onCreate(Bundle savedInstanceState)
 	{
     	super.onCreate(savedInstanceState);
+    	
+    	m_MarkerVBuffer=ByteBuffer.allocateDirect(4*3*4).order(ByteOrder.nativeOrder()).asFloatBuffer();
     	
 		m_CameraPreview=new SurfaceView(this);
     	m_CameraPreview.getHolder().addCallback(this);
@@ -103,6 +110,8 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
         BaldzARApp.getInstance().getTracker().setCallback(this);
         
         updateHUDButtons();
+        
+        
     }
 	
 	@Override
@@ -190,8 +199,58 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     @Override
     public void onDrawFrame(GL10 gl)
     {
-    	gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    	gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+		gl.glMatrixMode(GL10.GL_MODELVIEW);
+		gl.glLoadIdentity();
+		gl.glMatrixMode(GL10.GL_PROJECTION);
+		gl.glLoadIdentity();
+		gl.glOrthof(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 10.0f);
+        
+		gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+		
+		MarkerState markerState=BaldzARApp.getInstance().getMarkerState();
+		Tracker tracker=BaldzARApp.getInstance().getTracker();
+		Size2 trackerFrameSize=tracker.getFrameSize();
+		
+		if(markerState.isDetected())
+        {
+			gl.glDisable(GL10.GL_CULL_FACE);
+			gl.glDisable(GL10.GL_DEPTH_TEST);
+			gl.glDisable(GL10.GL_BLEND);
+			gl.glDisable(GL10.GL_LIGHTING);
+                
+			Point2[] marker_corners=markerState.getMarkerCorners();
+            /*
+			Point2[] marker_corners= {
+	            new Point2(0.0f,0.0f),
+	            new Point2(TRACKER_SIZE.m_Width,0.0f),
+	            new Point2(0.0f,TRACKER_SIZE.m_Height),
+	            new Point2(TRACKER_SIZE.m_Width,TRACKER_SIZE.m_Height)
+            };
+            */
+                
+                
+                
+			m_MarkerVBuffer.position(0);
+			for(int c=0;c<4;++c)
+			{
+				float[] vertex=
+				{
+			    	((marker_corners[c].m_X/trackerFrameSize.m_Width)-0.5f)*2.0f,
+			    	((marker_corners[c].m_Y/trackerFrameSize.m_Height)-0.5f)*(-2.0f),
+			        0.0f
+				};
+				//Log.i("BaldzAR", "c.x=" + Float.toString(marker_corners[c].m_X) + " c.y=" + Float.toString(marker_corners[c].m_Y) );
+			    m_MarkerVBuffer.put(vertex);
+			}
+			m_MarkerVBuffer.position(0);
+			gl.glColor4f(1.0f, 0.0f, 0.0f, 0.33f);
+			gl.glVertexPointer(3, GL10.GL_FLOAT, 0, m_MarkerVBuffer);
+			gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+			gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+			gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		}
     }
     
   //com.baldzarika.ar.Tracker.Callback
@@ -367,4 +426,6 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     private GLSurfaceView           		m_GLView=null;
 	private View							m_HUDView=null;
     private Camera                          m_Camera=null;
+	private FloatBuffer						m_MarkerVBuffer=null;
+   
 }
