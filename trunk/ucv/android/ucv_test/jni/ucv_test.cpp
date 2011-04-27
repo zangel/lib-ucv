@@ -29,5 +29,5 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
 	if(j2cpp::environment::init(raw_env))
 		return JNI_VERSION_1_4;
 
-	return JNI_VERSION_1_6;
+	return JNI_ERR;
 }

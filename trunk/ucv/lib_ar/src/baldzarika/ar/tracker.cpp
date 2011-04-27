@@ -13,11 +13,11 @@ namespace baldzarika { namespace ar {
 	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=2;
 	boost::uint32_t const tracker::DEFAULT_SURF_INTERVALS=4;
 	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=2;
-	float const tracker::DEFAULT_SURF_TRESHOLD=1.5e-3f;
+	float const tracker::DEFAULT_SURF_TRESHOLD=5.0e-4f;
 
 	boost::uint32_t const tracker::DEFAULT_KLT_WIN_SIZE=7;
 	boost::uint32_t const tracker::DEFAULT_KLT_LEVELS=4;
-	boost::uint32_t const tracker::DEFAULT_KLT_MAX_ITERATIONS=10;
+	boost::uint32_t const tracker::DEFAULT_KLT_MAX_ITERATIONS=5;
 	float const	tracker::DEFAULT_KLT_EPSILON=1.0e-4f;
 
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=8;
@@ -536,6 +536,10 @@ namespace baldzarika { namespace ar {
 
 	void tracker::detect_markers()
 	{
+		//discard all but last frame
+		while(m_integral_views.size()>1)
+			m_integral_views.pop_back();
+
 		if(m_surf.set_integral_view(m_integral_views.front()))
 		{
 			feature_points_t frame_features;
