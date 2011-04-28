@@ -30,6 +30,7 @@ namespace com { namespace baldzarika { namespace ar {
 
 		j2cpp::local_ref<Size2>	getSize();
 		jdouble					getMedianPixelValue();
+		jboolean				setSize(j2cpp::local_ref<Size2> const &fs);
 		jboolean				setPixels(j2cpp::local_ref< j2cpp::array<jbyte,1> > const &data, jint pfmt);
 
 		j2cpp::field<

@@ -35,6 +35,7 @@ public class Frame
 	public native Size2 getSize();
 	public native double getMedianPixelValue();
 	
+	public native boolean setSize(Size2 fs);
 	public native boolean setPixels(byte[] data, int pfmt);
 	
 	private long m_px=0;

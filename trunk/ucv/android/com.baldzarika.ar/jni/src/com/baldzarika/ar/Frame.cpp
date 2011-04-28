@@ -43,6 +43,13 @@ jdouble Java_com_baldzarika_ar_Frame_getMedianPixelValue(JNIEnv */*e*/, jobject 
 	return Frame(f).getMedianPixelValue();
 }
 
+jboolean Java_com_baldzarika_ar_Frame_setSize(JNIEnv */*e*/, jobject f, jobject fs)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Frame(f).setSize(local_ref<Size2>(fs));
+}
+
 jboolean Java_com_baldzarika_ar_Frame_setPixels(JNIEnv */*e*/, jobject f, jbyteArray data, jint pfmt)
 {
 	using namespace com::baldzarika::ar;
@@ -109,6 +116,16 @@ namespace com { namespace baldzarika { namespace ar {
 		if(px_t *p_px=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
 			return static_cast<jdouble>(p_px->first);
 		return -1.0;
+	}
+
+	jboolean Frame::setSize(j2cpp::local_ref<Size2> const &fs)
+	{
+		if(px_t *p_px=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+		{
+			p_px->second.recreate(jint(fs->m_Width), jint(fs->m_Height));
+			return JNI_TRUE;
+		}
+		return JNI_FALSE;
 	}
 
 	jboolean Frame::setPixels(j2cpp::local_ref< j2cpp::array<jbyte,1> > const &data, jint pfmt)

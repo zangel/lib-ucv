@@ -55,7 +55,7 @@ public class LevelIndicator extends View
 		
 		int nLevels=height/8;
 		
-		Rect rcLed=new Rect(0,height-8,16,height);
+		Rect rcLed=new Rect(0,height-8,width,height);
 		rcLed.inset(2, 1);
 		
 		float levelInc=(m_RangeMax-m_RangeMin)/nLevels;
