@@ -53,6 +53,14 @@ JNIEXPORT jdouble JNICALL Java_com_baldzarika_ar_Frame_getMedianPixelValue
 
 /*
  * Class:     com_baldzarika_ar_Frame
+ * Method:    setSize
+ * Signature: (Lcom/baldzarika/ar/Size2;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Frame_setSize
+  (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_Frame
  * Method:    setPixels
  * Signature: ([BI)Z
  */

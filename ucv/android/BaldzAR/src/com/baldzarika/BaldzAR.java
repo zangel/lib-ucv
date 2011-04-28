@@ -28,7 +28,7 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLSurfaceView.Renderer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.sax.RootElement;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
@@ -37,11 +37,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ToggleButton;
 
 public class BaldzAR extends Activity implements Callback, PreviewCallback, Renderer, Tracker.Callback
 {
-	protected static final int SET_MARKER=0;
+	protected static final int SET_MARKER=1;
+	protected static final int SETTINGS_CHANGED=2;
 	
 	//Activity
 	@Override
@@ -94,20 +94,28 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     		)
     	);
     	
-        final Button markerButton = (Button) findViewById(R.id.set_marker);
-        markerButton.setOnClickListener( new OnClickListener()
+        final Button markerButton=(Button)findViewById(R.id.set_marker);
+        markerButton.setOnClickListener(new OnClickListener()
         	{ public void onClick(View v) { onSetMarker(); } }
         );
         
-        final Button trackButton = (Button) findViewById(R.id.start_stop_tracking);
-        trackButton.setOnClickListener( new OnClickListener()
+        final Button trackButton=(Button)findViewById(R.id.start_stop_tracking);
+        trackButton.setOnClickListener(new OnClickListener()
     		{ public void onClick(View v) { onStartStopTracking(); } }
+        );
+        
+        final Button settingsButton=(Button)findViewById(R.id.settings);
+        settingsButton.setOnClickListener( new OnClickListener()
+    		{ public void onClick(View v) { onSettings(); } }
         );
         
         final LevelIndicator markerLevel=(LevelIndicator)findViewById(R.id.marker_level);
     	markerLevel.setRange(0.0f, 8.0f, 16.0f);
         
         BaldzARApp.getInstance().getTracker().setCallback(this);
+        
+        
+        PreferenceManager.setDefaultValues(this, R.xml.settings, false);
         
         updateHUDButtons();
         
@@ -144,6 +152,9 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     		case SET_MARKER:
     			if(resultCode==Activity.RESULT_OK) setMarker(data.getData());
     			break;
+    		case SETTINGS_CHANGED:
+    			if(resultCode==Activity.RESULT_OK) settingsChanged();
+    			break;
     	}
     }
 	
@@ -166,6 +177,7 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     @Override
 	public void surfaceDestroyed(SurfaceHolder holder)
 	{
+    	stopCameraPreview();
     	closeCamera();
     	updateHUDButtons();
     }
@@ -220,16 +232,6 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
 			gl.glDisable(GL10.GL_LIGHTING);
                 
 			Point2[] marker_corners=markerState.getMarkerCorners();
-            /*
-			Point2[] marker_corners= {
-	            new Point2(0.0f,0.0f),
-	            new Point2(TRACKER_SIZE.m_Width,0.0f),
-	            new Point2(0.0f,TRACKER_SIZE.m_Height),
-	            new Point2(TRACKER_SIZE.m_Width,TRACKER_SIZE.m_Height)
-            };
-            */
-                
-                
                 
 			m_MarkerVBuffer.position(0);
 			for(int c=0;c<4;++c)
@@ -340,6 +342,10 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     	updateHUDButtons();
     }
     
+    protected void settingsChanged()
+    {
+    }
+    
     protected void onSetMarker()
 	{
     	startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI), SET_MARKER);
@@ -349,17 +355,21 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
 	{
     	Tracker tracker=BaldzARApp.getInstance().getTracker();
     	
-    	boolean success=false;
-    	
     	if(tracker.isStarted())
     	{
-    		success=tracker.stop();
+    		tracker.stop();
     	}
     	else
     	{
-    		success=tracker.start();
+    		tracker.start();
     	}
     	updateHUDButtons();
+    }
+    
+    protected void onSettings()
+    {
+    	Intent launchSettingsIntent=new Intent().setClass(this, BaldzARSettings.class);
+    	startActivityForResult(launchSettingsIntent, SETTINGS_CHANGED);
     }
     
 	protected boolean startCameraPreview()
@@ -397,12 +407,12 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     	return false;
 	}
 	
-	protected boolean closeCamera()
+	protected boolean stopCameraPreview()
 	{
 		if(m_Camera!=null)
-	    {
-    		m_Camera.stopPreview();
-    		try
+		{
+			m_Camera.stopPreview();
+			try
     		{
     			m_Camera.setPreviewDisplay(null);
     		}
@@ -411,6 +421,15 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     			e.printStackTrace();
     		}
     		m_Camera.setPreviewCallback(null);
+    		return true;
+    	}
+		return false;
+	}
+	
+	protected boolean closeCamera()
+	{
+		if(m_Camera!=null)
+	    {
     		m_Camera.release();
     		m_Camera=null;
     		return true;
