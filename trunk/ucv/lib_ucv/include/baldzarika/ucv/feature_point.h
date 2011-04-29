@@ -29,10 +29,18 @@ namespace baldzarika { namespace ucv {
 			result_type operator()(feature_point const &t, size_t k) const { return t.m_desc[k]; }
 		};
 		
-		feature_point(point2_t const &p, value_type s) : point2_t(p) , m_scale(s) , m_orientation(0.0f) { }
+		feature_point(point2_t const &p, value_type s, bool lap)
+			: point2_t(p)
+			, m_scale(s)
+			, m_laplacian(lap)
+			, m_orientation(0.0f)
+		{
+		}
+
 		feature_point(feature_point const &that)
 			: point2_t(that)
 			, m_scale(that.m_scale)
+			, m_laplacian(that.m_laplacian)
 			, m_orientation(that.m_orientation)
 		{
 			::memcpy(m_desc, that.m_desc, sizeof(m_desc));
@@ -55,7 +63,13 @@ namespace baldzarika { namespace ucv {
 			return sqrt(sum);
 		}
 
+		bool operator&&(feature_point const &rhs) const
+		{
+			return !(!m_laplacian ^ !rhs.m_laplacian);
+		}
+
 		desc_value_type		m_scale;
+		bool				m_laplacian;
 		desc_value_type		m_orientation;
 		desc_value_type		m_desc[DESCRIPTOR_SIZE];
 	};
