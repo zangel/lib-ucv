@@ -10,7 +10,9 @@
     	<com.baldzarika.SliderPreference android:title="@string/settings_detection_min_features_title" android:key="@string/settings_detection_min_features_key"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_tracking_title">
-    	<com.baldzarika.SliderPreference android:title="@string/settings_tracking_win_size_title" android:key="@string/settings_tracking_win_size_key"/>
+    	<com.baldzarika.SliderPreference android:title="@string/settings_tracking_half_win_size_title" android:key="@string/settings_tracking_half_win_size_key"/>
+    	<com.baldzarika.SliderPreference android:title="@string/settings_tracking_num_levels_title" android:key="@string/settings_tracking_num_levels_key"/>
+    	<com.baldzarika.SliderPreference android:title="@string/settings_tracking_max_iterations_title" android:key="@string/settings_tracking_max_iterations_key"/>
     	<com.baldzarika.SliderPreference android:title="@string/settings_tracking_max_features_title" android:key="@string/settings_tracking_max_features_key"/>
     </PreferenceCategory>
 </PreferenceScreen>

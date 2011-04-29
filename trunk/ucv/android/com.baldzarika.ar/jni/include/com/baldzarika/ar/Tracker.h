@@ -112,6 +112,27 @@ namespace com { namespace baldzarika { namespace ar {
 		j2cpp::local_ref<Size2>			getFrameSize();
 		jboolean						setFrameSize(j2cpp::local_ref<Size2> const &fs);
 
+		jfloat							getDetectionTreshold();
+		jboolean						setDetectionTreshold(jfloat dt);
+
+		jint							getDetectionMinFeatures();
+		jboolean						setDetectionMinFeatures(jint minFeatures);
+
+		jint							getTrackingMaxFeatures();
+		jboolean						setTrackingMaxFeatures(jint maxFeatures);
+
+		jint							getTrackingHalfWinSize();
+		jboolean						setTrackingHalfWinSize(jint halfWinSize);
+
+		jint							getTrackingNumLevels();
+		jboolean						setTrackingNumLevels(jint numLevels);
+
+		jint							getTrackingMaxIterations();
+		jboolean						setTrackingMaxIterations(jint maxIters);
+
+
+
+
 		j2cpp::local_ref<MarkerState>	addMarker(j2cpp::local_ref<Marker> const &marker);
 
 

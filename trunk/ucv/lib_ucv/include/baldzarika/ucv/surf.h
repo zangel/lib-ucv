@@ -90,10 +90,13 @@ namespace baldzarika { namespace ucv {
 		boost::uint32_t				octaves() const;
 		boost::uint32_t				intervals() const;
 		boost::uint32_t				sample_step() const;
-		float						treshold() const;
 		
-		bool						resize(size2ui const &fs);
+		float						treshold() const;
+		void						set_treshold(float t);
+
 		size2ui	const&				size() const;
+		bool						resize(size2ui const &fs);
+
 		bool						set_integral_view(const_integral_view_t iv);
 		void						build_response_layers();
 

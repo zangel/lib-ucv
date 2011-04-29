@@ -24,6 +24,8 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 		super.onCreate();
 		s_Instance=this;
 		
+		m_FrameSizes=new ArrayList<Size2>();
+		
 		Camera camera=Camera.open();
 		if(camera!=null)
 		{
@@ -43,6 +45,8 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 		SharedPreferences sp=PreferenceManager.getDefaultSharedPreferences(this);
 		sp.registerOnSharedPreferenceChangeListener(this);
 		
+		SharedPreferences.Editor spEdit=sp.edit();
+		
 		m_DefaultFrameSize=null;
 		
 		for(Size2 sz: m_FrameSizes)
@@ -59,16 +63,49 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 		}
 		if(m_DefaultFrameSize==null)
 			throw new InvalidParameterException();
-				
-		String strFrameSize=sp.getString(getString(R.string.settings_frame_size_key), m_DefaultFrameSize);
+		
+		
+		Size2 frameSize=getFrameSizeSettings(sp, spEdit);
 		
 		
 		
-		m_Tracker=new Tracker(DEFAULT_TRACKER_SIZE);
-		private Marker m_Marker=new Marker();
-		private Tracker.MarkerState m_MarkerState=m_Tracker.addMarker(m_Marker);
-		private Frame m_Frame=new Frame(DEFAULT_TRACKER_SIZE);
+		m_Tracker=new Tracker(frameSize);
 		
+		int detectionTreshold=sp.getInt(getString(R.string.settings_detection_treshold_key), DEFAULT_DETECTION_TRESHOLD);
+		m_Tracker.setDetectionTreshold((float)Math.pow(10.0f, -4.0f+(detectionTreshold/50.0f)));
+		if(!sp.contains(getString(R.string.settings_detection_treshold_key)))
+			spEdit.putInt(getString(R.string.settings_detection_treshold_key), detectionTreshold);
+		
+		int minDetectionFeatures=sp.getInt(getString(R.string.settings_detection_min_features_key), DEFAULT_DETECTION_MIN_FEATURES);
+		m_Tracker.setDetectionMinFeatures(minDetectionFeatures);
+		if(!sp.contains(getString(R.string.settings_detection_min_features_key)))
+			spEdit.putInt(getString(R.string.settings_detection_min_features_key), minDetectionFeatures);
+		
+		int maxTrackingFeatures=sp.getInt(getString(R.string.settings_tracking_max_features_key), DEFAULT_TRACKING_MAX_FEATURES);
+		m_Tracker.setTrackingMaxFeatures(maxTrackingFeatures);
+		if(!sp.contains(getString(R.string.settings_tracking_max_features_key)))
+			spEdit.putInt(getString(R.string.settings_tracking_max_features_key), maxTrackingFeatures);
+		
+		int trackingHalfWinSize=sp.getInt(getString(R.string.settings_tracking_half_win_size_key), DEFAULT_TRACKING_HALF_WIN_SIZE);
+		m_Tracker.setTrackingHalfWinSize(trackingHalfWinSize);
+		if(!sp.contains(getString(R.string.settings_tracking_half_win_size_key)))
+			spEdit.putInt(getString(R.string.settings_tracking_half_win_size_key), trackingHalfWinSize);
+		
+		int trackingNumLevels=sp.getInt(getString(R.string.settings_tracking_num_levels_key), DEFAULT_TRACKING_NUM_LEVELS);
+		m_Tracker.setTrackingNumLevels(trackingNumLevels);
+		if(!sp.contains(getString(R.string.settings_tracking_num_levels_key)))
+			spEdit.putInt(getString(R.string.settings_tracking_num_levels_key), trackingNumLevels);
+		
+		int trackingMaxIterations=sp.getInt(getString(R.string.settings_tracking_max_iterations_key), DEFAULT_TRACKING_MAX_ITERATIONS);
+		m_Tracker.setTrackingMaxIterations(trackingMaxIterations);
+		if(!sp.contains(getString(R.string.settings_tracking_max_iterations_key)))
+			spEdit.putInt(getString(R.string.settings_tracking_max_iterations_key), trackingMaxIterations);
+		
+		m_Marker=new Marker();
+		m_MarkerState=m_Tracker.addMarker(m_Marker);
+		m_Frame=new Frame(frameSize);
+		
+		spEdit.commit();
 	}
 	
 	@Override
@@ -96,11 +133,43 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 	{
 		if(key.equals(getString(R.string.settings_frame_size_key)))
 		{
-			setFrameSize(getFrameSizeSettings(sharedPreferences));
+			setFrameSize(getFrameSizeSettings(sharedPreferences,null));
 		}
 		else
 		if(key.equals(getString(R.string.settings_detection_treshold_key)))
 		{
+			int detectionTreshold=sharedPreferences.getInt(key, 1);
+			m_Tracker.setDetectionTreshold((float)Math.pow(10.0f, -4.0f+(detectionTreshold/50.0f)));
+		}
+		else
+		if(key.equals(getString(R.string.settings_detection_min_features_key)))
+		{
+			int detectionMinFeatures=sharedPreferences.getInt(key, DEFAULT_DETECTION_MIN_FEATURES);
+			m_Tracker.setDetectionMinFeatures(detectionMinFeatures);
+		}
+		else
+		if(key.equals(getString(R.string.settings_tracking_max_features_key)))
+		{
+			int trackingMaxFeatures=sharedPreferences.getInt(key, DEFAULT_TRACKING_MAX_FEATURES);
+			m_Tracker.setTrackingMaxFeatures(trackingMaxFeatures);
+		}
+		else
+		if(key.equals(getString(R.string.settings_tracking_half_win_size_key)))
+		{
+			int trackingHalfWinSize=sharedPreferences.getInt(key, DEFAULT_TRACKING_HALF_WIN_SIZE);
+			m_Tracker.setTrackingHalfWinSize(trackingHalfWinSize);
+		}
+		else
+		if(key.equals(getString(R.string.settings_tracking_num_levels_key)))
+		{
+			int trackingNumLevels=sharedPreferences.getInt(key, DEFAULT_TRACKING_NUM_LEVELS);
+			m_Tracker.setTrackingNumLevels(trackingNumLevels);
+		}
+		else
+		if(key.equals(getString(R.string.settings_tracking_max_iterations_key)))
+		{
+			int trackingMaxIterations=sharedPreferences.getInt(key, DEFAULT_TRACKING_MAX_ITERATIONS);
+			m_Tracker.setTrackingMaxIterations(trackingMaxIterations);
 		}
 	}
 	
@@ -136,13 +205,18 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 	
 	private void setFrameSize(Size2 frameSize)
 	{
-		m_Tracker.setFrameSize(frameSize);
-		m_Frame.setSize(frameSize);
+		if(m_Tracker!=null)
+		{
+			m_Tracker.setFrameSize(frameSize);
+			m_Frame.setSize(frameSize);
+		}
 	}
 	
-	private Size2 getFrameSizeSettings(SharedPreferences sharedPreferences)
+	private Size2 getFrameSizeSettings(SharedPreferences sharedPreferences, SharedPreferences.Editor spEditor)
 	{
 		String frameSize=sharedPreferences.getString(getString(R.string.settings_frame_size_key), m_DefaultFrameSize);
+		if(spEditor!=null && !sharedPreferences.contains(getString(R.string.settings_frame_size_key)))
+			spEditor.putString(getString(R.string.settings_frame_size_key), frameSize);
 		
 		for(Size2 sz: m_FrameSizes)
 		{
@@ -159,12 +233,39 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 		return new Size2(0,0);
 	}
 	
-	private static BaldzARApp s_Instance;
+	private static BaldzARApp s_Instance=null;
 	
-	private List<Size2> m_FrameSizes=new ArrayList<Size2>();	
-	private String m_DefaultFrameSize;
-	private Tracker m_Tracker=new Tracker(DEFAULT_TRACKER_SIZE);
-	private Marker m_Marker=new Marker();
-	private Tracker.MarkerState m_MarkerState=m_Tracker.addMarker(m_Marker);
-	private Frame m_Frame=new Frame(DEFAULT_TRACKER_SIZE);
+	private List<Size2> m_FrameSizes=null;	
+	private String m_DefaultFrameSize=null;
+	private Tracker m_Tracker=null;
+	private Marker m_Marker=null;
+	private Tracker.MarkerState m_MarkerState=null;
+	private Frame m_Frame=null;
+	
+	
+	public static final int MIN_DETECTION_TRESHOLD=0;
+	public static final int MAX_DETECTION_TRESHOLD=100;
+	public static final int DEFAULT_DETECTION_TRESHOLD=35;
+	
+	
+	
+	public static final int MIN_DETECTION_MIN_FEATURES=8;
+	public static final int MAX_DETECTION_MIN_FEATURES=16;
+	public static final int DEFAULT_DETECTION_MIN_FEATURES=8;
+	
+	public static final int MIN_TRACKING_MAX_FEATURES=8;
+	public static final int MAX_TRACKING_MAX_FEATURES=16;
+	public static final int DEFAULT_TRACKING_MAX_FEATURES=16;
+	
+	public static final int MIN_TRACKING_HALF_WIN_SIZE=2;
+	public static final int MAX_TRACKING_HALF_WIN_SIZE=8;
+	public static final int DEFAULT_TRACKING_HALF_WIN_SIZE=3;
+	
+	public static final int MIN_TRACKING_NUM_LEVELS=1;
+	public static final int MAX_TRACKING_NUM_LEVELS=4;
+	public static final int DEFAULT_TRACKING_NUM_LEVELS=4;
+	
+	public static final int MIN_TRACKING_MAX_ITERATIONS=1;
+	public static final int MAX_TRACKING_MAX_ITERATIONS=100;
+	public static final int DEFAULT_TRACKING_MAX_ITERATIONS=10;
 }

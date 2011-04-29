@@ -3,17 +3,21 @@
     <string name="app_name">BaldzAR</string>
     <string name="app_desc">AR test application</string>
     <string name="settings_name">BaldzARSettings</string>
-    <string name="settings_detection_treshold_title">Treshold</string>
+    
     <string name="settings_general_title">General</string>
-    <string name="settings_frame_size_key">settings_frame_size</string>
-    <string name="settings_frame_size_title">Frame size</string>
-    <string name="settings_detection_title">Detection</string>
-    <string name="settings_detection_treshold_key">settings_detection_treshold</string>
+    <string name="settings_frame_size_key">settings_frame_size</string><string name="settings_frame_size_title">Frame size</string><string name="settings_detection_title">Detection</string>
+    
+    
+    <string name="settings_detection_treshold_key">settings_detection_treshold</string><string name="settings_detection_treshold_title">Treshold</string>
     <string name="settings_detection_min_features_key">settings_detection_min_features</string>
     <string name="settings_detection_min_features_title">Min features</string>
-    <string name="settings_tracking_max_features_key">settings_tracking_max_features</string>
+    <string name="settings_tracking_title">Tracking</string><string name="settings_tracking_max_features_key">settings_tracking_max_features</string>
     <string name="settings_tracking_max_features_title">Max features</string>
-    <string name="settings_tracking_title">Tracking</string>
-    <string name="settings_tracking_win_size_title">Win size</string>
-    <string name="settings_tracking_win_size_key">settings_tracking_win_size</string>
+    
+    
+    <string name="settings_tracking_half_win_size_key">settings_tracking_half_win_size</string><string name="settings_tracking_half_win_size_title">Half window size</string>
+    
+    <string name="settings_tracking_num_levels_key">settings_tracking_num_levels</string><string name="settings_tracking_num_levels_title">Num levels</string>
+    
+    <string name="settings_tracking_max_iterations_key">settings_tracking_max_iterations</string><string name="settings_tracking_max_iterations_title">Max iterations</string>
 </resources>

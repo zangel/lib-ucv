@@ -37,15 +37,21 @@ public class BaldzARSettings extends PreferenceActivity
 		
 		
 		SliderPreference detectionTreshold=(SliderPreference) findPreference(getString(R.string.settings_detection_treshold_key));
-		detectionTreshold.setRange(0, 100);
+		detectionTreshold.setRange(BaldzARApp.MIN_DETECTION_TRESHOLD, BaldzARApp.MAX_DETECTION_TRESHOLD);
 		
 		SliderPreference detectionMinFeatures=(SliderPreference) findPreference(getString(R.string.settings_detection_min_features_key));
-		detectionMinFeatures.setRange(8, 16);
+		detectionMinFeatures.setRange(BaldzARApp.MIN_DETECTION_MIN_FEATURES, BaldzARApp.MAX_DETECTION_MIN_FEATURES);
+		
+		SliderPreference trackingHalfWinSize=(SliderPreference) findPreference(getString(R.string.settings_tracking_half_win_size_key));
+		trackingHalfWinSize.setRange(BaldzARApp.MIN_TRACKING_HALF_WIN_SIZE, BaldzARApp.MAX_TRACKING_HALF_WIN_SIZE);
+		
+		SliderPreference trackingNumLevels=(SliderPreference) findPreference(getString(R.string.settings_tracking_num_levels_key));
+		trackingNumLevels.setRange(BaldzARApp.MIN_TRACKING_NUM_LEVELS, BaldzARApp.MAX_TRACKING_NUM_LEVELS);
+		
+		SliderPreference trackingMaxIterations=(SliderPreference) findPreference(getString(R.string.settings_tracking_max_iterations_key));
+		trackingMaxIterations.setRange(BaldzARApp.MIN_TRACKING_MAX_ITERATIONS, BaldzARApp.MAX_TRACKING_MAX_ITERATIONS);
 		
 		SliderPreference trackingMaxFeatures=(SliderPreference) findPreference(getString(R.string.settings_tracking_max_features_key));
-		trackingMaxFeatures.setRange(8, 16);
-		
-		SliderPreference trackingWinSize=(SliderPreference) findPreference(getString(R.string.settings_tracking_win_size_key));
-		trackingWinSize.setRange(5, 10);
+		trackingMaxFeatures.setRange(BaldzARApp.MIN_TRACKING_MAX_FEATURES, BaldzARApp.MAX_TRACKING_MAX_FEATURES);
 	}
 }

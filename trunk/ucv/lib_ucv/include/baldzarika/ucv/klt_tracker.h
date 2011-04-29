@@ -16,10 +16,10 @@ namespace baldzarika { namespace ucv {
 		typedef typename integral_image_t::view_t integral_view_t;
 		typedef typename integral_image_t::const_view_t const_integral_view_t;
 		
-		klt_tracker(size2ui const &fs, size2ui const &ws=ucv::size2ui(10,10), boost::uint32_t nl=3, boost::uint32_t mi=5, integral_t const &e=integral_t(1.0e-4f), integral_t const &sd=integral_t(1.0e-3f))
+		klt_tracker(size2ui const &fs, size2ui const &hws=ucv::size2ui(5,5), boost::uint32_t nl=3, boost::uint32_t mi=5, integral_t const &e=integral_t(1.0e-4f), integral_t const &sd=integral_t(1.0e-3f))
 			: m_frame_size(fs)
-			, m_win_size(ws.width()/2, ws.height()/2)
-			, m_window((2*m_win_size.width()+1+5)*3, 2*m_win_size.height()+1+5)
+			, m_half_win_size(hws.width(), hws.height())
+			, m_window((2*m_half_win_size.width()+1+5)*3, 2*m_half_win_size.height()+1+5)
 			, m_num_levels(nl)
 			, m_max_iters(mi)
 			, m_epsilon(e)
@@ -37,6 +37,36 @@ namespace baldzarika { namespace ucv {
 			m_frame_size=fs;
 		}
 
+		size2ui const& get_half_win_size() const
+		{
+			return m_half_win_size;
+		}
+
+		void set_half_win_size(size2ui const& hws)
+		{
+			m_half_win_size=hws;
+			m_window.recreate((2*m_half_win_size.width()+1+5)*3, 2*m_half_win_size.height()+1+5);
+		}
+
+		boost::uint32_t get_num_levels() const
+		{
+			return m_num_levels;
+		}
+
+		void  set_num_levels(boost::uint32_t nl)
+		{
+			m_num_levels=nl;
+		}
+
+		boost::uint32_t get_max_iterations() const
+		{
+			return m_max_iters;
+		}
+
+		void  set_max_iterations(boost::uint32_t mi)
+		{
+			m_max_iters=mi;
+		}
 
 		bool set_integral_views(const_integral_view_t prev_view, const_integral_view_t curr_view)
 		{
@@ -49,7 +79,6 @@ namespace baldzarika { namespace ucv {
 			return true;
 		}
 		
-
 		template < boost::uint32_t I2, boost::uint32_t F2 >
 		bool operator()(std::vector< point2< fixed_point<I2,F2> > > const &prev_fps, std::vector< point2< fixed_point<I2,F2> > > &curr_fps, std::vector<bool> &status)
 		{
@@ -71,7 +100,7 @@ namespace baldzarika { namespace ucv {
 		template < boost::uint32_t I2, boost::uint32_t F2 >
 		bool operator()(point2< fixed_point<I2,F2> > const &prev_fp, point2< fixed_point<I2,F2> > &curr_fp)
 		{
-			integral_t const range_corr=detail::constant::one<integral_t>()/integral_t((2*m_win_size.width()+1)*(2*m_win_size.height()+1));
+			integral_t const range_corr=detail::constant::one<integral_t>()/integral_t((2*m_half_win_size.width()+1)*(2*m_half_win_size.height()+1));
 			integral_t const step_factor=2.0f;
 			curr_fp=prev_fp;
 			for(boost::uint32_t l=0;l<m_num_levels;++l)
@@ -108,17 +137,17 @@ namespace baldzarika { namespace ucv {
 		
 		integral_view_t img_diff()
 		{
-			return gil::subimage_view(gil::view(m_window), 0*(2*m_win_size.width()+1+5), 0, 2*m_win_size.width()+1+5, 2*m_win_size.height()+1+5);
+			return gil::subimage_view(gil::view(m_window), 0*(2*m_half_win_size.width()+1+5), 0, 2*m_half_win_size.width()+1+5, 2*m_half_win_size.height()+1+5);
 		}
 
 		integral_view_t grad_sum_x()
 		{
-			return gil::subimage_view(gil::view(m_window), 1*(2*m_win_size.width()+1+5), 0, 2*m_win_size.width()+1+5, 2*m_win_size.height()+1+5);
+			return gil::subimage_view(gil::view(m_window), 1*(2*m_half_win_size.width()+1+5), 0, 2*m_half_win_size.width()+1+5, 2*m_half_win_size.height()+1+5);
 		}
 
 		integral_view_t grad_sum_y()
 		{
-			return gil::subimage_view(gil::view(m_window), 2*(2*m_win_size.width()+1+5), 0, 2*m_win_size.width()+1+5, 2*m_win_size.height()+1+5);
+			return gil::subimage_view(gil::view(m_window), 2*(2*m_half_win_size.width()+1+5), 0, 2*m_half_win_size.width()+1+5, 2*m_half_win_size.height()+1+5);
 		}
 		
 		template < boost::uint32_t I2, boost::uint32_t F2 >
@@ -135,13 +164,13 @@ namespace baldzarika { namespace ucv {
 			integral_view_t grad_sum_x_view=grad_sum_x();
 			integral_view_t grad_sum_y_view=grad_sum_y();
 
-			for(boost::uint32_t y=2;y<2*m_win_size.height()+1+2;++y)
+			for(boost::uint32_t y=2;y<2*m_half_win_size.height()+1+2;++y)
 			{
 				integral_t *img_diff_row=reinterpret_cast<integral_t *>(img_diff_view.row_begin(y))+2;
 				integral_t *grad_sum_x_row=reinterpret_cast<integral_t *>(grad_sum_x_view.row_begin(y))+2;
 				integral_t *grad_sum_y_row=reinterpret_cast<integral_t *>(grad_sum_y_view.row_begin(y))+2;
 
-				for(boost::uint32_t x=2;x<2*m_win_size.width()+1+2;++x)
+				for(boost::uint32_t x=2;x<2*m_half_win_size.width()+1+2;++x)
 				{
 					real_t diff=*img_diff_row++;
 					real_t gx=*grad_sum_x_row++;
@@ -188,12 +217,12 @@ namespace baldzarika { namespace ucv {
 			integral_view_t grad_sum_x_view=grad_sum_x();
 			integral_view_t grad_sum_y_view=grad_sum_y();
 
-			for(boost::uint32_t y=0;y<2*m_win_size.height()+5+1;++y)
+			for(boost::uint32_t y=0;y<2*m_half_win_size.height()+5+1;++y)
 			{
 				integral_t *img_diff_row=reinterpret_cast<integral_t *>(img_diff_view.row_begin(y));
 				integral_t *grad_sum_x_row=reinterpret_cast<integral_t *>(grad_sum_x_view.row_begin(y));
 				integral_t *grad_sum_y_row=reinterpret_cast<integral_t *>(grad_sum_y_view.row_begin(y));
-				for(boost::uint32_t x=0;x<2*m_win_size.width()+5+1;++x)
+				for(boost::uint32_t x=0;x<2*m_half_win_size.width()+5+1;++x)
 				{
 					*img_diff_row++=detail::constant::zero<integral_t>();
 					*grad_sum_x_row++=detail::constant::zero<integral_t>();
@@ -201,7 +230,7 @@ namespace baldzarika { namespace ucv {
 				}
 			}
 
-			for(boost::uint32_t y=1;y<(2*m_win_size.height()+1)+2+1;++y)
+			for(boost::uint32_t y=1;y<(2*m_half_win_size.height()+1)+2+1;++y)
 			{
 				integral_t *img_diff_rows[4]=
 				{
@@ -227,16 +256,16 @@ namespace baldzarika { namespace ucv {
 					reinterpret_cast<integral_t *>(grad_sum_y_view.row_begin(y+2))+1
 				};
 
-				for(boost::uint32_t x=1;x<(2*m_win_size.width()+1)+2+1;++x)
+				for(boost::uint32_t x=1;x<(2*m_half_win_size.width()+1)+2+1;++x)
 				{
 					point2i prev_pos(
-						static_cast<boost::int32_t>(prev_pt.x)+(x-m_win_size.width()-2)*s,
-						static_cast<boost::int32_t>(prev_pt.y)+(y-m_win_size.height()-2)*s
+						static_cast<boost::int32_t>(prev_pt.x)+(x-m_half_win_size.width()-2)*s,
+						static_cast<boost::int32_t>(prev_pt.y)+(y-m_half_win_size.height()-2)*s
 					);
 
 					point2i curr_pos(
-						static_cast<point2i::value_type>(curr_pt.x)+(x-m_win_size.width()-2)*s,
-						static_cast<point2i::value_type>(curr_pt.y)+(y-m_win_size.height()-2)*s
+						static_cast<point2i::value_type>(curr_pt.x)+(x-m_half_win_size.width()-2)*s,
+						static_cast<point2i::value_type>(curr_pt.y)+(y-m_half_win_size.height()-2)*s
 					);
 
 					integral_t prev_val=box_integral<const_integral_view_t,integral_t>(m_prev_view, prev_pos, size2ui(s,s))*inv_area;
@@ -394,7 +423,7 @@ namespace baldzarika { namespace ucv {
 
 	private:
 		size2ui					m_frame_size;
-		size2ui					m_win_size;
+		size2ui					m_half_win_size;
 		integral_image_t		m_window;
 		boost::uint32_t			m_num_levels;
 		boost::uint32_t			m_max_iters;

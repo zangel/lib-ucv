@@ -396,6 +396,11 @@ namespace baldzarika { namespace ucv  {
 	{
 		return m_treshold;
 	}
+
+	void surf::set_treshold(float t)
+	{
+		m_treshold=t;
+	}
 	
 	bool surf::resize(size2ui const &fs)
 	{
