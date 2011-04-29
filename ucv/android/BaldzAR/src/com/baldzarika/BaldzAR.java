@@ -256,17 +256,22 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
 		}
     }
     
-  //com.baldzarika.ar.Tracker.Callback
+	//com.baldzarika.ar.Tracker.Callback
     @Override
     public void onMarkerStateChanged(Tracker.MarkerState ms, int sc)
     {
+    	m_Handler.removeCallbacks(m_HUDMarkerLevelUpdateTask);
     	m_Handler.post(m_HUDMarkerLevelUpdateTask);
     }
     
     @Override
     public void onTrackerStart(Tracker t)
     {
+    	Thread.currentThread().setPriority(10);
+    	m_Handler.removeCallbacks(m_HUDButtonsUpdateTask);
     	m_Handler.post(m_HUDButtonsUpdateTask);
+    	
+    	m_Handler.removeCallbacks(m_HUDMarkerLevelUpdateTask);
     	m_Handler.post(m_HUDMarkerLevelUpdateTask);
     	
     }
@@ -274,7 +279,10 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     @Override
     public void onTrackerStop(Tracker t)
     {
+    	m_Handler.removeCallbacks(m_HUDButtonsUpdateTask);
     	m_Handler.post(m_HUDButtonsUpdateTask);
+    	
+    	m_Handler.removeCallbacks(m_HUDMarkerLevelUpdateTask);
     	m_Handler.post(m_HUDMarkerLevelUpdateTask);
     }
     
@@ -366,7 +374,9 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     	{
     		tracker.start();
     	}
-    	updateHUDButtons();
+    	m_MarkerButton.setEnabled(false);
+    	m_TrackingButton.setEnabled(false);
+    	m_SettingsButton.setEnabled(false);
     }
     
     protected void onSettings()
