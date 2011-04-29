@@ -38,32 +38,35 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 			camera=null;
 		}
 		else
-		{
-			m_FrameSizes.add(new Size2(0,0));
-		}
+			throw new RuntimeException("Unable to open camera!");
 		
 		SharedPreferences sp=PreferenceManager.getDefaultSharedPreferences(this);
 		sp.registerOnSharedPreferenceChangeListener(this);
 		
 		SharedPreferences.Editor spEdit=sp.edit();
 		
-		m_DefaultFrameSize=null;
 		
-		for(Size2 sz: m_FrameSizes)
+		
+		int closestFSIdx=0;
+		Size2 closestFS=m_FrameSizes.get(closestFSIdx);
+		double closeness=Math.pow(closestFS.m_Width-DEFAULT_FRAME_SIZE.m_Width, 2)+Math.pow(closestFS.m_Height-DEFAULT_FRAME_SIZE.m_Height, 2);
+		for(int ifs=1;ifs<m_FrameSizes.size();++ifs)
 		{
-			if(sz.m_Width>=320 && sz.m_Height>=240)
+			Size2 candidate=m_FrameSizes.get(ifs);
+			
+			double candidateCloseness=Math.pow(candidate.m_Width-DEFAULT_FRAME_SIZE.m_Width, 2)+Math.pow(candidate.m_Height-DEFAULT_FRAME_SIZE.m_Height, 2);
+			if(candidateCloseness<=closeness)
 			{
-				m_DefaultFrameSize = new StringBuilder().
-					append(sz.m_Width).
-					append("x").
-					append(sz.m_Height).
-					toString();
-				break;
+				closestFS=candidate;
+				closeness=candidateCloseness;
 			}
 		}
-		if(m_DefaultFrameSize==null)
-			throw new InvalidParameterException();
 		
+		m_DefaultFrameSize=new StringBuilder().
+			append(closestFS.m_Width).
+			append("x").
+			append(closestFS.m_Height).
+			toString();
 		
 		Size2 frameSize=getFrameSizeSettings(sp, spEdit);
 		
@@ -138,7 +141,7 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 		else
 		if(key.equals(getString(R.string.settings_detection_treshold_key)))
 		{
-			int detectionTreshold=sharedPreferences.getInt(key, 1);
+			int detectionTreshold=sharedPreferences.getInt(key, DEFAULT_DETECTION_TRESHOLD);
 			m_Tracker.setDetectionTreshold((float)Math.pow(10.0f, -4.0f+(detectionTreshold/50.0f)));
 		}
 		else
@@ -242,12 +245,11 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 	private Tracker.MarkerState m_MarkerState=null;
 	private Frame m_Frame=null;
 	
+	public static final Size2 DEFAULT_FRAME_SIZE=new Size2(320,240);
 	
 	public static final int MIN_DETECTION_TRESHOLD=0;
 	public static final int MAX_DETECTION_TRESHOLD=100;
-	public static final int DEFAULT_DETECTION_TRESHOLD=35;
-	
-	
+	public static final int DEFAULT_DETECTION_TRESHOLD=30;
 	
 	public static final int MIN_DETECTION_MIN_FEATURES=8;
 	public static final int MAX_DETECTION_MIN_FEATURES=16;
@@ -267,5 +269,5 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 	
 	public static final int MIN_TRACKING_MAX_ITERATIONS=1;
 	public static final int MAX_TRACKING_MAX_ITERATIONS=100;
-	public static final int DEFAULT_TRACKING_MAX_ITERATIONS=10;
+	public static final int DEFAULT_TRACKING_MAX_ITERATIONS=2;
 }
