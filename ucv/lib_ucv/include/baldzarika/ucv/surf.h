@@ -38,7 +38,13 @@ namespace baldzarika { namespace ucv {
 		typedef ucv::gil::image< response_pixel_t, false, std::allocator<unsigned char> > response_image_t;
 		typedef response_image_t::view_t response_view_t;
 
-		typedef boost::function<void (feature_point_t::point2_t const&, feature_point_t::desc_value_type const&)> point_detected_t;
+		
+		typedef gil::bit_aligned_image1_type< 1, gil::gray_layout_t >::type laplacian_image_t;
+		typedef laplacian_image_t::view_t laplacian_view_t;
+
+
+
+		typedef boost::function<void (feature_point_t::point2_t const&, feature_point_t::desc_value_type const&, bool)> point_detected_t;
 		typedef std::pair<point2i,size2ui> range_t;
 		typedef std::pair<range_t, point_detected_t> ranged_detect_params_t;
 
@@ -49,7 +55,7 @@ namespace baldzarika { namespace ucv {
 			friend class surf;
 		public:
 			response_layer(response_layer const &that);
-			response_layer(surf &sr, point2ui const &ro, response_view_t rv, boost::uint32_t ss, boost::uint32_t fs);
+			response_layer(surf &sr, point2ui const &ro, response_view_t rv, laplacian_view_t lv, boost::uint32_t ss, boost::uint32_t fs);
 			~response_layer();
 
 			operator bool() const;
@@ -58,6 +64,7 @@ namespace baldzarika { namespace ucv {
 			void				detect(response_layer &bl, response_layer &ml, ranged_detect_params_t const &rdp);
 						
 			response_t			get_response(boost::int32_t x, boost::int32_t y, response_layer const &src) const;
+			bool				get_laplacian(boost::int32_t x, boost::int32_t y, response_layer const &src) const;
 			
 			point2ui			get_offset() const;
 			size2ui				get_size() const;
@@ -67,11 +74,11 @@ namespace baldzarika { namespace ucv {
 
 			response_layer&		operator =(response_layer const &rhs);
 
-
 		protected:
 			surf				&m_surf;
 			point2ui			m_response_offset;
 			response_view_t		m_response_view;
+			laplacian_view_t	m_laplacian_view;
 			
 			boost::uint32_t		m_sample_step;
 			boost::uint32_t		m_filter_size;
@@ -143,6 +150,7 @@ namespace baldzarika { namespace ucv {
 		boost::uint32_t			m_max_features;
 
 		response_image_t		m_response_img;
+		laplacian_image_t		m_laplacian_img;
 		response_layers_t		m_response_layers;
 	};
 
