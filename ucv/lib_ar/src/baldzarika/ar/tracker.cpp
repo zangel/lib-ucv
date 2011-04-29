@@ -15,7 +15,7 @@ namespace baldzarika { namespace ar {
 	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=2;
 	float const tracker::DEFAULT_SURF_TRESHOLD=5.0e-4f;
 
-	boost::uint32_t const tracker::DEFAULT_KLT_WIN_SIZE=7;
+	boost::uint32_t const tracker::DEFAULT_KLT_HALF_WIN_SIZE=3;
 	boost::uint32_t const tracker::DEFAULT_KLT_LEVELS=4;
 	boost::uint32_t const tracker::DEFAULT_KLT_MAX_ITERATIONS=5;
 	float const	tracker::DEFAULT_KLT_EPSILON=1.0e-4f;
@@ -130,7 +130,7 @@ namespace baldzarika { namespace ar {
 			DEFAULT_SURF_TRESHOLD
 		)
 		, m_klt_tracker(fs,
-			ucv::size2ui(DEFAULT_KLT_WIN_SIZE,DEFAULT_KLT_WIN_SIZE),
+			ucv::size2ui(DEFAULT_KLT_HALF_WIN_SIZE,DEFAULT_KLT_HALF_WIN_SIZE),
 			DEFAULT_KLT_LEVELS,
 			DEFAULT_KLT_MAX_ITERATIONS,
 			DEFAULT_KLT_EPSILON
@@ -163,6 +163,85 @@ namespace baldzarika { namespace ar {
 		m_klt_tracker.set_frame_size(fs);
 		m_integral_frame_stg[0].recreate(fs.width(), fs.height());
 		m_integral_frame_stg[1].recreate(fs.width(), fs.height());
+		return true;
+	}
+
+	float tracker::get_detection_treshold() const
+	{
+		return m_surf.treshold();
+	}
+
+	bool tracker::set_detection_treshold(float dt)
+	{
+		if(is_active())
+			return false;
+		m_surf.set_treshold(dt);
+		return true;
+	}
+
+	boost::uint32_t tracker::get_detection_min_features() const
+	{
+		return m_min_marker_features;
+	}
+
+	bool tracker::set_detection_min_features(boost::uint32_t mf)
+	{
+		if(is_active())
+			return false;
+		m_min_marker_features=mf;
+		return true;
+	}
+
+	boost::uint32_t tracker::get_tracking_max_features() const
+	{
+		return m_max_marker_features;
+
+	}
+
+	bool tracker::set_tracking_max_features(boost::uint32_t mf)
+	{
+		if(is_active())
+			return false;
+		m_max_marker_features=mf;
+		return true;
+	}
+
+	boost::uint32_t tracker::get_tracking_half_win_size() const
+	{
+		return m_klt_tracker.get_half_win_size().width();
+	}
+
+	bool tracker::set_tracking_half_win_size(boost::uint32_t thws)
+	{
+		if(is_active())
+			return false;
+		m_klt_tracker.set_half_win_size(ucv::size2ui(thws,thws));
+		return true;
+	}
+
+	boost::uint32_t tracker::get_tracking_num_levels() const
+	{
+		return m_klt_tracker.get_num_levels();
+	}
+
+	bool tracker::set_tracking_num_levels(boost::uint32_t nl)
+	{
+		if(is_active())
+			return false;
+		m_klt_tracker.set_num_levels(nl);
+		return true;
+	}
+
+	boost::uint32_t tracker::get_tracking_max_iterations() const
+	{
+		return m_klt_tracker.get_max_iterations();
+	}
+
+	bool tracker::set_tracking_max_iterations(boost::uint32_t mi)
+	{
+		if(is_active())
+			return false;
+		m_klt_tracker.set_max_iterations(mi);
 		return true;
 	}
 

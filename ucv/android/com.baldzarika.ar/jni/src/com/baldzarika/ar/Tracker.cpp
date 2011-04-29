@@ -89,6 +89,90 @@ jboolean Java_com_baldzarika_ar_Tracker_setFrameSize(JNIEnv */*e*/, jobject t, j
 	return Tracker(t).setFrameSize(local_ref<Size2>(fs));
 }
 
+jfloat Java_com_baldzarika_ar_Tracker_getDetectionTreshold(JNIEnv */*e*/, jobject t)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).getDetectionTreshold();
+}
+
+jboolean Java_com_baldzarika_ar_Tracker_setDetectionTreshold(JNIEnv */*e*/, jobject t, jfloat treshold)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).setDetectionTreshold(treshold);
+}
+
+jint Java_com_baldzarika_ar_Tracker_getDetectionMinFeatures(JNIEnv */*e*/, jobject t)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).getDetectionMinFeatures();
+}
+
+jboolean Java_com_baldzarika_ar_Tracker_setDetectionMinFeatures(JNIEnv */*e*/, jobject t, jint minFeatures)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).setDetectionMinFeatures(minFeatures);
+}
+
+jint Java_com_baldzarika_ar_Tracker_getTrackingMaxFeatures(JNIEnv */*e*/, jobject t)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).getTrackingMaxFeatures();
+}
+
+jboolean Java_com_baldzarika_ar_Tracker_setTrackingMaxFeatures(JNIEnv */*e*/, jobject t, jint maxFeatures)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).setTrackingMaxFeatures(maxFeatures);
+}
+
+jint Java_com_baldzarika_ar_Tracker_getTrackingHalfWinSize(JNIEnv */*e*/, jobject t)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).getTrackingHalfWinSize();
+}
+
+jboolean Java_com_baldzarika_ar_Tracker_setTrackingHalfWinSize(JNIEnv */*e*/, jobject t, jint halfWinSize)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).setTrackingHalfWinSize(halfWinSize);
+}
+
+jint Java_com_baldzarika_ar_Tracker_getTrackingNumLevels(JNIEnv */*e*/, jobject t)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).getTrackingNumLevels();
+}
+
+jboolean Java_com_baldzarika_ar_Tracker_setTrackingNumLevels(JNIEnv */*e*/, jobject t, jint numLevels)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).setTrackingNumLevels(numLevels);
+}
+
+jint Java_com_baldzarika_ar_Tracker_getTrackingMaxIterations(JNIEnv */*e*/, jobject t)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).getTrackingMaxIterations();
+}
+
+jboolean Java_com_baldzarika_ar_Tracker_setTrackingMaxIterations(JNIEnv */*e*/, jobject t, jint maxIters)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).setTrackingMaxIterations(maxIters);
+}
+
 jobject Java_com_baldzarika_ar_Tracker_addMarker(JNIEnv */*e*/, jobject t, jobject m)
 {
 	using namespace com::baldzarika::ar;
@@ -380,6 +464,90 @@ namespace com { namespace baldzarika { namespace ar {
 					jint(fs->m_Height)
 				)
 			)?JNI_TRUE:JNI_FALSE;
+		return JNI_FALSE;
+	}
+
+	jfloat Tracker::getDetectionTreshold()
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->get_detection_treshold();
+		return 0.0f;
+	}
+
+	jboolean Tracker::setDetectionTreshold(jfloat dt)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->set_detection_treshold(dt)?JNI_TRUE:JNI_FALSE;
+		return JNI_FALSE;
+	}
+
+	jint Tracker::getDetectionMinFeatures()
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->get_detection_min_features();
+		return -1;
+	}
+
+	jboolean Tracker::setDetectionMinFeatures(jint minFeatures)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->set_detection_min_features(minFeatures)?JNI_TRUE:JNI_FALSE;
+		return JNI_FALSE;
+	}
+
+	jint Tracker::getTrackingMaxFeatures()
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->get_tracking_max_features();
+		return -1;
+	}
+
+	jboolean Tracker::setTrackingMaxFeatures(jint maxFeatures)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->set_tracking_max_features(maxFeatures)?JNI_TRUE:JNI_FALSE;
+		return JNI_FALSE;
+	}
+
+	jint Tracker::getTrackingHalfWinSize()
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->get_tracking_half_win_size();
+		return -1;
+	}
+
+	jboolean Tracker::setTrackingHalfWinSize(jint halfWinSize)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->set_tracking_half_win_size(halfWinSize)?JNI_TRUE:JNI_FALSE;
+		return JNI_FALSE;
+	}
+
+	jint Tracker::getTrackingNumLevels()
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->get_tracking_num_levels();
+		return -1;
+	}
+
+	jboolean Tracker::setTrackingNumLevels(jint numLevels)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->set_tracking_num_levels(numLevels)?JNI_TRUE:JNI_FALSE;
+		return JNI_FALSE;
+	}
+
+	jint Tracker::getTrackingMaxIterations()
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->get_tracking_max_iterations();
+		return -1;
+	}
+
+	jboolean Tracker::setTrackingMaxIterations(jint maxIters)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->set_tracking_max_iterations(maxIters)?JNI_TRUE:JNI_FALSE;
 		return JNI_FALSE;
 	}
 

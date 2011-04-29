@@ -94,23 +94,24 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     		)
     	);
     	
-        final Button markerButton=(Button)findViewById(R.id.set_marker);
-        markerButton.setOnClickListener(new OnClickListener()
+    	m_MarkerButton=(Button)findViewById(R.id.set_marker);
+    	m_MarkerButton.setOnClickListener(new OnClickListener()
         	{ public void onClick(View v) { onSetMarker(); } }
         );
         
-        final Button trackButton=(Button)findViewById(R.id.start_stop_tracking);
-        trackButton.setOnClickListener(new OnClickListener()
+    	m_TrackingButton=(Button)findViewById(R.id.start_stop_tracking);
+    	m_TrackingButton.setOnClickListener(new OnClickListener()
     		{ public void onClick(View v) { onStartStopTracking(); } }
         );
         
-        final Button settingsButton=(Button)findViewById(R.id.settings);
-        settingsButton.setOnClickListener( new OnClickListener()
+        m_SettingsButton=(Button)findViewById(R.id.settings);
+        m_SettingsButton.setOnClickListener( new OnClickListener()
     		{ public void onClick(View v) { onSettings(); } }
         );
         
-        final LevelIndicator markerLevel=(LevelIndicator)findViewById(R.id.marker_level);
-    	markerLevel.setRange(0.0f, 8.0f, 16.0f);
+        Tracker tracker=BaldzARApp.getInstance().getTracker();
+        m_MarkerLevel=(LevelIndicator)findViewById(R.id.marker_level);
+        m_MarkerLevel.setRange(0.0f, tracker.getDetectionMinFeatures(), tracker.getTrackingMaxFeatures());
         
         BaldzARApp.getInstance().getTracker().setCallback(this);
         
@@ -289,18 +290,18 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     	Marker marker=BaldzARApp.getInstance().getMarker();
     	Size2 markerSize=marker.getSize();
     	
-    	Button markerButton=(Button)findViewById(R.id.set_marker);
-    	markerButton.setEnabled(m_Camera!=null && !tracker.isStarted());
+    	m_MarkerButton.setEnabled(m_Camera!=null && !tracker.isStarted());
     	    	
-    	Button startStopTrackingButton=(Button)findViewById(R.id.start_stop_tracking);
-    	startStopTrackingButton.setEnabled(m_Camera!=null && markerSize.m_Width*markerSize.m_Height!=0);
-    	startStopTrackingButton.setBackgroundResource(tracker.isStarted()?R.drawable.stop_button:R.drawable.start_button);
+    	m_TrackingButton.setEnabled(m_Camera!=null && markerSize.m_Width*markerSize.m_Height!=0);
+    	m_TrackingButton.setBackgroundResource(tracker.isStarted()?R.drawable.stop_button:R.drawable.start_button);
+    	
+    	m_SettingsButton.setEnabled(m_Camera!=null && !tracker.isStarted());
+    	
     }
     
     private void updateMarkerLevel()
     {
-    	LevelIndicator markerLevel=(LevelIndicator)findViewById(R.id.marker_level);
-    	markerLevel.setValue(BaldzARApp.getInstance().getMarkerState().getFeatureMatchesSize());
+    	m_MarkerLevel.setValue(BaldzARApp.getInstance().getMarkerState().getFeatureMatchesSize());
     }
     
     private class HUDButtonsUpdateTask implements Runnable
@@ -344,6 +345,8 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     
     protected void settingsChanged()
     {
+    	Tracker tracker=BaldzARApp.getInstance().getTracker();
+        m_MarkerLevel.setRange(0.0f, tracker.getDetectionMinFeatures(), tracker.getTrackingMaxFeatures());
     }
     
     protected void onSetMarker()
@@ -446,5 +449,12 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
 	private View							m_HUDView=null;
     private Camera                          m_Camera=null;
 	private FloatBuffer						m_MarkerVBuffer=null;
+	
+	
+	private Button							m_MarkerButton=null;
+	private Button							m_TrackingButton=null;
+	private Button							m_SettingsButton=null;
+	private LevelIndicator					m_MarkerLevel=null;
+	
    
 }

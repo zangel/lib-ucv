@@ -32,7 +32,7 @@ namespace baldzarika { namespace ar {
 		static boost::uint32_t const	DEFAULT_SURF_SAMPLE_STEPS;
 		static float const				DEFAULT_SURF_TRESHOLD;
 
-		static boost::uint32_t const	DEFAULT_KLT_WIN_SIZE;
+		static boost::uint32_t const	DEFAULT_KLT_HALF_WIN_SIZE;
 		static boost::uint32_t const	DEFAULT_KLT_LEVELS;
 		static boost::uint32_t const	DEFAULT_KLT_MAX_ITERATIONS;
 		static float const				DEFAULT_KLT_EPSILON;
@@ -130,6 +130,30 @@ namespace baldzarika { namespace ar {
 
 		ucv::size2ui							get_frame_size() const;
 		bool									set_frame_size(ucv::size2ui const &fs);
+
+		float									get_detection_treshold() const;
+		bool									set_detection_treshold(float dt);
+
+		boost::uint32_t							get_detection_min_features() const;
+		bool									set_detection_min_features(boost::uint32_t mf);
+
+		boost::uint32_t							get_tracking_max_features() const;
+		bool									set_tracking_max_features(boost::uint32_t mf);
+
+		boost::uint32_t							get_tracking_half_win_size() const;
+		bool									set_tracking_half_win_size(boost::uint32_t thws);
+
+		boost::uint32_t							get_tracking_num_levels() const;
+		bool									set_tracking_num_levels(boost::uint32_t nl);
+
+		boost::uint32_t							get_tracking_max_iterations() const;
+		bool									set_tracking_max_iterations(boost::uint32_t mi);
+
+
+
+
+
+
 
 		boost::shared_ptr<marker_state>			add_marker(boost::shared_ptr<marker> const &m);
 		bool									remove_marker(boost::shared_ptr<marker> const &m);
