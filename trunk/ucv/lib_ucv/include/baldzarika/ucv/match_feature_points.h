@@ -18,6 +18,9 @@ namespace baldzarika { namespace ucv {
 			typename FPS2::const_iterator match=fps2.end();
 			for(typename FPS2::const_iterator ifp2=fps2.begin(); ifp2!=fps2.end();++ifp2) 
 			{
+				if(!(*ifp1 && *ifp2))
+					continue;
+				
 				typename FP::value_type dist=*ifp1-*ifp2;
 
 				if(dist<d1)

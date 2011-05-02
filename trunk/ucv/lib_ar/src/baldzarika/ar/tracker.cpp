@@ -4,13 +4,14 @@
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/match_feature_points.h>
 #include <baldzarika/ucv/homography.h>
+#include <baldzarika/ucv/norm.h>
 #if defined(ANDROID)
 #include <j2cpp/config.hpp>
 #endif
 
 namespace baldzarika { namespace ar {
 
-	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=2;
+	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=3;
 	boost::uint32_t const tracker::DEFAULT_SURF_INTERVALS=4;
 	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=2;
 	float const tracker::DEFAULT_SURF_TRESHOLD=5.0e-4f;
@@ -23,7 +24,7 @@ namespace baldzarika { namespace ar {
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=8;
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=16;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=2.0f;
-	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=1.3e-3f;
+	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=4.0e-3f;
 
 	namespace {
 
@@ -417,14 +418,28 @@ namespace baldzarika { namespace ar {
 			else
 			{
 				detect_markers();
-				if(m_integral_views.full())
-					m_integral_views.pop_back();
 			}
 		}
 	}
 
 	void tracker::on_stop()
 	{
+		marker_states_t::index<marker_state::detected_tag>::type &markers_by_detected=m_marker_states.get<marker_state::detected_tag>();
+		for(marker_states_t::iterator it_marker=m_marker_states.begin();it_marker!=m_marker_states.end();++it_marker)
+		{
+			boost::shared_ptr<marker_state> ms=*it_marker;
+			BOOST_ASSERT(ms);
+			markers_by_detected.modify(
+				m_marker_states.project<marker_state::detected_tag>(it_marker),
+				boost::bind(
+					&marker_state::set_detected,
+					_1,
+					false
+				)
+			);
+			m_marker_state_changed(ms, marker_state::SC_DETECTION);
+			describe_marker(*ms);
+		}
 		m_start_stop(shared_from_this(), false);
 	}
 
@@ -616,8 +631,20 @@ namespace baldzarika { namespace ar {
 	void tracker::detect_markers()
 	{
 		//discard all but last frame
+		if(m_integral_views.size()<2)
+			return;
+
+		integral_view_buffer_t::const_iterator it_last_frame=m_integral_views.begin();
+		integral_view_buffer_t::const_iterator it_prev_frame=it_last_frame;
+		it_prev_frame++;
+		
+		float frame_diff=ucv::norm_l1<gray_t>(*it_last_frame, *it_prev_frame, 2);
+
 		while(m_integral_views.size()>1)
 			m_integral_views.pop_back();
+
+		if(frame_diff>2.0e-2f)
+			return;
 
 		if(m_surf.set_integral_view(m_integral_views.front()))
 		{

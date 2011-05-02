@@ -114,7 +114,7 @@ void PreviewWidget::paintGL()
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, m_VideoTexture);
 
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glBegin(GL_QUADS) ;
 	{
 		glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,-1.0f, 0.0f);
@@ -124,7 +124,7 @@ void PreviewWidget::paintGL()
 	}
 	glEnd();
 
-
+	glEnable(GL_BLEND);
 	{
 		boost::mutex::scoped_lock lock_tfs(m_TrackingFeaturesSync);
 		if(!m_TrackingFeatures.empty())
@@ -146,13 +146,14 @@ void PreviewWidget::paintGL()
 			glPointSize(4.0f);
 			glVertexPointer(3, GL_FLOAT, 0, feature_coords.get());
 
-			glColor4ub(255, 0, 0, 127);
+			glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-			glColor4ub(0, 255, 0, 127);
+			glColor4f(0.0f, 1.0f, 0.0f, 0.5f);
 			glDrawArrays(GL_POINTS, 0, m_TrackingFeatures.size());
 
 			
 		}
 	}
+	glDisable(GL_BLEND);
 }
