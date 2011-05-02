@@ -100,6 +100,7 @@
     <ClInclude Include="include\baldzarika\ucv\homography.h" />
     <ClInclude Include="include\baldzarika\ucv\integral.h" />
     <ClInclude Include="include\baldzarika\ucv\matrix.h" />
+    <ClInclude Include="include\baldzarika\ucv\norm.h" />
     <ClInclude Include="include\baldzarika\ucv\point2.h" />
     <ClInclude Include="include\baldzarika\ucv\size2.h" />
     <ClInclude Include="include\baldzarika\ucv\surf.h" />

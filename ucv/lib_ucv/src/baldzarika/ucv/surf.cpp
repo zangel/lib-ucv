@@ -143,6 +143,7 @@ namespace baldzarika { namespace ucv  {
 	{
 		m_response_offset=rhs.m_response_offset;
 		m_response_view=rhs.m_response_view;
+		m_laplacian_view=rhs.m_laplacian_view;
 		m_sample_step=rhs.m_sample_step;
 		m_filter_size=rhs.m_filter_size;
 		return *this;
