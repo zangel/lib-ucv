@@ -70,7 +70,7 @@ namespace baldzarika { namespace ucv {
 			y_channel_t *y_row=reinterpret_cast<y_channel_t *>(y.row_begin(r));
 			uv_channel_t *uv_row=reinterpret_cast<uv_channel_t *>(uv.row_begin(r>>1));
 			dst_channel_t *dst_row=reinterpret_cast<dst_channel_t *>(dst.row_begin(r));
-			dst_channel_t median_row_sum=detail::constant::zero<dst_pixel_t>();
+			dst_channel_t median_row_sum=detail::constant::zero<dst_channel_t>();
 			for(std::size_t c=0;c<y.width();++c)
 			{
 				boost::int32_t Y=std::max<boost::int32_t>(0,static_cast<boost::int32_t>(*y_row)-16);
