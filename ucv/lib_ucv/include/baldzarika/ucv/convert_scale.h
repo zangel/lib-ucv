@@ -51,13 +51,11 @@ namespace baldzarika { namespace ucv {
 		typedef typename DVT::value_type	dst_pixel_t;
 		typedef typename gil::channel_type<dst_pixel_t>::type dst_channel_t;
 
-		typedef fixed_point<23,8> rgb_channel_t;
+		static dst_channel_t const r_s=0.30f;
+		static dst_channel_t const g_s=0.59f;
+		static dst_channel_t const b_s=0.11f;
 
-		static rgb_channel_t const c_3=3;
-		static rgb_channel_t const c_6=6;
-		static rgb_channel_t const c_2621430=2621430;
-
-
+		dst_channel_t const c_scale=scale;
 
 		if(y.width()/2!=uv.width() || y.height()/2!=uv.height() || !uv.width()*uv.height() || y.width()!=dst.width() || y.height()!=dst.height())
 			return false;
@@ -79,11 +77,19 @@ namespace baldzarika { namespace ucv {
 				boost::int32_t V=static_cast<boost::int32_t>((*uv_row) & 0x00ff)-128;
 				boost::int32_t U=static_cast<boost::int32_t>(((*uv_row) & 0xff00) >> 8)-128;
 								
-				rgb_channel_t B=std::min<boost::int32_t>(262143, std::max<boost::int32_t>(1192*Y+2066*U, 0));
-				rgb_channel_t G=std::min<boost::int32_t>(262143, std::max<boost::int32_t>(1192*Y-833*V-400*U, 0));
-				rgb_channel_t R=std::min<boost::int32_t>(262143, std::max<boost::int32_t>(1192*Y+1634*V, 0));
+				dst_channel_t B=dst_channel_t(
+						std::min<boost::int32_t>(262143, std::max<boost::int32_t>(1192*Y+2066*U, 0))>>10
+					)*detail::constant::i_255<dst_channel_t>();
 
-				dst_channel_t v=(B+G*c_6+R*c_3)/c_2621430;
+				dst_channel_t G=dst_channel_t(
+						std::min<boost::int32_t>(262143, std::max<boost::int32_t>(1192*Y-833*V-400*U, 0))>>10
+					)*detail::constant::i_255<dst_channel_t>();
+
+				dst_channel_t R=dst_channel_t(
+						std::min<boost::int32_t>(262143, std::max<boost::int32_t>(1192*Y+1634*V, 0))>>10
+					)*detail::constant::i_255<dst_channel_t>();
+
+				dst_channel_t v=c_scale*(B*b_s+G*g_s+R*r_s);
 				*dst_row=v;
 				median_row_sum+=v;
 				y_row++;
