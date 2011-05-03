@@ -130,8 +130,11 @@ namespace com { namespace baldzarika { namespace ar {
 		jint							getTrackingMaxIterations();
 		jboolean						setTrackingMaxIterations(jint maxIters);
 
+		jfloat							getDetectionMaxDiffNorm();
+		jboolean						setDetectionMaxDiffNorm(jfloat maxDiffNorm);
 
-
+		jfloat							getTrackingMaxDiffNorm();
+		jboolean						setTrackingMaxDiffNorm(jfloat maxDiffNorm);
 
 		j2cpp::local_ref<MarkerState>	addMarker(j2cpp::local_ref<Marker> const &marker);
 
