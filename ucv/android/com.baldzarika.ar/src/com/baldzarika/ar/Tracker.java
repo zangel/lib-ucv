@@ -84,6 +84,14 @@ public class Tracker
 	public native int getTrackingMaxIterations();
 	public native boolean setTrackingMaxIterations(int maxIters);
 	
+	public native float getDetectionMaxDiffNorm();
+	public native boolean setDetectionMaxDiffNorm(float maxDiffNorm);
+	
+	public native float getTrackingMaxDiffNorm();
+	public native boolean setTrackingMaxDiffNorm(float maxDiffNorm);
+	
+	
+	
 		
 	
 	public native MarkerState addMarker(Marker m);

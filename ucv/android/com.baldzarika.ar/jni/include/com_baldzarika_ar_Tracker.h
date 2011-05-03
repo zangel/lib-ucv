@@ -137,6 +137,38 @@ JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setTrackingMaxIteratio
 
 /*
  * Class:     com_baldzarika_ar_Tracker
+ * Method:    getDetectionMaxDiffNorm
+ * Signature: ()F
+ */
+JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_Tracker_getDetectionMaxDiffNorm
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_Tracker
+ * Method:    setDetectionMaxDiffNorm
+ * Signature: (F)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setDetectionMaxDiffNorm
+  (JNIEnv *, jobject, jfloat);
+
+/*
+ * Class:     com_baldzarika_ar_Tracker
+ * Method:    getTrackingMaxDiffNorm
+ * Signature: ()F
+ */
+JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_Tracker_getTrackingMaxDiffNorm
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_Tracker
+ * Method:    setTrackingMaxDiffNorm
+ * Signature: (F)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setTrackingMaxDiffNorm
+  (JNIEnv *, jobject, jfloat);
+
+/*
+ * Class:     com_baldzarika_ar_Tracker
  * Method:    addMarker
  * Signature: (Lcom/baldzarika/ar/Marker;)Lcom/baldzarika/ar/Tracker/MarkerState;
  */

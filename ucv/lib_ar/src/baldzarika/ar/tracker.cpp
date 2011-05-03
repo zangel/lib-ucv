@@ -23,8 +23,10 @@ namespace baldzarika { namespace ar {
 
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=8;
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=16;
-	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=2.0f;
-	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=4.0e-3f;
+	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=0.0f;
+	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=1.3e-3f;
+	float const	tracker::DEFAULT_DETECTION_MAX_DIFF_NORM=5.0e-3f;
+	float const	tracker::DEFAULT_TRACKING_MAX_DIFF_NORM=1.0e-2f;
 
 	namespace {
 
@@ -118,6 +120,8 @@ namespace baldzarika { namespace ar {
 		, m_max_marker_features(DEFAULT_TRACKER_MAX_MARKER_FEATURES)
 		, m_select_fp_scale(DEFAULT_TRACKER_SELECT_FP_SCALE)
 		, m_select_fp_min_area(DEFAULT_TRACKER_SELECT_FP_MIN_AREA)
+		, m_detection_max_diff_norm(DEFAULT_DETECTION_MAX_DIFF_NORM)
+		, m_tracking_max_diff_norm(DEFAULT_TRACKING_MAX_DIFF_NORM)
 		, m_ios()
 		, m_ios_work(m_ios)
 		, m_worker()
@@ -243,6 +247,33 @@ namespace baldzarika { namespace ar {
 		if(is_active())
 			return false;
 		m_klt_tracker.set_max_iterations(mi);
+		return true;
+	}
+
+	float tracker::get_detection_max_diff_norm() const
+	{
+		return m_detection_max_diff_norm;
+	}
+
+	bool tracker::set_detection_max_diff_norm(float mdn)
+	{
+		if(is_active())
+			return false;
+		m_detection_max_diff_norm=mdn;
+		return true;
+	}
+
+	float tracker::get_tracking_max_diff_norm() const
+	{
+		return m_tracking_max_diff_norm;
+
+	}
+
+	bool tracker::set_tracking_max_diff_norm(float mdn)
+	{
+		if(is_active())
+			return false;
+		m_tracking_max_diff_norm=mdn;
 		return true;
 	}
 
@@ -394,31 +425,17 @@ namespace baldzarika { namespace ar {
 				marker_states_by_detected.upper_bound(true)
 			);
 
-			if(any_detected_markers.first!=any_detected_markers.second)
-			{
-				if(m_integral_views.full())
-				{
-					integral_view_buffer_t::iterator curr_frame_it=m_integral_views.begin();
-					integral_view_buffer_t::iterator prev_frame_it=curr_frame_it;
-					prev_frame_it++;
-					
-					m_klt_tracker.set_integral_views(*prev_frame_it, *curr_frame_it);
+			std::vector<marker_states_t::iterator> detected_markers;
 
-					std::vector<marker_states_t::iterator> detected_markers;
+			for(marker_states_t::index<marker_state::detected_tag>::type::iterator itdm=any_detected_markers.first;
+				itdm!=any_detected_markers.second; itdm++)
+				detected_markers.push_back(m_marker_states.project<marker_state::order_tag>(itdm));
 
-					for(marker_states_t::index<marker_state::detected_tag>::type::iterator itdm=any_detected_markers.first;
-						itdm!=any_detected_markers.second; itdm++)
-						detected_markers.push_back(m_marker_states.project<marker_state::order_tag>(itdm));
-					
-					track_markers(detected_markers);
 
-					m_integral_views.pop_back();
-				}
-			}
-			else
-			{
+			if(detected_markers.empty())
 				detect_markers();
-			}
+			else
+				track_markers(detected_markers);
 		}
 	}
 
@@ -501,16 +518,6 @@ namespace baldzarika { namespace ar {
 			std::vector<ucv::surf::feature_point_t>
 		>(ms.m_features, ffs, marker_matches);
 
-		//m_stats(shared_from_this(), marker_matches.size());
-#if defined(ANDROID)
-		__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "tracker::detect_marker(): mfs=%d, ffs=%d, mms=%d",
-
-			ms.m_features.size(),
-			ffs.size(),
-			marker_matches.size()
-		);
-#endif
-
 		if(marker_matches.size()>=m_min_marker_features)
 		{
 			if(	ucv::find_homography_ransac(
@@ -538,19 +545,6 @@ namespace baldzarika { namespace ar {
 				marker_state::points2_t marker_points(ffs.size());
 
 				ucv::matrix33f inv_hm(ms.m_hmatrix.inverse());
-#if defined(ANDROID)
-				//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "h_matrix=[%f,%f,%f][%f,%f,%f][%f,%f,%f]",
-				//	ms.m_hmatrix.data()[0], ms.m_hmatrix.data()[1], ms.m_hmatrix.data()[2],
-				//	ms.m_hmatrix.data()[3], ms.m_hmatrix.data()[3], ms.m_hmatrix.data()[5],
-				//	ms.m_hmatrix.data()[6], ms.m_hmatrix.data()[7], ms.m_hmatrix.data()[8]
-				//);
-
-				//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "inv_h_matrix=[%f,%f,%f][%f,%f,%f][%f,%f,%f]",
-				//	inv_hm.data()[0], inv_hm.data()[1], inv_hm.data()[2],
-				//	inv_hm.data()[3], inv_hm.data()[3], inv_hm.data()[5],
-				//	inv_hm.data()[6], inv_hm.data()[7], inv_hm.data()[8]
-				//);
-#endif
 
 				for(std::size_t f=0;f<ffs.size();++f)
 				{
@@ -593,9 +587,6 @@ namespace baldzarika { namespace ar {
 						);
 					}
 				}
-#if defined(ANDROID)
-				__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "tracker::detect_marker(): marker_inliers.size()=%d", marker_inliers.size());
-#endif
 
 				std::sort(marker_inliers.begin(), marker_inliers.end(), compare_relative_fp_scales());
 				BOOST_ASSERT(marker_inliers.size()>=m_min_marker_features);
@@ -634,16 +625,19 @@ namespace baldzarika { namespace ar {
 		if(m_integral_views.size()<2)
 			return;
 
-		integral_view_buffer_t::const_iterator it_last_frame=m_integral_views.begin();
-		integral_view_buffer_t::const_iterator it_prev_frame=it_last_frame;
-		it_prev_frame++;
+		integral_view_buffer_t::const_iterator curr_frame_it=m_integral_views.begin();
+		integral_view_buffer_t::const_iterator prev_frame_it=curr_frame_it;
+		prev_frame_it++;
 		
-		float frame_diff=ucv::norm_l1<gray_t>(*it_last_frame, *it_prev_frame, 2);
+		gray_t const detection_max_diff_norm=m_detection_max_diff_norm;
+		gray_t frame_diff=ucv::norm_l1<gray_t>(*prev_frame_it, *curr_frame_it, 2);
+
+		//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "tracker::detect_markers: frame_diff=%f", static_cast<float>(frame_diff));
 
 		while(m_integral_views.size()>1)
 			m_integral_views.pop_back();
 
-		if(frame_diff>2.0e-2f)
+		if(frame_diff>detection_max_diff_norm)
 			return;
 
 		if(m_surf.set_integral_view(m_integral_views.front()))
@@ -737,28 +731,55 @@ namespace baldzarika { namespace ar {
 
 	void tracker::track_markers(std::vector<marker_states_t::iterator> const &dms)
 	{
-		marker_states_t::index<marker_state::detected_tag>::type &marker_states_by_detected=
-			m_marker_states.get<marker_state::detected_tag>();
+		if(m_integral_views.size()<2)
+			return;
 
-		for(std::size_t m=0;m<dms.size();++m)
+		integral_view_buffer_t::iterator curr_frame_it=m_integral_views.begin();
+		integral_view_buffer_t::iterator prev_frame_it=curr_frame_it;
+		prev_frame_it++;
+
+		//gray_t const tracking_max_diff_norm=m_tracking_max_diff_norm;
+		//gray_t frame_diff=ucv::norm_l1<gray_t>(*prev_frame_it, *curr_frame_it, 4);
+
+		//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "tracker::track_markers: frame_diff=%f", static_cast<float>(frame_diff));
+
+//		if(frame_diff<tracking_max_diff_norm)
+		if(true)
 		{
-			boost::shared_ptr<marker_state> const &pdms=*dms[m];
+			m_klt_tracker.set_integral_views(*prev_frame_it, *curr_frame_it);
 
-			if(track_marker(*pdms))
-				m_marker_state_changed(pdms, marker_state::SC_POSE);
-			else
+			marker_states_t::index<marker_state::detected_tag>::type &marker_states_by_detected=
+				m_marker_states.get<marker_state::detected_tag>();
+
+			for(std::size_t m=0;m<dms.size();++m)
 			{
-				marker_states_by_detected.modify(
-					m_marker_states.project<marker_state::detected_tag>(dms[m]),
-						boost::bind(
-						&marker_state::set_detected,
-						_1,
-						false
-					)
-				);
-				m_marker_state_changed(pdms, marker_state::SC_DETECTION);
+				boost::shared_ptr<marker_state> const &pdms=*dms[m];
+
+				if(track_marker(*pdms))
+					m_marker_state_changed(pdms, marker_state::SC_POSE);
+				else
+				{
+					marker_states_by_detected.modify(
+						m_marker_states.project<marker_state::detected_tag>(dms[m]),
+							boost::bind(
+							&marker_state::set_detected,
+							_1,
+							false
+						)
+					);
+					m_marker_state_changed(pdms, marker_state::SC_DETECTION);
+				}
 			}
 		}
+		else
+		{
+			//discard last frame
+			m_integral_views.pop_front();
+		}
+
+		//make room from next frames
+		while(m_integral_views.size()>1)
+			m_integral_views.pop_back();
 	}
 
 } //namespace ar

@@ -173,6 +173,35 @@ jboolean Java_com_baldzarika_ar_Tracker_setTrackingMaxIterations(JNIEnv */*e*/, 
 	return Tracker(t).setTrackingMaxIterations(maxIters);
 }
 
+jfloat Java_com_baldzarika_ar_Tracker_getDetectionMaxDiffNorm(JNIEnv */*e*/, jobject t)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).getDetectionMaxDiffNorm();
+}
+
+jboolean Java_com_baldzarika_ar_Tracker_setDetectionMaxDiffNorm(JNIEnv */*e*/, jobject t, jfloat maxDiffNorm)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).setDetectionMaxDiffNorm(maxDiffNorm);
+}
+
+jfloat Java_com_baldzarika_ar_Tracker_getTrackingMaxDiffNorm(JNIEnv */*e*/, jobject t)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).getTrackingMaxDiffNorm();
+}
+
+jboolean Java_com_baldzarika_ar_Tracker_setTrackingMaxDiffNorm(JNIEnv */*e*/, jobject t, jfloat maxDiffNorm)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).setTrackingMaxDiffNorm(maxDiffNorm);
+}
+
+
 jobject Java_com_baldzarika_ar_Tracker_addMarker(JNIEnv */*e*/, jobject t, jobject m)
 {
 	using namespace com::baldzarika::ar;
@@ -548,6 +577,34 @@ namespace com { namespace baldzarika { namespace ar {
 	{
 		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
 			return (*ppx)->set_tracking_max_iterations(maxIters)?JNI_TRUE:JNI_FALSE;
+		return JNI_FALSE;
+	}
+
+	jfloat Tracker::getDetectionMaxDiffNorm()
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->get_detection_max_diff_norm();
+		return std::numeric_limits<float>::max();
+	}
+
+	jboolean Tracker::setDetectionMaxDiffNorm(jfloat maxDiffNorm)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->set_detection_max_diff_norm(maxDiffNorm)?JNI_TRUE:JNI_FALSE;
+		return JNI_FALSE;
+	}
+
+	jfloat Tracker::getTrackingMaxDiffNorm()
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->get_tracking_max_diff_norm();
+		return std::numeric_limits<float>::max();
+	}
+
+	jboolean Tracker::setTrackingMaxDiffNorm(jfloat maxDiffNorm)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->set_tracking_max_diff_norm(maxDiffNorm)?JNI_TRUE:JNI_FALSE;
 		return JNI_FALSE;
 	}
 

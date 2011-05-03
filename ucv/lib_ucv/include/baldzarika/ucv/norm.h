@@ -13,6 +13,9 @@ namespace baldzarika { namespace ucv {
 		
 		size2ui const sample_size(s,s);
 
+		RT const inv_s_area=detail::constant::one<RT>()/RT(s*s);
+
+
 		RT const inv_width=detail::constant::one<RT>()/RT(i1.width()/s);
 		RT const inv_height=detail::constant::one<RT>()/RT(i1.height()/s);
 		
@@ -28,7 +31,7 @@ namespace baldzarika { namespace ucv {
 			}
 			norm_val+=row_norm_val*inv_width;
 		}
-		return norm_val*inv_height;
+		return norm_val*inv_height*inv_s_area;
 	}
 
 

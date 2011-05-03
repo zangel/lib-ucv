@@ -1,6 +1,5 @@
 package com.baldzarika;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,6 +83,11 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 		if(!sp.contains(getString(R.string.settings_detection_min_features_key)))
 			spEdit.putInt(getString(R.string.settings_detection_min_features_key), minDetectionFeatures);
 		
+		int detectionMaxDiffNorm=sp.getInt(getString(R.string.settings_detection_max_diff_norm_key), DEFAULT_DETECTION_MAX_DIFF_NORM);
+		m_Tracker.setDetectionMaxDiffNorm((float)Math.pow(10.0f, -3.0f+(detectionMaxDiffNorm/50.0f)));
+		if(!sp.contains(getString(R.string.settings_detection_max_diff_norm_key)))
+			spEdit.putInt(getString(R.string.settings_detection_max_diff_norm_key), detectionMaxDiffNorm);
+		
 		int maxTrackingFeatures=sp.getInt(getString(R.string.settings_tracking_max_features_key), DEFAULT_TRACKING_MAX_FEATURES);
 		m_Tracker.setTrackingMaxFeatures(maxTrackingFeatures);
 		if(!sp.contains(getString(R.string.settings_tracking_max_features_key)))
@@ -103,6 +107,11 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 		m_Tracker.setTrackingMaxIterations(trackingMaxIterations);
 		if(!sp.contains(getString(R.string.settings_tracking_max_iterations_key)))
 			spEdit.putInt(getString(R.string.settings_tracking_max_iterations_key), trackingMaxIterations);
+		
+		int trackingMaxDiffNorm=sp.getInt(getString(R.string.settings_tracking_max_diff_norm_key), DEFAULT_TRACKING_MAX_DIFF_NORM);
+		m_Tracker.setTrackingMaxDiffNorm((float)Math.pow(10.0f, -3.0f+(trackingMaxDiffNorm/50.0f)));
+		if(!sp.contains(getString(R.string.settings_tracking_max_diff_norm_key)))
+			spEdit.putInt(getString(R.string.settings_tracking_max_diff_norm_key), trackingMaxDiffNorm);
 		
 		m_Marker=new Marker();
 		m_MarkerState=m_Tracker.addMarker(m_Marker);
@@ -151,6 +160,12 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 			m_Tracker.setDetectionMinFeatures(detectionMinFeatures);
 		}
 		else
+		if(key.equals(getString(R.string.settings_detection_max_diff_norm_key)))
+		{
+			int detectionMaxDiffNorm=sharedPreferences.getInt(key, DEFAULT_DETECTION_MAX_DIFF_NORM);
+			m_Tracker.setDetectionMaxDiffNorm((float)Math.pow(10.0f, -3.0f+(detectionMaxDiffNorm/50.0f)));
+		}
+		else
 		if(key.equals(getString(R.string.settings_tracking_max_features_key)))
 		{
 			int trackingMaxFeatures=sharedPreferences.getInt(key, DEFAULT_TRACKING_MAX_FEATURES);
@@ -173,6 +188,12 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 		{
 			int trackingMaxIterations=sharedPreferences.getInt(key, DEFAULT_TRACKING_MAX_ITERATIONS);
 			m_Tracker.setTrackingMaxIterations(trackingMaxIterations);
+		}
+		else
+		if(key.equals(getString(R.string.settings_tracking_max_diff_norm_key)))
+		{
+			int trackingMaxDiffNorm=sharedPreferences.getInt(key, DEFAULT_TRACKING_MAX_DIFF_NORM);
+			m_Tracker.setTrackingMaxDiffNorm((float)Math.pow(10.0f, -3.0f+(trackingMaxDiffNorm/50.0f)));
 		}
 	}
 	
@@ -245,6 +266,7 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 	private Tracker.MarkerState m_MarkerState=null;
 	private Frame m_Frame=null;
 	
+	
 	public static final Size2 DEFAULT_FRAME_SIZE=new Size2(320,240);
 	
 	public static final int MIN_DETECTION_TRESHOLD=0;
@@ -255,13 +277,17 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 	public static final int MAX_DETECTION_MIN_FEATURES=16;
 	public static final int DEFAULT_DETECTION_MIN_FEATURES=8;
 	
+	public static final int MIN_DETECTION_MAX_DIFF_NORM=0;
+	public static final int MAX_DETECTION_MAX_DIFF_NORM=100;
+	public static final int DEFAULT_DETECTION_MAX_DIFF_NORM=35;
+	
 	public static final int MIN_TRACKING_MAX_FEATURES=8;
 	public static final int MAX_TRACKING_MAX_FEATURES=16;
 	public static final int DEFAULT_TRACKING_MAX_FEATURES=16;
-	
+		
 	public static final int MIN_TRACKING_HALF_WIN_SIZE=2;
 	public static final int MAX_TRACKING_HALF_WIN_SIZE=8;
-	public static final int DEFAULT_TRACKING_HALF_WIN_SIZE=3;
+	public static final int DEFAULT_TRACKING_HALF_WIN_SIZE=4;
 	
 	public static final int MIN_TRACKING_NUM_LEVELS=1;
 	public static final int MAX_TRACKING_NUM_LEVELS=4;
@@ -270,4 +296,8 @@ public class BaldzARApp extends Application implements SharedPreferences.OnShare
 	public static final int MIN_TRACKING_MAX_ITERATIONS=1;
 	public static final int MAX_TRACKING_MAX_ITERATIONS=100;
 	public static final int DEFAULT_TRACKING_MAX_ITERATIONS=2;
+	
+	public static final int MIN_TRACKING_MAX_DIFF_NORM=0;
+	public static final int MAX_TRACKING_MAX_DIFF_NORM=100;
+	public static final int DEFAULT_TRACKING_MAX_DIFF_NORM=50;
 }

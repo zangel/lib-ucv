@@ -42,6 +42,9 @@ public class BaldzARSettings extends PreferenceActivity
 		SliderPreference detectionMinFeatures=(SliderPreference) findPreference(getString(R.string.settings_detection_min_features_key));
 		detectionMinFeatures.setRange(BaldzARApp.MIN_DETECTION_MIN_FEATURES, BaldzARApp.MAX_DETECTION_MIN_FEATURES);
 		
+		SliderPreference detectionMaxDiffNorm=(SliderPreference) findPreference(getString(R.string.settings_detection_max_diff_norm_key));
+		detectionMaxDiffNorm.setRange(BaldzARApp.MIN_DETECTION_MAX_DIFF_NORM, BaldzARApp.MAX_DETECTION_MAX_DIFF_NORM);
+				
 		SliderPreference trackingHalfWinSize=(SliderPreference) findPreference(getString(R.string.settings_tracking_half_win_size_key));
 		trackingHalfWinSize.setRange(BaldzARApp.MIN_TRACKING_HALF_WIN_SIZE, BaldzARApp.MAX_TRACKING_HALF_WIN_SIZE);
 		
@@ -53,5 +56,8 @@ public class BaldzARSettings extends PreferenceActivity
 		
 		SliderPreference trackingMaxFeatures=(SliderPreference) findPreference(getString(R.string.settings_tracking_max_features_key));
 		trackingMaxFeatures.setRange(BaldzARApp.MIN_TRACKING_MAX_FEATURES, BaldzARApp.MAX_TRACKING_MAX_FEATURES);
+		
+		SliderPreference trackingMaxDiffNorm=(SliderPreference) findPreference(getString(R.string.settings_tracking_max_diff_norm_key));
+		trackingMaxDiffNorm.setRange(BaldzARApp.MIN_TRACKING_MAX_DIFF_NORM, BaldzARApp.MAX_TRACKING_MAX_DIFF_NORM);
 	}
 }

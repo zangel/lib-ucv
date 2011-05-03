@@ -42,6 +42,9 @@ namespace baldzarika { namespace ar {
 		static float const				DEFAULT_TRACKER_SELECT_FP_SCALE;
 		static float const				DEFAULT_TRACKER_SELECT_FP_MIN_AREA;
 
+		static float const				DEFAULT_DETECTION_MAX_DIFF_NORM;
+		static float const				DEFAULT_TRACKING_MAX_DIFF_NORM;
+
 
 		typedef boost::signals2::signal<void (boost::shared_ptr<tracker> const &, bool)> start_stop_signal_t;
 		typedef boost::signals2::signal<void (boost::shared_ptr<tracker> const &, boost::uint32_t)> stats_signal_t;
@@ -149,6 +152,14 @@ namespace baldzarika { namespace ar {
 		boost::uint32_t							get_tracking_max_iterations() const;
 		bool									set_tracking_max_iterations(boost::uint32_t mi);
 
+		float									get_detection_max_diff_norm() const;
+		bool									set_detection_max_diff_norm(float mdn);
+
+		float									get_tracking_max_diff_norm() const;
+		bool									set_tracking_max_diff_norm(float mdn);
+
+
+
 
 
 
@@ -199,6 +210,8 @@ namespace baldzarika { namespace ar {
 		boost::uint32_t							m_max_marker_features;
 		float									m_select_fp_scale;
 		float									m_select_fp_min_area;
+		float									m_detection_max_diff_norm;
+		float									m_tracking_max_diff_norm;
 		
 		mutable boost::asio::io_service			m_ios;
 		boost::asio::io_service::work			m_ios_work;
