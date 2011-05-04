@@ -119,6 +119,7 @@ namespace baldzarika { namespace ucv  {
 	} //namespace anonymous
 
 	
+	boost::uint32_t const surf::SAMPLES_PER_BLOCK=9;
 	surf::response_layer::response_layer(response_layer const &that)
 		: m_surf(that.m_surf)
 	{

@@ -51,10 +51,10 @@ namespace baldzarika { namespace ucv {
 		std::size_t		update_num_iters(float p, float ep, std::size_t mi, std::size_t nmp=4);
 	};
 
-	template < typename T, typename DT, typename MT >
+	template < typename T, typename DT, boost::uint32_t BS, typename MT >
 	bool find_homography_ransac(
-		std::vector< feature_point<T,DT> > const &ops,
-		std::vector< feature_point<T,DT> > const &ips,
+		std::vector< feature_point<T,DT,BS> > const &ops,
+		std::vector< feature_point<T,DT,BS> > const &ips,
 		std::vector< std::pair<std::size_t, std::size_t> > const &oim,
 		matrix<MT, 3, 3> &hm,
 		float rt=3.0f
