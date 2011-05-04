@@ -51,11 +51,9 @@ namespace baldzarika { namespace ucv {
 		typedef typename DVT::value_type	dst_pixel_t;
 		typedef typename gil::channel_type<dst_pixel_t>::type dst_channel_t;
 
-		static dst_channel_t const r_s=0.30f;
-		static dst_channel_t const g_s=0.59f;
-		static dst_channel_t const b_s=0.11f;
-
-		dst_channel_t const c_scale=scale;
+		dst_channel_t const r_s=scale*0.30f;
+		dst_channel_t const g_s=scale*0.59f;
+		dst_channel_t const b_s=scale*0.11f;
 
 		if(y.width()/2!=uv.width() || y.height()/2!=uv.height() || !uv.width()*uv.height() || y.width()!=dst.width() || y.height()!=dst.height())
 			return false;
@@ -89,7 +87,7 @@ namespace baldzarika { namespace ucv {
 						std::min<boost::int32_t>(262143, std::max<boost::int32_t>(1192*Y+1634*V, 0))>>10
 					)*detail::constant::i_255<dst_channel_t>();
 
-				dst_channel_t v=c_scale*(B*b_s+G*g_s+R*r_s);
+				dst_channel_t v=(B*b_s+G*g_s+R*r_s);
 				*dst_row=v;
 				median_row_sum+=v;
 				y_row++;

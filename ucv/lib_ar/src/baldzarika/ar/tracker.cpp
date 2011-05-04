@@ -14,18 +14,18 @@ namespace baldzarika { namespace ar {
 	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=3;
 	boost::uint32_t const tracker::DEFAULT_SURF_INTERVALS=4;
 	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=2;
-	float const tracker::DEFAULT_SURF_TRESHOLD=5.0e-4f;
+	float const tracker::DEFAULT_SURF_TRESHOLD=4.0e-4f;
 
-	boost::uint32_t const tracker::DEFAULT_KLT_HALF_WIN_SIZE=3;
+	boost::uint32_t const tracker::DEFAULT_KLT_HALF_WIN_SIZE=8;
 	boost::uint32_t const tracker::DEFAULT_KLT_LEVELS=4;
-	boost::uint32_t const tracker::DEFAULT_KLT_MAX_ITERATIONS=5;
+	boost::uint32_t const tracker::DEFAULT_KLT_MAX_ITERATIONS=2;
 	float const	tracker::DEFAULT_KLT_EPSILON=1.0e-4f;
 
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=8;
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=16;
-	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=0.0f;
+	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=2.0f;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=1.3e-3f;
-	float const	tracker::DEFAULT_DETECTION_MAX_DIFF_NORM=5.0e-3f;
+	float const	tracker::DEFAULT_DETECTION_MAX_DIFF_NORM=1.0e-2f;
 	float const	tracker::DEFAULT_TRACKING_MAX_DIFF_NORM=1.0e-2f;
 
 	namespace {
@@ -593,6 +593,8 @@ namespace baldzarika { namespace ar {
 				//m_stats(shared_from_this(), marker_inliers.size());
 				if(marker_inliers.size()>=m_min_marker_features)
 				{
+					//__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "tracker::detect_marker(): ffs.size()=%d, mms.size()=%d, mis.size()=%D", ffs.size(), marker_matches.size(), marker_inliers.size());
+
 					std::size_t select_n_inliers=std::min(marker_inliers.size(), m_max_marker_features);
 				
 					ms.m_marker_points.resize(select_n_inliers);
@@ -648,6 +650,7 @@ namespace baldzarika { namespace ar {
 			m_surf.describe(frame_features);
 			
 			//m_stats(shared_from_this(), frame_features.size());
+
 
 			if(frame_features.size()>=m_min_marker_features)
 			{

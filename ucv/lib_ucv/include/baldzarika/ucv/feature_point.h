@@ -6,12 +6,12 @@
 
 namespace baldzarika { namespace ucv {
 
-	template < typename T,  typename DT >
+	template < typename T,  typename DT, boost::uint32_t BS >
 	class feature_point
 		: public point2<T>
 	{
 	public:
-		static boost::uint32_t const DESCRIPTOR_SIZE=64;
+		static boost::uint32_t const DESCRIPTOR_SIZE=4*BS*BS;
 		typedef T value_type;
 		typedef point2<value_type> point2_t;
 		typedef DT desc_value_type;
@@ -52,7 +52,7 @@ namespace baldzarika { namespace ucv {
 			//static desc_value_type const s_coeff=pow(detail::constants::two<desc_value_type>(), desc_value_type(typename desc_value_type::IS-1));
 			//static desc_value_type const s_icoeff=0.1f;//detail::constants::one<desc_value_type>()/s_coeff;
 			desc_value_type sum=0;
-			for(boost::uint32_t d=0;d<64;++d)
+			for(boost::uint32_t d=0;d<DESCRIPTOR_SIZE;++d)
 			{
 				desc_value_type diff=m_desc[d]-rhs.m_desc[d];
 				//float diff_=diff;

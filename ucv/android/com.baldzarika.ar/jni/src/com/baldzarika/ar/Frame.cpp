@@ -13,7 +13,6 @@ void Java_com_baldzarika_ar_Frame_create__(JNIEnv */*e*/, jobject f)
 	Frame(f).create();
 }
 
-
 void Java_com_baldzarika_ar_Frame_create__Lcom_baldzarika_ar_Size2_2(JNIEnv */*e*/, jobject f, jobject fs)
 {
 	using namespace com::baldzarika::ar;
