@@ -85,9 +85,11 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\baldzarika\ucv\canny.h" />
     <ClInclude Include="include\baldzarika\ucv\config.h" />
     <ClInclude Include="include\baldzarika\ucv\convert_scale.h" />
     <ClInclude Include="include\baldzarika\ucv\feature_point.h" />
+    <ClInclude Include="include\baldzarika\ucv\gaussian_blur.h" />
     <ClInclude Include="include\baldzarika\ucv\good_features_detector.h" />
     <ClInclude Include="include\baldzarika\ucv\klt_tracker.h" />
     <ClInclude Include="include\baldzarika\ucv\match_feature_points.h" />
@@ -103,6 +105,7 @@
     <ClInclude Include="include\baldzarika\ucv\norm.h" />
     <ClInclude Include="include\baldzarika\ucv\point2.h" />
     <ClInclude Include="include\baldzarika\ucv\size2.h" />
+    <ClInclude Include="include\baldzarika\ucv\sobel.h" />
     <ClInclude Include="include\baldzarika\ucv\surf.h" />
     <ClInclude Include="include\baldzarika\ucv\vector.h" />
   </ItemGroup>
