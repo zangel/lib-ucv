@@ -14,6 +14,7 @@
 #include <baldzarika/ucv/good_features_detector.h>
 #include <baldzarika/ucv/sobel.h>
 #include <baldzarika/ucv/gaussian_blur.h>
+#include <baldzarika/ucv/canny.h>
 #include <boost/date_time.hpp>
 #define png_infopp_NULL (png_infopp)0
 #define int_p_NULL (int*)0
@@ -833,4 +834,10 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	);
 	cv::imshow(OPENCV_WND_NAME, cv::Mat(dy_img.height(), dy_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
 	cv::waitKey();
+
+	typedef ucv::canny<real_t, 3> canny_t;
+
+	canny_t canny(ucv::size2ui(gray8_img.width(), gray8_img.height()));
+
+	canny(gray_img);
 }
