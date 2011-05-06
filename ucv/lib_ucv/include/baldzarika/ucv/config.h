@@ -43,6 +43,7 @@
 
 
 #include <vector>
+#include <stack>
 #include <list>
 
 #include <kdtree++/kdtree.hpp>
