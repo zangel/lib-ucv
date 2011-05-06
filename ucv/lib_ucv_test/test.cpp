@@ -13,6 +13,7 @@
 #include <baldzarika/ucv/klt_tracker.h>
 #include <baldzarika/ucv/good_features_detector.h>
 #include <baldzarika/ucv/sobel.h>
+#include <baldzarika/ucv/gaussian_blur.h>
 #include <boost/date_time.hpp>
 #define png_infopp_NULL (png_infopp)0
 #define int_p_NULL (int*)0
@@ -770,36 +771,52 @@ BOOST_AUTO_TEST_CASE( test_vector )
 
 #endif
 
-BOOST_AUTO_TEST_CASE( sobel_test )
+BOOST_AUTO_TEST_CASE( canny_test )
 {
 	namespace ucv=baldzarika::ucv;
 
 	typedef ucv::fixed_point<10,21> real_t;
 	typedef ucv::sobel<real_t, 3, 1> sobel_t;
+	typedef ucv::gaussian_blur<real_t, 3> gaussian_blur_t;
+	
 
 	ucv::gil::gray8_image_t gray8_img;
-	ucv::gil::png_read_and_convert_image("test_img2.png", gray8_img);
-
-	sobel_t sobel(ucv::size2ui(gray8_img.width(), gray8_img.height()));
-
-	sobel_t::gray_image_t gray_img(gray8_img.width(), gray8_img.height());
-	sobel_t::gray_image_t dx_img(gray8_img.width(), gray8_img.height());
-	sobel_t::gray_image_t dy_img(gray8_img.width(), gray8_img.height());
+	ucv::gil::png_read_and_convert_image("image-test.png", gray8_img);
 
 
-
+	gaussian_blur_t::gray_image_t gray_img(gray8_img.width(), gray8_img.height());
+	
 	ucv::convert_scale(
 		ucv::gil::const_view(gray8_img),
 		ucv::gil::view(gray_img),
 		real_t(1.0f/255.0f)
 	);
 
+	gaussian_blur_t gaussian_blur(ucv::size2ui(gray8_img.width(), gray8_img.height()));
+	gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
+
+	sobel_t sobel(ucv::size2ui(gray8_img.width(), gray8_img.height()));
+
+	sobel_t::gray_image_t dx_img(gray8_img.width(), gray8_img.height());
+	sobel_t::gray_image_t dy_img(gray8_img.width(), gray8_img.height());
+
 	sobel(ucv::gil::const_view(gray_img), ucv::gil::view(dx_img), ucv::gil::view(dy_img));
 
 	cv::imshow(OPENCV_WND_NAME, cv::Mat(gray8_img.height(), gray8_img.width(), CV_8UC1, &gil::view(gray8_img)[0][0]));
 
 	cv::waitKey();
+	
 	ucv::gil::gray32f_image_t gray32f_img(dx_img.width(), dx_img.height());
+
+	ucv::convert_scale(
+		ucv::gil::const_view(gray_img),
+		ucv::gil::view(gray32f_img),
+		1.0f
+	);
+
+	cv::imshow(OPENCV_WND_NAME, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
+	cv::waitKey();
+
 	
 	ucv::convert_scale(
 		ucv::gil::const_view(dx_img),

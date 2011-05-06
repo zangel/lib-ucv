@@ -18,10 +18,10 @@ namespace baldzarika { namespace ucv {
 
 
 		template < typename PT >
-		PT const sobel_filter_traits< PT, 3, 1 >::SEPARABLE_X_KERNEL[2][3]={ {-1.0, 0.0, 1.0}, { 1.0, 2.0, 1.0} };
+		PT const sobel_filter_traits< PT, 3, 1 >::SEPARABLE_X_KERNEL[2][3]={ {-0.125, 0.0, 0.125}, { 0.125, 0.25, 0.125} };
 		
 		template < typename PT >
-		PT const sobel_filter_traits< PT, 3, 1 >::SEPARABLE_Y_KERNEL[2][3]={ { 1.0, 2.0, 1.0}, {-1.0, 0.0, 1.0} };
+		PT const sobel_filter_traits< PT, 3, 1 >::SEPARABLE_Y_KERNEL[2][3]={ { 0.125, 0.25, 0.125}, {-0.125, 0.0, 0.125} };
 	}
 
 	
