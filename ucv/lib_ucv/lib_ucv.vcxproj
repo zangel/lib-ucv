@@ -85,6 +85,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\baldzarika\ucv\adaptive_treshold.h" />
     <ClInclude Include="include\baldzarika\ucv\canny.h" />
     <ClInclude Include="include\baldzarika\ucv\config.h" />
     <ClInclude Include="include\baldzarika\ucv\convert_scale.h" />
