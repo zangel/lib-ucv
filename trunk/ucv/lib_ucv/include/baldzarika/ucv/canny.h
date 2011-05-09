@@ -1,6 +1,7 @@
 #ifndef BALDZARIKA_UCV_CANNY_H
 #define BALDZARIKA_UCV_CANNY_H
 
+#include <baldzarika/ucv/size2.h>
 #include <baldzarika/ucv/sobel.h>
 
 namespace baldzarika { namespace ucv {
@@ -28,11 +29,15 @@ namespace baldzarika { namespace ucv {
 		
 		canny()
 			: m_frame_size(0,0)
+			, m_low_treshold(0.3)
+			, m_high_treshold(0.9)
 		{
 		}
 
-		canny(size2ui const &fs)
+		canny(size2ui const &fs, gray_t const &low=gray_t(0.1), gray_t const &hi=gray_t(0.3))
 			: m_frame_size(0,0)
+			, m_low_treshold(low)
+			, m_high_treshold(hi)
 		{
 			set_frame_size(fs);
 			m_sobel.set_frame_size(fs);
@@ -55,16 +60,46 @@ namespace baldzarika { namespace ucv {
 			m_sobel.set_frame_size(fs);
 			m_dx_dy_img.recreate(fs.width(), fs.height()*2);
 			m_mag_ring_img.recreate(fs.width()+2, 3);
+			m_map_img.recreate(fs.width()+2, fs.height()+2);
 		}
 
+		template < typename BVT >
+		bool operator()(gray_const_view_t img, BVT bvt)
+		{
+			if(img.width()!=bvt.width() || img.height()!=bvt.height())
+				return false;
+
+			if(!this->operator()(img))
+				return false;
+
+			typedef typename BVT::value_type	bin_pixel_t;
+			typedef typename gil::channel_type<bin_pixel_t>::type bin_channel_t;
+
+			map_const_view_t map_view=gil::const_view(m_map_img);
+
+			for(boost::uint32_t y=0;y<m_frame_size.height();++y)
+			{
+				map_t const *map_row=reinterpret_cast<map_t const *>(map_view.row_begin(y+1))+1;
+				bin_channel_t *bin_row=reinterpret_cast<bin_channel_t *>(bvt.row_begin(y));
+
+				for(boost::uint32_t x=0;x<m_frame_size.width();++x)
+					bin_row[x]=bin_channel_t(map_row[x]>>1);
+			}
+			return true;
+		}
+
+	protected:
 		bool operator()(gray_const_view_t img)
 		{
 			static gray_t const tan_22_5=0.4142135623730950488016887242097;
 			static gray_t const tan_67_5=2.4142135623730950488016887242097;
 
+			static gray_t min_m=std::numeric_limits<gray_t>::max();
+			static gray_t max_m=std::numeric_limits<gray_t>::lowest();
+
 			if(	img.width()!=m_frame_size.width() || img.height()!=m_frame_size.height())
 				return false;
-			
+
 			if(!m_sobel(img, get_dx_view(), get_dy_view()))
 				return false;
 
@@ -95,23 +130,25 @@ namespace baldzarika { namespace ucv {
 				std::fill(map_first_row, map_first_row+m_frame_size.width()+2, detail::constant::one<map_t>());
 				std::fill(map_last_row, map_last_row+m_frame_size.width()+2, detail::constant::one<map_t>());
 			}
-			
 
-			for(boost::uint32_t y=0;y<=m_frame_size.height();++y)
+			boost::uint32_t map_step=m_frame_size.width()+2;
+
+			map_stack_t map_stack;
+			for(boost::int32_t y=0;y<=boost::int32_t(m_frame_size.height());++y)
 			{
-				gray_t *mag=mag_buf[(y>0?1:2)]+1;
+				gray_t *mag=mag_buf[(y>0?2:1)]+1;
 				gray_t const *dx_row=reinterpret_cast<gray_t const *>(dx_view.row_begin(y));
 				gray_t const *dy_row=reinterpret_cast<gray_t const *>(dy_view.row_begin(y));
 
-				if(y<m_frame_size.height())
+				if(y<boost::int32_t(m_frame_size.height()))
 				{
 					mag[-1]=mag[m_frame_size.width()]=detail::constant::zero<gray_t>();
 					for(boost::uint32_t x=0;x<m_frame_size.width();++x)
-						mag[j]=abs(dx_row[x])+abs(dy_row[x]);
+						mag[x]=abs(dx_row[x])+abs(dy_row[x]);
 				}
 				else
 				{
-					std::fill(mag, mag+m_frame_size.width()+2, detail::constant::zero<gray_t>());
+					std::fill(mag-1, mag+m_frame_size.width()+1, detail::constant::zero<gray_t>());
 				}
 
 				if(y==0) continue;
@@ -119,14 +156,123 @@ namespace baldzarika { namespace ucv {
 				map_t *map=reinterpret_cast<map_t *>(map_view.row_begin(y))+1;
 				map[-1]=map[m_frame_size.width()]=detail::constant::one<map_t>();
 
+
 				mag=mag_buf[1]+1;
 				dx_row=reinterpret_cast<gray_t const *>(dx_view.row_begin(y-1));
 				dy_row=reinterpret_cast<gray_t const *>(dy_view.row_begin(y-1));
-								
-				gray_t *tmp_mag_buf=mag_buf_view[0];
-				mag_buf_view[0]=mag_buf_view[1];
-				mag_buf_view[1]=mag_buf_view[2];
-				mag_buf_view[2]=tmp_mag_buf;
+
+				boost::int32_t mag_step1=mag_buf[2]-mag_buf[1];
+				boost::int32_t mag_step2=mag_buf[0]-mag_buf[1];
+
+				boost::uint8_t prev_flag=0;
+
+				for(boost::int32_t x=0;x<boost::int32_t(m_frame_size.width());++x)
+				{
+					gray_t dx=dx_row[x];
+					gray_t dy=dy_row[x];
+					gray_t m=mag[x];
+
+					min_m=std::min(m, min_m);
+					max_m=std::max(m, max_m);
+
+
+					//boost::int32_t s=dx*dy<detail::constant::zero<gray_t>()?-1:1;
+					boost::int32_t s=(dx.get() ^ dy.get())<0?-1:1;
+					
+					dx=abs(dx);
+					dy=abs(dy);
+
+					if(m>m_low_treshold)
+					{
+						gray_t tan_22_5_dx=dx*tan_22_5;
+						gray_t tan_67_5_dx=dx*tan_67_5;
+						//gray_t tan_67_5_dx=tan_22_5_dx+detail::constant::two<gray_t>()*dx;
+
+						if(dy<tan_22_5_dx)
+						{
+							if(m>mag[x-1] && m>=mag[x+1])
+							{
+								if(m>m_high_treshold && !prev_flag && map[x-map_step]!=2)
+								{
+									map[x]=2;
+									map_stack.push(map+x);
+									prev_flag=1;
+								}
+								else
+									map[x]=0;
+								continue;
+							}
+						}
+						else
+						if(dy>tan_67_5_dx)
+						{
+							if(m>mag[x+mag_step2] && m>=mag[x+mag_step1])
+							{
+								if(m>m_high_treshold && !prev_flag && map[x-map_step]!=2)
+								{
+									map[x]=2;
+									map_stack.push(map+x);
+									prev_flag=1;
+								}
+								else
+									map[x]=0;
+								continue;
+							}
+						}
+						else
+						{
+							if(m>mag[x+mag_step2-s] && m>mag[x+mag_step1+s])
+							{
+								if(m>m_high_treshold && !prev_flag && map[x-map_step]!=2)
+								{
+									map[x]=2;
+									map_stack.push(map+x);
+									prev_flag=1;
+								}
+								else
+									map[x]=0;
+								continue;
+							}
+						}
+					}
+					prev_flag=0;
+					map[x]=1;
+				}
+
+				mag=mag_buf[0];
+				mag_buf[0]=mag_buf[1];
+				mag_buf[1]=mag_buf[2];
+				mag_buf[2]=mag;
+			}
+
+			while(!map_stack.empty())
+			{
+				map_t *m=map_stack.top(), *mt;
+				map_stack.pop();
+
+				mt=m-1;
+				if(!*mt) { *mt=2; map_stack.push(mt); }
+
+				mt=m+1;
+				if(!*mt) { *mt=2; map_stack.push(mt); }
+
+				mt=m-map_step-1;
+				if(!*mt) { *mt=2; map_stack.push(mt); }
+
+				mt=m-map_step;
+				if(!*mt) { *mt=2; map_stack.push(mt); }
+
+				mt=m-map_step+1;
+				if(!*mt) { *mt=2; map_stack.push(mt); }
+
+				mt=m+map_step-1;
+				if(!*mt) { *mt=2; map_stack.push(mt); }
+
+				mt=m+map_step;
+				if(!*mt) { *mt=2; map_stack.push(mt); }
+
+				mt=m+map_step+1;
+				if(!*mt) { *mt=2; map_stack.push(mt); }
 			}
 			return true;
 		}
@@ -189,9 +335,11 @@ namespace baldzarika { namespace ucv {
 				m_frame_size.width()+2, 1
 			);
 		}
-	
+
 	private:
 		size2ui				m_frame_size;
+		gray_t				m_low_treshold;
+		gray_t				m_high_treshold;
 		sobel_t				m_sobel;
 		gray_image_t		m_dx_dy_img;
 		gray_image_t		m_mag_ring_img;

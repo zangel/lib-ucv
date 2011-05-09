@@ -329,6 +329,9 @@ namespace baldzarika { namespace ucv {
 		operator long double() const { return static_cast<long double>(m_value)/detail::pow2<F>::value; }
 
 
+		value_type get() const { return m_value; }
+
+
 		friend fixed_point fabs(fixed_point const &x)
 		{
 			return x<detail::constant::zero<fixed_point>()?-x:x;

@@ -1,6 +1,8 @@
 #ifndef BALDZARIKA_UCV_SOBEL_H
 #define BALDZARIKA_UCV_SOBEL_H
 
+#include <baldzarika/ucv/size2.h>
+
 namespace baldzarika { namespace ucv {
 
 	namespace detail {
@@ -18,10 +20,10 @@ namespace baldzarika { namespace ucv {
 
 
 		template < typename PT >
-		PT const sobel_filter_traits< PT, 3, 1 >::SEPARABLE_X_KERNEL[2][3]={ {-0.125, 0.0, 0.125}, { 0.125, 0.25, 0.125} };
+		PT const sobel_filter_traits< PT, 3, 1 >::SEPARABLE_X_KERNEL[2][3]={ {-1.0, 0.0, 1.0}, {1.0, 2.0, 1.0} };
 		
 		template < typename PT >
-		PT const sobel_filter_traits< PT, 3, 1 >::SEPARABLE_Y_KERNEL[2][3]={ { 0.125, 0.25, 0.125}, {-0.125, 0.0, 0.125} };
+		PT const sobel_filter_traits< PT, 3, 1 >::SEPARABLE_Y_KERNEL[2][3]={ {1.0, 2.0, 1.0}, {-1.0, 0.0, 1.0} };
 	}
 
 	
@@ -127,7 +129,7 @@ namespace baldzarika { namespace ucv {
 					for(boost::uint32_t f=0;f<KERNEL_SIZE;++f)
 					{
 						dx+=ring_dx_rows[f][c]*filter_tratis_t::SEPARABLE_X_KERNEL[1][f];
-						dy+=ring_dy_rows[f][c]*filter_tratis_t::SEPARABLE_Y_KERNEL[1][f];
+						dy+=ring_dy_rows[f][c]*filter_tratis_t::SEPARABLE_Y_KERNEL[1][KERNEL_SIZE-f-1];
 					}
 					dx_row[c]=dx;
 					dy_row[c]=dy;
