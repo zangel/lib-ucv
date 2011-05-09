@@ -11,6 +11,21 @@ namespace baldzarika { namespace ucv {
 	{
 	public:
 
+		static int const DELTAS[8][2]=
+		{
+			{ 1, 0 },
+			{ 1,-1 },
+			{ 0,-1 },
+			{-1,-1 },
+			{-1, 0 },
+			{-1, 1 },
+			{ 0, 1 },
+			{ 1, 1 }
+		};
+		
+		typedef std::vector<point2ui> contour_t;
+
+		
 		typedef sobel< PT, AS, 1 > sobel_t;
 
 		typedef typename sobel_t::gray_t gray_t;
@@ -69,9 +84,19 @@ namespace baldzarika { namespace ucv {
 			if(img.width()!=bvt.width() || img.height()!=bvt.height())
 				return false;
 
-			if(!this->operator()(img))
+			if(img.width()!=m_frame_size.width() || img.height()!=m_frame_size.height())
 				return false;
 
+			if(!m_sobel(img, get_dx_view(), get_dy_view()))
+				return false;
+
+			map_stack_t map_stack;
+			if(!non_maxima_suppression(map_stack))
+				return false;
+
+			if(!hysteresis_thresholding(map_stack))
+				return false;
+						
 			typedef typename BVT::value_type	bin_pixel_t;
 			typedef typename gil::channel_type<bin_pixel_t>::type bin_channel_t;
 
@@ -88,20 +113,77 @@ namespace baldzarika { namespace ucv {
 			return true;
 		}
 
-	protected:
-		bool operator()(gray_const_view_t img)
+		bool operator()(gray_const_view_t img, std::list< contour_t > &contours)
 		{
-			static gray_t const tan_22_5=0.4142135623730950488016887242097;
-			static gray_t const tan_67_5=2.4142135623730950488016887242097;
+			if(img.width()!=bvt.width() || img.height()!=bvt.height())
+				return false;
 
-			static gray_t min_m=std::numeric_limits<gray_t>::max();
-			static gray_t max_m=std::numeric_limits<gray_t>::lowest();
-
-			if(	img.width()!=m_frame_size.width() || img.height()!=m_frame_size.height())
+			if(img.width()!=m_frame_size.width() || img.height()!=m_frame_size.height())
 				return false;
 
 			if(!m_sobel(img, get_dx_view(), get_dy_view()))
 				return false;
+
+			map_stack_t map_stack;
+			if(!non_maxima_suppression(map_stack))
+				return false;
+
+			map_stack_t contour_candidates(map_stack);
+
+			if(!hysteresis_thresholding(map_stack))
+				return false;
+
+			contours.clear();
+
+			boost::uint32_t const map_step=m_frame_size.width()+2;
+
+			map_view_t map_view=gil::view(m_map_img);
+
+			while(!contour_candidates.empty())
+			{
+				map_t *begin=contour_candidates.top();
+				contour_candidates.pop();
+
+				if(!(*m & 0x02))
+					continue;
+
+				map_t *curr=begin;
+				boost::uint32_t cc=0;
+				std::stack< int, std::vector<int> > chain_codes;
+
+				do
+				{
+					
+					while(cc<8)
+					{
+						map_t *candidate=curr+DELTAS[cc][1]*map_step+DELTAS[cc][0];
+						if(*candidate & 0x02)
+						{
+							*candidate=0x00;
+							chain_codes.push(cc);
+							curr=candidate;
+							cc=0;
+							break;
+						}
+						cc++;
+					}
+
+					if(cc==8)
+					{
+						
+					}
+				}
+				while(!chain_codes.empty());
+			}
+
+			return true;
+		}
+
+	protected:
+		bool non_maxima_suppression(map_stack_t &map_stack)
+		{
+			static gray_t const tan_22_5=0.4142135623730950488016887242097;
+			static gray_t const tan_67_5=2.4142135623730950488016887242097;
 
 			gray_const_view_t dx_view=get_dx_const_view();
 			gray_const_view_t dy_view=get_dy_const_view();
@@ -123,17 +205,20 @@ namespace baldzarika { namespace ucv {
 			std::fill(mag_buf[0], mag_buf[0]+m_frame_size.width()+2, detail::constant::zero<gray_t>());
 
 			map_view_t map_view=gil::view(m_map_img);
+			
+			std::fill(
+				reinterpret_cast<map_t *>(map_view.row_begin(0)),
+				reinterpret_cast<map_t *>(map_view.row_begin(0))+m_frame_size.width()+2,
+				detail::constant::one<map_t>()
+			);
+			std::fill(
+				reinterpret_cast<map_t *>(map_view.row_begin(map_view.height()-1)),
+				reinterpret_cast<map_t *>(map_view.row_begin(map_view.height()-1))+m_frame_size.width()+2,
+				detail::constant::one<map_t>()
+			);
+			
+			boost::uint32_t const map_step=m_frame_size.width()+2;
 
-			{
-				map_t *map_first_row=reinterpret_cast<map_t *>(map_view.row_begin(0));
-				map_t *map_last_row=reinterpret_cast<map_t *>(map_view.row_begin(map_view.height()-1));
-				std::fill(map_first_row, map_first_row+m_frame_size.width()+2, detail::constant::one<map_t>());
-				std::fill(map_last_row, map_last_row+m_frame_size.width()+2, detail::constant::one<map_t>());
-			}
-
-			boost::uint32_t map_step=m_frame_size.width()+2;
-
-			map_stack_t map_stack;
 			for(boost::int32_t y=0;y<=boost::int32_t(m_frame_size.height());++y)
 			{
 				gray_t *mag=mag_buf[(y>0?2:1)]+1;
@@ -172,11 +257,6 @@ namespace baldzarika { namespace ucv {
 					gray_t dy=dy_row[x];
 					gray_t m=mag[x];
 
-					min_m=std::min(m, min_m);
-					max_m=std::max(m, max_m);
-
-
-					//boost::int32_t s=dx*dy<detail::constant::zero<gray_t>()?-1:1;
 					boost::int32_t s=(dx.get() ^ dy.get())<0?-1:1;
 					
 					dx=abs(dx);
@@ -186,8 +266,7 @@ namespace baldzarika { namespace ucv {
 					{
 						gray_t tan_22_5_dx=dx*tan_22_5;
 						gray_t tan_67_5_dx=dx*tan_67_5;
-						//gray_t tan_67_5_dx=tan_22_5_dx+detail::constant::two<gray_t>()*dx;
-
+						
 						if(dy<tan_22_5_dx)
 						{
 							if(m>mag[x-1] && m>=mag[x+1])
@@ -244,7 +323,12 @@ namespace baldzarika { namespace ucv {
 				mag_buf[1]=mag_buf[2];
 				mag_buf[2]=mag;
 			}
+			return true;
+		}
 
+		bool hysteresis_thresholding(map_stack_t &map_stack)
+		{
+			boost::uint32_t const map_step=m_frame_size.width()+2;
 			while(!map_stack.empty())
 			{
 				map_t *m=map_stack.top(), *mt;
@@ -277,7 +361,6 @@ namespace baldzarika { namespace ucv {
 			return true;
 		}
 
-	protected:
 		gray_const_view_t get_dx_const_view() const
 		{
 			return gil::subimage_view(
