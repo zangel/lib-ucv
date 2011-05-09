@@ -82,17 +82,15 @@ namespace baldzarika { namespace ucv {
 
 			for(boost::uint32_t r=0;r<m_frame_size.height();++r)
 			{
-				for(;ring_buff_pos<boost::int32_t(r);++ring_buff_pos)
+				while(ring_buff_pos<boost::int32_t(r))
 				{
-					boost::int32_t sr=ring_buff_pos+HALF_KERNEL_SIZE+1;
-					sr=std::abs(sr);
-					sr-=(sr/m_frame_size.height())*2*((sr+1)%m_frame_size.height());
-
+					ring_buff_pos++;
+					boost::int32_t sr=std::max<boost::int32_t>(0, std::min<boost::int32_t>(m_frame_size.height()-1, ring_buff_pos+HALF_KERNEL_SIZE));
 
 					gray_t const *img_row=reinterpret_cast<gray_t const *>(img.row_begin(sr));
 
-					gray_t *ring_dx_row=reinterpret_cast<gray_t *>(ring_dx_view.row_begin((ring_buff_pos-1)%KERNEL_SIZE));
-					gray_t *ring_dy_row=reinterpret_cast<gray_t *>(ring_dy_view.row_begin((ring_buff_pos-1)%KERNEL_SIZE));
+					gray_t *ring_dx_row=reinterpret_cast<gray_t *>(ring_dx_view.row_begin((ring_buff_pos+KERNEL_SIZE-1)%KERNEL_SIZE));
+					gray_t *ring_dy_row=reinterpret_cast<gray_t *>(ring_dy_view.row_begin((ring_buff_pos+KERNEL_SIZE-1)%KERNEL_SIZE));
 										
 					for(boost::int32_t c=0;c<boost::int32_t(m_frame_size.width());++c)
 					{
@@ -129,7 +127,7 @@ namespace baldzarika { namespace ucv {
 					for(boost::uint32_t f=0;f<KERNEL_SIZE;++f)
 					{
 						dx+=ring_dx_rows[f][c]*filter_tratis_t::SEPARABLE_X_KERNEL[1][f];
-						dy+=ring_dy_rows[f][c]*filter_tratis_t::SEPARABLE_Y_KERNEL[1][KERNEL_SIZE-f-1];
+						dy+=ring_dy_rows[f][c]*filter_tratis_t::SEPARABLE_Y_KERNEL[1][f];
 					}
 					dx_row[c]=dx;
 					dy_row[c]=dy;

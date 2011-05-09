@@ -15,6 +15,7 @@
 #include <baldzarika/ucv/sobel.h>
 #include <baldzarika/ucv/gaussian_blur.h>
 #include <baldzarika/ucv/canny.h>
+#include <baldzarika/ucv/adaptive_treshold.h>
 #include <boost/date_time.hpp>
 #define png_infopp_NULL (png_infopp)0
 #define int_p_NULL (int*)0
@@ -778,27 +779,34 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 	typedef ucv::fixed_point<10,21> real_t;
 	typedef ucv::sobel<real_t, 3, 1> sobel_t;
-	typedef ucv::gaussian_blur<real_t, 3> gaussian_blur_t;
+	typedef ucv::gaussian_blur<real_t, 5> gaussian_blur_t;
+	typedef ucv::adaptive_treshold<real_t, 7, true > adaptive_treshold_t;
 	
 
 	ucv::gil::gray8_image_t gray8_img;
 	ucv::gil::png_read_and_convert_image("image-test.png", gray8_img);
 
 
-	gaussian_blur_t::gray_image_t gray_img(gray8_img.width(), gray8_img.height());
+	gaussian_blur_t::gray_image_t raw_img(gray8_img.width(), gray8_img.height());
 	
 	ucv::convert_scale(
 		ucv::gil::const_view(gray8_img),
-		ucv::gil::view(gray_img),
+		ucv::gil::view(raw_img),
 		real_t(1.0f/255.0f)
 	);
 
+
+	gaussian_blur_t::gray_image_t gray_img(gray8_img.width(), gray8_img.height());
+
 	gaussian_blur_t gaussian_blur(ucv::size2ui(gray8_img.width(), gray8_img.height()));
-	gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
-	gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
-	gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
+	gaussian_blur(ucv::gil::const_view(raw_img), ucv::gil::view(gray_img));
 	//gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
 	//gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
+	//gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
+	//gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
+
+	
+
 
 	sobel_t sobel(ucv::size2ui(gray8_img.width(), gray8_img.height()));
 
@@ -810,8 +818,25 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	cv::imshow(OPENCV_WND_NAME, cv::Mat(gray8_img.height(), gray8_img.width(), CV_8UC1, &gil::view(gray8_img)[0][0]));
 
 	cv::waitKey();
-	
+
+
 	ucv::gil::gray32f_image_t gray32f_img(dx_img.width(), dx_img.height());
+
+
+	gaussian_blur_t::gray_image_t treshold_img(gray8_img.width(), gray8_img.height());
+	adaptive_treshold_t adaptive_treshold(ucv::size2ui(gray8_img.width(), gray8_img.height()), ucv::detail::constant::one<real_t>(), real_t(0.01));
+	adaptive_treshold(ucv::gil::const_view(raw_img),ucv::gil::view(treshold_img));
+
+	ucv::convert_scale(
+		ucv::gil::const_view(treshold_img),
+		ucv::gil::view(gray32f_img),
+		1.0f
+	);
+
+	cv::imshow(OPENCV_WND_NAME, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
+	cv::waitKey();
+
+
 
 	ucv::convert_scale(
 		ucv::gil::const_view(gray_img),
@@ -828,7 +853,7 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 	cv::imshow(OPENCV_WND_NAME, image);
 	cv::waitKey();
-	
+
 	cv::Mat image_dx, image_dy;
 	cv::Sobel(image,image_dx,CV_8UC1,1,0);
 	cv::Sobel(image,image_dy,CV_8UC1,0,1);
@@ -842,8 +867,8 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	cv::imshow(OPENCV_WND_NAME, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
 	cv::waitKey();
 
-	cv::imshow(OPENCV_WND_NAME, image_dx);
-	cv::waitKey();
+	//cv::imshow(OPENCV_WND_NAME, image_dx);
+	//cv::waitKey();
 
 	ucv::convert_scale(
 		ucv::gil::const_view(dy_img),
@@ -852,28 +877,9 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	);
 	cv::imshow(OPENCV_WND_NAME, cv::Mat(dy_img.height(), dy_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
 	cv::waitKey();
-	cv::imshow(OPENCV_WND_NAME, image_dy);
-	cv::waitKey();
+	//cv::imshow(OPENCV_WND_NAME, image_dy);
+	//cv::waitKey();
 
-	gaussian_blur_t::gray_image_t mag_img(gray8_img.width(), gray8_img.height());
-
-	for(boost::uint32_t y=0;y<boost::uint32_t(gray8_img.height());++y)
-	{
-		gaussian_blur_t::gray_t *mag_row=reinterpret_cast<gaussian_blur_t::gray_t*>(ucv::gil::view(mag_img).row_begin(y));
-		gaussian_blur_t::gray_t *dx_row=reinterpret_cast<gaussian_blur_t::gray_t*>(ucv::gil::view(dx_img).row_begin(y));
-		gaussian_blur_t::gray_t *dy_row=reinterpret_cast<gaussian_blur_t::gray_t*>(ucv::gil::view(dy_img).row_begin(y));
-		for(boost::uint32_t x=0;x<boost::uint32_t(gray8_img.width());++x)
-			mag_row[x]=abs(dx_row[x])+abs(dy_row[x]);
-	}
-	ucv::convert_scale(
-		ucv::gil::const_view(mag_img),
-		ucv::gil::view(gray32f_img),
-		1.0f
-	);
-	cv::imshow(OPENCV_WND_NAME, cv::Mat(dy_img.height(), dy_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
-	cv::waitKey();
-	
-	
 	typedef ucv::canny<real_t, 3> canny_t;
 
 
