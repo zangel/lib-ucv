@@ -10,18 +10,7 @@ namespace baldzarika { namespace ucv {
 	class canny
 	{
 	public:
-
-		static int const DELTAS[8][2]=
-		{
-			{ 1, 0 },
-			{ 1,-1 },
-			{ 0,-1 },
-			{-1,-1 },
-			{-1, 0 },
-			{-1, 1 },
-			{ 0, 1 },
-			{ 1, 1 }
-		};
+		static int const DELTAS[8][2];
 		
 		typedef std::vector<point2ui> contour_t;
 
@@ -428,6 +417,20 @@ namespace baldzarika { namespace ucv {
 		gray_image_t		m_mag_ring_img;
 		map_image_t			m_map_img;
 	};
+
+	template < typename PT, boost::uint32_t AS >
+	int const canny<PT,AS>::DELTAS[8][2]=
+	{
+		{ 1, 0 },
+		{ 1,-1 },
+		{ 0,-1 },
+		{-1,-1 },
+		{-1, 0 },
+		{-1, 1 },
+		{ 0, 1 },
+		{ 1, 1 }
+	};
+
 
 } //namespace ucv
 } //namespace baldzarika
