@@ -104,9 +104,6 @@ namespace baldzarika { namespace ucv {
 
 		bool operator()(gray_const_view_t img, std::list< contour_t > &contours)
 		{
-			if(img.width()!=bvt.width() || img.height()!=bvt.height())
-				return false;
-
 			if(img.width()!=m_frame_size.width() || img.height()!=m_frame_size.height())
 				return false;
 
@@ -133,36 +130,54 @@ namespace baldzarika { namespace ucv {
 				map_t *begin=contour_candidates.top();
 				contour_candidates.pop();
 
-				if(!(*m & 0x02))
+				if(*begin!=2)
 					continue;
 
 				map_t *curr=begin;
-				boost::uint32_t cc=0;
-				std::stack< int, std::vector<int> > chain_codes;
-
-				do
+				map_t *prev=curr;
+				boost::int32_t cc=0;
+				std::vector<boost::int32_t> chain_codes;
+				
+				while(true)
 				{
-					
+					map_t *cand=0;
 					while(cc<8)
 					{
-						map_t *candidate=curr+DELTAS[cc][1]*map_step+DELTAS[cc][0];
-						if(*candidate & 0x02)
-						{
-							*candidate=0x00;
-							chain_codes.push(cc);
-							curr=candidate;
-							cc=0;
+						cand=curr+DELTAS[cc][1]*map_step+DELTAS[cc][0];
+						if(cand!=prev && *cand>1)
 							break;
-						}
 						cc++;
 					}
 
-					if(cc==8)
+					if(cc<8)
 					{
-						
+						if(*cand==2)
+						{
+							*cand=3;
+							chain_codes.push_back(cc);
+							prev=curr;
+							curr=cand;
+							cc=0;
+							continue;
+						}
+						else
+						if(*cand==3) //possible closed contour
+						{
+							int c=0;
+																					
+						}
 					}
+
+					if(chain_codes.empty())
+						break;
+
+					cc=chain_codes.back();
+					chain_codes.pop_back();
+					curr=prev;
+					if(!chain_codes.empty())
+						prev=prev+DELTAS[chain_codes.back()][1]*map_step+DELTAS[chain_codes.back()][0];
+					cc++;
 				}
-				while(!chain_codes.empty());
 			}
 
 			return true;

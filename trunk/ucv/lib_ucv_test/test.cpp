@@ -882,6 +882,11 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 	typedef ucv::canny<real_t, 3> canny_t;
 
+	canny_t canny(ucv::size2ui(gray8_img.width(), gray8_img.height()), 0.2, 0.6);
+	std::list< canny_t::contour_t > contours;
+
+	canny(ucv::gil::const_view(gray_img), contours);
+
 
 	real_t th=0.0;
 	for(int i=0;i<10;++i)
