@@ -88,6 +88,7 @@
     <ClInclude Include="include\baldzarika\ucv\adaptive_treshold.h" />
     <ClInclude Include="include\baldzarika\ucv\canny.h" />
     <ClInclude Include="include\baldzarika\ucv\config.h" />
+    <ClInclude Include="include\baldzarika\ucv\contour.h" />
     <ClInclude Include="include\baldzarika\ucv\convert_scale.h" />
     <ClInclude Include="include\baldzarika\ucv\feature_point.h" />
     <ClInclude Include="include\baldzarika\ucv\gaussian_blur.h" />
