@@ -781,10 +781,19 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	typedef ucv::sobel<real_t, 3, 1> sobel_t;
 	typedef ucv::gaussian_blur<real_t, 5> gaussian_blur_t;
 	typedef ucv::adaptive_treshold<real_t, 7, true > adaptive_treshold_t;
+
+
+	unsigned int i1=1;
+	unsigned int i2=4;
+	
+	unsigned int c=(i1-i2)%5;
+
+
 	
 
 	ucv::gil::gray8_image_t gray8_img;
 	ucv::gil::png_read_and_convert_image("image-test.png", gray8_img);
+	//ucv::gil::png_read_and_convert_image("rectangle.png", gray8_img);
 
 
 	gaussian_blur_t::gray_image_t raw_img(gray8_img.width(), gray8_img.height());
@@ -848,6 +857,7 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	cv::waitKey();
 
 	cv::Mat image=cv::imread("image-test.png", CV_LOAD_IMAGE_GRAYSCALE);
+	//cv::Mat image=cv::imread("rectangle.png", CV_LOAD_IMAGE_GRAYSCALE);
 
 	cv::blur(image,image,cv::Size(3,3));
 
@@ -880,12 +890,42 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	//cv::imshow(OPENCV_WND_NAME, image_dy);
 	//cv::waitKey();
 
+
 	typedef ucv::canny<real_t, 3> canny_t;
 
-	canny_t canny(ucv::size2ui(gray8_img.width(), gray8_img.height()), 0.2, 0.6);
-	std::list< canny_t::contour_t > contours;
+	{
+		typedef ucv::contour<real_t> contour_t;
+		canny_t canny(ucv::size2ui(gray8_img.width(), gray8_img.height()), 0.6, 1.8);
+		std::list< contour_t > contours;
 
-	canny(ucv::gil::const_view(gray_img), contours);
+		canny.operator()(ucv::gil::const_view(gray_img), contours);
+
+		cv::Mat contour_img(dy_img.height(), dy_img.width(), CV_8UC3);
+
+		for(std::list<contour_t>::const_iterator ic=contours.begin();ic!=contours.end();++ic)
+		{
+			contour_img=cv::Mat::zeros(cv::Size(dy_img.width(),dy_img.height()), CV_8UC3);
+
+			contour_t const &contour=*ic;
+			boost::scoped_array<cv::Point> cpts(new cv::Point[contour.m_points.size()]);
+			for(boost::uint32_t p=0;p<contour.m_points.size();++p)
+				cpts.get()[p]=cv::Point(contour.m_points[p].x,contour.m_points[p].y);
+
+			int const npts=contour.m_points.size();
+			cv::Point const *ppts=cpts.get();
+
+			cv::polylines(
+				contour_img,
+				&ppts,
+				&npts,
+				1,
+				false,
+				cv::Scalar(255, 255.0, 255)
+			);
+			cv::imshow(OPENCV_WND_NAME, contour_img);
+			cv::waitKey();
+		}
+	}
 
 
 	real_t th=0.0;

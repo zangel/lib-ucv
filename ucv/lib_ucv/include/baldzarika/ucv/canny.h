@@ -3,6 +3,7 @@
 
 #include <baldzarika/ucv/size2.h>
 #include <baldzarika/ucv/sobel.h>
+#include <baldzarika/ucv/contour.h>
 
 namespace baldzarika { namespace ucv {
 
@@ -10,10 +11,6 @@ namespace baldzarika { namespace ucv {
 	class canny
 	{
 	public:
-		static int const DELTAS[8][2];
-		
-		typedef std::vector<point2ui> contour_t;
-
 		
 		typedef sobel< PT, AS, 1 > sobel_t;
 
@@ -29,8 +26,8 @@ namespace baldzarika { namespace ucv {
 		typedef typename map_view_t::value_type map_pixel_t;
 		typedef typename gil::channel_type<map_pixel_t>::type map_t;
 
-		typedef std::stack< map_t*, std::vector< map_t* > >	map_stack_t;
-		
+		typedef std::vector< map_t* > map_stack_t;
+
 		canny()
 			: m_frame_size(0,0)
 			, m_low_treshold(0.3)
@@ -65,6 +62,9 @@ namespace baldzarika { namespace ucv {
 			m_dx_dy_img.recreate(fs.width(), fs.height()*2);
 			m_mag_ring_img.recreate(fs.width()+2, 3);
 			m_map_img.recreate(fs.width()+2, fs.height()+2);
+
+			for(boost::uint32_t c=0;c<16;++c)
+				m_deltas[c]=DELTAS[c&7][1]*boost::int32_t(m_map_img.width())+DELTAS[c&7][0];
 		}
 
 		template < typename BVT >
@@ -102,7 +102,8 @@ namespace baldzarika { namespace ucv {
 			return true;
 		}
 
-		bool operator()(gray_const_view_t img, std::list< contour_t > &contours)
+		template < typename CT >
+		bool operator()(gray_const_view_t img, std::list< contour<CT> > &contours)
 		{
 			if(img.width()!=m_frame_size.width() || img.height()!=m_frame_size.height())
 				return false;
@@ -121,69 +122,30 @@ namespace baldzarika { namespace ucv {
 
 			contours.clear();
 
-			boost::uint32_t const map_step=m_frame_size.width()+2;
-
 			map_view_t map_view=gil::view(m_map_img);
 
-			while(!contour_candidates.empty())
+			for(map_stack_t::iterator c=contour_candidates.begin();c!=contour_candidates.end();++c)
 			{
-				map_t *begin=contour_candidates.top();
-				contour_candidates.pop();
-
-				if(*begin!=2)
+				map_t *candidate=*c;
+				
+				if(*candidate!=2)
 					continue;
 
-				map_t *curr=begin;
-				map_t *prev=curr;
-				boost::int32_t cc=0;
-				std::vector<boost::int32_t> chain_codes;
-				
-				while(true)
-				{
-					map_t *cand=0;
-					while(cc<8)
-					{
-						cand=curr+DELTAS[cc][1]*map_step+DELTAS[cc][0];
-						if(cand!=prev && *cand>1)
-							break;
-						cc++;
-					}
+				while(candidate[1]==2)
+					candidate++;
 
-					if(cc<8)
-					{
-						if(*cand==2)
-						{
-							*cand=3;
-							chain_codes.push_back(cc);
-							prev=curr;
-							curr=cand;
-							cc=0;
-							continue;
-						}
-						else
-						if(*cand==3) //possible closed contour
-						{
-							int c=0;
-																					
-						}
-					}
+				typename contour<CT>::points_t contour_pts;
+				fetch_contour<CT>(candidate, contour_pts, false);
 
-					if(chain_codes.empty())
-						break;
-
-					cc=chain_codes.back();
-					chain_codes.pop_back();
-					curr=prev;
-					if(!chain_codes.empty())
-						prev=prev+DELTAS[chain_codes.back()][1]*map_step+DELTAS[chain_codes.back()][0];
-					cc++;
-				}
+				if(contour_pts.size()>4)
+					contours.push_back(contour<CT>(contour_pts, detail::constant::sq_two<CT>()));
 			}
-
 			return true;
 		}
 
 	protected:
+		static boost::int32_t const DELTAS[8][2];
+
 		bool non_maxima_suppression(map_stack_t &map_stack)
 		{
 			static gray_t const tan_22_5=0.4142135623730950488016887242097;
@@ -278,7 +240,7 @@ namespace baldzarika { namespace ucv {
 								if(m>m_high_treshold && !prev_flag && map[x-map_step]!=2)
 								{
 									map[x]=2;
-									map_stack.push(map+x);
+									map_stack.push_back(map+x);
 									prev_flag=1;
 								}
 								else
@@ -294,7 +256,7 @@ namespace baldzarika { namespace ucv {
 								if(m>m_high_treshold && !prev_flag && map[x-map_step]!=2)
 								{
 									map[x]=2;
-									map_stack.push(map+x);
+									map_stack.push_back(map+x);
 									prev_flag=1;
 								}
 								else
@@ -309,7 +271,7 @@ namespace baldzarika { namespace ucv {
 								if(m>m_high_treshold && !prev_flag && map[x-map_step]!=2)
 								{
 									map[x]=2;
-									map_stack.push(map+x);
+									map_stack.push_back(map+x);
 									prev_flag=1;
 								}
 								else
@@ -335,34 +297,122 @@ namespace baldzarika { namespace ucv {
 			boost::uint32_t const map_step=m_frame_size.width()+2;
 			while(!map_stack.empty())
 			{
-				map_t *m=map_stack.top(), *mt;
-				map_stack.pop();
+				map_t *m=map_stack.back(), *mt;
+				map_stack.pop_back();
 
 				mt=m-1;
-				if(!*mt) { *mt=2; map_stack.push(mt); }
+				if(!*mt) { *mt=2; map_stack.push_back(mt); }
 
 				mt=m+1;
-				if(!*mt) { *mt=2; map_stack.push(mt); }
+				if(!*mt) { *mt=2; map_stack.push_back(mt); }
 
 				mt=m-map_step-1;
-				if(!*mt) { *mt=2; map_stack.push(mt); }
+				if(!*mt) { *mt=2; map_stack.push_back(mt); }
 
 				mt=m-map_step;
-				if(!*mt) { *mt=2; map_stack.push(mt); }
+				if(!*mt) { *mt=2; map_stack.push_back(mt); }
 
 				mt=m-map_step+1;
-				if(!*mt) { *mt=2; map_stack.push(mt); }
+				if(!*mt) { *mt=2; map_stack.push_back(mt); }
 
 				mt=m+map_step-1;
-				if(!*mt) { *mt=2; map_stack.push(mt); }
+				if(!*mt) { *mt=2; map_stack.push_back(mt); }
 
 				mt=m+map_step;
-				if(!*mt) { *mt=2; map_stack.push(mt); }
+				if(!*mt) { *mt=2; map_stack.push_back(mt); }
 
 				mt=m+map_step+1;
-				if(!*mt) { *mt=2; map_stack.push(mt); }
+				if(!*mt) { *mt=2; map_stack.push_back(mt); }
 			}
 			return true;
+		}
+
+		template < typename CT >
+		void fetch_contour(map_t *candidate, typename contour<CT>::points_t &cpts, bool hole=true)
+		{
+			boost::int32_t const map_step=boost::int32_t(m_frame_size.width()+2);
+			
+			map_view_t map_view=gil::view(m_map_img);
+			map_t *map_begin=reinterpret_cast<map_t*>(map_view.row_begin(0));
+
+			boost::int32_t map_y=(candidate-map_begin)/map_step;
+			boost::int32_t map_x=candidate-reinterpret_cast<map_t*>(map_view.row_begin(map_y));
+
+			if(map_y>0 && map_x>0)
+			{
+				map_t const nbd=4;
+				map_t const bit_7=128;
+				
+				point2ui pt_origin=point2ui(map_x-1,map_y-1);
+
+				point2ui pt=pt_origin;
+
+				boost::int32_t prev_s=-1;
+				boost::int32_t s=hole?0:4;
+				boost::int32_t s_end=s;
+
+				map_t *i0=candidate,*i1,*i3,*i4=0;
+
+				do
+				{
+					s=(s-1)&7;
+					i1=i0+m_deltas[s];
+					if(*i1>1)
+						break;
+				}
+				while(s!=s_end);
+
+				if(s==s_end)
+				{
+					*i0=nbd|bit_7;
+					cpts.push_back(typename contour<CT>::point2_t(pt.x,pt.y));
+				}
+				else
+				{
+					i3=i0;
+					prev_s=s^4;
+					
+					for(;;)
+					{
+						s_end=s;
+						for(;;)
+						{
+							i4=i3+m_deltas[++s];
+							if(*i4>1)
+								break;
+						}
+						s&=7;
+
+						if(boost::uint32_t(s-1)<boost::uint32_t(s_end))
+						{
+							*i3=nbd|bit_7;
+						}
+						else
+						if(*i3==2)
+						{
+							*i3=nbd;
+						}
+
+						if(s!=prev_s)
+						{
+							cpts.push_back(typename contour<CT>::point2_t(pt.x,pt.y));
+							prev_s = s;
+						}
+
+						pt.x+=DELTAS[s][0];
+						pt.y+=DELTAS[s][1];
+
+						if(i4==i0 && i3==i1)
+						{
+							cpts.push_back(typename contour<CT>::point2_t(pt.x,pt.y));
+							break;
+						}
+
+						i3=i4;
+						s=(s+4)&7;
+					}  
+				}
+			}
 		}
 
 		gray_const_view_t get_dx_const_view() const
@@ -431,6 +481,8 @@ namespace baldzarika { namespace ucv {
 		gray_image_t		m_dx_dy_img;
 		gray_image_t		m_mag_ring_img;
 		map_image_t			m_map_img;
+
+		boost::int32_t		m_deltas[16];
 	};
 
 	template < typename PT, boost::uint32_t AS >

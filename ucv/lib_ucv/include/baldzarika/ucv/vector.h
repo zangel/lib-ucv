@@ -79,8 +79,7 @@ namespace baldzarika { namespace ucv {
 			data()[1]=static_cast<T>(p2.y);
 			for(std::size_t d=2;d<D-1;++d)
 				data()[d]=detail::constant::zero<T>();
-			data()[D-1]=detail::constant::one<T>();
-
+			if(D>2) data()[D-1]=detail::constant::one<T>();
 		}
 
 		template < typename RT >
