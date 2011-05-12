@@ -12,18 +12,9 @@ namespace baldzarika { namespace ucv {
 	class contour
 	{
 	public:
-		typedef enum
-		{
-			kOriCCW=-1,
-			kOriInvalid=0,
-			kOriCW=1
-		} eOrientation;
-
 		typedef box2<T> box2_t;
 		typedef point2<T> point2_t;
 		typedef std::vector<point2_t> points_t;
-
-		
 
 		static bool check_is_closed(points_t const &pts, T const &eps)
 		{
@@ -61,43 +52,73 @@ namespace baldzarika { namespace ucv {
 			);
 		}
 
-		static eOrientation compute_orientation(points_t const &pts, box2_t const &bbox, bool is_closed)
+		static void compute_orientation_and_convexity(points_t const &pts, box2_t const &bbox, bool is_closed, bool &cw, bool &convex)
 		{
-			return kOriInvalid;
+			boost::int32_t const count=boost::int32_t(pts.size());
+			T const inv_width=detail::constant::one<T>()/bbox.width();
+			T const inv_height=detail::constant::one<T>()/bbox.height();
+
+			T cross_sum=detail::constant::zero<T>();
+			bool all_positive=true;
+			bool all_negative=true;
+
+			point2<T> prev_pt=is_closed?pts.back():pts.front();
+			point2<T> curr_pt=is_closed?pts.front():pts[1];
+
+			for(boost::int32_t p=(is_closed?0:1);p<(count-(is_closed?0:1));++p)
+			{
+				point2<T> next_pt=pts[(p+1)%count];
+
+				point2<T> a=next_pt-curr_pt;
+				a.x*=inv_width;
+				a.y*=inv_height;
+
+				point2<T> b=prev_pt-curr_pt;
+				b.x*=inv_width;
+				b.y*=inv_height;
+
+				T cross_prod=a.x*b.y-a.y*b.x;
+				cross_sum+=cross_prod;
+				all_positive=all_positive && cross_prod>=detail::constant::zero<T>();
+				all_negative=all_negative && cross_prod<=detail::constant::zero<T>();
+
+				prev_pt=curr_pt;
+				curr_pt=next_pt;
+			}
+
+			cw=cross_sum>=detail::constant::zero<T>();
+			convex=
+				(cross_sum>=detail::constant::zero<T>() && all_positive) ||
+				(cross_sum<=detail::constant::zero<T>() && all_negative);
 		}
 
 		contour()
 			: m_is_closed(false)
+			, m_is_clockwise(false)
+			, m_is_convex(false)
 		{
 		}
 
-		contour(points_t const &pts, box2_t const &bbox, bool is_closed, eOrientation ori)
+		contour(points_t const &pts, box2_t const &bbox, bool is_closed, bool is_clockwise, bool is_convex)
 			: m_points(pts)
 			, m_bbox(bbox)
 			, m_is_closed(is_closed)
-			, m_orientation(ori)
+			, m_is_clockwise(is_clockwise)
+			, m_is_convex(is_convex)
 		{
-		}
-
-		contour(points_t const &pts, T const &eps)
-			: m_points(pts)
-			, m_bbox(compute_bounding_box(pts))
-			, m_is_closed(check_is_closed(pts,eps))
-			, m_orientation()
-		{
-			if(m_is_closed)
-				m_points.pop_back();
 		}
 
 		void aproximate(T const &eps)
 		{
 			approximate_polygon(m_points, m_bbox, m_is_closed, eps);
+			compute_orientation_and_convexity(m_points, m_bbox, m_is_closed, m_is_clockwise, m_is_convex);
 		}
 
 		points_t		m_points;
 		box2_t			m_bbox;
 		bool			m_is_closed;
-		eOrientation	m_orientation;
+		bool			m_is_clockwise;
+		bool			m_is_convex;
 	};
 
 } //namespace ucv

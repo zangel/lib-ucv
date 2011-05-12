@@ -355,6 +355,8 @@ namespace baldzarika { namespace ucv {
 				CT max_y=pt_origin.y;
 
 				boost::int32_t n_ori=0;
+				bool all_positive=true;
+				bool all_negative=true;
 
 				boost::int32_t prev_s=-1;
 				boost::int32_t s=hole?0:4;
@@ -404,8 +406,12 @@ namespace baldzarika { namespace ucv {
 
 						if(s!=prev_s)
 						{
-							//boost::int32_t ori_change=(s>3?s-8:s)-(prev_s>3?prev_s-8);
-							//ori_change=
+							boost::int32_t ori_change=s-prev_s;
+							ori_change-=(ori_change/4)*8;
+							n_ori+=ori_change;
+							all_positive=all_positive && ori_change>=0;
+							all_negative=all_negative && ori_change<=0;
+
 
 							
 							cont.m_points.push_back(typename contour<CT>::point2_t(pt.x,pt.y));
@@ -436,7 +442,10 @@ namespace baldzarika { namespace ucv {
 					point2<CT>(max_x,max_y)
 				);
 				cont.m_is_closed=contour<CT>::check_is_closed(cont.m_points,detail::constant::two<CT>());
-				//cont.m_orientation=;
+				cont.m_is_clockwise=n_ori<=0;
+				cont.m_is_convex=(n_ori>=0 && all_positive) || (n_ori<=0 && all_negative);
+
+				
 			}
 		}
 
