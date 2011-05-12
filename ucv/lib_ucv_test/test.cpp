@@ -894,19 +894,26 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	typedef ucv::canny<real_t, 3> canny_t;
 
 	{
-		typedef ucv::contour<real_t> contour_t;
+		typedef ucv::contour< ucv::fixed_point<23,8> > contour_t;
 		canny_t canny(ucv::size2ui(gray8_img.width(), gray8_img.height()), 0.6, 1.8);
 		std::list< contour_t > contours;
 
 		canny.operator()(ucv::gil::const_view(gray_img), contours);
 
-		cv::Mat contour_img(dy_img.height(), dy_img.width(), CV_8UC3);
-
-		for(std::list<contour_t>::const_iterator ic=contours.begin();ic!=contours.end();++ic)
+		for(std::list<contour_t>::iterator ic=contours.begin();ic!=contours.end();++ic)
 		{
-			contour_img=cv::Mat::zeros(cv::Size(dy_img.width(),dy_img.height()), CV_8UC3);
+			cv::Mat contour_img(dy_img.height(),dy_img.width(),CV_8UC3);
+			image.convertTo(contour_img, CV_8UC3);
 
-			contour_t const &contour=*ic;
+
+			//contour_img=cv::Mat::zeros(cv::Size(dy_img.width(),dy_img.height()), CV_8UC3);
+
+			contour_t &contour=*ic;
+			contour.aproximate(3.0);
+
+			
+
+
 			boost::scoped_array<cv::Point> cpts(new cv::Point[contour.m_points.size()]);
 			for(boost::uint32_t p=0;p<contour.m_points.size();++p)
 				cpts.get()[p]=cv::Point(contour.m_points[p].x,contour.m_points[p].y);
@@ -919,11 +926,21 @@ BOOST_AUTO_TEST_CASE( canny_test )
 				&ppts,
 				&npts,
 				1,
-				false,
-				cv::Scalar(255, 255.0, 255)
+				contour.m_is_closed,
+				cv::Scalar(255, 0, 0)
 			);
+
+			for(int p=0;p<npts;++p)
+				cv::circle(contour_img,
+					ppts[p],
+					1,
+					cv::Scalar(255),
+					-1
+				);
 			cv::imshow(OPENCV_WND_NAME, contour_img);
 			cv::waitKey();
+			
+
 		}
 	}
 
@@ -945,6 +962,7 @@ BOOST_AUTO_TEST_CASE( canny_test )
 			ucv::gil::view(gray32f_img),
 		1.0f
 		);
+
 		cv::imshow(OPENCV_WND_NAME, cv::Mat(edge_img.height(), edge_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
 		cv::waitKey();
 	}
