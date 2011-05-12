@@ -900,18 +900,22 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 		canny.operator()(ucv::gil::const_view(gray_img), contours);
 
+		cv::Mat contour_img(dy_img.height(),dy_img.width(),CV_8UC3);
+		image.convertTo(contour_img, CV_8UC3);
+
 		for(std::list<contour_t>::iterator ic=contours.begin();ic!=contours.end();++ic)
 		{
 			//contour_img=cv::Mat::zeros(cv::Size(dy_img.width(),dy_img.height()), CV_8UC3);
 
 			contour_t &contour=*ic;
 			contour.aproximate(3.0);
+			
 
-			if(!contour.m_is_closed || contour.m_points.size()>4)
+
+			if(!contour.m_is_closed || contour.m_points.size()>4 || !contour.m_is_convex)
 				continue;
 
-			cv::Mat contour_img(dy_img.height(),dy_img.width(),CV_8UC3);
-			image.convertTo(contour_img, CV_8UC3);
+			
 
 			
 
@@ -932,18 +936,9 @@ BOOST_AUTO_TEST_CASE( canny_test )
 				cv::Scalar(255, 0, 0)
 			);
 
-			for(int p=0;p<npts;++p)
-				cv::circle(contour_img,
-					ppts[p],
-					1,
-					cv::Scalar(255),
-					-1
-				);
-			cv::imshow(OPENCV_WND_NAME, contour_img);
-			cv::waitKey();
-			
-
 		}
+		cv::imshow(OPENCV_WND_NAME, contour_img);
+		cv::waitKey();
 	}
 
 
