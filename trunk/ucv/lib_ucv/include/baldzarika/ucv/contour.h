@@ -3,6 +3,7 @@
 
 #include <baldzarika/ucv/point2.h>
 #include <baldzarika/ucv/vector.h>
+#include <baldzarika/ucv/approximate_polygon.h>
 
 namespace baldzarika { namespace ucv {
 
@@ -40,6 +41,11 @@ namespace baldzarika { namespace ucv {
 		{
 			if(m_is_closed)
 				m_points.pop_back();
+		}
+
+		void aproximate(T const &eps)
+		{
+			approximate_polygon(m_points, m_is_closed, eps);
 		}
 
 		bool		m_is_closed;

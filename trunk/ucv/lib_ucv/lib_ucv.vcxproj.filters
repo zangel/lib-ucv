@@ -111,6 +111,9 @@
     <ClInclude Include="include\baldzarika\ucv\contour.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\approximate_polygon.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ucv\config.cpp">
