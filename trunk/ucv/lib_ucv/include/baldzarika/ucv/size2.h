@@ -12,12 +12,13 @@ namespace baldzarika { namespace ucv {
 		size2() {}
 		size2(T w, T h): base_t(w,h) {}
 		size2(size2 const &s): base_t(s) {}
+		size2(base_t const &p): base_t(p) {}
 		~size2() {}
 
 		T		width() const { return base_t::x; }
 		T		height() const { return base_t::y; }
 		T		area() const { return base_t::x*base_t::y; }
-		bool	empty() const { return !(area()>0); }
+		bool	empty() const { return !(area()>detail::constant::zero<T>()); }
 	};
 
 	typedef size2<float>			size2f;

@@ -894,7 +894,7 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	typedef ucv::canny<real_t, 3> canny_t;
 
 	{
-		typedef ucv::contour< ucv::fixed_point<23,8> > contour_t;
+		typedef ucv::contour< real_t > contour_t;
 		canny_t canny(ucv::size2ui(gray8_img.width(), gray8_img.height()), 0.6, 1.8);
 		std::list< contour_t > contours;
 
@@ -902,14 +902,16 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 		for(std::list<contour_t>::iterator ic=contours.begin();ic!=contours.end();++ic)
 		{
-			cv::Mat contour_img(dy_img.height(),dy_img.width(),CV_8UC3);
-			image.convertTo(contour_img, CV_8UC3);
-
-
 			//contour_img=cv::Mat::zeros(cv::Size(dy_img.width(),dy_img.height()), CV_8UC3);
 
 			contour_t &contour=*ic;
 			contour.aproximate(3.0);
+
+			if(!contour.m_is_closed || contour.m_points.size()>4)
+				continue;
+
+			cv::Mat contour_img(dy_img.height(),dy_img.width(),CV_8UC3);
+			image.convertTo(contour_img, CV_8UC3);
 
 			
 

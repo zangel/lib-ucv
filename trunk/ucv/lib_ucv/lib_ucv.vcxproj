@@ -87,6 +87,7 @@
   <ItemGroup>
     <ClInclude Include="include\baldzarika\ucv\adaptive_treshold.h" />
     <ClInclude Include="include\baldzarika\ucv\approximate_polygon.h" />
+    <ClInclude Include="include\baldzarika\ucv\box2.h" />
     <ClInclude Include="include\baldzarika\ucv\canny.h" />
     <ClInclude Include="include\baldzarika\ucv\config.h" />
     <ClInclude Include="include\baldzarika\ucv\contour.h" />
