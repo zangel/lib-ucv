@@ -4,6 +4,7 @@
 #include <baldzarika/ucv/config.h>
 #include <baldzarika/ucv/fixed_point.h>
 #include <baldzarika/ucv/matrix.h>
+#include <baldzarika/ucv/svd.h>
 #include <baldzarika/ucv/vector.h>
 #include <baldzarika/ucv/convert_scale.h>
 #include <baldzarika/ucv/integral.h>
@@ -773,6 +774,18 @@ BOOST_AUTO_TEST_CASE( test_vector )
 
 #endif
 
+BOOST_AUTO_TEST_CASE( svd_test )
+{
+	namespace ucv=baldzarika::ucv;
+
+	ucv::matrix33f mat=ucv::matrix33f::identity(), u, v;
+	ucv::vector3f w;
+
+	ucv::svd(mat, u, w, v);
+
+	int c=0;
+}
+
 BOOST_AUTO_TEST_CASE( canny_test )
 {
 	namespace ucv=baldzarika::ucv;
@@ -967,7 +980,4 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	cv::Canny(image, image, 30, 90);
 	cv::imshow(OPENCV_WND_NAME, image);
 	cv::waitKey();
-
-
-
 }

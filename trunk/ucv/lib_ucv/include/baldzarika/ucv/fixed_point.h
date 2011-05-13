@@ -320,7 +320,7 @@ namespace baldzarika { namespace ucv {
 
 		operator unsigned long long() const { return static_cast<unsigned long long>(m_value>>F); }
 
-		operator bool() const { return static_cast<bool>(m_value); }
+		operator bool() const { return !(m_value==0); }
 
 		operator float() const { return static_cast<float>(m_value)/detail::pow2<F>::value; }
 		
@@ -572,6 +572,10 @@ namespace baldzarika { namespace ucv {
 		}
 
 #else
+		friend fixed_point sqr(fixed_point const &x)
+		{
+			return x*x;
+		}
 		
 		friend fixed_point sqrt(fixed_point const &x)
 		{

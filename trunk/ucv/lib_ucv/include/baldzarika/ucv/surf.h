@@ -22,12 +22,6 @@ namespace baldzarika { namespace ucv {
 		typedef KDTree::KDTree<feature_point_t::DESCRIPTOR_SIZE, feature_point_t, feature_point_t::description_accessor> fps_by_desc_tree_t;
 		
 		
-		//typedef fixed_point<10, 21> gray_t;
-		//typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
-		//typedef gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
-		//typedef gray_image_t::view_t gray_view_t;
-		
-
 		typedef fixed_point<10, 21> integral_t;
 		typedef gil::pixel<integral_t, ucv::gil::gray_layout_t> integral_pixel_t;
 		typedef gil::image< integral_pixel_t, false, std::allocator<unsigned char> > integral_image_t;
