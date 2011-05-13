@@ -25,6 +25,12 @@
     <Filter Include="Source Files\baldzarika\ar">
       <UniqueIdentifier>{65a2eaaf-5703-4d9a-9905-33ad909577f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\baldzarika\ar\fiducial">
+      <UniqueIdentifier>{5ffe7819-42d5-45e9-9147-1ec1538942dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\baldzarika\ar\fiducial">
+      <UniqueIdentifier>{e6d3b1ce-2b16-4e22-a3ee-ccc808c195bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -39,6 +45,18 @@
     <ClInclude Include="include\baldzarika\ar\tracker.h">
       <Filter>Header Files\baldzarika\ar</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\fiducial\model.h">
+      <Filter>Header Files\baldzarika\ar\fiducial</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\fiducial\tracker.h">
+      <Filter>Header Files\baldzarika\ar\fiducial</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\fiducial\typedefs.h">
+      <Filter>Header Files\baldzarika\ar\fiducial</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\fiducial\bch_model.h">
+      <Filter>Header Files\baldzarika\ar\fiducial</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ar\config.cpp">
@@ -49,6 +67,15 @@
     </ClCompile>
     <ClCompile Include="src\baldzarika\ar\tracker.cpp">
       <Filter>Source Files\baldzarika\ar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ar\fiducial\model.cpp">
+      <Filter>Source Files\baldzarika\ar\fiducial</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ar\fiducial\bch_model.cpp">
+      <Filter>Source Files\baldzarika\ar\fiducial</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ar\fiducial\tracker.cpp">
+      <Filter>Source Files\baldzarika\ar\fiducial</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

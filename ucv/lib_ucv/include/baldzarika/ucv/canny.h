@@ -444,8 +444,6 @@ namespace baldzarika { namespace ucv {
 				cont.m_is_closed=contour<CT>::check_is_closed(cont.m_points,detail::constant::two<CT>());
 				cont.m_is_clockwise=n_ori<=0;
 				cont.m_is_convex=(n_ori>=0 && all_positive) || (n_ori<=0 && all_negative);
-
-				
 			}
 		}
 

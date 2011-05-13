@@ -111,6 +111,7 @@
     <ClInclude Include="include\baldzarika\ucv\size2.h" />
     <ClInclude Include="include\baldzarika\ucv\sobel.h" />
     <ClInclude Include="include\baldzarika\ucv\surf.h" />
+    <ClInclude Include="include\baldzarika\ucv\svd.h" />
     <ClInclude Include="include\baldzarika\ucv\vector.h" />
   </ItemGroup>
   <ItemGroup>
