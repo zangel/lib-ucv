@@ -60,7 +60,7 @@ namespace baldzarika { namespace ucv {
 				sum+=diff*diff;
 			}
 			//float sum_=sum;
-			return sqrt(sum);
+			return std::sqrt(sum);
 		}
 
 		bool operator&&(feature_point const &rhs) const

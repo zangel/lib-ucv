@@ -12,6 +12,57 @@
 #endif
 
 namespace baldzarika { namespace ucv {
+	template <boost::uint32_t I, boost::uint32_t F > class fixed_point;
+} //namespace ucv
+} //namespace baldzarika
+
+namespace std {
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> abs(baldzarika::ucv::fixed_point<I,F> const &);
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> fabs(baldzarika::ucv::fixed_point<I,F> const &);
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> ceil(baldzarika::ucv::fixed_point<I,F> const &);
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> floor(baldzarika::ucv::fixed_point<I,F> const &);
+
+	template <boost::uint32_t I, boost::uint32_t F>
+	baldzarika::ucv::fixed_point<I,F> fmod(baldzarika::ucv::fixed_point<I,F> const &, baldzarika::ucv::fixed_point<I,F> const &);
+
+	template <boost::uint32_t I, boost::uint32_t F>
+	baldzarika::ucv::fixed_point<I,F> modf(baldzarika::ucv::fixed_point<I,F> const &, baldzarika::ucv::fixed_point<I,F> *);
+
+	template < typename T, boost::uint32_t I, boost::uint32_t F>
+	T round(baldzarika::ucv::fixed_point<I,F> const &);
+
+	template <boost::uint32_t I, boost::uint32_t F>
+	baldzarika::ucv::fixed_point<I,F> sqrt(baldzarika::ucv::fixed_point<I,F> const &);
+
+	template <boost::uint32_t I, boost::uint32_t F>
+	baldzarika::ucv::fixed_point<I,F> log(baldzarika::ucv::fixed_point<I,F> const &);
+
+	template <boost::uint32_t I, boost::uint32_t F>
+	baldzarika::ucv::fixed_point<I,F> pow(baldzarika::ucv::fixed_point<I,F> const &, baldzarika::ucv::fixed_point<I,F> const &);
+
+	template <boost::uint32_t I, boost::uint32_t F>
+	baldzarika::ucv::fixed_point<I,F> exp(baldzarika::ucv::fixed_point<I,F> const &);
+
+	template <boost::uint32_t I, boost::uint32_t F>
+	baldzarika::ucv::fixed_point<I,F> atan2(baldzarika::ucv::fixed_point<I,F> const &, baldzarika::ucv::fixed_point<I,F> const &);
+
+	template <boost::uint32_t I, boost::uint32_t F>
+	baldzarika::ucv::fixed_point<I,F> sin(baldzarika::ucv::fixed_point<I,F> const &);
+	
+	template <boost::uint32_t I, boost::uint32_t F>
+	baldzarika::ucv::fixed_point<I,F> cos(baldzarika::ucv::fixed_point<I,F> const &);
+
+} //namespace std
+
+namespace baldzarika { namespace ucv {
 
 	namespace detail {
 		
@@ -331,284 +382,49 @@ namespace baldzarika { namespace ucv {
 
 		value_type get() const { return m_value; }
 
+		template < boost::uint32_t I, boost::uint32_t F >
+		friend fixed_point<I,F> std::abs(fixed_point<I,F> const &);
 
-		friend fixed_point fabs(fixed_point const &x)
-		{
-			return x<detail::constant::zero<fixed_point>()?-x:x;
-		}
+		template < boost::uint32_t I, boost::uint32_t F >
+		friend fixed_point<I,F> std::fabs(fixed_point<I,F> const &);
 
-		friend fixed_point abs(fixed_point const &x)
-		{
-			return x<detail::constant::zero<fixed_point>()?-x:x;
-		}
-
-		friend fixed_point ceil(fixed_point const &x)
-		{
-			return fixed_point(x.m_value & ~(detail::pow2<F>::value-1), detail::fp_explicit_tag())+
-				((x.m_value & (detail::pow2<F>::value-1))?detail::constant::one<fixed_point>():detail::constant::zero<fixed_point>());
-		}
-
-
-		friend fixed_point floor(fixed_point const &x)
-		{
-			return fixed_point(x.m_value & ~(detail::pow2<F>::value-1), detail::fp_explicit_tag());
-		}
-
-		friend fixed_point fmod(fixed_point const &x, fixed_point const &y)
-		{
-			return fixed_point(x.m_value % y.m_value, detail::fp_explicit_tag());
-		}
-
-		friend fixed_point modf(fixed_point const &x, fixed_point *ptr)
-		{
-			*ptr=fixed_point(x.m_value & ~(detail::pow2<F>::value-1), detail::fp_explicit_tag());
-			if(x<detail::constant::zero<fixed_point>()) *ptr+=detail::constant::one<fixed_point>();
-
-			return fixed_point(
-				(
-					x<detail::constant::zero<fixed_point>()?
-					-(x.m_value & (detail::pow2<F>::value-1)):
-					(x.m_value & (detail::pow2<F>::value-1))
-				),
-				detail::fp_explicit_tag()
-			);
-		}
-
-		template< typename T >
-		friend T round(fixed_point const &x)
-		{
-			return static_cast<T>(x>=detail::constant::zero<fixed_point>()?
-				x+detail::constant::half<fixed_point>():
-			x-detail::constant::half<fixed_point>()
-				);
-		}
-
-		friend fixed_point log(fixed_point const &x)
-		{
-			return fixed_point(::logf(static_cast<float>(x)));
-		}
-
-		friend fixed_point pow(fixed_point const &x, fixed_point const &y)
-		{
-			return fixed_point(::pow(static_cast<float>(x), static_cast<float>(y)));
-		}
-
-#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_ATAN2)
+		template < boost::uint32_t I, boost::uint32_t F >
+		friend fixed_point<I,F> std::ceil(fixed_point<I,F> const &);
 		
-		friend fixed_point atan2(fixed_point const &y, fixed_point const &x)
-		{
-			return fixed_point(::atan2(static_cast<float>(y), static_cast<float>(x)));
-		}
+		template < boost::uint32_t I, boost::uint32_t F >
+		friend fixed_point<I,F> std::floor(fixed_point<I,F> const &);
 
-#else
+		template < boost::uint32_t I, boost::uint32_t F >
+		friend fixed_point<I,F> std::fmod(fixed_point<I,F> const &, fixed_point<I,F> const &);
 
-#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FIXED_POINT_ATAN2_HIGH_PRECISION)
-		friend fixed_point atan2(fixed_point const &y, fixed_point const &x)
-		{
-			fixed_point abs_y=fabs(y)+fixed_point(1, detail::fp_explicit_tag());
-			fixed_point angle;
+		template < boost::uint32_t I, boost::uint32_t F >
+		friend fixed_point<I,F> std::modf(fixed_point<I,F> const &, fixed_point<I,F> *);
 
-			if(x>=detail::constant::zero<fixed_point>())
-			{
-				fixed_point r=fixed_point(x.m_value-abs_y.m_value, detail::fp_explicit_tag())/fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag());
-				angle=detail::constant::atan_c1<fixed_point>()*r*r*r-detail::constant::atan_c2<fixed_point>()*r+detail::constant::pi_i4<fixed_point>();
-			}
-			else
-			{
-				fixed_point r=fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag())/fixed_point(abs_y.m_value-x.m_value, detail::fp_explicit_tag());
-				angle=detail::constant::atan_c1<fixed_point>()*r*r*r-detail::constant::atan_c2<fixed_point>()*r+detail::constant::pi_3i4<fixed_point>();
-			}
-			return (y<detail::constant::zero<fixed_point>()?-angle:angle);
-		}
-#else
-		friend fixed_point atan2(fixed_point const &y, fixed_point const &x)
-		{
-			fixed_point abs_y=fabs(y)+fixed_point(1, detail::fp_explicit_tag());
+		template< typename T, boost::uint32_t I, boost::uint32_t F >
+		friend T std::round(fixed_point<I,F> const &);
 
-			fixed_point angle((
-				x>=detail::constant::zero<fixed_point>()?
-				detail::constant::pi_i4<fixed_point>()-detail::constant::pi_i4<fixed_point>()*
-				(fixed_point(x.m_value-abs_y.m_value, detail::fp_explicit_tag())/fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag())):
-			detail::constant::pi_3i4<fixed_point>()-detail::constant::pi_i4<fixed_point>()*
-				(fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag())/fixed_point(abs_y.m_value-x.m_value, detail::fp_explicit_tag()))
-				));
-			return (y<detail::constant::zero<fixed_point>()?-angle:angle);
-		}
+		template < boost::uint32_t I, boost::uint32_t F >
+		friend fixed_point<I,F> std::sqrt(fixed_point<I,F> const &);
 
-#endif
-#endif
-
-#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_EXP)
-
-		friend fixed_point exp(fixed_point const &x)
-		{
-			return fixed_point(::exp(static_cast<float>(x)));
-		}
-
-#else
-		friend fixed_point exp(fixed_point const &x)
-		{
-			static fixed_point const a[]=
-			{
-				1.64872127070012814684865078781,
-				1.28402541668774148407342056806,
-				1.13314845306682631682900722781,
-				1.06449445891785942956339059464,
-				1.03174340749910267093874781528,
-				1.01574770858668574745853507208,
-				1.00784309720644797769345355976,
-				1.00391388933834757344360960390,
-				1.00195503359100281204651889805,
-				1.00097703949241653524284529261,
-				1.00048840047869447312617362381,
-				1.00024417042974785493700523392,
-				1.00012207776338377107650351967,
-				1.00006103701893304542177912060,
-				1.00003051804379102429545128481,
-				1.00001525890547841394814004262,
-				1.00000762942363515447174318433,
-				1.00000381470454159186605078771,
-				1.00000190735045180306002872525,
-				1.00000095367477115374544678825,
-				1.00000047683727188998079165439,
-				1.00000023841860752327418915867,
-				1.00000011920929665620888994533,
-				1.00000005960464655174749969329,
-				1.00000002980232283178452676169,
-				1.00000001490116130486995926397,
-				1.00000000745058062467940380956,
-				1.00000000372529030540080797502,
-				1.00000000186264515096568050830,
-				1.00000000093132257504915938475,
-				1.00000000046566128741615947508
-			};
-
-			fixed_point y(1);
-			for(boost::int32_t i=F-1; i>=0; --i)
-			{
-				if(!(x.m_value & 1<<i))
-					y*=a[F-i-1];
-			}
-
-			boost::int32_t x_int=floor(x);
-			if(x_int<0)
-			{
-				for(boost::int32_t i=1;i<=-x_int;++i)
-					y*=detail::constant::inv_e<fixed_point>();
-			}
-			else
-			{
-				for(boost::int32_t i=1;i<=x_int;++i)
-					y*=detail::constant::e<fixed_point>();
-			}
-			return y;
-		}
-#endif
-
-#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_COS)
-
-		friend fixed_point cos(fixed_point const &x)
-		{
-			return fixed_point(::cos(static_cast<float>(x)));
-		}
-#else
-
-		friend fixed_point cos(fixed_point const &x)
-		{
-			static fixed_point const i_2t3t4=0.04166666666666666666666666666667;
-			static fixed_point const i_2t3t4t5t6=0.00138888888888888888888888888889;
-
-			fixed_point x_=fmod(x, detail::constant::pi_2<fixed_point>());
-			if(x_>detail::constant::pi<fixed_point>())
-				x_-=detail::constant::pi_2<fixed_point>();
-			fixed_point xx=x_*x_;
-			fixed_point y=-xx*i_2t3t4t5t6;
-			y+=i_2t3t4;
-			y*=xx;
-			y-=detail::constant::half<fixed_point>();
-			y*=xx;
-			return y+detail::constant::one<fixed_point>();
-		}
-
-#endif
-
-#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_SIN)
-
-		friend fixed_point sin(fixed_point const &x)
-		{
-			return fixed_point(::sin(static_cast<float>(x)));
-		}
-
-#else
-
-		friend fixed_point sin(fixed_point const &x)
-		{
-			static fixed_point const i_2t3=0.16666666666666666666666666666667;
-			static fixed_point const i_2t3t4t5=0.00833333333333333333333333333333;
-			static fixed_point const i_2t3t4t5t6t7=1.984126984126984126984126984127e-4;
-
-			fixed_point x_=fmod(x, detail::constant::pi_2<fixed_point>());
-			if(x_>detail::constant::pi<fixed_point>())
-				x_-=detail::constant::pi_2<fixed_point>();
-
-			fixed_point xx=x_*x_;
-
-			fixed_point y=-xx*i_2t3t4t5t6t7;
-			y+=i_2t3t4t5;
-			y*=xx;
-			y-=i_2t3;
-			y*=xx;
-			y+=detail::constant::one<fixed_point>();
-			return y*x_;
-		}
-
-#endif
-
-#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_SQRT)
-
-		friend fixed_point sqrt(fixed_point const &x)
-		{
-			return fixed_point(::sqrt(static_cast<float>(x)));
-		}
-
-#else
-		friend fixed_point sqr(fixed_point const &x)
-		{
-			return x*x;
-		}
+		template < boost::uint32_t I, boost::uint32_t F >
+		friend fixed_point<I,F> std::log(fixed_point<I,F> const &);
 		
-		friend fixed_point sqrt(fixed_point const &x)
-		{
-			//return fixed_point(::sqrt(static_cast<float>(x)));
+		template < boost::uint32_t I, boost::uint32_t F >
+		friend fixed_point<I,F> std::pow(fixed_point<I,F> const &, fixed_point<I,F> const &);
 
-			if(x<detail::constant::zero<fixed_point>())
-				return 0;
-			
-			typename fixed_point<2*I, 2*F>::value_type op=
-				typename fixed_point<2*I, 2*F>::value_type(x.m_value)<<(I+1);
-			
-			typename fixed_point<2*I, 2*F>::value_type res=0;
-			typename fixed_point<2*I, 2*F>::value_type one=
-				typename fixed_point<2*I, 2*F>::value_type(1)<<
-				(std::numeric_limits<typename fixed_point<2*I, 2*F>::value_type>::digits-1);
+		template < boost::uint32_t I, boost::uint32_t F >
+		friend fixed_point<I,F> std::exp(fixed_point<I,F> const &);
 
-			while(one>op)
-				one>>=2;
-			
-			while(one!=0)
-			{
-				if(op>=res+one)
-				{
-					op=op-(res+one);
-					res=res+(one<<1);
-				}
-				res >>= 1;
-				one >>= 2;
-			}
-			return fixed_point(static_cast<value_type>(res), detail::fp_explicit_tag());
-		}
-#endif
-	
+		template < boost::uint32_t I, boost::uint32_t F >
+		friend fixed_point<I,F> std::atan2(fixed_point<I,F> const &, fixed_point<I,F> const &);
+
+		template < boost::uint32_t I, boost::uint32_t F >
+		friend fixed_point<I,F> std::sin(fixed_point<I,F> const &);
+
+		template < boost::uint32_t I, boost::uint32_t F >
+		friend fixed_point<I,F> std::cos(fixed_point<I,F> const &);
+
+		
 	private:
 		value_type		m_value;
 	};
@@ -618,13 +434,6 @@ namespace baldzarika { namespace ucv {
 
 namespace std
 {
-	template <boost::uint32_t I, boost::uint32_t F>
-	baldzarika::ucv::fixed_point<I,F> sqrt(baldzarika::ucv::fixed_point<I,F> const &x)
-	{
-		return baldzarika::ucv::fixed_point<I,F>(std::sqrt(static_cast<float>(x)));
-	}
-
-
 	template< boost::uint32_t I, boost::uint32_t F>
 	class numeric_limits< baldzarika::ucv::fixed_point<I, F> >
 	{
@@ -699,6 +508,304 @@ namespace std
 			return fp_type(0);
 		}
 	};
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> abs(baldzarika::ucv::fixed_point<I,F> const &x)
+	{
+		namespace bucv=baldzarika::ucv;
+		return x<bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?-x:x;
+	}
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> fabs(baldzarika::ucv::fixed_point<I,F> const &x)
+	{
+		namespace bucv=baldzarika::ucv;
+		return x<bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?-x:x;
+	}
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> ceil(baldzarika::ucv::fixed_point<I,F> const &x)
+	{
+		namespace bucv=baldzarika::ucv;
+		return bucv::fixed_point<I,F>(x.m_value & ~(bucv::detail::pow2<F>::value-1), bucv::detail::fp_explicit_tag())+
+			((x.m_value & (bucv::detail::pow2<F>::value-1))?
+				bucv::detail::constant::one< bucv::fixed_point<I,F> >():
+				bucv::detail::constant::zero< bucv::fixed_point<I,F> >()
+			);
+	}
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> floor(baldzarika::ucv::fixed_point<I,F> const &x)
+	{
+		namespace bucv=baldzarika::ucv;
+		return bucv::fixed_point<I,F>(x.m_value & ~(bucv::detail::pow2<F>::value-1), bucv::detail::fp_explicit_tag());
+	}
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> fmod(baldzarika::ucv::fixed_point<I,F> const &x, baldzarika::ucv::fixed_point<I,F> const &y)
+	{
+		namespace bucv=baldzarika::ucv;
+		return bucv::fixed_point<I,F>(x.m_value % y.m_value, bucv::detail::fp_explicit_tag());
+	}
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> modf(baldzarika::ucv::fixed_point<I,F> const &x, baldzarika::ucv::fixed_point<I,F> *ptr)
+	{
+		namespace bucv=baldzarika::ucv;
+
+		*ptr=bucv::fixed_point<I,F>(x.m_value & ~(bucv::detail::pow2<F>::value-1), bucv::detail::fp_explicit_tag());
+		if(x<bucv::detail::constant::zero< bucv::fixed_point<I,F> >()) *ptr+=bucv::detail::constant::one< bucv::fixed_point<I,F> >();
+
+		return bucv::fixed_point<I,F>(
+			(x<detail::constant::zero< bucv::fixed_point<I,F> >()?
+				-(x.m_value & (bucv::detail::pow2<F>::value-1)):
+				(x.m_value & (bucv::detail::pow2<F>::value-1))
+			),
+			bucv::detail::fp_explicit_tag()
+		);
+	}
+
+	template< typename T, boost::uint32_t I, boost::uint32_t F >
+	T round(baldzarika::ucv::fixed_point<I,F> const &x)
+	{
+		namespace bucv=baldzarika::ucv;
+
+		return static_cast<T>(x>=bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?
+			x+bucv::detail::constant::half< bucv::fixed_point<I,F> >():
+			x-bucv::detail::constant::half< bucv::fixed_point<I,F> >()
+		);
+	}
+
+
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> sqrt(baldzarika::ucv::fixed_point<I,F> const &x)
+	{
+		namespace bucv=baldzarika::ucv;
+
+#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_SQRT)
+		return bucv::fixed_point<I,F>(std::sqrt(static_cast<float>(x)));
+#else
+
+#if 0
+		using baldzarika::ucv::detail::constant::zero;
+		using baldzarika::ucv::detail::fp_explicit_tag;
+
+		if(x<zero< fixed_point<I,F> >())
+			return 0;
+
+		typename fixed_point<2*I, 2*F>::value_type op=
+			typename fixed_point<2*I, 2*F>::value_type(x.m_value)<<(I+1);
+
+		typename fixed_point<2*I, 2*F>::value_type res=0;
+		typename fixed_point<2*I, 2*F>::value_type one=
+			typename fixed_point<2*I, 2*F>::value_type(1)<<
+			(std::numeric_limits<typename fixed_point<2*I, 2*F>::value_type>::digits-1);
+
+		while(one>op)
+			one>>=2;
+
+		while(one!=0)
+		{
+			if(op>=res+one)
+			{
+				op=op-(res+one);
+				res=res+(one<<1);
+			}
+			res >>= 1;
+			one >>= 2;
+		}
+		return fixed_point<I,F>(static_cast< fixed_point<I, F>::value_type >(res), fp_explicit_tag());
+#endif
+#endif
+	}
+
+
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> log(baldzarika::ucv::fixed_point<I,F> const &x)
+	{
+		namespace bucv=baldzarika::ucv;
+		return bucv::fixed_point<I,F>(::logf(static_cast<float>(x)));
+	}
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> pow(baldzarika::ucv::fixed_point<I,F> const &x, baldzarika::ucv::fixed_point<I,F> const &y)
+	{
+		namespace bucv=baldzarika::ucv;
+		return bucv::fixed_point<I,F>(::pow(static_cast<float>(x), static_cast<float>(y)));
+	}
+
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> exp(baldzarika::ucv::fixed_point<I,F> const &x)
+	{
+		namespace bucv=baldzarika::ucv;
+
+#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_EXP)
+
+		return bucv::fixed_point<I,F>(::exp(static_cast<float>(x)));
+
+#else
+		static fixed_point const a[]=
+		{
+			1.64872127070012814684865078781,
+			1.28402541668774148407342056806,
+			1.13314845306682631682900722781,
+			1.06449445891785942956339059464,
+			1.03174340749910267093874781528,
+			1.01574770858668574745853507208,
+			1.00784309720644797769345355976,
+			1.00391388933834757344360960390,
+			1.00195503359100281204651889805,
+			1.00097703949241653524284529261,
+			1.00048840047869447312617362381,
+			1.00024417042974785493700523392,
+			1.00012207776338377107650351967,
+			1.00006103701893304542177912060,
+			1.00003051804379102429545128481,
+			1.00001525890547841394814004262,
+			1.00000762942363515447174318433,
+			1.00000381470454159186605078771,
+			1.00000190735045180306002872525,
+			1.00000095367477115374544678825,
+			1.00000047683727188998079165439,
+			1.00000023841860752327418915867,
+			1.00000011920929665620888994533,
+			1.00000005960464655174749969329,
+			1.00000002980232283178452676169,
+			1.00000001490116130486995926397,
+			1.00000000745058062467940380956,
+			1.00000000372529030540080797502,
+			1.00000000186264515096568050830,
+			1.00000000093132257504915938475,
+			1.00000000046566128741615947508
+		};
+
+		fixed_point y(1);
+		for(boost::int32_t i=F-1; i>=0; --i)
+		{
+			if(!(x.m_value & 1<<i))
+				y*=a[F-i-1];
+		}
+
+		boost::int32_t x_int=floor(x);
+		if(x_int<0)
+		{
+			for(boost::int32_t i=1;i<=-x_int;++i)
+				y*=detail::constant::inv_e<fixed_point>();
+		}
+		else
+		{
+			for(boost::int32_t i=1;i<=x_int;++i)
+				y*=detail::constant::e<fixed_point>();
+		}
+		return y;
+#endif
+
+	}
+
+
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> atan2(baldzarika::ucv::fixed_point<I,F> const &y, baldzarika::ucv::fixed_point<I,F> const &x)
+	{
+		namespace bucv=baldzarika::ucv;
+
+#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_ATAN2)
+		return bucv::fixed_point<I,F>(::atan2(static_cast<float>(y), static_cast<float>(x)));
+#else
+#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FIXED_POINT_ATAN2_HIGH_PRECISION)
+		
+	fixed_point abs_y=fabs(y)+fixed_point(1, detail::fp_explicit_tag());
+	fixed_point angle;
+
+	if(x>=detail::constant::zero<fixed_point>())
+	{
+		fixed_point r=fixed_point(x.m_value-abs_y.m_value, detail::fp_explicit_tag())/fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag());
+		angle=detail::constant::atan_c1<fixed_point>()*r*r*r-detail::constant::atan_c2<fixed_point>()*r+detail::constant::pi_i4<fixed_point>();
+	}
+	else
+	{
+		fixed_point r=fixed_point(x.m_value+abs_y.m_value, detail::fp_explicit_tag())/fixed_point(abs_y.m_value-x.m_value, detail::fp_explicit_tag());
+		angle=detail::constant::atan_c1<fixed_point>()*r*r*r-detail::constant::atan_c2<fixed_point>()*r+detail::constant::pi_3i4<fixed_point>();
+	}
+	return (y<detail::constant::zero<fixed_point>()?-angle:angle);
+
+#else
+
+	bucv::fixed_point<I,F> abs_y=std::abs(y)+bucv::fixed_point<I,F>(1, bucv::detail::fp_explicit_tag());
+
+	bucv::fixed_point<I,F> angle(
+		x>=bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?
+			bucv::detail::constant::pi_i4< bucv::fixed_point<I,F> >()-bucv::detail::constant::pi_i4< bucv::fixed_point<I,F> >()*
+				(bucv::fixed_point<I,F>(x.m_value-abs_y.m_value, bucv::detail::fp_explicit_tag())/bucv::fixed_point<I,F>(x.m_value+abs_y.m_value, bucv::detail::fp_explicit_tag())):
+			bucv::detail::constant::pi_3i4< bucv::fixed_point<I,F> >()-bucv::detail::constant::pi_i4< bucv::fixed_point<I,F> >()*
+				(bucv::fixed_point<I,F>(x.m_value+abs_y.m_value, bucv::detail::fp_explicit_tag())/bucv::fixed_point<I,F>(abs_y.m_value-x.m_value, bucv::detail::fp_explicit_tag()))
+	);
+	return (y<bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?-angle:angle);
+
+#endif
+#endif
+	}
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> sin(baldzarika::ucv::fixed_point<I,F> const &x)
+	{
+		namespace bucv=baldzarika::ucv;
+
+#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_SIN)
+
+		return bucv::fixed_point<I,F>(::sin(static_cast<float>(x)));
+#else
+
+		static bucv::fixed_point<I,F> const i_2t3=0.16666666666666666666666666666667;
+		static bucv::fixed_point<I,F> const i_2t3t4t5=0.00833333333333333333333333333333;
+		static bucv::fixed_point<I,F> const i_2t3t4t5t6t7=1.984126984126984126984126984127e-4;
+
+		bucv::fixed_point<I,F> x_=std::fmod(x, bucv::detail::constant::pi_2< bucv::fixed_point<I,F> >());
+		if(x_>bucv::detail::constant::pi< bucv::fixed_point<I,F> >())
+			x_-=bucv::detail::constant::pi_2< bucv::fixed_point<I,F> >();
+
+		bucv::fixed_point<I,F> xx=x_*x_;
+
+		bucv::fixed_point<I,F> y=-xx*i_2t3t4t5t6t7;
+		y+=i_2t3t4t5;
+		y*=xx;
+		y-=i_2t3;
+		y*=xx;
+		y+=bucv::detail::constant::one< bucv::fixed_point<I,F> >();
+		return y*x_;
+#endif
+	}
+
+
+	template < boost::uint32_t I, boost::uint32_t F >
+	baldzarika::ucv::fixed_point<I,F> cos(baldzarika::ucv::fixed_point<I,F> const &x)
+	{
+		namespace bucv=baldzarika::ucv;
+
+#if defined(BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_COS)
+
+		return bucv::fixed_point<I,F>(::cos(static_cast<float>(x)));
+#else
+
+		static bucv::fixed_point<I,F> const i_2t3t4=0.04166666666666666666666666666667;
+		static bucv::fixed_point<I,F> const i_2t3t4t5t6=0.00138888888888888888888888888889;
+
+		bucv::fixed_point<I,F> x_=std::fmod(x, bucv::detail::constant::pi_2< bucv::fixed_point<I,F> >());
+		if(x_>bucv::detail::constant::pi< bucv::fixed_point<I,F> >())
+			x_-=bucv::detail::constant::pi_2< bucv::fixed_point<I,F> >();
+		bucv::fixed_point<I,F> xx=x_*x_;
+		bucv::fixed_point<I,F> y=-xx*i_2t3t4t5t6;
+		y+=i_2t3t4;
+		y*=xx;
+		y-=bucv::detail::constant::half< bucv::fixed_point<I,F> >();
+		y*=xx;
+		return y+bucv::detail::constant::one< bucv::fixed_point<I,F> >();
+#endif
+	}
+
 } //namespace std
 
 namespace baldzarika { namespace ucv {

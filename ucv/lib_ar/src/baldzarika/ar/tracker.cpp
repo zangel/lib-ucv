@@ -556,7 +556,7 @@ namespace baldzarika { namespace ar {
 					{
 						boost::uint32_t fp_g_x=static_cast<boost::uint32_t>(ffs[f].x*inv_select_fp_min_distance);
 						boost::uint32_t fp_g_y=static_cast<boost::uint32_t>(ffs[f].y*inv_select_fp_min_distance);
-						feature_point_t::desc_value_type fp_sel_scale=fabs(ffs[f].m_scale-select_scale);
+						feature_point_t::desc_value_type fp_sel_scale=std::abs(ffs[f].m_scale-select_scale);
 
 						std::size_t si;
 						for(si=0;si<marker_inliers.size();++si)
@@ -581,7 +581,7 @@ namespace baldzarika { namespace ar {
 
 						marker_inliers.push_back(
 							std::make_pair(
-								fabs(ffs[f].m_scale-select_scale),
+								std::abs(ffs[f].m_scale-select_scale),
 								f
 							)
 						);

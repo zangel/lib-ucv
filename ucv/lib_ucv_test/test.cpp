@@ -980,4 +980,5 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	cv::Canny(image, image, 30, 90);
 	cv::imshow(OPENCV_WND_NAME, image);
 	cv::waitKey();
+	
 }

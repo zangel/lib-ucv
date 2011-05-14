@@ -119,7 +119,7 @@ namespace baldzarika { namespace ucv {
 
 					integral_t det=gxx*gyy-gxy*gxy;
 
-					if(fabs(det)<m_small_det)
+					if(std::abs(det)<m_small_det)
 						return false;
 
 					integral_t dx=(gyy*ex-gxy*ey)/det;
