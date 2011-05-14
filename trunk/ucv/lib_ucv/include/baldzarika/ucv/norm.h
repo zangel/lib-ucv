@@ -27,7 +27,7 @@ namespace baldzarika { namespace ucv {
 			for(std::size_t x=0;x<static_cast<std::size_t>(i1.width());x+=s)
 			{
 				point2i sample_at(x,y);
-				row_norm_val+=abs(box_integral<IVT,RT>(i1,sample_at,sample_size)-box_integral<IVT,RT>(i2,sample_at,sample_size));
+				row_norm_val+=std::abs(box_integral<IVT,RT>(i1,sample_at,sample_size)-box_integral<IVT,RT>(i2,sample_at,sample_size));
 			}
 			norm_val+=row_norm_val*inv_width;
 		}
