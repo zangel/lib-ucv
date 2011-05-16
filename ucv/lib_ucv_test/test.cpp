@@ -19,6 +19,7 @@
 #include <baldzarika/ucv/gaussian_blur.h>
 #include <baldzarika/ucv/canny.h>
 #include <baldzarika/ucv/adaptive_treshold.h>
+#include <baldzarika/ucv/threshold.h>
 #include <baldzarika/ucv/perspective_transform.h>
 
 #include <boost/date_time.hpp>
@@ -1112,6 +1113,12 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 			if(!ucv::warp(ucv::gil::const_view(gray_img), ucv::gil::view(warped_img), pm, true))
 				continue;
+
+			ucv::threshold(
+				ucv::gil::const_view(warped_img),
+				ucv::gil::view(warped_img),
+				ucv::detail::normal_binary_threshold<gaussian_blur_t::gray_t,gaussian_blur_t::gray_t>(0.5, 1.0)
+			);
 
 			boost::uint8_t median;
 			ucv::convert_scale(

@@ -115,6 +115,7 @@
     <ClInclude Include="include\baldzarika\ucv\solve.h" />
     <ClInclude Include="include\baldzarika\ucv\surf.h" />
     <ClInclude Include="include\baldzarika\ucv\svd.h" />
+    <ClInclude Include="include\baldzarika\ucv\threshold.h" />
     <ClInclude Include="include\baldzarika\ucv\utils.h" />
     <ClInclude Include="include\baldzarika\ucv\vector.h" />
     <ClInclude Include="include\baldzarika\ucv\warp.h" />

@@ -135,6 +135,9 @@
     <ClInclude Include="include\baldzarika\ucv\utils.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\threshold.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ucv\config.cpp">
