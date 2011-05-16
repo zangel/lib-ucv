@@ -128,6 +128,11 @@ namespace baldzarika { namespace ucv {
 			return detail::invert_matrix<T>(*this);
 		}
 
+		inline matrix<T,C,R> transposed() const
+		{
+			return matrix<T,C,R>(ublas::trans(*this));
+		}
+
 		template < typename VT >
 		inline vector< VT, R > operator *(vector< VT, C > const &v) const
 		{
