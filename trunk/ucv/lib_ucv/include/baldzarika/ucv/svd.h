@@ -11,7 +11,7 @@ namespace baldzarika { namespace ucv {
 		template < typename T >
 		static inline T sign(T const &a, T const &b)
 		{
-			return std::abs(a)*(b<detail::constant::zero<T>()?-detail::constant::one<T>():detail::constant::one<T>());
+			return (b<detail::constant::zero<T>()?-std::abs(a):std::abs(a));
 		}
 
 		template < typename T >
@@ -20,7 +20,6 @@ namespace baldzarika { namespace ucv {
 			return x*x;
 		}
 		
-
 
 		template < typename T >
 		static inline T pythag(T const &a, T const &b)
@@ -136,7 +135,7 @@ namespace baldzarika { namespace ucv {
 				for(j=l;j<n;j++)
 					v(i,j)=v(j,i)=detail::constant::zero<T>();
 			}
-			v(i,i)=detail::constant::zero<T>();
+			v(i,i)=detail::constant::one<T>();
 			g=rv1[i];
 			l=i;
 		}
@@ -277,6 +276,20 @@ namespace baldzarika { namespace ucv {
 				w[k]=x;
 			}
 		}
+#if 0
+		for(k=0;k<n;k++)
+		{
+			s=0;
+			for(i=0;i<m;i++) if(u(i,k)<detail::constant::zero<T>()) s++;
+			for(j=0;j<n;j++) if(v(j,k)<detail::constant::zero<T>()) s++;
+			if(s>(m+n)/2)
+			{
+				for(i=0;i<m;i++) u(i,k) = -u(i,k);
+				for(j=0;j<n;j++) v(j,k) = -v(j,k);
+			}
+		}
+#endif
+
 		return true;
 	}
 

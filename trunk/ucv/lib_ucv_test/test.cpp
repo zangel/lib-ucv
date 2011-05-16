@@ -5,8 +5,10 @@
 #include <baldzarika/ucv/fixed_point.h>
 #include <baldzarika/ucv/matrix.h>
 #include <baldzarika/ucv/svd.h>
+#include <baldzarika/ucv/solve.h>
 #include <baldzarika/ucv/vector.h>
 #include <baldzarika/ucv/convert_scale.h>
+#include <baldzarika/ucv/warp.h>
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/surf.h>
 #include <baldzarika/ucv/homography.h>
@@ -17,6 +19,8 @@
 #include <baldzarika/ucv/gaussian_blur.h>
 #include <baldzarika/ucv/canny.h>
 #include <baldzarika/ucv/adaptive_treshold.h>
+#include <baldzarika/ucv/perspective_transform.h>
+
 #include <boost/date_time.hpp>
 #define png_infopp_NULL (png_infopp)0
 #define int_p_NULL (int*)0
@@ -778,14 +782,168 @@ BOOST_AUTO_TEST_CASE( svd_test )
 {
 	namespace ucv=baldzarika::ucv;
 
-	ucv::matrix33f mat=ucv::matrix33f::identity(), u, v;
-	ucv::vector3f w;
+	typedef ucv::matrix< float, 8, 8> matrix0_t;
+	typedef ucv::vector< float, 8 > vector0_t;
 
-	ucv::svd(mat, u, w, v);
+	typedef ucv::matrix< ucv::fixed_point<15,16>, 8, 8> matrix1_t;
+	typedef ucv::vector< ucv::fixed_point<15,16>, 8 > vector1_t;
+
+	matrix0_t mat0, u0, v0;
+	vector0_t w0;
+
+	matrix1_t mat1, u1, v1;
+	vector1_t w1;
+
+	float s=1.0f;
+
+	for(int i=0;i<8*8;++i)
+	{
+		mat0(i/8, i%8)=s;
+		mat1(i/8, i%8)=ucv::fixed_point<10,21>(s++);
+	}
+
+	ucv::svd(mat0, u0, w0, v0);
+	ucv::svd(mat1, u1, w1, v1);
+
+	for(int i=0;i<8;++i)
+	{
+		float val0=w0[i];
+		float val1=w1[i];
+		float delta=val1-val0;
+		int c=0;
+	}
+	
+	ucv::matrix33f mat2_0;
+	ucv::matrix33f mat2_1=ucv::matrix33f::identity();
+
+	s=1.0f;
+	for(boost::uint32_t i=0;i<9;++i)
+		mat2_0(i/3, i%3)=s++;
+	
+	mat2_1(0,0)=1.0f; mat2_1(1,1)=2.0f; mat2_1(2,2)=3.0f;
+
+	ucv::matrix33f mat2_2=mat2_0*mat2_1;
 
 	int c=0;
+
 }
 
+BOOST_AUTO_TEST_CASE( solve_test )
+{
+	namespace ucv=baldzarika::ucv;
+
+	typedef ucv::matrix< float, 2, 2> matrix_t;
+	typedef ucv::vector< float, 2> vector_t;
+
+	matrix_t a;
+	a(0,0)=2.0f; a(0,1)=1.0f;
+	a(1,0)=2.0f; a(1,1)=-1.0f;
+
+	vector_t b;
+	b[0]=4.0f;
+	b[1]=8.0f;
+
+	vector_t x;
+	
+	BOOST_CHECK(ucv::solve(a, b, x));
+
+	BOOST_CHECK_LT( std::abs(x[0]-( 3.0f)), 1.0e-6f);
+	BOOST_CHECK_LT( std::abs(x[1]-(-2.0f)), 1.0e-6f);
+}
+
+BOOST_AUTO_TEST_CASE( perspective_transform_test )
+{
+	namespace ucv=baldzarika::ucv;
+	typedef ucv::point2<float> point_t;
+	typedef ucv::vector<float,3> vector_t;
+	typedef ucv::matrix<float,3,3> matrix_t;
+
+	point_t const points[4]=
+	{
+		point_t( 0.0f, 0.0f ),
+		point_t( 0.0f, 100.0f ),
+		point_t( 100.0f, 100.0f ),
+		point_t( 100.0f, 0.0f )
+	};
+
+	std::vector<point_t> src(4),dst(4);
+	for(boost::uint32_t i=0;i<4;++i)
+	{
+		src[i]=points[i];
+		dst[i]=points[i]+point_t(15.0f, -20.0f);
+	}
+
+	matrix_t pm;
+	BOOST_CHECK(ucv::perspective_transform(src,dst,pm));
+
+	matrix_t identity=pm*pm.inverse();
+
+	BOOST_CHECK_LT( std::abs((pm*vector_t(src[0]))[0]-dst[0][0]), 5.0e-2f);
+	BOOST_CHECK_LT( std::abs((pm*vector_t(src[0]))[1]-dst[0][1]), 5.0e-2f);
+
+}
+
+BOOST_AUTO_TEST_CASE( warp_test )
+{
+	namespace ucv=baldzarika::ucv;
+	
+
+	typedef ucv::fixed_point<10,21> gray_t;
+	typedef ucv::gil::pixel< gray_t, ucv::gil::gray_layout_t > gray_pixel_t;
+	typedef ucv::gil::image< gray_pixel_t, false, std::allocator< unsigned char > > gray_image_t;
+	typedef gray_image_t::view_t gray_view_t;
+
+
+	ucv::gil::rgb8_image_t src8_img;
+	ucv::gil::png_read_and_convert_image("image-test.png", src8_img);
+
+	gray_image_t src_img(src8_img.width(), src8_img.height());
+
+	ucv::convert_scale(
+		ucv::gil::const_view(src8_img),
+		ucv::gil::view(src_img),
+		gray_t(1.0f/255.0f)
+	);
+
+	typedef ucv::point2<float> point_t;
+	typedef ucv::vector<float,3> vector_t;
+	typedef ucv::matrix<float,3,3> matrix_t;
+
+	std::vector<point_t> src(4),dst(4);
+#if 1
+	dst[0]=point_t( 200.0f, 200.0f ); src[0]=point_t(   0.0f,   0.0f );
+	dst[1]=point_t( 327.0f, 327.0f ); src[1]=point_t(  45.0f,   0.0f );
+	dst[2]=point_t( 200.0f, 454.0f ); src[2]=point_t(  45.0f,  45.0f );
+	dst[3]=point_t(  73.0f, 327.0f ); src[3]=point_t(   0.0f,  45.0f );
+#else
+	dst[0]=point_t(  0.0f,  0.0f ); src[0]=point_t(   0.0f,   0.0f );
+	dst[1]=point_t( 45.0f,  0.0f ); src[1]=point_t(  45.0f,   0.0f );
+	dst[2]=point_t( 45.0f, 45.0f ); src[2]=point_t(  45.0f,  45.0f );
+	dst[3]=point_t(  0.0f, 45.0f ); src[3]=point_t(   0.0f,  45.0f );
+#endif
+
+	matrix_t pm;
+	BOOST_CHECK(ucv::perspective_transform(src,dst,pm));
+
+	gray_image_t dst_img(45, 45);
+
+	BOOST_CHECK(ucv::warp(ucv::gil::const_view(src_img), ucv::gil::view(dst_img), pm, true));
+
+	ucv::gil::gray32f_image_t dst32f_img(45, 45);
+
+
+	BOOST_CHECK(ucv::convert_scale(
+		ucv::gil::const_view(dst_img),
+		ucv::gil::view(dst32f_img),
+		1.0f
+	));
+	
+	cv::imshow(OPENCV_WND_NAME, cv::Mat(dst32f_img.height(), dst32f_img.width(), CV_32FC1, &ucv::gil::view(dst32f_img)[0][0]));
+	cv::waitKey();
+}
+
+
+#if 0
 BOOST_AUTO_TEST_CASE( canny_test )
 {
 	namespace ucv=baldzarika::ucv;
@@ -807,6 +965,7 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	ucv::gil::gray8_image_t gray8_img;
 	ucv::gil::png_read_and_convert_image("image-test.png", gray8_img);
 	//ucv::gil::png_read_and_convert_image("rectangle.png", gray8_img);
+	//ucv::gil::png_read_and_convert_image("sudoku.png", gray8_img);
 
 
 	gaussian_blur_t::gray_image_t raw_img(gray8_img.width(), gray8_img.height());
@@ -871,6 +1030,7 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 	cv::Mat image=cv::imread("image-test.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::Mat image=cv::imread("rectangle.png", CV_LOAD_IMAGE_GRAYSCALE);
+	//cv::Mat image=cv::imread("sudoku.png", CV_LOAD_IMAGE_GRAYSCALE);
 
 	cv::blur(image,image,cv::Size(3,3));
 
@@ -908,10 +1068,10 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 	{
 		typedef ucv::contour< real_t > contour_t;
-		canny_t canny(ucv::size2ui(gray8_img.width(), gray8_img.height()), 0.6, 1.8);
+		canny_t canny(ucv::size2ui(gray8_img.width(), gray8_img.height()), 0.3, 0.9);
 		std::list< contour_t > contours;
 
-		canny.operator()(ucv::gil::const_view(gray_img), contours);
+		canny(ucv::gil::const_view(gray_img), contours);
 
 		cv::Mat contour_img(dy_img.height(),dy_img.width(),CV_8UC3);
 		image.convertTo(contour_img, CV_8UC3);
@@ -982,3 +1142,5 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	cv::waitKey();
 	
 }
+
+#endif
