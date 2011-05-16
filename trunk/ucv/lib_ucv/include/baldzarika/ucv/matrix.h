@@ -66,6 +66,12 @@ namespace baldzarika { namespace ucv {
 		}
 
 		template < typename RT >
+		inline matrix(matrix<RT,R,C> const &that)
+			: base_t(that)
+		{
+		}
+
+		template < typename RT >
 		inline matrix& operator =(matrix<RT,R,C> const &rhs)
 		{
 			base_t::operator =(rhs);

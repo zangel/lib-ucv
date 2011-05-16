@@ -4,11 +4,21 @@
 #include <baldzarika/ucv/matrix.h>
 #include <baldzarika/ucv/vector.h>
 #include <baldzarika/ucv/svd.h>
+#include <baldzarika/ucv/jacobi.h>
 
 namespace baldzarika { namespace ucv {
 
+	namespace detail {
+
+		struct svd_solver {};
+		struct jacobi_solver {};
+
+	} //namespace detail
+
+
+	
 	template < typename T, boost::uint32_t MN >
-	bool solve(matrix<T, MN, MN> const &a, vector<T, MN> const &b, vector<T, MN> &x)
+	bool solve(matrix<T, MN, MN> const &a, vector<T, MN> const &b, vector<T, MN> &x, detail::svd_solver)
 	{
 		matrix<T, MN, MN> u, v;
 		vector<T, MN> w;
@@ -31,6 +41,13 @@ namespace baldzarika { namespace ucv {
 		x=v*(u.transposed()*b);
 		return true;
 	}
+
+	template < typename T, boost::uint32_t MN >
+	bool solve(matrix<T, MN, MN> const &a, vector<T, MN> const &b, vector<T, MN> &x, detail::jacobi_solver)
+	{
+		return false;
+	}
+
 
 } //namespace ucv
 } //namespace baldzarika

@@ -28,7 +28,7 @@ namespace baldzarika { namespace ucv {
 			MT x_src_0=y_dst*mat(0,1)+mat(0,2);
 			MT y_src_0=y_dst*mat(1,1)+mat(1,2);
 			MT w_src_0=y_dst*mat(2,1)+mat(2,2);
-						
+
 			for(boost::int32_t x=0;x<dst.width();++x)
 			{
 				MT x_dst=x;
