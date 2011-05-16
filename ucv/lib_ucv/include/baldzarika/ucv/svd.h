@@ -53,7 +53,7 @@ namespace baldzarika { namespace ucv {
 		g=scale=anorm=detail::constant::zero<T>();
 		for(i=0;i<n;i++)
 		{
-			l=i+2;
+			l=i+1;
 			rv1[i]=scale*g;
 			g=s=scale=detail::constant::zero<T>();
 			if(i<m)
@@ -71,7 +71,7 @@ namespace baldzarika { namespace ucv {
 					g=-detail::sign(std::sqrt(s),f);
 					h=f*g-s;
 					u(i,i)=f-g;
-					for(j=l-1;j<n;j++)
+					for(j=l;j<n;j++)
 					{
 						for(s=detail::constant::zero<T>(),k=i;k<m;k++)
 							s+=u(k,i)*u(k,j);
@@ -85,31 +85,31 @@ namespace baldzarika { namespace ucv {
 			}
 			w[i]=scale*g;
 			g=s=scale=detail::constant::zero<T>();
-			if(i+1<=m && i+1!=n)
+			if(i<m && i+1!=n)
 			{
 				for(k=l-1;k<n;k++)
 					scale+=std::abs(u(i,k));
 				if(scale!=detail::constant::zero<T>())
 				{
-					for(k=l-1;k<n;k++)
+					for(k=l;k<n;k++)
 					{
 						u(i,k)/=scale;
 						s+=u(i,k)*u(i,k);
 					}
-					f=u(i,l-1);
+					f=u(i,l);
 					g=-detail::sign(std::sqrt(s),f);
 					h=f*g-s;
-					u(i,l-1)=f-g;
-					for(k=l-1;k<n;k++)
+					u(i,l)=f-g;
+					for(k=l;k<n;k++)
 						rv1[k]=u(i,k)/h;
-					for(j=l-1;j<m;j++)
+					for(j=l;j<m;j++)
 					{
-						for(s=detail::constant::zero<T>(),k=l-1;k<n;k++)
+						for(s=detail::constant::zero<T>(),k=l;k<n;k++)
 							s+=u(j,k)*u(i,k);
-						for(k=l-1;k<n;k++)
+						for(k=l;k<n;k++)
 							u(j,k)+=s*rv1[k];
 					}
-					for(k=l-1;k<n;k++)
+					for(k=l;k<n;k++)
 						u(i,k)*=scale;
 				}
 			}
@@ -176,23 +176,23 @@ namespace baldzarika { namespace ucv {
 				for(l=k;l>=0;l--)
 				{
 					nm=l-1;
-					if(l==0 || std::abs(rv1[l])<=eps*anorm)
+					if((std::abs(rv1[l])+anorm)==anorm)
 					{
 						flag=false;
 						break;
 					}
-					if(std::abs(w[nm])<=eps*anorm)
+					if((std::abs(rv1[nm])+anorm)==anorm)
 						break;
 				}
 				if(flag)
 				{
 					c=detail::constant::zero<T>();
 					s=detail::constant::one<T>();
-					for(i=l;i<k+1;i++)
+					for(i=l;i<=k;i++)
 					{
 						f=s*rv1[i];
 						rv1[i]=c*rv1[i];
-						if(std::abs(f)<=eps*anorm)
+						if((std::abs(f)+anorm)==anorm)
 							break;
 						g=w[i];
 						h=detail::pythag(f,g);
@@ -289,7 +289,6 @@ namespace baldzarika { namespace ucv {
 			}
 		}
 #endif
-
 		return true;
 	}
 
