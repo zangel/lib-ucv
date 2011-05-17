@@ -197,7 +197,7 @@ namespace baldzarika { namespace ucv {
 				{
 					mag[-1]=mag[m_frame_size.width()]=detail::constant::zero<gray_t>();
 					for(boost::uint32_t x=0;x<m_frame_size.width();++x)
-						mag[x]=abs(dx_row[x])+abs(dy_row[x]);
+						mag[x]=std::abs(dx_row[x])+std::abs(dy_row[x]);
 				}
 				else
 				{
@@ -227,8 +227,8 @@ namespace baldzarika { namespace ucv {
 
 					boost::int32_t s=(dx.get() ^ dy.get())<0?-1:1;
 					
-					dx=abs(dx);
-					dy=abs(dy);
+					dx=std::abs(dx);
+					dy=std::abs(dy);
 
 					if(m>m_low_treshold)
 					{

@@ -1,12 +1,5 @@
 #include <baldzarika/ar/config.h>
 #include <baldzarika/ar/marker.h>
-#include <baldzarika/ucv/convert_scale.h>
-#include <boost/algorithm/string/predicate.hpp>
-
-#define png_infopp_NULL (png_infopp)0
-#define int_p_NULL (int*)0
-
-#include <boost/gil/extension/io/png_io.hpp>
 
 namespace baldzarika { namespace ar {
 

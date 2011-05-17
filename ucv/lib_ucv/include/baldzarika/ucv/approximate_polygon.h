@@ -102,7 +102,7 @@ namespace baldzarika { namespace ucv {
 					diff_start.y*=inv_height;
 
 
-					PT dist=fabs(diff_start.y*diff.x-diff_start.x*diff.y);
+					PT dist=std::abs(diff_start.y*diff.x-diff_start.x*diff.y);
 					
 					if(dist>max_dist)
 					{
@@ -156,7 +156,7 @@ namespace baldzarika { namespace ucv {
 			diff_start.x*=inv_width;
 			diff_start.y*=inv_height;
 
-			PT dist=fabs(diff_start.x*diff.y-diff_start.y*diff.x);
+			PT dist=std::abs(diff_start.x*diff.y-diff_start.y*diff.x);
 			dist*=dist;
 			
 			float dist_f=dist;

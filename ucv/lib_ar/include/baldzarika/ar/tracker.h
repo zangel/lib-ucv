@@ -1,10 +1,6 @@
 #ifndef BALDZARIKA_AR_TRACKER_H
 #define BALDZARIKA_AR_TRACKER_H
 
-#include <baldzarika/ucv/surf.h>
-#include <baldzarika/ucv/klt_tracker.h>
-#include <baldzarika/ucv/matrix.h>
-
 namespace baldzarika { namespace ar {
 	
 	class marker;

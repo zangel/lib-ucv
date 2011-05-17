@@ -15,6 +15,9 @@
 #include <boost/gil/typedefs.hpp>
 #include <boost/gil/extension/numeric/sampler.hpp>
 #include <boost/gil/extension/numeric/resample.hpp>
+#define png_infopp_NULL (png_infopp)0
+#define int_p_NULL (int*)0
+#include <boost/gil/extension/io/png_io.hpp>
 
 #include <boost/smart_ptr.hpp>
 #include <boost/noncopyable.hpp>

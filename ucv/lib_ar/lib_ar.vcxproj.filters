@@ -45,9 +45,6 @@
     <ClInclude Include="include\baldzarika\ar\tracker.h">
       <Filter>Header Files\baldzarika\ar</Filter>
     </ClInclude>
-    <ClInclude Include="include\baldzarika\ar\fiducial\tracker.h">
-      <Filter>Header Files\baldzarika\ar\fiducial</Filter>
-    </ClInclude>
     <ClInclude Include="include\baldzarika\ar\fiducial\typedefs.h">
       <Filter>Header Files\baldzarika\ar\fiducial</Filter>
     </ClInclude>
@@ -55,6 +52,9 @@
       <Filter>Header Files\baldzarika\ar\fiducial</Filter>
     </ClInclude>
     <ClInclude Include="include\baldzarika\ar\fiducial\bch_marker_model.h">
+      <Filter>Header Files\baldzarika\ar\fiducial</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\fiducial\detector.h">
       <Filter>Header Files\baldzarika\ar\fiducial</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,13 +68,13 @@
     <ClCompile Include="src\baldzarika\ar\tracker.cpp">
       <Filter>Source Files\baldzarika\ar</Filter>
     </ClCompile>
-    <ClCompile Include="src\baldzarika\ar\fiducial\tracker.cpp">
-      <Filter>Source Files\baldzarika\ar\fiducial</Filter>
-    </ClCompile>
     <ClCompile Include="src\baldzarika\ar\fiducial\marker_model.cpp">
       <Filter>Source Files\baldzarika\ar\fiducial</Filter>
     </ClCompile>
     <ClCompile Include="src\baldzarika\ar\fiducial\bch_marker_model.cpp">
+      <Filter>Source Files\baldzarika\ar\fiducial</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ar\fiducial\detector.cpp">
       <Filter>Source Files\baldzarika\ar\fiducial</Filter>
     </ClCompile>
   </ItemGroup>

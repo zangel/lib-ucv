@@ -20,12 +20,11 @@
 #include <baldzarika/ucv/canny.h>
 #include <baldzarika/ucv/adaptive_treshold.h>
 #include <baldzarika/ucv/threshold.h>
+#include <baldzarika/ucv/ranged_histogram.h>
+#include <baldzarika/ucv/find_otsu_threshold.h>
 #include <baldzarika/ucv/perspective_transform.h>
 
 #include <boost/date_time.hpp>
-#define png_infopp_NULL (png_infopp)0
-#define int_p_NULL (int*)0
-#include <boost/gil/extension/io/png_io.hpp>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -1114,10 +1113,17 @@ BOOST_AUTO_TEST_CASE( canny_test )
 			if(!ucv::warp(ucv::gil::const_view(gray_img), ucv::gil::view(warped_img), pm, true))
 				continue;
 
+			boost::array<gaussian_blur_t::gray_t, 20> histogram;
+			ucv::ranged_histogram(ucv::gil::const_view(warped_img), histogram, 0, 1);
+
+
+			gaussian_blur_t::gray_t otsu_treshold_val=ucv::find_otsu_threshold<gaussian_blur_t::gray_const_view_t,20>(ucv::gil::const_view(warped_img), 0, 1)*gaussian_blur_t::gray_t(1.2);
+
+			
 			ucv::threshold(
 				ucv::gil::const_view(warped_img),
 				ucv::gil::view(warped_img),
-				ucv::detail::normal_binary_threshold<gaussian_blur_t::gray_t,gaussian_blur_t::gray_t>(0.5, 1.0)
+				ucv::detail::normal_binary_threshold<gaussian_blur_t::gray_t,gaussian_blur_t::gray_t>(otsu_treshold_val, 1.0)
 			);
 
 			boost::uint8_t median;
