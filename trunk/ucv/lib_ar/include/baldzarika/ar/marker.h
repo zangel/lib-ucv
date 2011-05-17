@@ -1,8 +1,6 @@
 #ifndef BALDZARIKA_AR_MARKER_H
 #define BALDZARIKA_AR_MARKER_H
 
-#include <baldzarika/ucv/surf.h>
-
 namespace baldzarika { namespace ar {
 
 	class marker

@@ -1,13 +1,13 @@
 #include <baldzarika/ar/config.h>
-#include <baldzarika/ar/fiducial/tracker.h>
+#include <baldzarika/ar/fiducial/detector.h>
 
 namespace baldzarika { namespace ar { namespace fiducial {
 
-	tracker::tracker()
+	detector::detector()
 	{
 	}
 
-	tracker::~tracker()
+	detector::~detector()
 	{
 	}
 

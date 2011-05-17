@@ -47,9 +47,25 @@ namespace baldzarika { namespace ucv {
 			return m_size.height();
 		}
 
+		size2_t const& size() const
+		{
+			return m_size;
+		}
+
 		bool empty() const
 		{
 			return m_size.empty();
+		}
+
+		bool intersects(box2 const &rhs) const
+		{
+			T tlx=std::max(m_top_left.x, rhs.m_top_left.x);
+			T tly=std::max(m_top_left.y, rhs.m_top_left.y);
+
+			T brx=std::min(m_top_left.x+m_size.width(), rhs.m_top_left.x+rhs.m_size.width());
+			T bry=std::min(m_top_left.y+m_size.height(), rhs.m_top_left.x+rhs.m_size.height());
+
+			return tlx<=brx && tly<=bry;
 		}
 
 		point2_t	m_top_left;

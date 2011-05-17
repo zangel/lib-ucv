@@ -1,10 +1,7 @@
 #include <baldzarika/ar/config.h>
 #include <baldzarika/ar/tracker.h>
 #include <baldzarika/ar/marker.h>
-#include <baldzarika/ucv/integral.h>
-#include <baldzarika/ucv/match_feature_points.h>
-#include <baldzarika/ucv/homography.h>
-#include <baldzarika/ucv/norm.h>
+
 #if defined(ANDROID)
 #include <j2cpp/config.hpp>
 #endif

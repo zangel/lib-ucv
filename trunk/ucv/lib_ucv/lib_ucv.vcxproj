@@ -52,7 +52,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(BOOST_DIR)/;../3rd_party/libkdtree;./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_DIR)/;$(LIBPNG_DIR);../3rd_party/libkdtree;./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -71,7 +71,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(BOOST_DIR)/;../3rd_party/libkdtree;./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_DIR)/;$(LIBPNG_DIR);../3rd_party/libkdtree;./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -108,8 +108,10 @@
     <ClInclude Include="include\baldzarika\ucv\integral.h" />
     <ClInclude Include="include\baldzarika\ucv\matrix.h" />
     <ClInclude Include="include\baldzarika\ucv\norm.h" />
+    <ClInclude Include="include\baldzarika\ucv\find_otsu_threshold.h" />
     <ClInclude Include="include\baldzarika\ucv\perspective_transform.h" />
     <ClInclude Include="include\baldzarika\ucv\point2.h" />
+    <ClInclude Include="include\baldzarika\ucv\ranged_histogram.h" />
     <ClInclude Include="include\baldzarika\ucv\size2.h" />
     <ClInclude Include="include\baldzarika\ucv\sobel.h" />
     <ClInclude Include="include\baldzarika\ucv\solve.h" />

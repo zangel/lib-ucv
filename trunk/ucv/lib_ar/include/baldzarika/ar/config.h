@@ -2,6 +2,25 @@
 #define BALDZARIKA_AR_CONFIG_H
 
 #include <baldzarika/ucv/config.h>
+#include <baldzarika/ucv/fixed_point.h>
+#include <baldzarika/ucv/matrix.h>
+#include <baldzarika/ucv/gil_channel_traits.h>
+#include <baldzarika/ucv/convert_scale.h>
+#include <baldzarika/ucv/integral.h>
+#include <baldzarika/ucv/norm.h>
+#include <baldzarika/ucv/contour.h>
+#include <baldzarika/ucv/surf.h>
+#include <baldzarika/ucv/match_feature_points.h>
+#include <baldzarika/ucv/klt_tracker.h>
+#include <baldzarika/ucv/homography.h>
+#include <baldzarika/ucv/perspective_transform.h>
+#include <baldzarika/ucv/warp.h>
+#include <baldzarika/ucv/find_otsu_threshold.h>
+#include <baldzarika/ucv/threshold.h>
+#include <baldzarika/ucv/gaussian_blur.h>
+#include <baldzarika/ucv/canny.h>
+
+
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/thread.hpp>
 #include <boost/asio/io_service.hpp>
@@ -11,6 +30,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/signals2.hpp>
 #include <boost/circular_buffer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 
 
