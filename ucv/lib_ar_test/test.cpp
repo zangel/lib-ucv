@@ -104,27 +104,31 @@ BOOST_AUTO_TEST_CASE( fiducial_bch_marker_model )
 	);
 
 	
+
 	ar::fiducial::gray_image_t gray_blurred_img(gray8_img.width(), gray8_img.height());
 	gaussian_blur_t gaussian_blur(ucv::size2ui(gray8_img.width(), gray8_img.height()));
-	gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_blurred_img));
-			
-	std::list< ar::fiducial::contour_t > contours;
 	canny_t canny(ucv::size2ui(gray8_img.width(), gray8_img.height()), 0.4, 1.2);
 
-	//boost::posix_time::ptime start_time=boost::posix_time::microsec_clock::local_time();
-	//for(boost::uint32_t i=0;i<100;++i)
+	boost::posix_time::ptime start_time=boost::posix_time::microsec_clock::local_time();
+	for(boost::uint32_t i=0;i<100;++i)
+	{
+
+		gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_blurred_img));
+			
+		std::list< ar::fiducial::contour_t > contours;
+	
+
+	
 		canny(ucv::gil::const_view(gray_blurred_img), contours);
-	//boost::posix_time::ptime finish_time=boost::posix_time::microsec_clock::local_time();
-	//std::cout << "canny performance=" << 100.0f/(1.0e-3f*float((finish_time-start_time).total_milliseconds())) << "fps" << std::endl;
+		for(std::list<ar::fiducial::contour_t>::iterator ic=contours.begin();ic!=contours.end();++ic)
+			if(ic->m_is_closed) ic->aproximate(3.0);
 
-	for(std::list<ar::fiducial::contour_t>::iterator ic=contours.begin();ic!=contours.end();++ic)
-		if(ic->m_is_closed) ic->aproximate(3.0);
+		ar::fiducial::bch_marker_model model;
 
-	ar::fiducial::bch_marker_model model;
-
-	std::list<ar::fiducial::marker_model::detect_info> d_infos;
-	BOOST_CHECK(model.detect_markers(ucv::gil::const_view(gray_img),contours,d_infos));
-	
-
-	
+		std::list<ar::fiducial::marker_model::detect_info> d_infos;
+		BOOST_CHECK(model.detect_markers(ucv::gil::const_view(gray_img),contours,d_infos));
+		BOOST_CHECK_EQUAL(d_infos.size(),6);
+	}
+	boost::posix_time::ptime finish_time=boost::posix_time::microsec_clock::local_time();
+	std::cout << "canny performance=" << 100.0f/(1.0e-3f*float((finish_time-start_time).total_milliseconds())) << "fps" << std::endl;
 }

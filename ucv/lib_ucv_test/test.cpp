@@ -23,6 +23,7 @@
 #include <baldzarika/ucv/ranged_histogram.h>
 #include <baldzarika/ucv/find_otsu_threshold.h>
 #include <baldzarika/ucv/perspective_transform.h>
+#include <baldzarika/ucv/pixel_count.h>
 
 #include <boost/date_time.hpp>
 
@@ -946,7 +947,7 @@ BOOST_AUTO_TEST_CASE( canny_test )
 {
 	namespace ucv=baldzarika::ucv;
 
-	typedef ucv::fixed_point<10,21> real_t;
+	typedef ucv::fixed_point<15,16> real_t;
 	typedef ucv::sobel<real_t, 3, 1> sobel_t;
 	typedef ucv::gaussian_blur<real_t, 5> gaussian_blur_t;
 	typedef ucv::adaptive_treshold<real_t, 7, true > adaptive_treshold_t;
@@ -1125,6 +1126,10 @@ BOOST_AUTO_TEST_CASE( canny_test )
 				ucv::gil::view(warped_img),
 				ucv::detail::normal_binary_threshold<gaussian_blur_t::gray_t,gaussian_blur_t::gray_t>(otsu_treshold_val, 1.0)
 			);
+
+			boost::uint32_t pc=ucv::pixel_count(ucv::gil::const_view(warped_img), ucv::detail::is_non_zero());
+
+
 
 			boost::uint8_t median;
 			ucv::convert_scale(

@@ -31,6 +31,7 @@ namespace baldzarika { namespace ucv {
 		using base_t::size2;
 		using base_t::operator();
 		using base_t::data;
+		using base_t::at_element;
 
 		typedef typename base_t::pointer pointer;
 		typedef typename base_t::const_pointer const_pointer;
@@ -69,6 +70,14 @@ namespace baldzarika { namespace ucv {
 		inline matrix(matrix<RT,R,C> const &that)
 			: base_t(that)
 		{
+		}
+
+		template < typename RT >
+		inline matrix(RT(&mat)[R][C])
+		{
+			for(boost::uint32_t r=0;r<R;++r)
+				for(boost::uint32_t c=0;c<C;++c)
+					at_element(r,c)=mat[r][c];
 		}
 
 		template < typename RT >

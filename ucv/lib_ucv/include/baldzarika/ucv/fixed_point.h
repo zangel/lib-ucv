@@ -293,7 +293,7 @@ namespace baldzarika { namespace ucv {
 
 		bool operator !() const
 		{
-			return m_value==0; 
+			return m_value==0;
 		}
 
 		fixed_point operator -() const
@@ -371,7 +371,7 @@ namespace baldzarika { namespace ucv {
 
 		operator unsigned long long() const { return static_cast<unsigned long long>(m_value>>F); }
 
-		operator bool() const { return !(m_value==0); }
+		operator bool() const { return m_value?true:false; }
 
 		operator float() const { return static_cast<float>(m_value)/detail::pow2<F>::value; }
 		
