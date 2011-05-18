@@ -19,6 +19,8 @@
 #include <baldzarika/ucv/threshold.h>
 #include <baldzarika/ucv/gaussian_blur.h>
 #include <baldzarika/ucv/canny.h>
+#include <baldzarika/ucv/pixel_count.h>
+
 
 
 #include <boost/enable_shared_from_this.hpp>
