@@ -123,13 +123,13 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		boost::uint32_t rot=0;
 		boost::uint32_t min_dist=marker_hamming_distance(bcv);
 
-		boost::uint32_t dist=marker_hamming_distance(ucv::gil::rotated90cw_view(bcv));
+		boost::uint32_t dist=marker_hamming_distance(ucv::gil::rotated90ccw_view(bcv));
 		if(dist<min_dist) { min_dist=dist; rot=1; }
 
 		dist=marker_hamming_distance(ucv::gil::rotated180_view(bcv));
 		if(dist<min_dist) { min_dist=dist; rot=2; }
 
-		dist=marker_hamming_distance(ucv::gil::rotated90ccw_view(bcv));
+		dist=marker_hamming_distance(ucv::gil::rotated90cw_view(bcv));
 		if(dist<min_dist) { min_dist=dist; rot=3; }
 
 		if(min_dist==0)
@@ -139,11 +139,11 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			case 0:
 				return marker_id_rot_t(marker_hamming_id(bcv),0);
 			case 1:
-				return marker_id_rot_t(marker_hamming_id(ucv::gil::rotated90cw_view(bcv)),1);
+				return marker_id_rot_t(marker_hamming_id(ucv::gil::rotated90ccw_view(bcv)),1);
 			case 2:
 				return marker_id_rot_t(marker_hamming_id(ucv::gil::rotated180_view(bcv)),2);
 			case 3:
-				return marker_id_rot_t(marker_hamming_id(ucv::gil::rotated90ccw_view(bcv)),3);
+				return marker_id_rot_t(marker_hamming_id(ucv::gil::rotated90cw_view(bcv)),3);
 			}
 		}
 		
@@ -284,15 +284,15 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		switch(mid_and_rot.second)
 		{
 		case 0:
-			homography=homography_rotation<0>()*homography; break;
+			homography*=homography_rotation<0>(); break;
 		case 1:
-			homography=homography_rotation<1>()*homography; break;
+			homography*=homography_rotation<1>(); break;
 		case 2:
-			homography=homography_rotation<2>()*homography; break;
+			homography*=homography_rotation<2>(); break;
 		case 3:
-			homography=homography_rotation<3>()*homography; break;
+			homography*=homography_rotation<3>(); break;
 		}
-		
+		homography.scale(1.0f/homography(2,2));
 		return mid_and_rot.first;
 	}
 	
@@ -316,27 +316,14 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				dst_pts[p]=ucv::point2f(pt.x, pt.y);
 			}
 			
-			ucv::matrix33f homgraphy;
-			if(!ucv::perspective_transform(src_pts,dst_pts,homgraphy))
+			ucv::matrix33f homography;
+			if(!ucv::perspective_transform(src_pts,dst_pts,homography))
 				continue;
 
 			//use fixed_point based warp for performance reason
-			ucv::matrix<ucv::decimal_t, 3, 3> fp_homgraphy=homgraphy;
-			if(!ucv::warp(img, ucv::gil::view(m_warped_img), fp_homgraphy, true))
+			ucv::matrix<ucv::decimal_t, 3, 3> fp_homography=homography;
+			if(!ucv::warp(img, ucv::gil::view(m_warped_img), fp_homography, true))
 				continue;
-
-#if 0
-			ucv::gil::gray8_image_t warped8_img(MARKER_SIZE.width(), MARKER_SIZE.height());
-			boost::uint8_t median;
-			ucv::convert_scale(
-				ucv::gil::const_view(m_warped_img),
-				ucv::gil::view(warped8_img),
-				255.0f,
-				median
-			);
-			
-			ucv::gil::png_write_view("marker.png", ucv::gil::const_view(warped8_img));
-#endif
 
 			if(	!ucv::threshold(
 					ucv::gil::const_view(m_warped_img),
@@ -354,13 +341,14 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 
 
-			marker_id_t marker_id=find_marker_id(homgraphy);
+			marker_id_t marker_id=find_marker_id(homography);
 			if(marker_id==NULL_MARKER_ID) continue;
+			
 			dis.push_back(
 				detect_info(
 					marker_id,
 					MARKER_SIZE,
-					homgraphy
+					homography
 				)
 			);
 		}
