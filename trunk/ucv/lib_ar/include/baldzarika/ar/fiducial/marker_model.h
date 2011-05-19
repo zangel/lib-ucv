@@ -5,16 +5,11 @@
 
 namespace baldzarika { namespace ar { namespace fiducial {
 
-	class descriptor;
-
 	class marker_model
 		: public boost::enable_shared_from_this<marker_model>
+		, boost::noncopyable
 	{
 	public:
-
-		typedef boost::uint32_t marker_id_t;
-
-		static marker_id_t const NULL_MARKER_ID;
 
 		class detect_info
 		{
@@ -32,6 +27,9 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		virtual ~marker_model();
 
 		virtual bool	detect_markers(gray_const_view_t img, std::list<contour_t> const &cnts, std::list<detect_info> &dis) const=0;
+
+	public:
+		mutable boost::any						m_any_data;
 	};
 
 } //namespace fiducial

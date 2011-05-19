@@ -3,8 +3,6 @@
 
 namespace baldzarika { namespace ar { namespace fiducial {
 
-	marker_model::marker_id_t const marker_model::NULL_MARKER_ID=marker_model::marker_id_t(-1);
-
 	marker_model::detect_info::detect_info()
 		: m_marker_id(NULL_MARKER_ID)
 	{

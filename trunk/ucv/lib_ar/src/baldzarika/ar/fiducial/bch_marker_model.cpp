@@ -29,9 +29,9 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		}
 
 		template < typename BCGV >
-		static inline marker_model::marker_id_t marker_hamming_id(BCGV bcv)
+		static inline marker_id_t marker_hamming_id(BCGV bcv)
 		{
-			marker_model::marker_id_t mid(0);
+			marker_id_t mid(0);
 			for(boost::uint32_t y=0;y<5;y++)
 			{
 				typename BCGV::x_iterator bc_row=bcv.x_at(0,y);
@@ -235,7 +235,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		}
 	}
 
-	marker_model::marker_id_t bch_marker_model::find_marker_id(ucv::matrix33f &homography) const
+	marker_id_t bch_marker_model::find_marker_id(ucv::matrix33f &homography) const
 	{
 		gray_const_view_t warped_view=ucv::gil::const_view(m_warped_img);
 		

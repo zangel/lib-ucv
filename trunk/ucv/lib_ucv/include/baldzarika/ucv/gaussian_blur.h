@@ -6,19 +6,57 @@ namespace baldzarika { namespace ucv {
 	namespace detail {
 
 		template < typename PT, boost::uint32_t KS >
-		struct gaussian_blur_filter_traits { };
+		struct gaussian_filter { };
 
 
 		template < typename PT >
-		struct gaussian_blur_filter_traits< PT, 3 >
+		struct gaussian_filter< PT, 3 >
 		{
-			static PT const SEPARABLE_KERNEL[3];
+			static inline void x_filter(PT const *src, PT *ring, boost::int32_t width)
+			{
+				static PT const scale=0.25;
+
+				ring[0]=(src[1]+src[0]*constant::three<PT>())*scale;
+
+				for(boost::int32_t x=1;x<width-1;++x)
+					ring[x]=(src[x-1]+constant::two<PT>()*src[x]+src[x+1])*scale;
+
+				ring[width-1]=(src[width-2]+constant::three<PT>()*src[width-1])*scale;
+			}
+
+			static inline void y_filter(PT const *ring[3], PT *dst, boost::int32_t width)
+			{
+				static PT const scale=0.25;
+
+				for(boost::int32_t x=0;x<width;++x)
+					dst[x]=(ring[0][x]+constant::two<PT>()*ring[1][x]+ring[2][x])*scale;
+			}
+
 		};
 
 		template < typename PT >
-		struct gaussian_blur_filter_traits< PT, 5 >
+		struct gaussian_filter< PT, 5 >
 		{
-			static PT const SEPARABLE_KERNEL[5];
+			static inline void x_filter(PT const *src, PT *ring, boost::int32_t width)
+			{
+				static PT const scale=0.0625;
+
+				ring[0]=(src[1]+src[0]*constant::three<PT>())*scale;
+
+				for(boost::int32_t x=1;x<width-1;++x)
+					ring[x]=(src[x-1]+src[x]+src[x+1])*scale;
+
+				ring[width-1]=(src[width-2]+constant::three<PT>()*src[width-1])*scale;
+			}
+
+			static inline void y_filter(PT const *ring[3], PT *dst, boost::int32_t width)
+			{
+				static PT const scale=0.25;
+
+				for(boost::int32_t x=0;x<width;++x)
+					dst[x]=(ring[0][x]+constant::two<PT>()*ring[1][x]+ring[2][x])*scale;
+			}
+
 		};
 
 		template < typename PT >
@@ -27,6 +65,7 @@ namespace baldzarika { namespace ucv {
 			static PT const SEPARABLE_KERNEL[7];
 		};
 
+		/*
 		template < typename PT >
 		PT const gaussian_blur_filter_traits< PT, 3 >::SEPARABLE_KERNEL[3]={0.25, 0.5, 0.25};
 
@@ -35,6 +74,7 @@ namespace baldzarika { namespace ucv {
 
 		template < typename PT >
 		PT const gaussian_blur_filter_traits< PT, 7 >::SEPARABLE_KERNEL[7]={0.03125, 0.109375, 0.21875, 0.28125, 0.21875, 0.109375, 0.03125};
+		*/
 	}
 
 	template < typename PT, boost::uint32_t KS >
