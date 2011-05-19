@@ -28,4 +28,4 @@ namespace baldzarika { namespace ucv {
 } //namespace ucv
 } //namespace baldzarika
 
-#endif BALDZARIKA_UCV_COPY_PIXELS_H
+#endif //BALDZARIKA_UCV_COPY_PIXELS_H

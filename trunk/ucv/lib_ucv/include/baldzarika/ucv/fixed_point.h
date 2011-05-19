@@ -171,6 +171,9 @@ namespace baldzarika { namespace ucv {
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(two, 2.0)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(three, 3.0)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(four, 4.0)
+			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(five, 5.0)
+			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(six, 6.0)
+			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(eleven, 11.0)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(sq_two, 1.4142135623730950488016887242097)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(half, 0.5)
 			BALDZARIKA_UCV_FIXED_POINT_DEFINE_CONSTANT(pi, 3.1415926535897932384626433832795)
@@ -383,47 +386,47 @@ namespace baldzarika { namespace ucv {
 
 		value_type get() const { return m_value; }
 
-		template < boost::uint32_t I, boost::uint32_t F >
-		friend fixed_point<I,F> std::abs(fixed_point<I,F> const &);
+		template < boost::uint32_t I2, boost::uint32_t F2 >
+		friend fixed_point<I2,F2> std::abs(fixed_point<I2,F2> const &);
 
-		template < boost::uint32_t I, boost::uint32_t F >
-		friend fixed_point<I,F> std::fabs(fixed_point<I,F> const &);
+		template < boost::uint32_t I2, boost::uint32_t F2 >
+		friend fixed_point<I2,F2> std::fabs(fixed_point<I2,F2> const &);
 
-		template < boost::uint32_t I, boost::uint32_t F >
-		friend fixed_point<I,F> std::ceil(fixed_point<I,F> const &);
+		template < boost::uint32_t I2, boost::uint32_t F2 >
+		friend fixed_point<I2,F2> std::ceil(fixed_point<I2,F2> const &);
 		
-		template < boost::uint32_t I, boost::uint32_t F >
-		friend fixed_point<I,F> std::floor(fixed_point<I,F> const &);
+		template < boost::uint32_t I2, boost::uint32_t F2 >
+		friend fixed_point<I2,F2> std::floor(fixed_point<I2,F2> const &);
 
-		template < boost::uint32_t I, boost::uint32_t F >
-		friend fixed_point<I,F> std::fmod(fixed_point<I,F> const &, fixed_point<I,F> const &);
+		template < boost::uint32_t I2, boost::uint32_t F2 >
+		friend fixed_point<I2,F2> std::fmod(fixed_point<I2,F2> const &, fixed_point<I2,F2> const &);
 
-		template < boost::uint32_t I, boost::uint32_t F >
-		friend fixed_point<I,F> std::modf(fixed_point<I,F> const &, fixed_point<I,F> *);
+		template < boost::uint32_t I2, boost::uint32_t F2 >
+		friend fixed_point<I2,F2> std::modf(fixed_point<I2,F2> const &, fixed_point<I2,F2> *);
 
-		template< typename T, boost::uint32_t I, boost::uint32_t F >
-		friend T std::round(fixed_point<I,F> const &);
+		template< typename T, boost::uint32_t I2, boost::uint32_t F2 >
+		friend T std::round(fixed_point<I2,F2> const &);
 
-		template < boost::uint32_t I, boost::uint32_t F >
-		friend fixed_point<I,F> std::sqrt(fixed_point<I,F> const &);
+		template < boost::uint32_t I2, boost::uint32_t F2 >
+		friend fixed_point<I2,F2> std::sqrt(fixed_point<I2,F2> const &);
 
-		template < boost::uint32_t I, boost::uint32_t F >
-		friend fixed_point<I,F> std::log(fixed_point<I,F> const &);
+		template < boost::uint32_t I2, boost::uint32_t F2 >
+		friend fixed_point<I2,F2> std::log(fixed_point<I2,F2> const &);
 		
-		template < boost::uint32_t I, boost::uint32_t F >
-		friend fixed_point<I,F> std::pow(fixed_point<I,F> const &, fixed_point<I,F> const &);
+		template < boost::uint32_t I2, boost::uint32_t F2 >
+		friend fixed_point<I2,F2> std::pow(fixed_point<I2,F2> const &, fixed_point<I2,F2> const &);
 
-		template < boost::uint32_t I, boost::uint32_t F >
-		friend fixed_point<I,F> std::exp(fixed_point<I,F> const &);
+		template < boost::uint32_t I2, boost::uint32_t F2 >
+		friend fixed_point<I2,F2> std::exp(fixed_point<I2,F2> const &);
 
-		template < boost::uint32_t I, boost::uint32_t F >
-		friend fixed_point<I,F> std::atan2(fixed_point<I,F> const &, fixed_point<I,F> const &);
+		template < boost::uint32_t I2, boost::uint32_t F2 >
+		friend fixed_point<I2,F2> std::atan2(fixed_point<I2,F2> const &, fixed_point<I2,F2> const &);
 
-		template < boost::uint32_t I, boost::uint32_t F >
-		friend fixed_point<I,F> std::sin(fixed_point<I,F> const &);
+		template < boost::uint32_t I2, boost::uint32_t F2 >
+		friend fixed_point<I2,F2> std::sin(fixed_point<I2,F2> const &);
 
-		template < boost::uint32_t I, boost::uint32_t F >
-		friend fixed_point<I,F> std::cos(fixed_point<I,F> const &);
+		template < boost::uint32_t I2, boost::uint32_t F2 >
+		friend fixed_point<I2,F2> std::cos(fixed_point<I2,F2> const &);
 
 		
 	private:
@@ -558,7 +561,7 @@ namespace std
 		if(x<bucv::detail::constant::zero< bucv::fixed_point<I,F> >()) *ptr+=bucv::detail::constant::one< bucv::fixed_point<I,F> >();
 
 		return bucv::fixed_point<I,F>(
-			(x<detail::constant::zero< bucv::fixed_point<I,F> >()?
+			(x<bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?
 				-(x.m_value & (bucv::detail::pow2<F>::value-1)):
 				(x.m_value & (bucv::detail::pow2<F>::value-1))
 			),
@@ -648,7 +651,7 @@ namespace std
 		return bucv::fixed_point<I,F>(::exp(static_cast<float>(x)));
 
 #else
-		static fixed_point const a[]=
+		static bucv::fixed_point<I,F> const a[]=
 		{
 			1.64872127070012814684865078781,
 			1.28402541668774148407342056806,
@@ -683,23 +686,23 @@ namespace std
 			1.00000000046566128741615947508
 		};
 
-		fixed_point y(1);
+		bucv::fixed_point<I,F> y(1);
 		for(boost::int32_t i=F-1; i>=0; --i)
 		{
 			if(!(x.m_value & 1<<i))
 				y*=a[F-i-1];
 		}
 
-		boost::int32_t x_int=floor(x);
+		boost::int32_t x_int=std::floor(x);
 		if(x_int<0)
 		{
 			for(boost::int32_t i=1;i<=-x_int;++i)
-				y*=detail::constant::inv_e<fixed_point>();
+				y*=bucv::detail::constant::inv_e< bucv::fixed_point<I,F> >();
 		}
 		else
 		{
 			for(boost::int32_t i=1;i<=x_int;++i)
-				y*=detail::constant::e<fixed_point>();
+				y*=bucv::detail::constant::e< bucv::fixed_point<I,F> >();
 		}
 		return y;
 #endif

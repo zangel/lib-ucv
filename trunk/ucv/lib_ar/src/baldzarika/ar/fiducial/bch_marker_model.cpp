@@ -45,16 +45,16 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		}
 
 		template < boost::uint32_t R >
-		static inline ucv::matrix33f const& homography_rotation();
+		inline ucv::matrix33f const& homography_rotation();
 
 		template<>
-		static inline ucv::matrix33f const& homography_rotation<0>()
+		inline ucv::matrix33f const& homography_rotation<0>()
 		{
 			return ucv::matrix33f::identity();
 		}
 
 		template<>
-		static inline ucv::matrix33f const& homography_rotation<1>()
+		inline ucv::matrix33f const& homography_rotation<1>()
 		{
 			static float const matd[3][3]=
 			{
@@ -68,7 +68,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		}
 
 		template<>
-		static inline ucv::matrix33f const& homography_rotation<2>()
+		inline ucv::matrix33f const& homography_rotation<2>()
 		{
 			static float const matd[3][3]=
 			{
@@ -82,7 +82,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		}
 
 		template<>
-		static inline ucv::matrix33f const& homography_rotation<3>()
+		inline ucv::matrix33f const& homography_rotation<3>()
 		{
 			static float const matd[3][3]=
 			{

@@ -950,7 +950,7 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	typedef ucv::fixed_point<15,16> real_t;
 	typedef ucv::sobel<real_t, 3, 1> sobel_t;
 	typedef ucv::gaussian_blur<real_t, 5> gaussian_blur_t;
-	typedef ucv::adaptive_treshold<real_t, 7, true > adaptive_treshold_t;
+	typedef ucv::adaptive_treshold<real_t, 5, true > adaptive_treshold_t;
 
 
 	unsigned int i1=1;

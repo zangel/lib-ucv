@@ -80,10 +80,10 @@ namespace baldzarika { namespace ucv  {
 			template < boost::uint32_t I1, boost::uint32_t F1 >
 			value_type operator()(fixed_point<I1,F1> const &x, fixed_point<I1,F1> const &y) const
 			{
-				static fixed_point<I1,F1> _scale=SS;
-				BOOST_ASSERT(round<boost::uint32_t>(std::abs(x*_scale))<S*SS);
-				BOOST_ASSERT(round<boost::uint32_t>(std::abs(y*_scale))<S*SS);
-				return m_lut[round<boost::uint32_t>(std::abs(y*_scale))][round<boost::uint32_t>(std::abs(x*_scale))];
+				static fixed_point<I1,F1> const _scale=SS;
+				BOOST_ASSERT(std::round<boost::uint32_t>(std::abs(x*_scale))<S*SS);
+				BOOST_ASSERT(std::round<boost::uint32_t>(std::abs(y*_scale))<S*SS);
+				return m_lut[std::round<boost::uint32_t>(std::abs(y*_scale))][std::round<boost::uint32_t>(std::abs(x*_scale))];
 			}
 		
 		private:

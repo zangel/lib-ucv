@@ -134,7 +134,8 @@ namespace baldzarika { namespace ucv {
 				while(candidate[1]==2)
 					candidate++;
 
-				std::list< contour<CT> >::iterator new_contour=contours.insert(contours.end(), contour<CT>());
+				typename std::list< contour<CT> >::iterator new_contour=
+					contours.insert(contours.end(), contour<CT>());
 
 				
 				fetch_contour<CT>(candidate, *new_contour, true);
