@@ -4,6 +4,7 @@
 #include <baldzarika/ar/config.h>
 #include <baldzarika/ar/tracker.h>
 #include <baldzarika/ar/marker.h>
+#include <baldzarika/ar/fiducial/detector.h>
 #include <baldzarika/ar/fiducial/bch_marker_model.h>
 
 #if 0
@@ -84,7 +85,9 @@ BOOST_AUTO_TEST_CASE( tracker_detect_marker )
 	BOOST_CHECK_EQUAL(anonymous.pdms, pms);
 }
 
+
 #endif
+
 
 BOOST_AUTO_TEST_CASE( fiducial_bch_marker_model )
 {
@@ -126,9 +129,72 @@ BOOST_AUTO_TEST_CASE( fiducial_bch_marker_model )
 		ar::fiducial::bch_marker_model model;
 
 		std::list<ar::fiducial::marker_model::detect_info> d_infos;
-		BOOST_CHECK(model.detect_markers(ucv::gil::const_view(gray_img),contours,d_infos));
+		BOOST_CHECK(model.detect_markers(ucv::gil::const_view(gray_blurred_img),contours,d_infos));
 		BOOST_CHECK_EQUAL(d_infos.size(),6);
 	}
 	boost::posix_time::ptime finish_time=boost::posix_time::microsec_clock::local_time();
-	std::cout << "canny performance=" << 100.0f/(1.0e-3f*float((finish_time-start_time).total_milliseconds())) << "fps" << std::endl;
+	std::cout << "fiducial_bch_marker_model performance=" << 100.0f/(1.0e-3f*float((finish_time-start_time).total_milliseconds())) << "fps" << std::endl;
+}
+
+
+
+BOOST_AUTO_TEST_CASE( fiducial_detector_start_stop_test )
+{
+	using namespace baldzarika;
+
+	boost::shared_ptr<ar::fiducial::detector> detector(new ar::fiducial::detector(ucv::size2ui(100,100)));
+
+	BOOST_CHECK(!detector->is_started());
+	BOOST_CHECK(detector->start());
+	BOOST_CHECK(detector->is_starting() || detector->is_started());
+	BOOST_CHECK(detector->stop());
+	BOOST_CHECK(!detector->is_started());
+	detector->wait_to_stop();
+}
+
+
+BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
+{
+	using namespace baldzarika;
+
+	ucv::gil::gray8_image_t gray8_frame;
+	ucv::gil::png_read_and_convert_image("../lib_ucv_test/image-test.png", gray8_frame);
+
+	ar::fiducial::gray_image_t gray_frame(gray8_frame.width(), gray8_frame.height());
+
+	ucv::convert_scale(
+		ucv::gil::const_view(gray8_frame),
+		ucv::gil::view(gray_frame),
+		ar::fiducial::gray_t(1.0f/255.0f)
+	);
+
+	boost::shared_ptr<ar::fiducial::detector> detector(new ar::fiducial::detector(ucv::size2ui(gray8_frame.width(), gray8_frame.height())));
+
+	BOOST_CHECK(detector->add_marker_model( boost::shared_ptr<ar::fiducial::marker_model>(
+		new ar::fiducial::bch_marker_model()
+	)));
+
+
+
+	struct _signal_listener
+	{
+		_signal_listener(): m_detected(0){ }
+
+		void on_marker_state_changed_signal(boost::shared_ptr<ar::fiducial::detector::marker_state> const &ms, ar::fiducial::detector::marker_state::eSC sc)
+		{
+			if(sc==ar::fiducial::detector::marker_state::SC_DETECTION && ms->is_detected())
+				m_detected++;
+		}
+
+		boost::uint32_t m_detected;
+	} signal_listener;
+
+
+	detector->marker_state_changed().connect(boost::bind(&_signal_listener::on_marker_state_changed_signal, &signal_listener, _1, _2));
+	detector->start();
+	detector->update(ucv::gil::const_view(gray_frame));
+	detector->stop();
+	detector->wait_to_stop();
+
+	BOOST_CHECK_EQUAL(signal_listener.m_detected, 6);
 }

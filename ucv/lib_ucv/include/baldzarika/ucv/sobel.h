@@ -8,22 +8,47 @@ namespace baldzarika { namespace ucv {
 	namespace detail {
 
 		template < typename PT, boost::uint32_t KS, boost::uint32_t O >
-		struct sobel_filter_traits { };
+		struct sobel_filter { };
 
 
 		template < typename PT >
-		struct sobel_filter_traits< PT, 3, 1 >
+		struct sobel_filter< PT, 3, 1 >
 		{
-			static PT const SEPARABLE_X_KERNEL[2][3];
-			static PT const SEPARABLE_Y_KERNEL[2][3];
+			//static PT const SEPARABLE_X_KERNEL[2][3];
+			//static PT const SEPARABLE_Y_KERNEL[2][3];
+
+			static inline void x_filter(PT const *src, PT *ring_x, PT *ring_y, boost::int32_t width)
+			{
+				ring_x[0]=src[1]-src[0];
+				ring_y[0]=src[1]+src[0]*constant::three<PT>();
+				
+				for(boost::int32_t x=1;x<width-1;++x)
+				{
+					ring_x[x]=src[x+1]-src[x-1];
+					ring_y[x]=src[x-1]+constant::two<PT>()*src[x]+src[x+1];
+				}
+
+				ring_x[width-1]=src[width-1]-src[width-2];
+				ring_y[width-1]=src[width-2]+constant::three<PT>()*src[width-1];
+			}
+
+			static inline void y_filter(PT const *ring_x[3], PT const *ring_y[3], PT *dst_x, PT *dst_y, boost::int32_t width)
+			{
+				for(boost::int32_t x=0;x<width;++x)
+				{
+					dst_x[x]=ring_x[0][x]+constant::two<PT>()*ring_x[1][x]+ring_x[2][x];
+					dst_y[x]=ring_y[2][x]-ring_y[0][x];
+				}
+			}
+
 		};
 
 
-		template < typename PT >
-		PT const sobel_filter_traits< PT, 3, 1 >::SEPARABLE_X_KERNEL[2][3]={ {-1.0, 0.0, 1.0}, {1.0, 2.0, 1.0} };
+		//template < typename PT >
+		//PT const sobel_filter_traits< PT, 3, 1 >::SEPARABLE_X_KERNEL[2][3]={ {-1.0, 0.0, 1.0}, {1.0, 2.0, 1.0} };
 		
-		template < typename PT >
-		PT const sobel_filter_traits< PT, 3, 1 >::SEPARABLE_Y_KERNEL[2][3]={ {1.0, 2.0, 1.0}, {-1.0, 0.0, 1.0} };
+		//template < typename PT >
+		//PT const sobel_filter_traits< PT, 3, 1 >::SEPARABLE_Y_KERNEL[2][3]={ {1.0, 2.0, 1.0}, {-1.0, 0.0, 1.0} };
 	}
 
 	
@@ -42,7 +67,7 @@ namespace baldzarika { namespace ucv {
 		typedef typename gray_image_t::const_view_t gray_const_view_t;
 
 
-		typedef detail::sobel_filter_traits<PT, KS, O> filter_tratis_t;
+		typedef detail::sobel_filter<PT, KS, O> filter_t;
 
 		sobel()
 			: m_frame_size(0,0)
@@ -91,7 +116,12 @@ namespace baldzarika { namespace ucv {
 
 					gray_t *ring_dx_row=reinterpret_cast<gray_t *>(ring_dx_view.row_begin((ring_buff_pos+KERNEL_SIZE-1)%KERNEL_SIZE));
 					gray_t *ring_dy_row=reinterpret_cast<gray_t *>(ring_dy_view.row_begin((ring_buff_pos+KERNEL_SIZE-1)%KERNEL_SIZE));
+
+
+					filter_t::x_filter(img_row, ring_dx_row, ring_dy_row, m_frame_size.width());
 										
+					/*
+					
 					for(boost::int32_t c=0;c<boost::int32_t(m_frame_size.width());++c)
 					{
 						gray_t dx=detail::constant::zero<gray_t>();
@@ -105,6 +135,7 @@ namespace baldzarika { namespace ucv {
 						ring_dx_row[c]=dx;
 						ring_dy_row[c]=dy;
 					}
+					*/
 				}
 
 				gray_t const *ring_dx_rows[KERNEL_SIZE];
@@ -118,7 +149,10 @@ namespace baldzarika { namespace ucv {
 
 				gray_t *dx_row=reinterpret_cast<gray_t *>(dx.row_begin(r));
 				gray_t *dy_row=reinterpret_cast<gray_t *>(dy.row_begin(r));
+
+				filter_t::y_filter(ring_dx_rows, ring_dy_rows, dx_row, dy_row, m_frame_size.width());
 				
+				/*
 				for(boost::uint32_t c=0;c<m_frame_size.width();++c)
 				{
 					gray_t dx=detail::constant::zero<gray_t>();
@@ -132,6 +166,7 @@ namespace baldzarika { namespace ucv {
 					dx_row[c]=dx;
 					dy_row[c]=dy;
 				}
+				*/
 			}
 			return true;
 		}

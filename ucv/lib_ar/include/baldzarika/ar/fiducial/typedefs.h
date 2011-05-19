@@ -11,6 +11,10 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	typedef ucv::contour<ucv::decimal_t> contour_t;
 
+	typedef boost::uint32_t marker_id_t;
+
+	static marker_id_t const NULL_MARKER_ID=marker_id_t(-1);
+
 
 } //namespace fiducial
 } //namespace ar
