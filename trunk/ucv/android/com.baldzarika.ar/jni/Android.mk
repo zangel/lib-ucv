@@ -22,6 +22,9 @@ LOCAL_SRC_FILES :=	src/support.cpp \
 					src/com/baldzarika/ar/Tracker.cpp \
 					../../../lib_ar/src/baldzarika/ar/marker.cpp \
 					../../../lib_ar/src/baldzarika/ar/tracker.cpp \
+					../../../lib_ar/src/baldzarika/ar/fiducial/marker_model.cpp \
+					../../../lib_ar/src/baldzarika/ar/fiducial/bch_marker_model.cpp \
+					../../../lib_ar/src/baldzarika/ar/fiducial/detector.cpp \
 					../../../lib_ucv/src/baldzarika/ucv/surf.cpp \
 					../../../lib_ucv/src/baldzarika/ucv/homography.cpp
 					
