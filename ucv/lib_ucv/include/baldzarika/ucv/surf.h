@@ -1,10 +1,10 @@
 #ifndef BALDZARIKA_UCV_SURF_H
 #define BALDZARIKA_UCV_SURF_H
 
+#include <baldzarika/ucv/fixed_point.h>
 #include <baldzarika/ucv/feature_point.h>
 #include <baldzarika/ucv/point2.h>
 #include <baldzarika/ucv/size2.h>
-#include <baldzarika/ucv/fixed_point.h>
 #include <baldzarika/ucv/gil_channel_traits.h>
 
 namespace baldzarika { namespace ucv {

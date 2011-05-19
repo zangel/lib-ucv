@@ -4,7 +4,7 @@
 #include <baldzarika/ucv/point2.h>
 #include <baldzarika/ucv/vector.h>
 #include <baldzarika/ucv/fixed_point.h>
-
+#include <baldzarika/ucv/ublas_fixed_point_type_traits.h>
 
 namespace baldzarika { namespace ucv {
 

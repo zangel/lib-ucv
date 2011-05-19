@@ -25,6 +25,7 @@ namespace baldzarika { namespace ucv {
 		struct normal_binary_threshold
 			: binary_threshold<ST,DT>
 		{
+
 			normal_binary_threshold(ST const &th, DT const &mv)
 				: binary_threshold<ST,DT>(th,mv)
 			{
@@ -33,7 +34,9 @@ namespace baldzarika { namespace ucv {
 
 			inline DT operator()(ST const &src) const
 			{
-				return src<m_threshold?constant::zero<DT>():m_max_value;
+				return src<binary_threshold<ST,DT>::m_threshold?
+					constant::zero<DT>():
+					binary_threshold<ST,DT>::m_max_value;
 			}
 		};
 
@@ -49,7 +52,9 @@ namespace baldzarika { namespace ucv {
 
 			inline DT operator()(ST const &src) const
 			{
-				return src<m_threshold?m_max_value:constant::zero<DT>();
+				return src<binary_threshold<ST,DT>::m_threshold?
+					binary_threshold<ST,DT>::m_max_value:
+					constant::zero<DT>();
 			}
 		};
 
