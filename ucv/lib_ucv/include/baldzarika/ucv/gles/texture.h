@@ -25,7 +25,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 	class frame_buffer;
 
 	class texture
-		: protected boost::noncopyable
+		: private boost::noncopyable
 	{
 	public:
 		texture();

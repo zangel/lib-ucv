@@ -6,7 +6,7 @@
 namespace baldzarika { namespace ucv { namespace gles {
 
 	class shader
-		: public boost::noncopyable
+		: private boost::noncopyable
 	{
 	protected:
 		shader(GLenum sht);
@@ -69,7 +69,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 	};
 
 	class program
-		: protected boost::noncopyable
+		: private boost::noncopyable
 	{
 	public:
 

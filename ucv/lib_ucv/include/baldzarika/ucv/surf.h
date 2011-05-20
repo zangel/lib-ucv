@@ -10,7 +10,7 @@
 namespace baldzarika { namespace ucv {
 
 	class surf
-		: public boost::noncopyable
+		: private boost::noncopyable
 	{
 	public:
 

@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE( tracker_detect_marker )
 }
 
 
-#endif
+
 
 
 BOOST_AUTO_TEST_CASE( fiducial_bch_marker_model )
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_start_stop_test )
 	detector->wait_to_stop();
 }
 
-
+#endif
 BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 {
 	using namespace baldzarika;
@@ -193,8 +193,21 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 	detector->marker_state_changed().connect(boost::bind(&_signal_listener::on_marker_state_changed_signal, &signal_listener, _1, _2));
 	detector->start();
 	detector->update(ucv::gil::const_view(gray_frame));
+	
+	
 	detector->stop();
 	detector->wait_to_stop();
 
+	BOOST_CHECK_EQUAL(signal_listener.m_detected, 6);
+
+	signal_listener.m_detected=0;
+	detector->start();
+	{
+		ar::fiducial::detector::locked_frame frame_lock=detector->lock_frame();
+		BOOST_CHECK(static_cast<bool>(frame_lock));
+		BOOST_CHECK(ucv::copy_pixels(ucv::gil::const_view(gray_frame),frame_lock.get_view()));
+	}
+	detector->stop();
+	detector->wait_to_stop();
 	BOOST_CHECK_EQUAL(signal_listener.m_detected, 6);
 }

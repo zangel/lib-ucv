@@ -12,7 +12,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 
 
 	class hessian_detector
-		: public boost::noncopyable
+		: private boost::noncopyable
 	{
 	public:
 		class response_layer
