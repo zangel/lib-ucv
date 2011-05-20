@@ -108,7 +108,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 
 
 	class frame_buffer
-		: protected boost::noncopyable
+		: private boost::noncopyable
 	{
 	public:
 		frame_buffer();

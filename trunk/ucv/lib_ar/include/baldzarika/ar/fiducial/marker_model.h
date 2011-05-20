@@ -7,7 +7,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	class marker_model
 		: public boost::enable_shared_from_this<marker_model>
-		, boost::noncopyable
+		, private boost::noncopyable
 	{
 	public:
 

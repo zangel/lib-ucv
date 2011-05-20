@@ -7,7 +7,7 @@ namespace baldzarika { namespace ar {
 
 	class tracker
 		: public boost::enable_shared_from_this<tracker>
-		, public boost::noncopyable
+		, private boost::noncopyable
 	{
 	public:
 
@@ -47,7 +47,7 @@ namespace baldzarika { namespace ar {
 		
 		class marker_state
 			: public boost::enable_shared_from_this<marker_state>
-			, public boost::noncopyable
+			, private boost::noncopyable
 		{
 		public:
 			typedef std::vector<feature_point_t::point2_t> points2_t;

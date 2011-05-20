@@ -8,6 +8,61 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	float const detector::DEFAULT_SAME_MARKER_MAX_AREA=1.0e-3f;
 	boost::uint32_t const detector::DEFAULT_KEEP_DETECTED_FRAME_COUNT=10;
 
+	detector::locked_frame::locked_frame()
+		: m_is_dirty(false)
+	{
+	}
+
+	detector::locked_frame::locked_frame(boost::shared_ptr<detector> const &d)
+		: m_detector(d)
+		, m_lock(d->m_update_sync)
+		, m_is_dirty(false)
+	{
+	}
+
+	detector::locked_frame::locked_frame(locked_frame const &that)
+		: m_detector(that.m_detector)
+		, m_lock(that.m_lock.move())
+		, m_is_dirty(that.m_is_dirty)
+	{
+	}
+	
+	detector::locked_frame::~locked_frame()
+	{
+		if(m_is_dirty)
+		{
+			if(boost::shared_ptr<detector> d=m_detector.lock())
+			{
+				if(d->m_running_state!=RS_STOPPED && d->m_running_state<RS_STOPPING)
+				{
+					BOOST_ASSERT(!d->m_frame_is_dirty);
+					d->m_gaussian_blur(ucv::gil::const_view(d->m_frame), ucv::gil::view(d->m_blurred_frame));
+					d->m_frame_is_dirty=true;
+					d->m_ios.post(boost::bind(&detector::on_update, d.get()));
+				}
+			}
+		}
+	}
+
+	detector::locked_frame::operator bool() const
+	{
+		if(boost::shared_ptr<detector> d=m_detector.lock())
+			return m_lock;
+		return false;
+	}
+
+	gray_view_t detector::locked_frame::get_view()
+	{
+		if(boost::shared_ptr<detector> d=m_detector.lock())
+		{
+			if(m_lock)
+			{
+				m_is_dirty=true;
+				return ucv::gil::view(d->m_frame);
+			}
+		}
+		return gray_view_t();
+	}
 
 	detector::marker_state::marker_state(boost::shared_ptr<marker_model_holder> const &mmh, marker_id_t mid, bool det)
 		: m_marker_model_holder(mmh)
@@ -226,6 +281,13 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		}
 		return true;
 	}
+
+	detector::locked_frame detector::lock_frame()
+	{
+		if(m_running_state==RS_STOPPED || m_running_state>RS_STARTED)
+			return locked_frame();
+		return locked_frame(shared_from_this());
+	}
 	
 	void detector::on_start()
 	{
@@ -275,8 +337,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				);
 				m_marker_state_changed_signal(ms, marker_state::SC_DETECTION);
 			}
+			mmh->m_marker_states.clear();
 		}
-		m_marker_model_holders.clear();
 	}
 
 	void detector::detect_markers(boost::shared_ptr<marker_model_holder> const &mmh, std::list<contour_t> const &contours)

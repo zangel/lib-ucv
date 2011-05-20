@@ -10,7 +10,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	class detector
 		: public boost::enable_shared_from_this<detector>
-		, public boost::noncopyable
+		, private boost::noncopyable
 	{
 	
 	protected:
@@ -35,7 +35,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		
 		class marker_state
 			: public boost::enable_shared_from_this<marker_state>
-			, public boost::noncopyable
+			, private boost::noncopyable
 		{
 		public:
 			friend class detector;
@@ -78,6 +78,27 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 		public:
 			mutable boost::any						m_any_data;
+		};
+
+
+		class locked_frame
+		{
+			friend class detector;
+		private:
+			locked_frame();
+			locked_frame(boost::shared_ptr<detector> const &d);
+		
+		public:
+			locked_frame(locked_frame const &that);
+			~locked_frame();
+			
+											operator bool() const;
+			gray_view_t						get_view();
+		
+		private:
+			boost::weak_ptr<detector>				m_detector;
+			mutable boost::mutex::scoped_try_lock	m_lock;
+			bool									m_is_dirty;
 		};
 
 	protected:
@@ -153,7 +174,6 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		
 	
 	public:
-
 		detector(ucv::size2ui const &fs);
 		~detector();
 
@@ -175,6 +195,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		bool									wait_to_stop();
 
 		bool									update(gray_const_view_t gv);
+		locked_frame							lock_frame();
+
 
 	protected:
 		void									on_start();
