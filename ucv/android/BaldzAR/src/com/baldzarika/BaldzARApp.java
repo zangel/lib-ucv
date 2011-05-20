@@ -14,13 +14,13 @@ import com.baldzarika.ar.Marker;
 import com.baldzarika.ar.Tracker;
 import com.baldzarika.ar.Size2;
 
-
 public class BaldzARApp extends Application implements SharedPreferences.OnSharedPreferenceChangeListener
 {
 	@Override
 	public final void onCreate()
 	{
 		super.onCreate();
+		
 		s_Instance=this;
 		
 		m_FrameSizes=new ArrayList<Size2>();

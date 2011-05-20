@@ -15,6 +15,8 @@ import com.baldzarika.ar.Point2;
 import com.baldzarika.ar.Size2;
 import com.baldzarika.ar.Tracker;
 import com.baldzarika.ar.Tracker.MarkerState;
+import com.baldzarika.ar.fiducial.BCHMarkerModel;
+import com.baldzarika.ar.fiducial.Detector;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -38,7 +40,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class BaldzAR extends Activity implements Callback, PreviewCallback, Renderer, Tracker.Callback
+public class BaldzAR extends Activity implements Callback, PreviewCallback, Renderer, Tracker.Callback, Detector.Callback
 {
 	protected static final int SET_MARKER=1;
 	protected static final int SETTINGS_CHANGED=2;
@@ -49,6 +51,26 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
 	{
     	super.onCreate(savedInstanceState);
     	
+    	m_BCHMarkerModel=new BCHMarkerModel();
+    	m_Detector=new Detector(BaldzARApp.getInstance().getTracker().getFrameSize());
+    	m_Detector.addMarkerModel(m_BCHMarkerModel);
+    	
+    	m_Detector.setCallback(this);
+    	boolean detRes=m_Detector.start();
+    	while(!m_Detector.isStarted())
+    	{
+    		try
+    		{
+				Thread.sleep(100);
+			}
+    		catch(InterruptedException e)
+    		{
+			}
+    	}
+    	m_Detector.stop();
+    	m_Detector.waitToStop();
+    	
+    	    	    	
     	m_MarkerVBuffer=ByteBuffer.allocateDirect(4*3*4).order(ByteOrder.nativeOrder()).asFloatBuffer();
     	
 		m_CameraPreview=new SurfaceView(this);
@@ -256,6 +278,19 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
 		}
     }
     
+    
+    //com.baldzarika.ar.Detector.Callback
+    @Override
+    public void onRunningStateChanged(Detector detector, int rs)
+    {
+    	    	
+    }
+    
+    public void onMarkerStateChanged(Detector.MarkerState markerState, int sc)
+    {
+    	    	
+    }
+    
 	//com.baldzarika.ar.Tracker.Callback
     @Override
     public void onMarkerStateChanged(Tracker.MarkerState ms, int sc)
@@ -450,6 +485,11 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
 		return false;
 	}
 	
+	
+	private BCHMarkerModel					m_BCHMarkerModel=null;
+	private Detector						m_Detector=null;
+	
+	
 	private Handler							m_Handler=new Handler();
 	private HUDButtonsUpdateTask			m_HUDButtonsUpdateTask=new HUDButtonsUpdateTask();
 	private HUDMarkerLevelUpdateTask		m_HUDMarkerLevelUpdateTask=new HUDMarkerLevelUpdateTask();
@@ -465,6 +505,9 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
 	private Button							m_TrackingButton=null;
 	private Button							m_SettingsButton=null;
 	private LevelIndicator					m_MarkerLevel=null;
+	
+	
+	
 	
    
 }

@@ -20,6 +20,9 @@ LOCAL_SRC_FILES :=	src/support.cpp \
 					src/com/baldzarika/ar/Frame.cpp \
 					src/com/baldzarika/ar/Marker.cpp \
 					src/com/baldzarika/ar/Tracker.cpp \
+					src/com/baldzarika/ar/fiducial/MarkerModel.cpp \
+					src/com/baldzarika/ar/fiducial/BCHMarkerModel.cpp \
+					src/com/baldzarika/ar/fiducial/Detector.cpp \
 					../../../lib_ar/src/baldzarika/ar/marker.cpp \
 					../../../lib_ar/src/baldzarika/ar/tracker.cpp \
 					../../../lib_ar/src/baldzarika/ar/fiducial/marker_model.cpp \
