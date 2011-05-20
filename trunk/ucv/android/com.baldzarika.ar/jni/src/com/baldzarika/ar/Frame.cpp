@@ -133,6 +133,7 @@ namespace com { namespace baldzarika { namespace ar {
 		{
 			if(pfmt==17 && data->size()>=(p_px->second.width()*p_px->second.height()+p_px->second.width()*p_px->second.height()/2))
 			{
+#if 0
 				return ::baldzarika::ucv::convert_nv16_to_gray(
 					//y channel
 					::baldzarika::ucv::gil::interleaved_view(
@@ -149,6 +150,7 @@ namespace com { namespace baldzarika { namespace ar {
 					::baldzarika::ucv::gil::view(p_px->second),
 					p_px->first
 				)?JNI_TRUE:JNI_FALSE;
+#endif
 			}
 		}
 		return JNI_FALSE;
