@@ -118,6 +118,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		{1,1,1,1,0}
 	};
 
+
 	bch_marker_model::marker_id_rot_t bch_marker_model::find_marker_id_and_rot(ucv::gil::gray8c_view_t bcv)
 	{
 		boost::uint32_t rot=0;
@@ -149,8 +150,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		
 		return marker_id_rot_t(NULL_MARKER_ID,0);
 	}
-
-			
+				
 	bch_marker_model::bch_marker_model()
 		: m_warped_img(MARKER_SIZE.width(), MARKER_SIZE.height())
 		, m_eccentricity(DEFAULT_ECCENTRICITY)
@@ -161,6 +161,11 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	bch_marker_model::~bch_marker_model()
 	{
 
+	}
+
+	ucv::size2ui bch_marker_model::get_marker_size(marker_id_t mid) const
+	{
+		return MARKER_SIZE;
 	}
 
 	bool bch_marker_model::detect_markers(gray_const_view_t img, std::list<contour_t> const &contours, std::list<detect_info> &dis) const
@@ -176,15 +181,24 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		if(!(contour.m_is_closed && contour.m_points.size()==4 && contour.m_is_convex))
 			return false;
 
+		ucv::decimal_t inv_scale=ucv::detail::constant::one<ucv::decimal_t>()/
+			ucv::decimal_t(std::max(contour.m_bbox.width(),contour.m_bbox.height()));
+
+		ucv::decimal_t min_side_length=m_min_side_length*inv_scale;
+
 		for(boost::uint32_t p=0;p<4;++p)
 		{
 			ucv::vector<ucv::decimal_t, 2> prev=contour.m_points[(p-1)%4]-contour.m_points[p];
+			prev*=inv_scale;
+
 			ucv::decimal_t prev_length=prev.length();
-			if(prev_length<m_min_side_length)
+			if(prev_length<min_side_length)
 				return false;
 			
 			prev/=prev_length;
 			ucv::vector<ucv::decimal_t, 2> next=contour.m_points[(p+1)%4]-contour.m_points[p];
+			next*=inv_scale;
+
 			if(std::abs(next.normalized().dot(prev))>m_eccentricity)
 				return false;
 		}
@@ -296,7 +310,6 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		return mid_and_rot.first;
 	}
 	
-
 	bool bch_marker_model::detect_markers(gray_const_view_t img, std::list<std::list<contour_t>::const_iterator> const &candidates, std::list<detect_info> &dis) const
 	{
 		std::vector<ucv::point2f> src_pts(4), dst_pts(4);

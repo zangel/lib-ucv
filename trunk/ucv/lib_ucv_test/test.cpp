@@ -23,6 +23,7 @@
 #include <baldzarika/ucv/ranged_histogram.h>
 #include <baldzarika/ucv/find_otsu_threshold.h>
 #include <baldzarika/ucv/perspective_transform.h>
+#include <baldzarika/ucv/camera_pose.h>
 #include <baldzarika/ucv/pixel_count.h>
 
 #include <boost/date_time.hpp>
@@ -943,13 +944,80 @@ BOOST_AUTO_TEST_CASE( warp_test )
 
 
 #if 1
+
+BOOST_AUTO_TEST_CASE( camera_pose_test )
+{
+	namespace ucv=baldzarika::ucv;
+
+	typedef ucv::point2<float> point2_t;
+	
+	ucv::size2ui const fs=ucv::size2ui(100,100);
+	ucv::size2ui const ms=ucv::size2ui(50,50);
+	
+	std::vector<point2_t> src(4),dst(4);
+
+	src[0]=point2_t( 0.0f,			0.0f );			dst[0]=point2_t( 0.0f,			0.0f );			
+	src[1]=point2_t( ms.width(),	0.0f );			dst[1]=point2_t( fs.width(),	0.0f );			
+	src[2]=point2_t( ms.width(),	ms.height() );	dst[2]=point2_t( fs.width(),	fs.height() );
+	src[3]=point2_t( 0.0f,			ms.height() );	dst[3]=point2_t( 0.0f,			fs.height() );
+
+	ucv::matrix33f hm;
+
+	ucv::perspective_transform(src,dst,hm);
+
+	float const fovy=45.0f;
+	float ty=std::tan(fovy*0.5f/360.0f*ucv::detail::constant::pi<float>());
+	float fl=fs.height()/(2.0f*ty);
+	
+	ucv::matrix44f cam_matrix;
+	ucv::camera_pose(fl, fl, point2_t(fs.width()/2,fs.height()/2), hm, cam_matrix);
+
+	ucv::matrix44f cam_adjust=ucv::matrix44f::identity();
+
+	cam_adjust(0,0)=ms.width()/2.0f;
+	cam_adjust(0,3)=ms.width()/2.0f;
+
+	cam_adjust(1,1)=-(ms.height()/2.0f);
+	cam_adjust(1,3)=ms.height()/2.0f;
+
+	cam_matrix*=cam_adjust;
+	
+	float corners[4][4]=
+	{
+		{ -1.0f,  1.0f, 0.0f, 1.0f },
+		{  1.0f,  1.0f,	0.0f, 1.0f },
+		{  1.0f, -1.0f,	0.0f, 1.0f },
+		{ -1.0f, -1.0f,	0.0f, 1.0f }
+	};
+	
+	ucv::vector4f top_left=cam_matrix*ucv::vector4f(corners[0]);
+	ucv::vector4f top_right=cam_matrix*ucv::vector4f(corners[1]);
+	ucv::vector4f bottom_right=cam_matrix*ucv::vector4f(corners[2]);
+	ucv::vector4f bottom_left=cam_matrix*ucv::vector4f(corners[3]);
+
+	ucv::matrix44f cam_intr=ucv::matrix44f::identity();
+	cam_intr(0,0)=fl;
+	cam_intr(0,2)=fs.width()/2;
+	cam_intr(1,1)=fl;
+	cam_intr(1,2)=fs.height()/2;
+
+	top_left=cam_intr*top_left; top_left/=top_left[2];
+	top_right=cam_intr*top_right; top_right/=top_right[2];
+	bottom_right=cam_intr*bottom_right; bottom_right/=bottom_right[2];
+	bottom_left=cam_intr*bottom_left; bottom_left/=bottom_left[2];
+
+
+	
+
+}
+
 BOOST_AUTO_TEST_CASE( canny_test )
 {
 	namespace ucv=baldzarika::ucv;
 
 	typedef ucv::fixed_point<15,16> real_t;
 	typedef ucv::sobel<real_t, 3, 1> sobel_t;
-	typedef ucv::gaussian_blur<real_t, 5> gaussian_blur_t;
+	typedef ucv::gaussian_blur<real_t, 3> gaussian_blur_t;
 	typedef ucv::adaptive_treshold<real_t, 5, true > adaptive_treshold_t;
 
 
@@ -962,7 +1030,8 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	
 
 	ucv::gil::gray8_image_t gray8_img;
-	ucv::gil::png_read_and_convert_image("image-test.png", gray8_img);
+	//ucv::gil::png_read_and_convert_image("image-test.png", gray8_img);
+	ucv::gil::png_read_and_convert_image("frame.png", gray8_img);
 	//ucv::gil::png_read_and_convert_image("rectangle.png", gray8_img);
 	//ucv::gil::png_read_and_convert_image("sudoku.png", gray8_img);
 
@@ -1027,9 +1096,10 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	cv::imshow(OPENCV_WND_NAME, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
 	cv::waitKey();
 
-	cv::Mat image=cv::imread("image-test.png", CV_LOAD_IMAGE_GRAYSCALE);
+	//cv::Mat image=cv::imread("image-test.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::Mat image=cv::imread("rectangle.png", CV_LOAD_IMAGE_GRAYSCALE);
 	//cv::Mat image=cv::imread("sudoku.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat image=cv::imread("frame.png", CV_LOAD_IMAGE_GRAYSCALE);
 
 	cv::blur(image,image,cv::Size(3,3));
 
@@ -1084,7 +1154,6 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 		gaussian_blur_t::gray_image_t warped_img(50,50);
 		ucv::gil::gray8_image_t warped8_img(50,50);
-
 
 		canny(ucv::gil::const_view(gray_img), contours);
 		

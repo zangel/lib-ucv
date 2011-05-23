@@ -171,20 +171,18 @@ namespace baldzarika { namespace ucv {
 				reinterpret_cast<gray_t *>(mag_buf_view[2].row_begin(0))
 			};
 
-			std::fill(mag_buf[0], mag_buf[0]+m_frame_size.width()+2, detail::constant::zero<gray_t>());
-
 			map_view_t map_view=gil::view(m_map_img);
-			
-			std::fill(
-				reinterpret_cast<map_t *>(map_view.row_begin(0)),
-				reinterpret_cast<map_t *>(map_view.row_begin(0))+m_frame_size.width()+2,
-				detail::constant::one<map_t>()
-			);
-			std::fill(
-				reinterpret_cast<map_t *>(map_view.row_begin(map_view.height()-1)),
-				reinterpret_cast<map_t *>(map_view.row_begin(map_view.height()-1))+m_frame_size.width()+2,
-				detail::constant::one<map_t>()
-			);
+
+			//std::fill(mag_buf[0], mag_buf[0]+m_frame_size.width()+2, detail::constant::zero<gray_t>());
+
+			map_t *first_map_row=reinterpret_cast<map_t *>(map_view.row_begin(0));
+			map_t *last_map_row=reinterpret_cast<map_t *>(map_view.row_begin(map_view.height()-1));
+			for(boost::int32_t i=0;i<boost::int32_t(m_frame_size.width()+2);++i)
+			{
+				mag_buf[0][i]=detail::constant::zero<gray_t>();
+				first_map_row[i]=1;
+				last_map_row[i]=1;
+			}
 			
 			boost::uint32_t const map_step=m_frame_size.width()+2;
 
@@ -196,13 +194,17 @@ namespace baldzarika { namespace ucv {
 
 				if(y<boost::int32_t(m_frame_size.height()))
 				{
-					mag[-1]=mag[m_frame_size.width()]=detail::constant::zero<gray_t>();
+					mag[-1]=detail::constant::zero<gray_t>();
+					mag[m_frame_size.width()]=detail::constant::zero<gray_t>();
 					for(boost::uint32_t x=0;x<m_frame_size.width();++x)
 						mag[x]=std::abs(dx_row[x])+std::abs(dy_row[x]);
 				}
 				else
 				{
-					std::fill(mag-1, mag+m_frame_size.width()+1, detail::constant::zero<gray_t>());
+					mag--;
+					for(boost::uint32_t x=0;x<m_frame_size.width()+2;++x)
+						mag[x]=detail::constant::zero<gray_t>();
+					mag++;
 				}
 
 				if(y==0) continue;
@@ -442,7 +444,7 @@ namespace baldzarika { namespace ucv {
 					point2<CT>(min_x,min_y),
 					point2<CT>(max_x,max_y)
 				);
-				cont.m_is_closed=contour<CT>::check_is_closed(cont.m_points,detail::constant::two<CT>());
+				cont.m_is_closed=contour<CT>::check_is_closed(cont.m_points, detail::constant::two<CT>());
 				cont.m_is_clockwise=n_ori<=0;
 				cont.m_is_convex=(n_ori>=0 && all_positive) || (n_ori<=0 && all_negative);
 			}

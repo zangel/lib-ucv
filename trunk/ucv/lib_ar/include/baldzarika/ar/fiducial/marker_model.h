@@ -26,7 +26,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		marker_model();
 		virtual ~marker_model();
 
-		virtual bool	detect_markers(gray_const_view_t img, std::list<contour_t> const &cnts, std::list<detect_info> &dis) const=0;
+		virtual ucv::size2ui		get_marker_size(marker_id_t mid) const=0;
+		virtual bool				detect_markers(gray_const_view_t img, std::list<contour_t> const &cnts, std::list<detect_info> &dis) const=0;
 
 	public:
 		mutable boost::any						m_any_data;

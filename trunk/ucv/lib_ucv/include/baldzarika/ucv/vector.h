@@ -241,7 +241,20 @@ namespace baldzarika { namespace ucv {
 
 	typedef vector<float, 2> vector2f;
 	typedef vector<float, 3> vector3f;
+	typedef vector<float, 4> vector4f;
 	typedef vector<float, 9> vector9f;
+
+	template < typename T >
+	vector<T,3> cross_product(vector<T,3> const &a, vector<T,3> const &b)
+	{
+		T res[3]=
+		{
+			a[1]*b[2]-b[1]*a[2],
+			a[2]*b[0]-b[2]*a[0],
+			a[0]*b[1]-b[0]*a[1]
+		};
+		return vector<T,3>(res);
+	}
 
 } //namespace ucv
 } //namespace baldzarika

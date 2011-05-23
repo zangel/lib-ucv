@@ -153,6 +153,9 @@
     <ClInclude Include="include\baldzarika\ucv\ublas_fixed_point_type_traits.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\camera_pose.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ucv\config.cpp">

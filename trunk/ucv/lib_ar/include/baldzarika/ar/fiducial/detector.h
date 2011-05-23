@@ -21,6 +21,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		static float const DEFAULT_EDGE_DETECTION_THRESHOLD;
 		static float const DEFAULT_POLYGON_APPROXIMATION_EPS;
 		static float const DEFAULT_SAME_MARKER_MAX_AREA;
+		static float const DEFAULT_CAMERA_FOVY;
 		static boost::uint32_t const DEFAULT_KEEP_DETECTED_FRAME_COUNT;
 
 		typedef enum
@@ -62,11 +63,14 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			boost::shared_ptr<detector>				get_detector() const;
 			boost::shared_ptr<marker_model>			get_marker_model() const;
 			marker_id_t								get_marker_id() const;
+			ucv::size2ui							get_marker_size() const;
 			bool									is_detected() const;
 			ucv::matrix33f const&					get_homography() const;
-
+			ucv::matrix44f const&					get_camera_pose() const;
+			
 		protected:
 			void									set_detected(bool d);
+			void									set_homography(ucv::matrix33f const &hm);
 					
 		private:
 			boost::weak_ptr<marker_model_holder>	m_marker_model_holder;
@@ -75,6 +79,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			bool									m_is_detected;
 			boost::uint32_t							m_undetected_frame_count;
 			ucv::matrix33f							m_homography;
+			ucv::matrix44f							m_camera_pose;
 
 		public:
 			mutable boost::any						m_any_data;
@@ -169,7 +174,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		> marker_model_holders_t;
 
 
-		typedef ucv::gaussian_blur<ar::fiducial::gray_t, 5> gaussian_blur_t;
+		typedef ucv::gaussian_blur<ar::fiducial::gray_t, 3> gaussian_blur_t;
 		typedef ucv::canny<ar::fiducial::gray_t, 3> canny_t;
 		
 	
@@ -180,7 +185,12 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		ucv::size2ui							get_frame_size() const;
 		bool									set_frame_size(ucv::size2ui const &fs);
 
+		float									get_camera_fovy() const;
+		bool									set_camera_fovy(float fovy);
 
+		float									get_camera_focal_length() const;
+		ucv::matrix44f const&					get_camera_projection() const;
+		
 		bool									add_marker_model(boost::shared_ptr<marker_model> const &mm);
 		bool									remove_marker_model(boost::shared_ptr<marker_model> const &mm);
 
@@ -203,17 +213,21 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		void									on_update();
 		void									on_stop();
 		void									detect_markers(boost::shared_ptr<marker_model_holder> const &mmh, std::list<contour_t> const &contours);
-				
+
+		void									update_camera_projection();
+						
 	private:
 		void									run();
-		
 
-
-	
 	private:
 		float									m_polygon_approximation_eps;
 		float									m_same_marker_max_area;
 		boost::uint32_t							m_keep_detected_frame_count;
+
+		float									m_camera_fovy;
+		float									m_camera_focal_length;
+		ucv::matrix44f							m_camera_projection;
+		
 		mutable boost::asio::io_service			m_ios;
 		boost::asio::io_service::work			m_ios_work;
 		boost::thread							m_worker;

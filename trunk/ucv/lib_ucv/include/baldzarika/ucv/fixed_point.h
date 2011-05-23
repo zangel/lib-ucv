@@ -194,9 +194,10 @@ namespace baldzarika { namespace ucv {
 
 	template < boost::uint32_t I, boost::uint32_t F >
 	class fixed_point
-		: boost::ordered_field_operators< fixed_point<I, F>
-		, boost::unit_steppable< fixed_point<I, F>
-		, boost::shiftable< fixed_point<I, F>, boost::uint32_t > > >
+		//: boost::ordered_field_operators< fixed_point<I, F>
+		//, boost::unit_steppable< fixed_point<I, F>
+		//, boost::shiftable< fixed_point<I, F>, boost::uint32_t > 
+		//> >
 	{
 		template <boost::uint32_t, boost::uint32_t> friend class fixed_point;
 	
@@ -210,6 +211,7 @@ namespace baldzarika { namespace ucv {
 
 #if defined (NDEBUG)
 		fixed_point()
+			: m_value(0)
 		{
 		}
 #else
@@ -219,13 +221,13 @@ namespace baldzarika { namespace ucv {
 		}
 #endif
 
-		explicit fixed_point(value_type v, detail::fp_explicit_tag)
+		inline explicit fixed_point(value_type v, detail::fp_explicit_tag)
 			: m_value(v)
 		{
 		}
 
 #define BALDZARIKA_UCV_FIXED_POINT_INTEGRAL_CONSTRUCTOR(T)\
-		fixed_point(T v)\
+		inline fixed_point(T v)\
 			: m_value(static_cast<value_type>(v)<<F)\
 		{\
 		}
@@ -242,149 +244,203 @@ namespace baldzarika { namespace ucv {
 	
 		
 
-		fixed_point(float v)
+		inline fixed_point(float v)
 			: m_value(static_cast<value_type>(v*detail::pow2<F>::value+(v>=0.0f?0.5f:-0.5f)))
 		{
 		}
 
-		fixed_point(double v)
+		inline fixed_point(double v)
 			: m_value(static_cast<value_type>(v*detail::pow2<F>::value+(v>=0.0?0.5:-0.5)))
 		{
 		}
 
-		fixed_point(long double v)
+		inline fixed_point(long double v)
 			: m_value(static_cast<value_type>(v*detail::pow2<F>::value+(v>=0.0?0.5:-0.5)))
 		{
 		}
 
-		fixed_point(fixed_point const& that)
+		inline fixed_point(fixed_point const& that)
 			: m_value(that.m_value)
 		{
 		}
 
 		template< boost::uint32_t I2, boost::uint32_t F2 >
-		fixed_point(fixed_point< I2, F2 > const& that)
+		inline fixed_point(fixed_point< I2, F2 > const& that)
 			: m_value( detail::adjuster< (F>F2) >::
 				template adjust< value_type, typename fixed_point< I2, F2 >::value_type, F, F2>(that.m_value)
 			)
 		{ 
 		}
 
-		fixed_point& operator =(fixed_point const& rhs)
+		inline fixed_point& operator =(fixed_point const& rhs)
 		{
 			m_value=rhs.m_value;
 			return *this;
 		}
 
-
-
 		template< boost::uint32_t I2, boost::uint32_t F2 >
-		fixed_point& operator =(fixed_point< I2, F2 > const& rhs)
+		inline fixed_point& operator =(fixed_point< I2, F2 > const& rhs)
 		{
 			m_value=fixed_point(rhs).m_value;
 			return *this;
 		}
 
-		bool operator <(fixed_point const& rhs) const
+		inline bool operator <(fixed_point const& rhs) const
 		{
 			return m_value<rhs.m_value; 
 		}
 
-		bool operator ==(fixed_point const& rhs) const
+		inline bool operator <=(fixed_point const& rhs) const
+		{
+			return m_value<=rhs.m_value; 
+		}
+
+		inline bool operator >(fixed_point const& rhs) const
+		{
+			return m_value>rhs.m_value; 
+		}
+
+		inline bool operator >=(fixed_point const& rhs) const
+		{
+			return m_value>=rhs.m_value; 
+		}
+
+		inline bool operator ==(fixed_point const& rhs) const
 		{
 			return m_value==rhs.m_value; 
 		}
 
-		bool operator !() const
+		inline bool operator !=(fixed_point const& rhs) const
+		{
+			return m_value!=rhs.m_value; 
+		}
+
+		inline bool operator !() const
 		{
 			return m_value==0;
 		}
 
-		fixed_point operator -() const
+		inline fixed_point operator -() const
 		{
 			return fixed_point(-m_value, detail::fp_explicit_tag());
 		}
 
-		fixed_point& operator ++()
+		inline fixed_point& operator ++()
 		{
 			m_value+=detail::pow2<F>::value;
 			return *this;
 		}
 
-		fixed_point& operator --()
+		inline fixed_point& operator --()
 		{
 			m_value-=detail::pow2<F>::value;
 			return *this;
 		}
 		
-		fixed_point& operator +=(fixed_point const& rhs)
+		inline fixed_point& operator +=(fixed_point const& rhs)
 		{
 			m_value+=rhs.m_value;
 			return *this;
 		}
 
-		fixed_point& operator -=(fixed_point const& rhs)
+		inline fixed_point operator +(fixed_point const& rhs) const
+		{
+			return fixed_point(m_value+rhs.m_value, detail::fp_explicit_tag());
+		}
+
+		inline fixed_point& operator -=(fixed_point const& rhs)
 		{
 			m_value-=rhs.m_value;
 			return *this;
 		}
 
-		fixed_point& operator *=(fixed_point const& rhs)
+		inline fixed_point operator -(fixed_point const& rhs) const
+		{
+			return fixed_point(m_value-rhs.m_value, detail::fp_explicit_tag());
+		}
+
+		inline fixed_point& operator *=(fixed_point const& rhs)
 		{
 			m_value=(typename fixed_point<2*I, 2*F>::value_type(m_value)*rhs.m_value)>>F;
 			return *this;
 		}
 
-		fixed_point& operator /=(fixed_point const& rhs)
+		inline fixed_point operator *(fixed_point const& rhs) const
+		{
+			return fixed_point(
+				(typename fixed_point<2*I, 2*F>::value_type(m_value)*rhs.m_value)>>F,
+				detail::fp_explicit_tag()
+			);
+		}
+
+		inline fixed_point& operator /=(fixed_point const& rhs)
 		{
 			m_value=(typename fixed_point<2*I, 2*F>::value_type(m_value)<<F)/rhs.m_value;
 			return *this;
 		}
 
-		fixed_point& operator >>=(boost::uint32_t b)
+		inline fixed_point operator /(fixed_point const& rhs) const
+		{
+			return fixed_point(
+				(typename fixed_point<2*I, 2*F>::value_type(m_value)<<F)/rhs.m_value,
+				detail::fp_explicit_tag()
+			);
+		}
+
+		inline fixed_point& operator >>=(boost::uint32_t b)
 		{
 			m_value>>=b;
 			return *this;
 		}
 
-		fixed_point& operator <<=(boost::uint32_t b)
+		inline fixed_point& operator <<=(boost::uint32_t b)
 		{
 			m_value<<=b;
 			return *this;
 		}
 
-		operator char() const { return static_cast<char>(m_value>>F); }
+		inline fixed_point operator >>(boost::uint32_t b) const
+		{
+			return fixed_point(m_value>>b, detail::fp_explicit_tag());
+		}
 
-		operator signed char() const { return static_cast<signed char>(m_value>>F); }
+		inline fixed_point operator <<(boost::uint32_t b) const
+		{
+			return fixed_point(m_value<<b, detail::fp_explicit_tag());
+		}
 
-		operator unsigned char() const { return static_cast<unsigned char>(m_value>>F); }
+		inline operator char() const { return static_cast<char>(m_value>>F); }
 
-		operator short() const { return static_cast<short>(m_value>>F); }
+		inline operator signed char() const { return static_cast<signed char>(m_value>>F); }
 
-		operator unsigned short() const { return static_cast<unsigned short>(m_value>>F); }
+		inline operator unsigned char() const { return static_cast<unsigned char>(m_value>>F); }
 
-		operator int() const { return static_cast<int>(m_value>>F); }
+		inline operator short() const { return static_cast<short>(m_value>>F); }
 
-		operator unsigned int() const { return static_cast<unsigned int>(m_value>>F); }
+		inline operator unsigned short() const { return static_cast<unsigned short>(m_value>>F); }
 
-		operator long() const { return static_cast<long>(m_value>>F); }
+		inline operator int() const { return static_cast<int>(m_value>>F); }
 
-		operator unsigned long() const { return static_cast<unsigned long>(m_value>>F); }
+		inline operator unsigned int() const { return static_cast<unsigned int>(m_value>>F); }
 
-		operator long long() const { return static_cast<long long>(m_value>>F); }
+		inline operator long() const { return static_cast<long>(m_value>>F); }
 
-		operator unsigned long long() const { return static_cast<unsigned long long>(m_value>>F); }
+		inline operator unsigned long() const { return static_cast<unsigned long>(m_value>>F); }
 
-		operator bool() const { return m_value?true:false; }
+		inline operator long long() const { return static_cast<long long>(m_value>>F); }
 
-		operator float() const { return static_cast<float>(m_value)/detail::pow2<F>::value; }
+		inline operator unsigned long long() const { return static_cast<unsigned long long>(m_value>>F); }
+
+		inline operator bool() const { return m_value?true:false; }
+
+		inline operator float() const { return static_cast<float>(m_value)/detail::pow2<F>::value; }
 		
-		operator double() const { return static_cast<double>(m_value)/detail::pow2<F>::value; }
+		inline operator double() const { return static_cast<double>(m_value)/detail::pow2<F>::value; }
 
-		operator long double() const { return static_cast<long double>(m_value)/detail::pow2<F>::value; }
+		inline operator long double() const { return static_cast<long double>(m_value)/detail::pow2<F>::value; }
 
 
-		value_type get() const { return m_value; }
+		inline value_type get() const { return m_value; }
 
 		template < boost::uint32_t I2, boost::uint32_t F2 >
 		friend fixed_point<I2,F2> std::abs(fixed_point<I2,F2> const &);
@@ -466,69 +522,69 @@ namespace std
 		static const int min_exponent=0;
 		static const int min_exponent10=0;
 		static const int radix=0;
-		static fp_type (min)()
+		static inline fp_type (min)()
 		{
 			//return fp_type((std::numeric_limits<typename fp_type::value_type>::min)(), baldzarika::ucv::detail::fp_explicit_tag());
 			return fp_type(1, baldzarika::ucv::detail::fp_explicit_tag());
 		}
 
-		static fp_type (max)()
+		static inline fp_type (max)()
 		{
 			return fp_type((std::numeric_limits<typename fp_type::value_type>::max)(), baldzarika::ucv::detail::fp_explicit_tag());
 		}
 
-		static fp_type epsilon()
+		static inline fp_type epsilon()
 		{
 			return fp_type(1, baldzarika::ucv::detail::fp_explicit_tag());
 		}
 
-		static fp_type (lowest)()
+		static inline fp_type (lowest)()
 		{
 			return fp_type((std::numeric_limits<typename fp_type::value_type>::min)(), baldzarika::ucv::detail::fp_explicit_tag());
 		}
 
-		static fp_type round_error()
+		static inline fp_type round_error()
 		{
 			return fp_type(0.5);
 		}
 
-		static fp_type denorm_min()
+		static inline fp_type denorm_min()
 		{
 			return fp_type(0);
 		}
 
-		static fp_type infinity()
+		static inline fp_type infinity()
 		{
 			return fp_type(0);
 		}
 
-		static fp_type quiet_NaN()
+		static inline fp_type quiet_NaN()
 		{
 			return fp_type(0);
 		}
 
-		static fp_type signaling_NaN()
+		static inline fp_type signaling_NaN()
 		{
 			return fp_type(0);
 		}
 	};
 
 	template < boost::uint32_t I, boost::uint32_t F >
-	baldzarika::ucv::fixed_point<I,F> abs(baldzarika::ucv::fixed_point<I,F> const &x)
+	inline baldzarika::ucv::fixed_point<I,F> abs(baldzarika::ucv::fixed_point<I,F> const &x)
 	{
 		namespace bucv=baldzarika::ucv;
 		return x<bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?-x:x;
 	}
 
 	template < boost::uint32_t I, boost::uint32_t F >
-	baldzarika::ucv::fixed_point<I,F> fabs(baldzarika::ucv::fixed_point<I,F> const &x)
+	inline baldzarika::ucv::fixed_point<I,F> fabs(baldzarika::ucv::fixed_point<I,F> const &x)
 	{
 		namespace bucv=baldzarika::ucv;
 		return x<bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?-x:x;
 	}
 
 	template < boost::uint32_t I, boost::uint32_t F >
-	baldzarika::ucv::fixed_point<I,F> ceil(baldzarika::ucv::fixed_point<I,F> const &x)
+	inline baldzarika::ucv::fixed_point<I,F> ceil(baldzarika::ucv::fixed_point<I,F> const &x)
 	{
 		namespace bucv=baldzarika::ucv;
 		return bucv::fixed_point<I,F>(x.m_value & ~(bucv::detail::pow2<F>::value-1), bucv::detail::fp_explicit_tag())+
@@ -539,21 +595,21 @@ namespace std
 	}
 
 	template < boost::uint32_t I, boost::uint32_t F >
-	baldzarika::ucv::fixed_point<I,F> floor(baldzarika::ucv::fixed_point<I,F> const &x)
+	inline baldzarika::ucv::fixed_point<I,F> floor(baldzarika::ucv::fixed_point<I,F> const &x)
 	{
 		namespace bucv=baldzarika::ucv;
 		return bucv::fixed_point<I,F>(x.m_value & ~(bucv::detail::pow2<F>::value-1), bucv::detail::fp_explicit_tag());
 	}
 
 	template < boost::uint32_t I, boost::uint32_t F >
-	baldzarika::ucv::fixed_point<I,F> fmod(baldzarika::ucv::fixed_point<I,F> const &x, baldzarika::ucv::fixed_point<I,F> const &y)
+	inline baldzarika::ucv::fixed_point<I,F> fmod(baldzarika::ucv::fixed_point<I,F> const &x, baldzarika::ucv::fixed_point<I,F> const &y)
 	{
 		namespace bucv=baldzarika::ucv;
 		return bucv::fixed_point<I,F>(x.m_value % y.m_value, bucv::detail::fp_explicit_tag());
 	}
 
 	template < boost::uint32_t I, boost::uint32_t F >
-	baldzarika::ucv::fixed_point<I,F> modf(baldzarika::ucv::fixed_point<I,F> const &x, baldzarika::ucv::fixed_point<I,F> *ptr)
+	inline baldzarika::ucv::fixed_point<I,F> modf(baldzarika::ucv::fixed_point<I,F> const &x, baldzarika::ucv::fixed_point<I,F> *ptr)
 	{
 		namespace bucv=baldzarika::ucv;
 
@@ -570,7 +626,7 @@ namespace std
 	}
 
 	template< typename T, boost::uint32_t I, boost::uint32_t F >
-	T round(baldzarika::ucv::fixed_point<I,F> const &x)
+	inline T round(baldzarika::ucv::fixed_point<I,F> const &x)
 	{
 		namespace bucv=baldzarika::ucv;
 
@@ -583,7 +639,7 @@ namespace std
 
 
 	template < boost::uint32_t I, boost::uint32_t F >
-	baldzarika::ucv::fixed_point<I,F> sqrt(baldzarika::ucv::fixed_point<I,F> const &x)
+	inline baldzarika::ucv::fixed_point<I,F> sqrt(baldzarika::ucv::fixed_point<I,F> const &x)
 	{
 		namespace bucv=baldzarika::ucv;
 
@@ -627,14 +683,14 @@ namespace std
 
 
 	template < boost::uint32_t I, boost::uint32_t F >
-	baldzarika::ucv::fixed_point<I,F> log(baldzarika::ucv::fixed_point<I,F> const &x)
+	inline baldzarika::ucv::fixed_point<I,F> log(baldzarika::ucv::fixed_point<I,F> const &x)
 	{
 		namespace bucv=baldzarika::ucv;
 		return bucv::fixed_point<I,F>(::logf(static_cast<float>(x)));
 	}
 
 	template < boost::uint32_t I, boost::uint32_t F >
-	baldzarika::ucv::fixed_point<I,F> pow(baldzarika::ucv::fixed_point<I,F> const &x, baldzarika::ucv::fixed_point<I,F> const &y)
+	inline baldzarika::ucv::fixed_point<I,F> pow(baldzarika::ucv::fixed_point<I,F> const &x, baldzarika::ucv::fixed_point<I,F> const &y)
 	{
 		namespace bucv=baldzarika::ucv;
 		return bucv::fixed_point<I,F>(::pow(static_cast<float>(x), static_cast<float>(y)));
@@ -642,7 +698,7 @@ namespace std
 
 
 	template < boost::uint32_t I, boost::uint32_t F >
-	baldzarika::ucv::fixed_point<I,F> exp(baldzarika::ucv::fixed_point<I,F> const &x)
+	inline baldzarika::ucv::fixed_point<I,F> exp(baldzarika::ucv::fixed_point<I,F> const &x)
 	{
 		namespace bucv=baldzarika::ucv;
 
@@ -712,7 +768,7 @@ namespace std
 
 
 	template < boost::uint32_t I, boost::uint32_t F >
-	baldzarika::ucv::fixed_point<I,F> atan2(baldzarika::ucv::fixed_point<I,F> const &y, baldzarika::ucv::fixed_point<I,F> const &x)
+	inline baldzarika::ucv::fixed_point<I,F> atan2(baldzarika::ucv::fixed_point<I,F> const &y, baldzarika::ucv::fixed_point<I,F> const &x)
 	{
 		namespace bucv=baldzarika::ucv;
 
@@ -738,23 +794,23 @@ namespace std
 
 #else
 
-	bucv::fixed_point<I,F> abs_y=std::abs(y)+bucv::fixed_point<I,F>(1, bucv::detail::fp_explicit_tag());
+		bucv::fixed_point<I,F> abs_y=std::abs(y)+bucv::fixed_point<I,F>(1, bucv::detail::fp_explicit_tag());
 
-	bucv::fixed_point<I,F> angle(
-		x>=bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?
-			bucv::detail::constant::pi_i4< bucv::fixed_point<I,F> >()-bucv::detail::constant::pi_i4< bucv::fixed_point<I,F> >()*
-				(bucv::fixed_point<I,F>(x.m_value-abs_y.m_value, bucv::detail::fp_explicit_tag())/bucv::fixed_point<I,F>(x.m_value+abs_y.m_value, bucv::detail::fp_explicit_tag())):
-			bucv::detail::constant::pi_3i4< bucv::fixed_point<I,F> >()-bucv::detail::constant::pi_i4< bucv::fixed_point<I,F> >()*
-				(bucv::fixed_point<I,F>(x.m_value+abs_y.m_value, bucv::detail::fp_explicit_tag())/bucv::fixed_point<I,F>(abs_y.m_value-x.m_value, bucv::detail::fp_explicit_tag()))
-	);
-	return (y<bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?-angle:angle);
+		bucv::fixed_point<I,F> angle(
+			x>=bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?
+				bucv::detail::constant::pi_i4< bucv::fixed_point<I,F> >()-bucv::detail::constant::pi_i4< bucv::fixed_point<I,F> >()*
+					(bucv::fixed_point<I,F>(x.m_value-abs_y.m_value, bucv::detail::fp_explicit_tag())/bucv::fixed_point<I,F>(x.m_value+abs_y.m_value, bucv::detail::fp_explicit_tag())):
+				bucv::detail::constant::pi_3i4< bucv::fixed_point<I,F> >()-bucv::detail::constant::pi_i4< bucv::fixed_point<I,F> >()*
+					(bucv::fixed_point<I,F>(x.m_value+abs_y.m_value, bucv::detail::fp_explicit_tag())/bucv::fixed_point<I,F>(abs_y.m_value-x.m_value, bucv::detail::fp_explicit_tag()))
+		);
+		return (y<bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?-angle:angle);
 
 #endif
 #endif
 	}
 
 	template < boost::uint32_t I, boost::uint32_t F >
-	baldzarika::ucv::fixed_point<I,F> sin(baldzarika::ucv::fixed_point<I,F> const &x)
+	inline baldzarika::ucv::fixed_point<I,F> sin(baldzarika::ucv::fixed_point<I,F> const &x)
 	{
 		namespace bucv=baldzarika::ucv;
 
@@ -785,7 +841,7 @@ namespace std
 
 
 	template < boost::uint32_t I, boost::uint32_t F >
-	baldzarika::ucv::fixed_point<I,F> cos(baldzarika::ucv::fixed_point<I,F> const &x)
+	inline baldzarika::ucv::fixed_point<I,F> cos(baldzarika::ucv::fixed_point<I,F> const &x)
 	{
 		namespace bucv=baldzarika::ucv;
 

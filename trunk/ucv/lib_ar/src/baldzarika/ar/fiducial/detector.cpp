@@ -5,7 +5,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	float const detector::DEFAULT_EDGE_DETECTION_THRESHOLD=0.4f;
 	float const detector::DEFAULT_POLYGON_APPROXIMATION_EPS=3.0f;
-	float const detector::DEFAULT_SAME_MARKER_MAX_AREA=1.0e-3f;
+	float const detector::DEFAULT_SAME_MARKER_MAX_AREA=1.0e-2f;
+	float const detector::DEFAULT_CAMERA_FOVY=45.0f;
 	boost::uint32_t const detector::DEFAULT_KEEP_DETECTED_FRAME_COUNT=10;
 
 	detector::locked_frame::locked_frame()
@@ -36,7 +37,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				if(d->m_running_state!=RS_STOPPED && d->m_running_state<RS_STOPPING)
 				{
 					BOOST_ASSERT(!d->m_frame_is_dirty);
-					d->m_gaussian_blur(ucv::gil::const_view(d->m_frame), ucv::gil::view(d->m_blurred_frame));
+					//d->m_gaussian_blur(ucv::gil::const_view(d->m_frame), ucv::gil::view(d->m_blurred_frame));
 					d->m_frame_is_dirty=true;
 					d->m_ios.post(boost::bind(&detector::on_update, d.get()));
 				}
@@ -47,7 +48,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	detector::locked_frame::operator bool() const
 	{
 		if(boost::shared_ptr<detector> d=m_detector.lock())
-			return m_lock;
+			return m_lock && !d->m_frame_is_dirty;
 		return false;
 	}
 
@@ -95,6 +96,14 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		return m_marker_id;
 	}
 
+	ucv::size2ui detector::marker_state::get_marker_size() const
+	{
+		boost::shared_ptr<marker_model_holder> mmh=m_marker_model_holder.lock();
+		BOOST_ASSERT(mmh);
+		BOOST_ASSERT(mmh->m_marker_model);
+		return mmh->m_marker_model->get_marker_size(m_marker_id);
+	}
+
 	bool detector::marker_state::is_detected() const
 	{
 		return m_is_detected;
@@ -105,9 +114,41 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		return m_homography;
 	}
 
+	ucv::matrix44f const& detector::marker_state::get_camera_pose() const
+	{
+		return m_camera_pose;
+	}
+
 	void detector::marker_state::set_detected(bool d)
 	{
 		m_is_detected=d;
+	}
+
+	void detector::marker_state::set_homography(ucv::matrix33f const &hm)
+	{
+		boost::shared_ptr<marker_model_holder> mmh=m_marker_model_holder.lock();
+		BOOST_ASSERT(mmh);
+		BOOST_ASSERT(mmh->m_marker_model);
+		boost::shared_ptr<detector> det=mmh->m_detector.lock();
+		BOOST_ASSERT(det);
+
+		m_homography=hm;
+
+		ucv::size2ui fs=det->get_frame_size();
+		ucv::size2ui ms=mmh->m_marker_model->get_marker_size(m_marker_id);
+		float focal_length=det->get_camera_focal_length();
+
+		ucv::camera_pose(focal_length, focal_length, ucv::point2f(float(fs.width())*0.5f,float(fs.height())*0.5f), m_homography, m_camera_pose);
+
+		ucv::matrix44f cam_adjust=ucv::matrix44f::identity();
+
+		cam_adjust(0,0)=float(ms.width())*0.5f;
+		cam_adjust(0,3)=float(ms.width())*0.5f;
+
+		cam_adjust(1,1)=-float(ms.height())*0.5f;
+		cam_adjust(1,3)=float(ms.height())*0.5f;
+		
+		m_camera_pose*=cam_adjust;
 	}
 
 	detector::marker_model_holder::marker_model_holder(boost::shared_ptr<detector> const &d, boost::shared_ptr<marker_model> const &mm)
@@ -134,6 +175,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		: m_polygon_approximation_eps(DEFAULT_POLYGON_APPROXIMATION_EPS)
 		, m_same_marker_max_area(DEFAULT_SAME_MARKER_MAX_AREA)
 		, m_keep_detected_frame_count(DEFAULT_KEEP_DETECTED_FRAME_COUNT)
+		, m_camera_fovy(DEFAULT_CAMERA_FOVY)
 		, m_ios()
 		, m_ios_work(m_ios)
 		, m_worker()
@@ -144,6 +186,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		, m_gaussian_blur(fs)
 		, m_canny(fs,DEFAULT_EDGE_DETECTION_THRESHOLD, DEFAULT_EDGE_DETECTION_THRESHOLD*3.0f)
 	{
+		update_camera_projection();
 	}
 
 	detector::~detector()
@@ -165,7 +208,32 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		m_blurred_frame.recreate(fs.width(),fs.height());
 		m_gaussian_blur.set_frame_size(fs);
 		m_canny.set_frame_size(fs);
+		update_camera_projection();
 		return true;
+	}
+
+	float detector::get_camera_fovy() const
+	{
+		return m_camera_fovy;
+	}
+
+	bool detector::set_camera_fovy(float fovy)
+	{
+		if(m_running_state)
+			return false;
+		m_camera_fovy=fovy;
+		update_camera_projection();
+		return true;
+	}
+
+	float detector::get_camera_focal_length() const
+	{
+		return m_camera_focal_length;
+	}
+
+	ucv::matrix44f const& detector::get_camera_projection() const
+	{
+		return m_camera_projection;
 	}
 
 	bool detector::add_marker_model(boost::shared_ptr<marker_model> const &mm)
@@ -273,7 +341,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				if(!m_frame_is_dirty)
 				{
 					ucv::copy_pixels(gv,ucv::gil::view(m_frame));
-					m_gaussian_blur(ucv::gil::const_view(m_frame), ucv::gil::view(m_blurred_frame));
+					//m_gaussian_blur(ucv::gil::const_view(m_frame), ucv::gil::view(m_blurred_frame));
 					m_frame_is_dirty=true;
 					m_ios.post(boost::bind(&detector::on_update, this));
 				}
@@ -299,15 +367,13 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		if(m_frame_is_dirty)
 		{
 			std::list< ar::fiducial::contour_t > contours;
-			m_canny(ucv::gil::const_view(m_blurred_frame), contours);
+			m_canny(ucv::gil::const_view(m_frame), contours);
 			
 			for(std::list<contour_t>::iterator conti=contours.begin();conti!=contours.end();++conti)
 				if(conti->m_is_closed) conti->aproximate(m_polygon_approximation_eps);
 			
 			for(marker_model_holders_t::iterator mmhi=m_marker_model_holders.begin();mmhi!=m_marker_model_holders.end();++mmhi)
-			{
 				detect_markers(*mmhi,contours);
-			}
 			
 			m_frame_is_dirty=false;
 		}
@@ -378,8 +444,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 					new marker_state(mmh, dm.m_marker_id, true)
 				);
 
-				new_marker_state->m_homography=dm.m_homography;
-
+				new_marker_state->set_homography(dm.m_homography);
+				
 				if(mmh->m_marker_states.push_back(new_marker_state).second)
 					m_marker_state_changed_signal(new_marker_state, marker_state::SC_DETECTION);
 			}
@@ -400,7 +466,10 @@ namespace baldzarika { namespace ar { namespace fiducial {
 					boost::shared_ptr<marker_state> const &cand_ms=*dmci;
 					if(!cand_ms->m_is_detected) continue;
 					
-					float dist=ucv::vector2f(ucv::point2f(cand_ms->m_homography(0,2), cand_ms->m_homography(1,2))).length();
+					float dist=ucv::vector2f(
+						ucv::point2f(cand_ms->m_homography(0,2), cand_ms->m_homography(1,2))-
+						ucv::point2f(dm.m_homography(0,2), dm.m_homography(1,2))
+					).length();
 					if(dist<max_dist && dist<min_dist)
 					{
 						min_dist=dist;
@@ -412,7 +481,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				{
 					boost::shared_ptr<marker_state> const &same_marker=*smi;
 					same_marker->m_undetected_frame_count=0;
-					same_marker->m_homography=dm.m_homography;
+					same_marker->set_homography(dm.m_homography);
 					if(same_marker->m_is_detected)
 					{
 						m_marker_state_changed_signal(same_marker, marker_state::SC_POSE);
@@ -441,7 +510,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 						if(!cand_ms->m_is_detected)
 						{
 							new_marker_state=cand_ms;
-							new_marker_state->m_homography=dm.m_homography;
+							new_marker_state->set_homography(dm.m_homography);
 							new_marker_state->m_undetected_frame_count=0;
 							ms_by_detected.modify(
 								mmh->m_marker_states.project<marker_state::detected_tag>(umsi),
@@ -459,7 +528,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 					{
 						new_marker_state.reset(new marker_state(mmh, dm.m_marker_id, true));
 						if(mmh->m_marker_states.push_back(new_marker_state).second)
-							new_marker_state->m_homography=dm.m_homography;
+							new_marker_state->set_homography(dm.m_homography);
 						else
 							new_marker_state.reset();
 					}
@@ -469,6 +538,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				}
 			}
 		}
+
 
 		for(marker_model_holder::marker_states_t::iterator msi=mmh->m_marker_states.begin();msi!=mmh->m_marker_states.end();++msi)
 		{
@@ -486,6 +556,17 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				m_marker_state_changed_signal(ms, marker_state::SC_DETECTION);
 			}
 		}
+	}
+
+	void detector::update_camera_projection()
+	{
+		float ty=std::tan(m_camera_fovy*0.5f/360.0f*ucv::detail::constant::pi<float>());
+		m_camera_focal_length=float(m_frame.height())/(2.0f*ty);
+		m_camera_projection=ucv::matrix44f::identity();
+		m_camera_projection(0,0)=m_camera_focal_length;
+		m_camera_projection(0,2)=float(m_frame.width())*0.5f;
+		m_camera_projection(1,1)=m_camera_focal_length;
+		m_camera_projection(1,2)=float(m_frame.height())*0.5f;
 	}
 
 	void detector::run()

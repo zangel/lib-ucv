@@ -196,6 +196,7 @@ namespace baldzarika { namespace ucv {
 	
 
 	typedef matrix<float, 3, 3> matrix33f;
+	typedef matrix<float, 4, 4> matrix44f;
 	typedef matrix<float, 9, 9> matrix99f;
 
 
