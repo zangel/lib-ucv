@@ -212,9 +212,15 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 				ucv::vector4f top_right=transform*ucv::vector4f(corners[1]);
 				top_right*=1.0f/top_right[2];
 				ucv::vector4f bottom_right=transform*ucv::vector4f(corners[2]);
-				bottom_right*=1.0f/bottom_right[2];
+				bottom_right*=1.0f/bottom_right[2]; 
 				ucv::vector4f bottom_left=transform*ucv::vector4f(corners[3]);
 				bottom_left*=1.0f/bottom_left[2];
+
+				std::cout << std::endl;
+				std::cout << "tl=(" << top_left[0] << "," << top_left[1] << ")" << std::endl;
+				std::cout << "tr=(" << top_right[0] << "," << top_right[1] << ")" << std::endl;
+				std::cout << "br=(" << bottom_right[0] << "," << bottom_right[1] << ")" << std::endl;
+				std::cout << "bl=(" << bottom_left[0] << "," << bottom_left[1] << ")" << std::endl;
 
 				m_detected++;
 			}
@@ -250,5 +256,5 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 	}
 	detector->stop();
 	detector->wait_to_stop();
-	BOOST_CHECK_EQUAL(signal_listener.m_detected, 1);
+	BOOST_CHECK_EQUAL(signal_listener.m_detected, 6);
 }

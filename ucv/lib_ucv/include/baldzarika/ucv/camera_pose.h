@@ -22,15 +22,15 @@ namespace baldzarika { namespace ucv {
 		//vector<T, 3> h2; h2[0]=hm(2,0); h2[1]=hm(2,1); h2[2]=hm(2,2);
 
 		vector<T, 3> r0=inv_intrinsics*h0;
-		T l0=r0.length(); r0*=(detail::constant::one<T>()/l0);
+		T lambda0=r0.length(); r0*=(detail::constant::one<T>()/lambda0);
 
 		vector<T, 3> r1=inv_intrinsics*h1;
-		T l1=r1.length(); r1*=(detail::constant::one<T>()/l1);
+		T lambda1=r1.length(); r1*=(detail::constant::one<T>()/lambda0);
 
 		vector<T, 3> r2=cross_product(r0,r1);
-		T l2=(l0+l1)*detail::constant::half<T>();
+		T lambda2=(lambda0+lambda1)*detail::constant::half<T>();
 
-		vector<T, 3> t=(inv_intrinsics*h2)*(detail::constant::one<T>()/l2);
+		vector<T, 3> t=(inv_intrinsics*h2)*(detail::constant::one<T>()/lambda0);
 
 		for(boost::uint32_t i=0;i<3;++i)
 		{

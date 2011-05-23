@@ -47,6 +47,9 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 
 			j2cpp::local_ref<j2cpp::android::graphics::Matrix>
 											getHomography();
+
+			jboolean						getCameraPose(j2cpp::local_ref< j2cpp::array<jfloat,1> > const &cameraPose);
+
 			void							create(jlong px);
 			void							destroy();
 
@@ -109,6 +112,16 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 
 		jboolean	addMarkerModel(j2cpp::local_ref<MarkerModel> const &markerModel);
 		jboolean	removeMarkerModel(j2cpp::local_ref<MarkerModel> const &markerModel);
+
+		j2cpp::local_ref<Size2>	getFrameSize();
+		jboolean				setFrameSize(j2cpp::local_ref<Size2> const &frameSize);
+
+		jfloat		getCameraFovy();
+		jboolean	setCameraFovy(jfloat fovy);
+
+		jfloat		getCameraFocalLength();
+		jboolean 	getCameraProjection(j2cpp::local_ref< j2cpp::array<jfloat,1> > const &cameraProjection);
+
 
 		jboolean	start();
 		jboolean	isActive();
