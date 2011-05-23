@@ -31,6 +31,7 @@ import android.opengl.GLSurfaceView.Renderer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
@@ -56,20 +57,7 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     	m_Detector.addMarkerModel(m_BCHMarkerModel);
     	
     	m_Detector.setCallback(this);
-    	boolean detRes=m_Detector.start();
-    	while(!m_Detector.isStarted())
-    	{
-    		try
-    		{
-				Thread.sleep(100);
-			}
-    		catch(InterruptedException e)
-    		{
-			}
-    	}
-    	m_Detector.stop();
-    	m_Detector.waitToStop();
-    	
+    	m_Detector.start();
     	    	    	
     	m_MarkerVBuffer=ByteBuffer.allocateDirect(4*3*4).order(ByteOrder.nativeOrder()).asFloatBuffer();
     	
@@ -150,6 +138,9 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
 	{
 		super.onDestroy();
 		BaldzARApp.getInstance().getTracker().setCallback(null);
+		m_Detector.stop();
+    	m_Detector.waitToStop();
+    	m_Detector.setCallback(null);
 	}
 	
 	@Override
@@ -208,8 +199,10 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     //android.hardware.Camera.PreviewCallback
     public void onPreviewFrame(byte[] data, Camera camera)
     {
+    	boolean updateRes=m_Detector.update(data, camera.getParameters().getPreviewFormat());
+    	
     	Tracker tracker=BaldzARApp.getInstance().getTracker();
-    	if(tracker.isStarted())
+    	if(!updateRes && tracker.isStarted())
     	{
     		Frame frame=BaldzARApp.getInstance().getFrame();
     		if(frame.setPixels(data, camera.getParameters().getPreviewFormat()))
@@ -217,6 +210,7 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     			tracker.update(frame);
     		}
     	}
+    	
     }
     
     //android.opengl.GLSurfaceView.Renderer
@@ -243,41 +237,81 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
 		gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		
-		MarkerState markerState=BaldzARApp.getInstance().getMarkerState();
 		Tracker tracker=BaldzARApp.getInstance().getTracker();
 		Size2 trackerFrameSize=tracker.getFrameSize();
 		
-		if(markerState.isDetected())
-        {
-			gl.glDisable(GL10.GL_CULL_FACE);
-			gl.glDisable(GL10.GL_DEPTH_TEST);
-			gl.glDisable(GL10.GL_BLEND);
-			gl.glDisable(GL10.GL_LIGHTING);
-                
-			Point2[] marker_corners=markerState.getMarkerCorners();
-                
+		if(m_IsDetected)
+		{
+			float [] markerCorners=
+			{
+				 0.0f,  0.0f,
+				49.0f,  0.0f,
+				 0.0f, 49.0f,
+				49.0f, 49.0f
+			};
+			
+			m_Homography.mapPoints(markerCorners);
+			
 			m_MarkerVBuffer.position(0);
 			for(int c=0;c<4;++c)
 			{
 				float[] vertex=
 				{
-			    	((marker_corners[c].m_X/trackerFrameSize.m_Width)-0.5f)*2.0f,
-			    	((marker_corners[c].m_Y/trackerFrameSize.m_Height)-0.5f)*(-2.0f),
+			    	((markerCorners[c*2+0]/trackerFrameSize.m_Width)-0.5f)*2.0f,
+			    	((markerCorners[c*2+1]/trackerFrameSize.m_Height)-0.5f)*(-2.0f),
 			        0.0f
 				};
-				//Log.i("BaldzAR", "c.x=" + Float.toString(marker_corners[c].m_X) + " c.y=" + Float.toString(marker_corners[c].m_Y) );
-			    m_MarkerVBuffer.put(vertex);
+				m_MarkerVBuffer.put(vertex);
 			}
 			m_MarkerVBuffer.position(0);
+			
+			gl.glDisable(GL10.GL_CULL_FACE);
+			gl.glDisable(GL10.GL_DEPTH_TEST);
+			gl.glDisable(GL10.GL_BLEND);
+			gl.glDisable(GL10.GL_LIGHTING);
+			
 			gl.glColor4f(1.0f, 0.0f, 0.0f, 0.33f);
 			gl.glVertexPointer(3, GL10.GL_FLOAT, 0, m_MarkerVBuffer);
 			gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 			gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 			gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 			gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+			
+		}
+		else
+		{
+			MarkerState markerState=BaldzARApp.getInstance().getMarkerState();
+			if(markerState.isDetected())
+	        {
+				gl.glDisable(GL10.GL_CULL_FACE);
+				gl.glDisable(GL10.GL_DEPTH_TEST);
+				gl.glDisable(GL10.GL_BLEND);
+				gl.glDisable(GL10.GL_LIGHTING);
+	                
+				Point2[] marker_corners=markerState.getMarkerCorners();
+	                
+				m_MarkerVBuffer.position(0);
+				for(int c=0;c<4;++c)
+				{
+					float[] vertex=
+					{
+				    	((marker_corners[c].m_X/trackerFrameSize.m_Width)-0.5f)*2.0f,
+				    	((marker_corners[c].m_Y/trackerFrameSize.m_Height)-0.5f)*(-2.0f),
+				        0.0f
+					};
+					//Log.i("BaldzAR", "c.x=" + Float.toString(marker_corners[c].m_X) + " c.y=" + Float.toString(marker_corners[c].m_Y) );
+				    m_MarkerVBuffer.put(vertex);
+				}
+				m_MarkerVBuffer.position(0);
+				gl.glColor4f(1.0f, 0.0f, 0.0f, 0.33f);
+				gl.glVertexPointer(3, GL10.GL_FLOAT, 0, m_MarkerVBuffer);
+				gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+				gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+				gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+				gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+			}
 		}
     }
-    
     
     //com.baldzarika.ar.Detector.Callback
     @Override
@@ -288,7 +322,12 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     
     public void onMarkerStateChanged(Detector.MarkerState markerState, int sc)
     {
-    	    	
+    	if(markerState.getMarkerId()==701)
+    	{
+    		//Log.i("FIDUCIAL_AR","D=" + Boolean.toString(markerState.isDetected()) + " S="+Integer.toString(sc));
+    		m_IsDetected=markerState.isDetected();
+    		m_Homography.set(markerState.getHomography());
+    	}
     }
     
 	//com.baldzarika.ar.Tracker.Callback
@@ -488,6 +527,9 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
 	
 	private BCHMarkerModel					m_BCHMarkerModel=null;
 	private Detector						m_Detector=null;
+	private android.graphics.Matrix			m_Homography=new android.graphics.Matrix();
+	private boolean							m_IsDetected=false;
+	
 	
 	
 	private Handler							m_Handler=new Handler();

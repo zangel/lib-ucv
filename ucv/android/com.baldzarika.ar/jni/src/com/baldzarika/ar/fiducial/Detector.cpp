@@ -132,6 +132,13 @@ jboolean Java_com_baldzarika_ar_fiducial_Detector_waitToStop(JNIEnv */*e*/, jobj
 	return Detector(d).waitToStop();
 }
 
+jboolean Java_com_baldzarika_ar_fiducial_Detector_update(JNIEnv */*e*/, jobject d, jbyteArray data, jint pfmt)
+{
+	using namespace com::baldzarika::ar::fiducial;
+	using namespace j2cpp;
+	return Detector(d).update(local_ref< array< jbyte,1> >(data), pfmt);
+}
+
 namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 
 	namespace _Detector {
@@ -471,13 +478,44 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 					{
 						if(::baldzarika::ar::fiducial::detector::locked_frame frame_lock=(*p_px)->lock_frame())
 						{
-
+							::baldzarika::ar::fiducial::gray_t median;
+#if 0
+							return ::baldzarika::ucv::convert_nv16_to_gray(
+								//y channel
+								::baldzarika::ucv::gil::interleaved_view(
+									frameSize.width(), frameSize.height(),
+									reinterpret_cast< ::baldzarika::ucv::gil::gray8_pixel_t * >(data->data()),
+									frameSize.width()
+								),
+								//uv channels
+								::baldzarika::ucv::gil::interleaved_view(
+									frameSize.width()/2, frameSize.height()/2,
+									reinterpret_cast< ::baldzarika::ucv::gil::gray16_pixel_t * >(data->data()+frameSize.width()*frameSize.height()),
+									(frameSize.width()/2)*2
+								),
+								frame_lock.get_view(),
+								median
+							)?JNI_TRUE:JNI_FALSE;
+#else
+							return ::baldzarika::ucv::convert_scale(
+								//y channel
+								::baldzarika::ucv::gil::interleaved_view(
+									frameSize.width(), frameSize.height(),
+									reinterpret_cast< ::baldzarika::ucv::gil::gray8_pixel_t * >(data->data()),
+									frameSize.width()
+								),
+								frame_lock.get_view(),
+								::baldzarika::ar::fiducial::gray_t(1.0f/255.0f),
+								median
+							)?JNI_TRUE:JNI_FALSE;
+#endif
 						}
 					}
 				}
+				break;
 			}
 		}
-
+		return JNI_FALSE;
 	}
 
 } //namespace fiducial
