@@ -67,6 +67,14 @@ JNIEXPORT jobject JNICALL Java_com_baldzarika_ar_fiducial_Detector_00024MarkerSt
 JNIEXPORT jobject JNICALL Java_com_baldzarika_ar_fiducial_Detector_00024MarkerState_getHomography
   (JNIEnv *, jobject);
 
+/*
+ * Class:     com_baldzarika_ar_fiducial_Detector_MarkerState
+ * Method:    getCameraPose
+ * Signature: ([F)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_fiducial_Detector_00024MarkerState_getCameraPose
+  (JNIEnv *, jobject, jfloatArray);
+
 #ifdef __cplusplus
 }
 #endif

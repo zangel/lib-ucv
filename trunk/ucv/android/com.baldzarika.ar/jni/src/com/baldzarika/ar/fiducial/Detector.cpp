@@ -61,6 +61,13 @@ jobject Java_com_baldzarika_ar_fiducial_Detector_00024MarkerState_getHomography(
 	return Detector::MarkerState(ms).getHomography().get_jobject();
 }
 
+jboolean JNICALL Java_com_baldzarika_ar_fiducial_Detector_00024MarkerState_getCameraPose(JNIEnv */*e*/, jobject ms, jfloatArray cameraPose)
+{
+	using namespace com::baldzarika::ar::fiducial;
+	using namespace j2cpp;
+	return Detector::MarkerState(ms).getCameraPose(local_ref< array< jfloat,1 > >(cameraPose));
+}
+
 void Java_com_baldzarika_ar_fiducial_Detector_create(JNIEnv */*e*/, jobject d, jobject frameSize)
 {
 	using namespace com::baldzarika::ar;
@@ -88,6 +95,50 @@ jboolean Java_com_baldzarika_ar_fiducial_Detector_removeMarkerModel(JNIEnv */*e*
 	using namespace com::baldzarika::ar::fiducial;
 	using namespace j2cpp;
 	return Detector(d).removeMarkerModel(local_ref<MarkerModel>(markerModel));
+}
+
+jobject Java_com_baldzarika_ar_fiducial_Detector_getFrameSize(JNIEnv */*e*/, jobject d)
+{
+	using namespace com::baldzarika::ar;
+	using namespace com::baldzarika::ar::fiducial;
+	using namespace j2cpp;
+	return Detector(d).getFrameSize().get_jobject();
+}
+
+jboolean Java_com_baldzarika_ar_fiducial_Detector_setFrameSize(JNIEnv */*e*/, jobject d, jobject frameSize)
+{
+	using namespace com::baldzarika::ar;
+	using namespace com::baldzarika::ar::fiducial;
+	using namespace j2cpp;
+	return Detector(d).setFrameSize(local_ref<Size2>(frameSize));
+}
+
+jfloat Java_com_baldzarika_ar_fiducial_Detector_getCameraFovy(JNIEnv */*e*/, jobject d)
+{
+	using namespace com::baldzarika::ar::fiducial;
+	using namespace j2cpp;
+	return Detector(d).getCameraFovy();
+}
+
+jboolean Java_com_baldzarika_ar_fiducial_Detector_setCameraFovy(JNIEnv */*e*/, jobject d, jfloat fovy)
+{
+	using namespace com::baldzarika::ar::fiducial;
+	using namespace j2cpp;
+	return Detector(d).setCameraFovy(fovy);
+}
+
+jfloat Java_com_baldzarika_ar_fiducial_Detector_getCameraFocalLength(JNIEnv */*e*/, jobject d)
+{
+	using namespace com::baldzarika::ar::fiducial;
+	using namespace j2cpp;
+	return Detector(d).getCameraFocalLength();
+}
+
+jboolean Java_com_baldzarika_ar_fiducial_Detector_getCameraProjection(JNIEnv */*e*/, jobject d, jfloatArray cameraProjection)
+{
+	using namespace com::baldzarika::ar::fiducial;
+	using namespace j2cpp;
+	return Detector(d).getCameraProjection(local_ref< array< jfloat,1 > >(cameraProjection));
 }
 
 jboolean Java_com_baldzarika_ar_fiducial_Detector_start(JNIEnv */*e*/, jobject d)
@@ -220,6 +271,24 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 				return ret_val;
 			}
 			return j2cpp::local_ref<j2cpp::android::graphics::Matrix>();
+		}
+
+		jboolean MarkerState::getCameraPose(j2cpp::local_ref< j2cpp::array<jfloat,1> > const &cameraPose)
+		{
+			if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			{
+				if(cameraPose->length()==16)
+				{
+					jfloat *dst=cameraPose->data();
+					::baldzarika::ucv::matrix44f const &cp=(*ppx)->get_camera_pose();
+					for(boost::uint32_t r=0;r<4;++r)
+						for(boost::uint32_t c=0;c<4;++c)
+							*dst++=cp(r,c);
+					return JNI_TRUE;
+				}
+
+			}
+			return JNI_FALSE;
 		}
 
 		void MarkerState::create(jlong px)
@@ -394,6 +463,65 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 				return (*ppx)->remove_marker_model(mm)?
 					JNI_TRUE:
 					JNI_FALSE;
+			}
+		}
+		return JNI_FALSE;
+	}
+
+	j2cpp::local_ref<Size2>	Detector::getFrameSize()
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return j2cpp::local_ref<Size2>(
+				Size2((*ppx)->get_frame_size().width(),(*ppx)->get_frame_size().height())
+			);
+		return j2cpp::local_ref<Size2>(Size2(0,0));
+	}
+
+	jboolean Detector::setFrameSize(j2cpp::local_ref<Size2> const &fs)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->set_frame_size(
+				::baldzarika::ucv::size2ui(
+					jint(fs->m_Width),
+					jint(fs->m_Height)
+				)
+			)?JNI_TRUE:JNI_FALSE;
+		return JNI_FALSE;
+	}
+
+	jfloat Detector::getCameraFovy()
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->get_camera_fovy();
+		return 0.0f;
+	}
+
+	jboolean Detector::setCameraFovy(jfloat fovy)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->set_camera_fovy(fovy)?JNI_TRUE:JNI_FALSE;
+		return JNI_FALSE;
+	}
+
+	jfloat Detector::getCameraFocalLength()
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+			return (*ppx)->get_camera_focal_length();
+		return 0.0f;
+	}
+
+	jboolean Detector::getCameraProjection(j2cpp::local_ref< j2cpp::array<jfloat,1> > const &cameraProjection)
+	{
+		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+		{
+			if(cameraProjection->length()==16)
+			{
+				jfloat *dst=cameraProjection->data();
+				::baldzarika::ucv::matrix44f const &cp=(*ppx)->get_camera_projection();
+				for(boost::uint32_t r=0;r<4;++r)
+					for(boost::uint32_t c=0;c<4;++c)
+						*dst++=cp(r,c);
+				return JNI_TRUE;
 			}
 		}
 		return JNI_FALSE;

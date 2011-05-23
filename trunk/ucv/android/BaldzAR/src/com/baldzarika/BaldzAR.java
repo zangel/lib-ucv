@@ -56,6 +56,9 @@ public class BaldzAR extends Activity implements Callback, PreviewCallback, Rend
     	m_Detector=new Detector(BaldzARApp.getInstance().getTracker().getFrameSize());
     	m_Detector.addMarkerModel(m_BCHMarkerModel);
     	
+    	float [] cameraProjection = new float [16];
+    	m_Detector.getCameraProjection(cameraProjection);
+    	
     	m_Detector.setCallback(this);
     	m_Detector.start();
     	    	    	

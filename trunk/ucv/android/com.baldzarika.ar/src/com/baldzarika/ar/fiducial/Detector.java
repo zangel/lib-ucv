@@ -34,6 +34,7 @@ public class Detector
 		public native MarkerModel getMarkerModel();
 		public native Detector getDetector();
 		public native android.graphics.Matrix getHomography();
+		public native boolean getCameraPose(float [] cameraPose);
 		
 		private long m_px;
 	}
@@ -55,17 +56,27 @@ public class Detector
 		create(frameSize);
 	}
 	
-	public native boolean	addMarkerModel(MarkerModel markerModel);
-	public native boolean	removeMarkerModel(MarkerModel markerModel);
+	public native boolean addMarkerModel(MarkerModel markerModel);
+	public native boolean removeMarkerModel(MarkerModel markerModel);
 	
-	public native boolean	start();
-	public native boolean	isActive();
-	public native boolean	isStarting();
-	public native boolean	isStarted();
-	public native boolean	stop();
-	public native boolean	waitToStop();
+	public native Size2 getFrameSize();
+	public native boolean setFrameSize(Size2 frameSize);
 	
-	public native boolean 	update(byte[] data, int pfmt);
+	public native float getCameraFovy();
+	public native boolean setCameraFovy(float fovy);
+	
+	public native float getCameraFocalLength();
+	public native boolean getCameraProjection(float [] cameraProjection);
+		
+	
+	public native boolean start();
+	public native boolean isActive();
+	public native boolean isStarting();
+	public native boolean isStarted();
+	public native boolean stop();
+	public native boolean waitToStop();
+	
+	public native boolean update(byte[] data, int pfmt);
 	
 	public boolean setCallback(Callback cb)
 	{

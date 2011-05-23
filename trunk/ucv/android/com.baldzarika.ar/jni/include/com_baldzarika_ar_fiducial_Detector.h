@@ -49,6 +49,54 @@ JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_fiducial_Detector_removeMarker
 
 /*
  * Class:     com_baldzarika_ar_fiducial_Detector
+ * Method:    getFrameSize
+ * Signature: ()Lcom/baldzarika/ar/Size2;
+ */
+JNIEXPORT jobject JNICALL Java_com_baldzarika_ar_fiducial_Detector_getFrameSize
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_fiducial_Detector
+ * Method:    setFrameSize
+ * Signature: (Lcom/baldzarika/ar/Size2;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_fiducial_Detector_setFrameSize
+  (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_fiducial_Detector
+ * Method:    getCameraFovy
+ * Signature: ()F
+ */
+JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_fiducial_Detector_getCameraFovy
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_fiducial_Detector
+ * Method:    setCameraFovy
+ * Signature: (F)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_fiducial_Detector_setCameraFovy
+  (JNIEnv *, jobject, jfloat);
+
+/*
+ * Class:     com_baldzarika_ar_fiducial_Detector
+ * Method:    getCameraFocalLength
+ * Signature: ()F
+ */
+JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_fiducial_Detector_getCameraFocalLength
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_fiducial_Detector
+ * Method:    getCameraProjection
+ * Signature: ([F)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_fiducial_Detector_getCameraProjection
+  (JNIEnv *, jobject, jfloatArray);
+
+/*
+ * Class:     com_baldzarika_ar_fiducial_Detector
  * Method:    start
  * Signature: ()Z
  */
