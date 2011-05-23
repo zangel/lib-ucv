@@ -1,11 +1,7 @@
 package com.baldzarika.ar.fiducial;
 
-import com.baldzarika.ar.Marker;
-import com.baldzarika.ar.Point2;
 import com.baldzarika.ar.Size2;
-import com.baldzarika.ar.Tracker;
-import com.baldzarika.ar.Tracker.Callback;
-import com.baldzarika.ar.Tracker.MarkerState;
+
 
 public class Detector
 {
