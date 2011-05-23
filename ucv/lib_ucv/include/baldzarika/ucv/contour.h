@@ -18,11 +18,8 @@ namespace baldzarika { namespace ucv {
 
 		static bool check_is_closed(points_t const &pts, T const &eps)
 		{
-			if(pts.size()>3)
-			{
-				float dist=vector<T,2>(pts.back()-pts.front()).length();
+			if(pts.size()>4)
 				return (vector<T,2>(pts.back()-pts.front()).length()<=eps);
-			}
 			return false;
 		}
 		

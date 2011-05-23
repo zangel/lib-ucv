@@ -88,7 +88,6 @@ BOOST_AUTO_TEST_CASE( tracker_detect_marker )
 
 
 
-
 BOOST_AUTO_TEST_CASE( fiducial_bch_marker_model )
 {
 	using namespace baldzarika;
@@ -153,6 +152,7 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_start_stop_test )
 }
 
 #endif
+
 BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 {
 	using namespace baldzarika;
@@ -178,36 +178,77 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 
 	struct _signal_listener
 	{
-		_signal_listener(): m_detected(0){ }
+		_signal_listener(boost::shared_ptr<ar::fiducial::detector> const &d): m_detector(d), m_detected(0){ }
 
 		void on_marker_state_changed_signal(boost::shared_ptr<ar::fiducial::detector::marker_state> const &ms, ar::fiducial::detector::marker_state::eSC sc)
 		{
 			if(sc==ar::fiducial::detector::marker_state::SC_DETECTION && ms->is_detected())
-				m_detected++;
-		}
+			{
+				
+				ucv::matrix44f cam_pose=ms->get_camera_pose();
+				ucv::matrix44f cam_proj=m_detector->get_camera_projection();
+				ucv::matrix44f transform=cam_proj*cam_pose;
+#if 0
+				ucv::size2ui mark_size=ms->get_marker_size();
+				float corners[4][4]=
+				{
+					{ 0.0f,					0.0f,				0.0f, 1.0f },
+					{ mark_size.width(),	0.0f,				0.0f, 1.0f },
+					{ mark_size.width(),	mark_size.height(),	0.0f, 1.0f },
+					{ 0.0f,					mark_size.height(),	0.0f, 1.0f }
+				};
+#else
+				float corners[4][4]=
+				{
+					{ -1.0f,  1.0f, 0.0f, 1.0f },
+					{  1.0f,  1.0f,	0.0f, 1.0f },
+					{  1.0f, -1.0f,	0.0f, 1.0f },
+					{ -1.0f, -1.0f,	0.0f, 1.0f }
+				};
+#endif
 
+				ucv::vector4f top_left=transform*ucv::vector4f(corners[0]);
+				top_left*=1.0f/top_left[2];
+				ucv::vector4f top_right=transform*ucv::vector4f(corners[1]);
+				top_right*=1.0f/top_right[2];
+				ucv::vector4f bottom_right=transform*ucv::vector4f(corners[2]);
+				bottom_right*=1.0f/bottom_right[2];
+				ucv::vector4f bottom_left=transform*ucv::vector4f(corners[3]);
+				bottom_left*=1.0f/bottom_left[2];
+
+				m_detected++;
+			}
+		}
+		boost::shared_ptr<ar::fiducial::detector> m_detector;
 		boost::uint32_t m_detected;
-	} signal_listener;
+
+	} signal_listener(detector);
+
 
 
 	detector->marker_state_changed().connect(boost::bind(&_signal_listener::on_marker_state_changed_signal, &signal_listener, _1, _2));
-	detector->start();
-	detector->update(ucv::gil::const_view(gray_frame));
+	//detector->start();
+	//detector->update(ucv::gil::const_view(gray_frame));
 	
 	
-	detector->stop();
-	detector->wait_to_stop();
+	//detector->stop();
+	//detector->wait_to_stop();
 
-	BOOST_CHECK_EQUAL(signal_listener.m_detected, 6);
+	//BOOST_CHECK_EQUAL(signal_listener.m_detected, 6);
 
 	signal_listener.m_detected=0;
 	detector->start();
+	boost::uint32_t n=2;
+	while(n)
 	{
-		ar::fiducial::detector::locked_frame frame_lock=detector->lock_frame();
-		BOOST_CHECK(static_cast<bool>(frame_lock));
-		BOOST_CHECK(ucv::copy_pixels(ucv::gil::const_view(gray_frame),frame_lock.get_view()));
+		if(ar::fiducial::detector::locked_frame frame_lock=detector->lock_frame())
+		{
+			BOOST_CHECK(static_cast<bool>(frame_lock));	
+			BOOST_CHECK(ucv::copy_pixels(ucv::gil::const_view(gray_frame),frame_lock.get_view()));
+			n--;
+		}
 	}
 	detector->stop();
 	detector->wait_to_stop();
-	BOOST_CHECK_EQUAL(signal_listener.m_detected, 6);
+	BOOST_CHECK_EQUAL(signal_listener.m_detected, 1);
 }

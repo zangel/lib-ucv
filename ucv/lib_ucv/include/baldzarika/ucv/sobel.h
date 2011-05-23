@@ -25,7 +25,7 @@ namespace baldzarika { namespace ucv {
 				for(boost::int32_t x=1;x<width-1;++x)
 				{
 					ring_x[x]=src[x+1]-src[x-1];
-					ring_y[x]=src[x-1]+constant::two<PT>()*src[x]+src[x+1];
+					ring_y[x]=src[x-1]+src[x].operator<<(1)+src[x+1];
 				}
 
 				ring_x[width-1]=src[width-1]-src[width-2];
@@ -36,7 +36,7 @@ namespace baldzarika { namespace ucv {
 			{
 				for(boost::int32_t x=0;x<width;++x)
 				{
-					dst_x[x]=ring_x[0][x]+constant::two<PT>()*ring_x[1][x]+ring_x[2][x];
+					dst_x[x]=ring_x[0][x]+ring_x[1][x].operator<<(1)+ring_x[2][x];
 					dst_y[x]=ring_y[2][x]-ring_y[0][x];
 				}
 			}
@@ -119,23 +119,6 @@ namespace baldzarika { namespace ucv {
 
 
 					filter_t::x_filter(img_row, ring_dx_row, ring_dy_row, m_frame_size.width());
-										
-					/*
-					
-					for(boost::int32_t c=0;c<boost::int32_t(m_frame_size.width());++c)
-					{
-						gray_t dx=detail::constant::zero<gray_t>();
-						gray_t dy=detail::constant::zero<gray_t>();
-						for(boost::uint32_t f=0;f<KERNEL_SIZE;++f)
-						{
-							boost::int32_t img_col=std::max<boost::int32_t>(0, std::min<boost::int32_t>(m_frame_size.width()-1, (c+f)-HALF_KERNEL_SIZE));
-							dx+=img_row[img_col]*filter_tratis_t::SEPARABLE_X_KERNEL[0][f];
-							dy+=img_row[img_col]*filter_tratis_t::SEPARABLE_Y_KERNEL[0][f];
-						}
-						ring_dx_row[c]=dx;
-						ring_dy_row[c]=dy;
-					}
-					*/
 				}
 
 				gray_t const *ring_dx_rows[KERNEL_SIZE];
@@ -151,22 +134,6 @@ namespace baldzarika { namespace ucv {
 				gray_t *dy_row=reinterpret_cast<gray_t *>(dy.row_begin(r));
 
 				filter_t::y_filter(ring_dx_rows, ring_dy_rows, dx_row, dy_row, m_frame_size.width());
-				
-				/*
-				for(boost::uint32_t c=0;c<m_frame_size.width();++c)
-				{
-					gray_t dx=detail::constant::zero<gray_t>();
-					gray_t dy=detail::constant::zero<gray_t>();
-
-					for(boost::uint32_t f=0;f<KERNEL_SIZE;++f)
-					{
-						dx+=ring_dx_rows[f][c]*filter_tratis_t::SEPARABLE_X_KERNEL[1][f];
-						dy+=ring_dy_rows[f][c]*filter_tratis_t::SEPARABLE_Y_KERNEL[1][f];
-					}
-					dx_row[c]=dx;
-					dy_row[c]=dy;
-				}
-				*/
 			}
 			return true;
 		}
