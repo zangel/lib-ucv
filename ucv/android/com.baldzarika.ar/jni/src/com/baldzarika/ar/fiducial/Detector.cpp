@@ -281,8 +281,8 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 				{
 					jfloat *dst=cameraPose->data();
 					::baldzarika::ucv::matrix44f const &cp=(*ppx)->get_camera_pose();
-					for(boost::uint32_t r=0;r<4;++r)
-						for(boost::uint32_t c=0;c<4;++c)
+					for(boost::uint32_t c=0;c<4;++c)
+						for(boost::uint32_t r=0;r<4;++r)
 							*dst++=cp(r,c);
 					return JNI_TRUE;
 				}
@@ -518,8 +518,9 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 			{
 				jfloat *dst=cameraProjection->data();
 				::baldzarika::ucv::matrix44f const &cp=(*ppx)->get_camera_projection();
-				for(boost::uint32_t r=0;r<4;++r)
-					for(boost::uint32_t c=0;c<4;++c)
+
+				for(boost::uint32_t c=0;c<4;++c)
+					for(boost::uint32_t r=0;r<4;++r)
 						*dst++=cp(r,c);
 				return JNI_TRUE;
 			}
