@@ -142,7 +142,7 @@ void PreviewWidget::paintGL()
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glDisable(GL_TEXTURE_2D);
 
-			
+
 			glPointSize(4.0f);
 			glVertexPointer(3, GL_FLOAT, 0, feature_coords.get());
 
