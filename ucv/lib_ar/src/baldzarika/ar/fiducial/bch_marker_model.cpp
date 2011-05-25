@@ -295,17 +295,17 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		if(mid_and_rot.first==NULL_MARKER_ID)
 			return NULL_MARKER_ID;
 
-#if 0
+#if 1
 		switch(mid_and_rot.second)
 		{
 		case 0:
 			homography*=homography_rotation<0>(); break;
 		case 1:
-			homography*=homography_rotation<3>(); break;
+			homography*=homography_rotation<1>(); break;
 		case 2:
 			homography*=homography_rotation<2>(); break;
 		case 3:
-			homography*=homography_rotation<1>(); break;
+			homography*=homography_rotation<3>(); break;
 		}
 #endif
 		homography.scale(1.0f/homography(2,2));

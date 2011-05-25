@@ -6,7 +6,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	float const detector::DEFAULT_EDGE_DETECTION_THRESHOLD=0.4f;
 	float const detector::DEFAULT_POLYGON_APPROXIMATION_EPS=3.0f;
 	float const detector::DEFAULT_SAME_MARKER_MAX_AREA=1.0e-2f;
-	float const detector::DEFAULT_CAMERA_FOVY=45.0f;
+	float const detector::DEFAULT_CAMERA_FOVY=65.0f;
 	boost::uint32_t const detector::DEFAULT_KEEP_DETECTED_FRAME_COUNT=10;
 
 	detector::locked_frame::locked_frame()
@@ -142,10 +142,10 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 		ucv::matrix44f cam_adjust=ucv::matrix44f::identity();
 
-		cam_adjust(0,0)=float(ms.width())*0.5f;
+		//cam_adjust(0,0)=float(ms.width())*0.5f;
 		cam_adjust(0,3)=float(ms.width())*0.5f;
 
-		cam_adjust(1,1)=-float(ms.height())*0.5f;
+		cam_adjust(1,1)=-1.0f;//float(ms.height())*0.5f;
 		cam_adjust(1,3)=float(ms.height())*0.5f;
 		
 		m_camera_pose*=cam_adjust;
@@ -176,6 +176,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		, m_same_marker_max_area(DEFAULT_SAME_MARKER_MAX_AREA)
 		, m_keep_detected_frame_count(DEFAULT_KEEP_DETECTED_FRAME_COUNT)
 		, m_camera_fovy(DEFAULT_CAMERA_FOVY)
+		, m_z_near(100.0f)
+		, m_z_far(500.0f)
 		, m_ios()
 		, m_ios_work(m_ios)
 		, m_worker()
@@ -562,11 +564,19 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	{
 		float ty=std::tan(m_camera_fovy*0.5f/360.0f*ucv::detail::constant::pi<float>());
 		m_camera_focal_length=float(m_frame.height())/(2.0f*ty);
+
 		m_camera_projection=ucv::matrix44f::identity();
-		m_camera_projection(0,0)=m_camera_focal_length;
-		m_camera_projection(0,2)=float(m_frame.width())*0.5f;
-		m_camera_projection(1,1)=m_camera_focal_length;
-		m_camera_projection(1,2)=float(m_frame.height())*0.5f;
+
+		m_camera_projection(0,0)=2.0f*m_camera_focal_length/float(m_frame.width());
+		m_camera_projection(0,2)=2.0f*(float(m_frame.width())*0.5f)/float(m_frame.width())-1.0f;
+
+		m_camera_projection(1,1)=-(2.0f*m_camera_focal_length/float(m_frame.height()));
+		m_camera_projection(1,2)=-(2.0f*(float(m_frame.height())*0.5f)/float(m_frame.height())-1.0f);
+
+		m_camera_projection(2,2)=(m_z_far+m_z_near)/(m_z_far-m_z_near);
+		m_camera_projection(2,3)=-2.0f*m_z_far*m_z_near/(m_z_far-m_z_near);
+		m_camera_projection(3,2)=1.0f;
+		m_camera_projection(3,3)=0.0f;
 	}
 
 	void detector::run()

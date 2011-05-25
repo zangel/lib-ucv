@@ -1,5 +1,6 @@
 #include "Prec.h"
 #include "ArTestDlg.h"
+#include "FiducialTestDlg.h"
 
 int main(int argc, char *argv[])
 {
@@ -8,7 +9,11 @@ int main(int argc, char *argv[])
 	QGLFormat::setDefaultFormat(defaultGLFormat);
 	
 	QApplication a(argc, argv);
+#if 0
 	ArTestDlg w;
+#else
+	FiducialTestDlg w;
+#endif
 	w.show();
 	return a.exec();
 }

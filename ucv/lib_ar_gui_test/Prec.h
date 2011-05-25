@@ -5,6 +5,10 @@
 #include <baldzarika/ar/config.h>
 #include <baldzarika/ar/tracker.h>
 #include <baldzarika/ar/marker.h>
+#include <baldzarika/ar/fiducial/detector.h>
+#include <baldzarika/ar/fiducial/marker_model.h>
+#include <baldzarika/ar/fiducial/bch_marker_model.h>
+
 
 #include <QDialog>
 #include <QApplication>
@@ -12,6 +16,7 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QUrl>
+#include <QTimer>
 
 #include <videoInput.h>
 

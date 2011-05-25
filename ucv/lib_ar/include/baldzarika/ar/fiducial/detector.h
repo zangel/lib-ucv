@@ -225,6 +225,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		boost::uint32_t							m_keep_detected_frame_count;
 
 		float									m_camera_fovy;
+		float									m_z_near;
+		float									m_z_far;
 		float									m_camera_focal_length;
 		ucv::matrix44f							m_camera_projection;
 		
