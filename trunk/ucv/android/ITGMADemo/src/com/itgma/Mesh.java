@@ -14,14 +14,6 @@ public class Mesh
 	{
 		super();
 		
-		Log.i("FIDUCIAL_AR", 
-				"CS="+Integer.toString(coords.size())+
-				"TCS="+Integer.toString(texCoords.size())+
-				"CPS="+Integer.toString(coordPointer.size())+
-				"TCPS="+Integer.toString(texCoordPointer.size()));
-				
-				
-		
 		if(!coordPointer.isEmpty())
 		{
 			m_ArraySize=coordPointer.size();
