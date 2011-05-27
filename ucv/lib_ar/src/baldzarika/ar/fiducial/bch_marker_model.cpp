@@ -5,6 +5,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	namespace {
 
+
 		template < typename BCGV >
 		static inline boost::uint32_t marker_hamming_distance(BCGV bcv)
 		{
@@ -99,7 +100,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	ucv::size2ui const bch_marker_model::MARKER_CELL_SIZE=ucv::size2ui(7,7);
 	ucv::size2ui const bch_marker_model::MARKER_SIZE=ucv::size2ui(MARKER_CELL_SIZE.width()*7, MARKER_CELL_SIZE.height()*7);
 		
-	ucv::decimal_t const bch_marker_model::DEFAULT_ECCENTRICITY=0.5;
+	ucv::decimal_t const bch_marker_model::DEFAULT_ECCENTRICITY=0.70710678118654752440084436210485;
 	ucv::decimal_t const bch_marker_model::DEFAULT_MIN_SIDE_LENGTH=20.0;
 
 	boost::uint8_t const bch_marker_model::HAMMING_CODEWORDS[4][5]=
@@ -330,6 +331,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				contour_t::point2_t const &pt=contour.m_points[contour.m_is_clockwise?p:3-p];
 				dst_pts[p]=ucv::point2f(pt.x, pt.y);
 			}
+
+			ucv::corners_subpixel(img,dst_pts);
 			
 			ucv::matrix33f homography;
 			if(!ucv::perspective_transform(src_pts,dst_pts,homography))

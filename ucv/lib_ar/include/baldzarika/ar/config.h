@@ -17,6 +17,7 @@
 #include <baldzarika/ucv/perspective_transform.h>
 #include <baldzarika/ucv/camera_pose.h>
 #include <baldzarika/ucv/warp.h>
+#include <baldzarika/ucv/corners_subpixel.h>
 #include <baldzarika/ucv/find_otsu_threshold.h>
 #include <baldzarika/ucv/threshold.h>
 #include <baldzarika/ucv/gaussian_blur.h>

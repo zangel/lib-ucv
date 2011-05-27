@@ -156,6 +156,9 @@
     <ClInclude Include="include\baldzarika\ucv\camera_pose.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\corners_subpixel.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ucv\config.cpp">
