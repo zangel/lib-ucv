@@ -174,7 +174,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		> marker_model_holders_t;
 
 
-		typedef ucv::gaussian_blur<ar::fiducial::gray_t, 3> gaussian_blur_t;
+		//typedef ucv::gaussian_blur<ar::fiducial::gray_t, 3> gaussian_blur_t;
 		typedef ucv::canny<ar::fiducial::gray_t, 3> canny_t;
 		
 	
@@ -239,10 +239,10 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		bool									m_frame_is_dirty;
 		
 		gray_image_t							m_frame;
-		gray_image_t							m_blurred_frame;
-		gaussian_blur_t							m_gaussian_blur;
+		//gray_image_t							m_blurred_frame;
+		//gaussian_blur_t						m_gaussian_blur;
 		canny_t									m_canny;
-												
+
 		marker_model_holders_t					m_marker_model_holders;
 
 		mutable running_state_signal_t			m_running_state_singal;
