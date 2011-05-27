@@ -1,8 +1,8 @@
 #include "Prec.h"
 #include "FiducialTestPreviewWidget.h"
 
-#define FIDUCIAL_PREVIEW_WIDTH 320
-#define FIDUCIAL_PREVIEW_HEIGHT 240
+#define FIDUCIAL_PREVIEW_WIDTH 640
+#define FIDUCIAL_PREVIEW_HEIGHT 480
 
 
 FiducialTestPreviewWidget::FiducialTestPreviewWidget(QWidget *parent/* =0 */)
@@ -155,11 +155,7 @@ void FiducialTestPreviewWidget::paintGL()
 		glDisable(GL_TEXTURE_2D);
 		glPointSize(4.0f);
 
-		ucv::matrix44f convert=ucv::matrix44f::identity();
-		//convert(1,1)=-1.0f;
-		//convert(2,2)=-1.0f;
-
-		ucv::matrix44f converted=m_model_view*convert;
+		ucv::matrix44f converted=m_model_view;
 		
 		GLfloat model_view[16]=
 		{
@@ -220,11 +216,11 @@ void FiducialTestPreviewWidget::paintGL()
 
 			glEnd();
 			
-#if 0
+#if 1
 			glBegin(GL_LINES);
 			glColor4fv(colors+i*4);
 			glVertex3fv(high_corners+i*3);
-			
+
 			glColor4fv(colors+((i+1)%4)*4);
 			glVertex3fv(high_corners+((i+1)%4)*3);
 			glEnd();

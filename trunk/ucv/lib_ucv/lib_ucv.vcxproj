@@ -116,6 +116,7 @@
     <ClInclude Include="include\baldzarika\ucv\pixel_count.h" />
     <ClInclude Include="include\baldzarika\ucv\point2.h" />
     <ClInclude Include="include\baldzarika\ucv\ranged_histogram.h" />
+    <ClInclude Include="include\baldzarika\ucv\resize.h" />
     <ClInclude Include="include\baldzarika\ucv\size2.h" />
     <ClInclude Include="include\baldzarika\ucv\sobel.h" />
     <ClInclude Include="include\baldzarika\ucv\solve.h" />

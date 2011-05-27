@@ -184,8 +184,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		, m_running_state(RS_STOPPED)
 		, m_frame_is_dirty(false)
 		, m_frame(fs.width(), fs.height())
-		, m_blurred_frame(fs.width(), fs.height())
-		, m_gaussian_blur(fs)
+		//, m_blurred_frame(fs.width(), fs.height())
+		//, m_gaussian_blur(fs)
 		, m_canny(fs,DEFAULT_EDGE_DETECTION_THRESHOLD, DEFAULT_EDGE_DETECTION_THRESHOLD*3.0f)
 	{
 		update_camera_projection();
@@ -207,8 +207,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		if(m_running_state)
 			return false;
 		m_frame.recreate(fs.width(),fs.height());
-		m_blurred_frame.recreate(fs.width(),fs.height());
-		m_gaussian_blur.set_frame_size(fs);
+		//m_blurred_frame.recreate(fs.width(),fs.height());
+		//m_gaussian_blur.set_frame_size(fs);
 		m_canny.set_frame_size(fs);
 		update_camera_projection();
 		return true;
