@@ -76,7 +76,7 @@ public class Detector
 	public native boolean stop();
 	public native boolean waitToStop();
 	
-	public native boolean update(byte[] data, int pfmt);
+	public native boolean update(byte[] data, int pfmt, int width, int height);
 	
 	public boolean setCallback(Callback cb)
 	{

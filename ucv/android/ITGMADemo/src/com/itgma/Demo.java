@@ -2,9 +2,6 @@ package com.itgma;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -17,7 +14,6 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
-import android.opengl.Matrix;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -225,7 +221,13 @@ public class Demo extends Activity implements SurfaceHolder.Callback, GLSurfaceV
     public void onPreviewFrame(byte[] data, Camera camera)
     {
     	if(DemoApp.getInstance().getDetector().isStarted())
-    		DemoApp.getInstance().getDetector().update(data, camera.getParameters().getPreviewFormat());
+    	//{
+    		DemoApp.getInstance().getDetector().update(
+    			data, camera.getParameters().getPreviewFormat(),
+    			camera.getParameters().getPreviewSize().width, camera.getParameters().getPreviewSize().height
+    		);
+    		//Log.i("FIDUCIAL_AR", "updateRes="+Boolean.toString(updateRes)+" width="+Integer.toString(camera.getParameters().getPreviewSize().width)+"height="+Integer.toString(camera.getParameters().getPreviewSize().height));
+    	//}
     }
     
 	//com.baldzarika.ar.Detector.Callback
@@ -252,7 +254,7 @@ public class Demo extends Activity implements SurfaceHolder.Callback, GLSurfaceV
 		if(m_Camera!=null)
     	{
     		Camera.Parameters cameraParams=m_Camera.getParameters();
-    		Size2 previewSize=DemoApp.getInstance().getDetector().getFrameSize();
+    		Size2 previewSize=DemoApp.getInstance().getPreviewSize();
     		cameraParams.setPreviewSize(previewSize.m_Width,previewSize.m_Height);
     		m_Camera.setParameters(cameraParams);
     		m_Camera.startPreview();

@@ -5,8 +5,6 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Vector;
 
-import android.util.Log;
-
 public class Mesh
 {
 	public Mesh(Vector<Float> coords, Vector<Float> normals, Vector<Float> texCoords,

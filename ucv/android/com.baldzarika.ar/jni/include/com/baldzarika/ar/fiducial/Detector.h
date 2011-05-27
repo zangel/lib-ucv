@@ -130,7 +130,7 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 		jboolean	stop();
 		jboolean	waitToStop();
 
-		jboolean	update(j2cpp::local_ref< j2cpp::array<jbyte,1> > const &data, jint pfmt);
+		jboolean	update(j2cpp::local_ref< j2cpp::array<jbyte,1> > const &data, jint pfmt, jint width, jint height);
 
 		j2cpp::field<
 			J2CPP_CLASS_NAME,

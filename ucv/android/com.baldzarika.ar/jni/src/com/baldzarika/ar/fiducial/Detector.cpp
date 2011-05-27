@@ -4,6 +4,8 @@
 #include <com/baldzarika/ar/fiducial/MarkerModel.h>
 #include <com_baldzarika_ar_fiducial_Detector.h>
 #include <com_baldzarika_ar_fiducial_Detector_MarkerState.h>
+#include <baldzarika/ucv/resize.h>
+
 
 void Java_com_baldzarika_ar_fiducial_Detector_00024MarkerState_create(JNIEnv */*e*/, jobject ms, jlong px)
 {
@@ -183,11 +185,11 @@ jboolean Java_com_baldzarika_ar_fiducial_Detector_waitToStop(JNIEnv */*e*/, jobj
 	return Detector(d).waitToStop();
 }
 
-jboolean Java_com_baldzarika_ar_fiducial_Detector_update(JNIEnv */*e*/, jobject d, jbyteArray data, jint pfmt)
+jboolean Java_com_baldzarika_ar_fiducial_Detector_update(JNIEnv */*e*/, jobject d, jbyteArray data, jint pfmt, jint width, jint height)
 {
 	using namespace com::baldzarika::ar::fiducial;
 	using namespace j2cpp;
-	return Detector(d).update(local_ref< array< jbyte,1> >(data), pfmt);
+	return Detector(d).update(local_ref< array< jbyte,1> >(data), pfmt, width, height);
 }
 
 namespace com { namespace baldzarika { namespace ar { namespace fiducial {
@@ -594,7 +596,7 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 		return JNI_FALSE;
 	}
 
-	jboolean Detector::update(j2cpp::local_ref< j2cpp::array<jbyte,1> > const &data, jint pfmt)
+	jboolean Detector::update(j2cpp::local_ref< j2cpp::array<jbyte,1> > const &data, jint pfmt, jint width, jint height)
 	{
 		if(px_t *p_px=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
 		{
@@ -603,41 +605,35 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 			{
 			case 17:
 				{
-					if(data->size()>=(frameSize.area()+frameSize.width()*frameSize.height()/2))
+					if(::baldzarika::ar::fiducial::detector::locked_frame frame_lock=(*p_px)->lock_frame())
 					{
-						if(::baldzarika::ar::fiducial::detector::locked_frame frame_lock=(*p_px)->lock_frame())
+						if(width==frameSize.width() && height==frameSize.height())
 						{
 							::baldzarika::ar::fiducial::gray_t median;
-#if 0
-							return ::baldzarika::ucv::convert_nv16_to_gray(
-								//y channel
-								::baldzarika::ucv::gil::interleaved_view(
-									frameSize.width(), frameSize.height(),
-									reinterpret_cast< ::baldzarika::ucv::gil::gray8_pixel_t * >(data->data()),
-									frameSize.width()
-								),
-								//uv channels
-								::baldzarika::ucv::gil::interleaved_view(
-									frameSize.width()/2, frameSize.height()/2,
-									reinterpret_cast< ::baldzarika::ucv::gil::gray16_pixel_t * >(data->data()+frameSize.width()*frameSize.height()),
-									(frameSize.width()/2)*2
-								),
-								frame_lock.get_view(),
-								median
-							)?JNI_TRUE:JNI_FALSE;
-#else
 							return ::baldzarika::ucv::convert_scale(
 								//y channel
 								::baldzarika::ucv::gil::interleaved_view(
-									frameSize.width(), frameSize.height(),
+									width, height,
 									reinterpret_cast< ::baldzarika::ucv::gil::gray8_pixel_t * >(data->data()),
-									frameSize.width()
+									width
 								),
 								frame_lock.get_view(),
 								::baldzarika::ar::fiducial::gray_t(1.0f/255.0f),
 								median
 							)?JNI_TRUE:JNI_FALSE;
-#endif
+						}
+						else
+						{
+							return ::baldzarika::ucv::resize_and_scale(
+								//y channel
+								::baldzarika::ucv::gil::interleaved_view(
+									width, height,
+									reinterpret_cast< ::baldzarika::ucv::gil::gray8_pixel_t * >(data->data()),
+									width
+								),
+								frame_lock.get_view(),
+								::baldzarika::ar::fiducial::gray_t(1.0f/255.0f)
+							)?JNI_TRUE:JNI_FALSE;
 						}
 					}
 				}

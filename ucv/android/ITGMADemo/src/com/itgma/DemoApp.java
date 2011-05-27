@@ -1,6 +1,5 @@
 package com.itgma;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,10 +9,11 @@ import com.baldzarika.ar.fiducial.Detector;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 public class DemoApp extends Application implements SharedPreferences.OnSharedPreferenceChangeListener
 {
@@ -23,7 +23,7 @@ public class DemoApp extends Application implements SharedPreferences.OnSharedPr
 		super.onCreate();
 		s_Instance=this;
 		
-		m_FrameSizes=new ArrayList<Size2>();
+		m_PreviewSizes=new ArrayList<Size2>();
 		
 		Camera camera=Camera.open();
 		if(camera!=null)
@@ -31,7 +31,7 @@ public class DemoApp extends Application implements SharedPreferences.OnSharedPr
 			List<Camera.Size> cameraPreviewSizes=camera.getParameters().getSupportedPreviewSizes();
 			for(Camera.Size cs: cameraPreviewSizes)
 			{
-				m_FrameSizes.add( new Size2(cs.width, cs.height));
+				m_PreviewSizes.add( new Size2(cs.width, cs.height));
 			}
 			camera.release();
 			camera=null;
@@ -44,14 +44,22 @@ public class DemoApp extends Application implements SharedPreferences.OnSharedPr
 		
 		SharedPreferences.Editor spEdit=sp.edit();
 		
+		
+		DisplayMetrics metrics = new DisplayMetrics();
+		WindowManager wmgr=(WindowManager)getSystemService(WINDOW_SERVICE);
+		wmgr.getDefaultDisplay().getMetrics(metrics);
+		 
+		Size2 screenSize=new Size2(metrics.widthPixels,metrics.heightPixels);
+		
+		
 		int closestFSIdx=0;
-		Size2 closestFS=m_FrameSizes.get(closestFSIdx);
-		double closeness=Math.pow(closestFS.m_Width-DEFAULT_FRAME_SIZE.m_Width, 2)+Math.pow(closestFS.m_Height-DEFAULT_FRAME_SIZE.m_Height, 2);
-		for(int ifs=1;ifs<m_FrameSizes.size();++ifs)
+		Size2 closestFS=m_PreviewSizes.get(closestFSIdx);
+		double closeness=Math.pow(closestFS.m_Width-screenSize.m_Width, 2)+Math.pow(closestFS.m_Height-screenSize.m_Height, 2);
+		for(int ifs=1;ifs<m_PreviewSizes.size();++ifs)
 		{
-			Size2 candidate=m_FrameSizes.get(ifs);
+			Size2 candidate=m_PreviewSizes.get(ifs);
 			
-			double candidateCloseness=Math.pow(candidate.m_Width-DEFAULT_FRAME_SIZE.m_Width, 2)+Math.pow(candidate.m_Height-DEFAULT_FRAME_SIZE.m_Height, 2);
+			double candidateCloseness=Math.pow(candidate.m_Width-screenSize.m_Width, 2)+Math.pow(candidate.m_Height-screenSize.m_Height, 2);
 			if(candidateCloseness<=closeness)
 			{
 				closestFS=candidate;
@@ -59,15 +67,15 @@ public class DemoApp extends Application implements SharedPreferences.OnSharedPr
 			}
 		}
 		
-		m_DefaultFrameSize=new StringBuilder().
+		m_DefaultPreviewSize=new StringBuilder().
 			append(closestFS.m_Width).
 			append("x").
 			append(closestFS.m_Height).
 			toString();
 		
-		Size2 frameSize=getFrameSizeSettings(sp, spEdit);
+		m_PreviewSize=getPreviewSizeSettings(sp, spEdit);
 		
-		m_Detector=new Detector(frameSize);
+		m_Detector=new Detector(findOptimalFrameSize(m_PreviewSize));
 		m_BCHMarkerModel = new BCHMarkerModel();
 		m_Detector.addMarkerModel(m_BCHMarkerModel);
 		
@@ -98,9 +106,9 @@ public class DemoApp extends Application implements SharedPreferences.OnSharedPr
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
 	{
-		if(key.equals(getString(R.string.settings_frame_size_key)))
+		if(key.equals(getString(R.string.settings_preview_size_key)))
 		{
-			setFrameSize(getFrameSizeSettings(sharedPreferences,null));
+			setPreviewSize(getPreviewSizeSettings(sharedPreferences,null));
 		}
 	}
 	
@@ -114,20 +122,34 @@ public class DemoApp extends Application implements SharedPreferences.OnSharedPr
 		return m_Detector;
 	}
 
-	public List<Size2> getFrameSizes()
+	public List<Size2> getPreviewSizes()
 	{
-		return m_FrameSizes;		
+		return m_PreviewSizes;		
 	}
 	
-	private Size2 getFrameSizeSettings(SharedPreferences sharedPreferences, SharedPreferences.Editor spEditor)
+	public Size2 getPreviewSize()
 	{
-		String frameSize=sharedPreferences.getString(getString(R.string.settings_frame_size_key), m_DefaultFrameSize);
-		if(spEditor!=null && !sharedPreferences.contains(getString(R.string.settings_frame_size_key)))
-			spEditor.putString(getString(R.string.settings_frame_size_key), frameSize);
-		
-		for(Size2 sz: m_FrameSizes)
+		return m_PreviewSize;
+	}
+	
+	private Size2 findOptimalFrameSize(Size2 previewSize)
+	{
+		if(previewSize.m_Width*m_PreviewSize.m_Height > 2*OPTIMAL_FRAME_SIZE.m_Width*OPTIMAL_FRAME_SIZE.m_Height)
 		{
-			if(frameSize.equals(new StringBuilder().
+			return new Size2(previewSize.m_Width/2, previewSize.m_Height/2);
+		}
+		return previewSize;
+	}
+	
+	private Size2 getPreviewSizeSettings(SharedPreferences sharedPreferences, SharedPreferences.Editor spEditor)
+	{
+		String previewSize=sharedPreferences.getString(getString(R.string.settings_preview_size_key), m_DefaultPreviewSize);
+		if(spEditor!=null && !sharedPreferences.contains(getString(R.string.settings_preview_size_key)))
+			spEditor.putString(getString(R.string.settings_preview_size_key), previewSize);
+		
+		for(Size2 sz: m_PreviewSizes)
+		{
+			if(previewSize.equals(new StringBuilder().
 					append(sz.m_Width).
 					append("x").
 					append(sz.m_Height).
@@ -140,19 +162,18 @@ public class DemoApp extends Application implements SharedPreferences.OnSharedPr
 		return new Size2(0,0);
 	}
 	
-	private void setFrameSize(Size2 frameSize)
+	private void setPreviewSize(Size2 previewSize)
 	{
-		if(m_Detector!=null)
-		{
-			m_Detector.setFrameSize(frameSize);
-		}
+		m_PreviewSize=previewSize;
+		m_Detector.setFrameSize(findOptimalFrameSize(m_PreviewSize));
 	}
 	
 	private static DemoApp s_Instance=null;
-	public static final Size2 DEFAULT_FRAME_SIZE=new Size2(320,240);
+	public static final Size2 OPTIMAL_FRAME_SIZE=new Size2(320,240);
 	
-	private List<Size2> m_FrameSizes=null;
-	private String m_DefaultFrameSize=null;
+	private List<Size2> m_PreviewSizes=null;
+	private String m_DefaultPreviewSize=null;
+	private Size2 m_PreviewSize=null;
 	private Detector m_Detector=null;
 	private BCHMarkerModel m_BCHMarkerModel=null;
 }
