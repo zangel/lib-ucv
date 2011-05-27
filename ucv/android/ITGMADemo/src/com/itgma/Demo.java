@@ -242,7 +242,7 @@ public class Demo extends Activity implements SurfaceHolder.Callback, GLSurfaceV
     	if(markerState.getMarkerId()==477)
     	{
     		markerState.getCameraPose(m_CameraPose);
-    		Matrix.rotateM(m_CameraPose, 0, -90, 1.0f, 0.0f, 0.0f);
+    		//Matrix.rotateM(m_CameraPose, 0, -90, 1.0f, 0.0f, 0.0f);
     		m_IsDetected=markerState.isDetected();
     	}
     }
