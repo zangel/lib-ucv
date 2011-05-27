@@ -146,10 +146,10 @@ JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_fiducial_Detector_waitToStop
 /*
  * Class:     com_baldzarika_ar_fiducial_Detector
  * Method:    update
- * Signature: ([BI)Z
+ * Signature: ([BIII)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_fiducial_Detector_update
-  (JNIEnv *, jobject, jbyteArray, jint);
+  (JNIEnv *, jobject, jbyteArray, jint, jint, jint);
 
 #ifdef __cplusplus
 }
