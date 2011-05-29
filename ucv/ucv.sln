@@ -24,8 +24,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_ar_gui_test", "lib_ar_g
 		{D60FD689-2C93-486B-9705-C6BA83BB29FE} = {D60FD689-2C93-486B-9705-C6BA83BB29FE}
 	EndProjectSection
 EndProject
-Project("{6141683F-8A12-4E36-9623-2EB02B2C2303}") = "lib_ar_gui_test_setup", "lib_ar_gui_test_setup\lib_ar_gui_test_setup.isproj", "{1A73C4E7-EC35-4825-B186-EE1103114E80}"
-EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -89,16 +87,6 @@ Global
 		{6E078D05-D2C5-4E06-BA81-35727310E31C}.Release|Win32.Build.0 = Release|Win32
 		{6E078D05-D2C5-4E06-BA81-35727310E31C}.SingleImage|Win32.ActiveCfg = Release|Win32
 		{6E078D05-D2C5-4E06-BA81-35727310E31C}.SingleImage|Win32.Build.0 = Release|Win32
-		{1A73C4E7-EC35-4825-B186-EE1103114E80}.CD_ROM|Win32.ActiveCfg = CD_ROM
-		{1A73C4E7-EC35-4825-B186-EE1103114E80}.CD_ROM|Win32.Build.0 = CD_ROM
-		{1A73C4E7-EC35-4825-B186-EE1103114E80}.Debug|Win32.ActiveCfg = DVD-5
-		{1A73C4E7-EC35-4825-B186-EE1103114E80}.Debug|Win32.Build.0 = DVD-5
-		{1A73C4E7-EC35-4825-B186-EE1103114E80}.DVD-5|Win32.ActiveCfg = DVD-5
-		{1A73C4E7-EC35-4825-B186-EE1103114E80}.DVD-5|Win32.Build.0 = DVD-5
-		{1A73C4E7-EC35-4825-B186-EE1103114E80}.Release|Win32.ActiveCfg = SingleImage
-		{1A73C4E7-EC35-4825-B186-EE1103114E80}.Release|Win32.Build.0 = SingleImage
-		{1A73C4E7-EC35-4825-B186-EE1103114E80}.SingleImage|Win32.ActiveCfg = SingleImage
-		{1A73C4E7-EC35-4825-B186-EE1103114E80}.SingleImage|Win32.Build.0 = SingleImage
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

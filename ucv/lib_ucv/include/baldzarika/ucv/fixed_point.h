@@ -573,7 +573,8 @@ namespace std
 	inline baldzarika::ucv::fixed_point<I,F> abs(baldzarika::ucv::fixed_point<I,F> const &x)
 	{
 		namespace bucv=baldzarika::ucv;
-		return x<bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?-x:x;
+		//return x<bucv::detail::constant::zero< bucv::fixed_point<I,F> >()?-x:x;
+		return baldzarika::ucv::fixed_point<I,F>(std::abs(x.m_value), bucv::detail::fp_explicit_tag());
 	}
 
 	template < boost::uint32_t I, boost::uint32_t F >
