@@ -154,8 +154,12 @@ namespace baldzarika { namespace ucv {
 			static gray_t const tan_22_5=0.4142135623730950488016887242097;
 			static gray_t const tan_67_5=2.4142135623730950488016887242097;
 
+			boost::int32_t const width=boost::int32_t(m_frame_size.width());
+			boost::int32_t const height=boost::int32_t(m_frame_size.height());
+
 			gray_const_view_t dx_view=get_dx_const_view();
 			gray_const_view_t dy_view=get_dy_const_view();
+
 
 			gray_view_t mag_buf_view[3]=
 			{
@@ -177,7 +181,7 @@ namespace baldzarika { namespace ucv {
 
 			map_t *first_map_row=reinterpret_cast<map_t *>(map_view.row_begin(0));
 			map_t *last_map_row=reinterpret_cast<map_t *>(map_view.row_begin(map_view.height()-1));
-			for(boost::int32_t i=0;i<boost::int32_t(m_frame_size.width()+2);++i)
+			for(boost::int32_t i=0;i<width+2;++i)
 			{
 				mag_buf[0][i]=detail::constant::zero<gray_t>();
 				first_map_row[i]=1;
@@ -186,23 +190,23 @@ namespace baldzarika { namespace ucv {
 			
 			boost::uint32_t const map_step=m_frame_size.width()+2;
 
-			for(boost::int32_t y=0;y<=boost::int32_t(m_frame_size.height());++y)
+			for(boost::int32_t y=0;y<=height;++y)
 			{
 				gray_t *mag=mag_buf[(y>0?2:1)]+1;
 				gray_t const *dx_row=reinterpret_cast<gray_t const *>(dx_view.row_begin(y));
 				gray_t const *dy_row=reinterpret_cast<gray_t const *>(dy_view.row_begin(y));
 
-				if(y<boost::int32_t(m_frame_size.height()))
+				if(y<height)
 				{
 					mag[-1]=detail::constant::zero<gray_t>();
 					mag[m_frame_size.width()]=detail::constant::zero<gray_t>();
-					for(boost::uint32_t x=0;x<m_frame_size.width();++x)
+					for(boost::uint32_t x=0;x<width;++x)
 						mag[x]=std::abs(dx_row[x])+std::abs(dy_row[x]);
 				}
 				else
 				{
 					mag--;
-					for(boost::uint32_t x=0;x<m_frame_size.width()+2;++x)
+					for(boost::uint32_t x=0;x<width+2;++x)
 						mag[x]=detail::constant::zero<gray_t>();
 					mag++;
 				}
@@ -210,7 +214,7 @@ namespace baldzarika { namespace ucv {
 				if(y==0) continue;
 
 				map_t *map=reinterpret_cast<map_t *>(map_view.row_begin(y))+1;
-				map[-1]=map[m_frame_size.width()]=detail::constant::one<map_t>();
+				map[-1]=map[width]=detail::constant::one<map_t>();
 
 
 				mag=mag_buf[1]+1;
@@ -222,7 +226,7 @@ namespace baldzarika { namespace ucv {
 
 				boost::uint8_t prev_flag=0;
 
-				for(boost::int32_t x=0;x<boost::int32_t(m_frame_size.width());++x)
+				for(boost::int32_t x=0;x<width;++x)
 				{
 					gray_t dx=dx_row[x];
 					gray_t dy=dy_row[x];

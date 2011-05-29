@@ -54,9 +54,6 @@
     <ClInclude Include="include\baldzarika\ucv\gil_channel_traits.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\convert_scale.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\surf.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
@@ -160,6 +157,9 @@
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\resize.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\convert_scale.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,8 +1,8 @@
 #include "Prec.h"
 #include "FiducialTestPreviewWidget.h"
 
-#define FIDUCIAL_PREVIEW_WIDTH 640
-#define FIDUCIAL_PREVIEW_HEIGHT 480
+#define FIDUCIAL_PREVIEW_WIDTH 320
+#define FIDUCIAL_PREVIEW_HEIGHT 240
 
 
 FiducialTestPreviewWidget::FiducialTestPreviewWidget(QWidget *parent/* =0 */)
