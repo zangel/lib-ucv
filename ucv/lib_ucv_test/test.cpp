@@ -7,7 +7,7 @@
 #include <baldzarika/ucv/svd.h>
 #include <baldzarika/ucv/solve.h>
 #include <baldzarika/ucv/vector.h>
-#include <baldzarika/ucv/convert_scale.h>
+#include <baldzarika/ucv/convert.h>
 #include <baldzarika/ucv/warp.h>
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/surf.h>
@@ -45,102 +45,14 @@ BOOST_AUTO_TEST_CASE( create_open_cv_window )
 	cv::namedWindow(OPENCV_WND_NAME);
 	//cv::namedWindow(OPENCV_WND_NAME2);
 }
-#if 0
-
-BOOST_AUTO_TEST_CASE( test_fixed_point )
-{
-	using namespace baldzarika::ucv;
-
-	typedef fixed_point<15,16> fixed_t;
-
-
-	BOOST_CHECK_EQUAL(static_cast<float>(fixed_t(fixed_point<0,15>(0.5f))), 0.5f);
-	BOOST_CHECK_EQUAL(static_cast<float>(fixed_point<0,15>(fixed_t(0.5f))), 0.5f);
-	
-	BOOST_CHECK_EQUAL(1, static_cast<int>(fixed_t(3)/fixed_t(2)) );
-	BOOST_CHECK_EQUAL(1.5f, static_cast<float>(fixed_t(3)/fixed_t(2)));
-
-	//sqrt
-	BOOST_CHECK_EQUAL(static_cast<int>(sqrt(fixed_t(144))), 12);
-	BOOST_CHECK_LT(fabs(static_cast<float>(sqrt(fixed_t(2)))-sqrt(2.0f)), 1.0e-3f);
-
-	BOOST_CHECK_LT(fabs(static_cast<float>(sqrt(fixed_t(0.00001f)))-sqrt(0.00001f)), 1.0e-6f);
-
-
-	//sin
-	BOOST_CHECK_LT( fabs(static_cast<float>(sin(baldzarika::ucv::detail::constants::zero<fixed_t>()))-sin(0.0f)), 1.0e-3f);
-	BOOST_CHECK_LT( fabs(static_cast<float>(sin(baldzarika::ucv::detail::constants::pi_i2<fixed_t>()))-sin(3.1415926535897932384626433832795f/2.0f)), 1.0e-3f);
-
-	//cos
-	BOOST_CHECK_LT( fabs(static_cast<float>(cos(baldzarika::ucv::detail::constants::zero<fixed_t>()))-cos(0.0f)), 1.0e-3f);
-	BOOST_CHECK_LT( fabs(static_cast<float>(cos(baldzarika::ucv::detail::constants::pi_i2<fixed_t>()))-cos(3.1415926535897932384626433832795f/2.0f)), 1.0e-3f);
-	
-	
-	//fabs
-	BOOST_CHECK( (fabs( fixed_point<15,16>(1) ) == fixed_point<15,16>(1)) );
-	BOOST_CHECK( (fabs( fixed_point<15,16>(0) ) == fixed_point<15,16>(0)) );
-	BOOST_CHECK( (fabs( fixed_point<15,16>(-1) ) == fixed_point<15,16>(1)) );
-
-	//floor
-	BOOST_CHECK( (floor( fixed_point<15,16>(1.5) ) == fixed_point<15,16>(1.0)) );
-	BOOST_CHECK( (floor( fixed_point<15,16>(-1.5) ) == fixed_point<15,16>(-2.0)) );
-
-	//ceil
-	BOOST_CHECK( (ceil( fixed_point<15,16>(1.5) ) == fixed_point<15,16>(2.0)) );
-	BOOST_CHECK( (ceil( fixed_point<15,16>(-1.5) ) == fixed_point<15,16>(-1.0)) );
-
-	//fmod
-	BOOST_CHECK( (fmod( fixed_point<15,16>(2.5), fixed_point<15,16>(2.0) ) == fixed_point<15,16>(0.5)) );
-	BOOST_CHECK( (fmod( fixed_point<15,16>(1.5), fixed_point<15,16>(2.0) ) == fixed_point<15,16>(1.5)) );
-
-
-	//modf
-	fixed_point<15,16> ip;
-	BOOST_CHECK( (modf( fixed_point<15,16>(10.5), &ip ) == fixed_point<15,16>(0.5)) );
-	BOOST_CHECK( (ip == fixed_point<15,16>(10.0)) );
-
-	//atan2
-	float y=sin(3.14f/2.0f);
-	float x=cos(3.14f/2.0f);
-	
-	BOOST_CHECK_LT( fabs(static_cast<float>(atan2(fixed_point<15,16>(y),fixed_point<15,16>(x)))-atan2(y, x)), 7.2e-2f);
-	BOOST_CHECK_LT( fabs(static_cast<float>(atan2(fixed_point<15,16>(y),fixed_point<15,16>(-x)))-atan2(y, -x)), 7.2e-2f);
-	BOOST_CHECK_LT( fabs(static_cast<float>(atan2(fixed_point<15,16>(-y),fixed_point<15,16>(x)))-atan2(-y, x)), 7.2e-2f);
-	BOOST_CHECK_LT( fabs(static_cast<float>(atan2(fixed_point<15,16>(-y),fixed_point<15,16>(-x)))-atan2(-y, -x)), 7.2e-2f);
-}
-
-
-BOOST_AUTO_TEST_CASE( test_fixed_point_atan2_speed )
-{
-	using namespace baldzarika::ucv;
-
-	float f_res;
-	fixed_point<15,16> fp_res;
-	float y=sin(2.5f);
-	float x=cos(2.5f);
-	fixed_point<15,16> fp_x(x), fp_y(y);
-
-	posix_time::ptime cp_1=posix_time::microsec_clock::local_time();
-	
-	for(uint32_t i=0;i<10000000;++i)
-	{
-		f_res=atan2(y, x);
-	}
-	
-	posix_time::ptime cp_2=posix_time::microsec_clock::local_time();
-
-	for(uint32_t i=0;i<10000000;++i)
-	{
-		fp_res=atan2(fixed_point<15,16>(fp_y), fixed_point<15,16>(fp_x));
-	}
-	posix_time::ptime cp_3=posix_time::microsec_clock::local_time();
-
-	std::cout << "fixed_point speed=" << float((cp_3-cp_2).total_microseconds())/float((cp_2-cp_1).total_microseconds()) << " " << f_res << " " << static_cast<float>(fp_res) << std::endl;
-}
 
 
 
-BOOST_AUTO_TEST_CASE( test_convert_scale )
+
+
+
+
+BOOST_AUTO_TEST_CASE( test_convert )
 {
 	namespace ucv=baldzarika::ucv;
 
@@ -156,29 +68,31 @@ BOOST_AUTO_TEST_CASE( test_convert_scale )
 	
 	gray_real_image_t gray_img(cv_img.cols, cv_img.rows, 4);
 	
-	ucv::convert_scale(
+	ucv::convert(
 		ucv::gil::interleaved_view(
 			cv_img.cols, cv_img.rows,
 			reinterpret_cast<ucv::gil::gray8_pixel_t*>(cv_img.data),
 			cv_img.step
 		),
 		ucv::gil::view(gray_img),
-		real_t(1.0f/255.0f)
+		ucv::detail::grayscale_convert()
 	);
 
-	ucv::convert_scale(
+	ucv::convert(
 		ucv::gil::view(gray_img),
 		ucv::gil::interleaved_view(
 			cv_img.cols, cv_img.rows,
 			reinterpret_cast<ucv::gil::gray8_pixel_t*>(cv_img.data),
-			cv_img.step
+			cv_img.step 
 		),
-		real_t(255.0f)
+		ucv::detail::grayscale_convert()
 	);
 	
 	cv::imshow(OPENCV_WND_NAME, cv_img);
 	cv::waitKey();
 }
+ 
+
 
 BOOST_AUTO_TEST_CASE( test_integral )
 {
@@ -190,20 +104,20 @@ BOOST_AUTO_TEST_CASE( test_integral )
 	typedef ucv::gil::image< integral_pixel_t, false, std::allocator<unsigned char> > integral_image_t;
 	typedef integral_image_t::view_t integral_view_t;
 
-	cv::Mat cv_img=cv::imread("test_img.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img=cv::imread("test_img2.png", CV_LOAD_IMAGE_GRAYSCALE);
 	cv::imshow(OPENCV_WND_NAME, cv_img);
 	cv::waitKey();
 
 	integral_image_t gray_img(cv_img.cols, cv_img.rows, 4);
 
-	ucv::convert_scale(
+	ucv::convert(
 		ucv::gil::interleaved_view(
 			cv_img.cols, cv_img.rows,
 			reinterpret_cast<ucv::gil::gray8_pixel_t*>(cv_img.data),
 			cv_img.step
 		),
 		ucv::gil::view(gray_img),
-		integral_t(1.0f/255.0f)
+		ucv::detail::grayscale_convert()
 	);
 
 	integral_image_t integral_img(cv_img.cols, cv_img.rows, 4);
@@ -217,6 +131,8 @@ BOOST_AUTO_TEST_CASE( test_integral )
 	cv::waitKey();
 }
 
+
+#if 0
 BOOST_AUTO_TEST_CASE( test_surf )
 {
 	namespace ucv=baldzarika::ucv;
@@ -854,7 +770,7 @@ BOOST_AUTO_TEST_CASE( solve_test )
 	BOOST_CHECK_LT( std::abs(x[0]-( 3.0f)), 1.0e-6f);
 	BOOST_CHECK_LT( std::abs(x[1]-(-2.0f)), 1.0e-6f);
 }
-#endif
+
 
 BOOST_AUTO_TEST_CASE( perspective_transform_test )
 {
@@ -941,9 +857,9 @@ BOOST_AUTO_TEST_CASE( warp_test )
 
 	ucv::gil::png_write_view("warped-image-test.png", ucv::gil::const_view(dst8_img));
 }
+#endif
 
-
-#if 1
+#if 0
 
 BOOST_AUTO_TEST_CASE( camera_pose_test )
 {

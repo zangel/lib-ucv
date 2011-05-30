@@ -342,7 +342,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			{
 				if(!m_frame_is_dirty)
 				{
-					ucv::copy_pixels(gv,ucv::gil::view(m_frame));
+					ucv::convert(gv,ucv::gil::view(m_frame), ucv::detail::convert());
 					//m_gaussian_blur(ucv::gil::const_view(m_frame), ucv::gil::view(m_blurred_frame));
 					m_frame_is_dirty=true;
 					m_ios.post(boost::bind(&detector::on_update, this));

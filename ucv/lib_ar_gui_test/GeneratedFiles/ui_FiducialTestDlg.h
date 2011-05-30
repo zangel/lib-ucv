@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'FiducialTestDlg.ui'
 **
-** Created: Fri 27. May 12:51:53 2011
+** Created: Mon 30. May 11:39:53 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

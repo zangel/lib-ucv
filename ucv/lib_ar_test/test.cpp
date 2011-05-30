@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE( tracker_frame_size )
 	BOOST_CHECK(ar_tracker->get_frame_size()==ucv::size2ui(100,100));
 }
 
-
+#endif
 
 BOOST_AUTO_TEST_CASE( tracker_detect_marker )
 {
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_start_stop_test )
 	detector->wait_to_stop();
 }
 
-#endif
+
 
 BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 {
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 		if(ar::fiducial::detector::locked_frame frame_lock=detector->lock_frame())
 		{
 			BOOST_CHECK(static_cast<bool>(frame_lock));	
-			BOOST_CHECK(ucv::copy_pixels(ucv::gil::const_view(gray_frame),frame_lock.get_view()));
+			BOOST_CHECK(ucv::convert(ucv::gil::const_view(gray_frame),frame_lock.get_view(), ucv::detail::convert));
 			n--;
 		}
 	}

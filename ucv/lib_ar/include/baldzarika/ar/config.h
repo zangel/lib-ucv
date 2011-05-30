@@ -5,8 +5,7 @@
 #include <baldzarika/ucv/fixed_point.h>
 #include <baldzarika/ucv/matrix.h>
 #include <baldzarika/ucv/gil_channel_traits.h>
-#include <baldzarika/ucv/convert_scale.h>
-#include <baldzarika/ucv/copy_pixels.h>
+#include <baldzarika/ucv/convert.h>
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/norm.h>
 #include <baldzarika/ucv/contour.h>
