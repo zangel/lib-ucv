@@ -94,10 +94,10 @@ void FiducialTestPreviewWidget::paintGL()
 				ucv::gil::view(m_gray_frame)
 			);
 
-			ucv::convert_scale(
+			ucv::convert(
 				ucv::gil::const_view(m_gray_frame),
 				frame_lock.get_view(),
-				1.0f/255.0f
+				ucv::detail::grayscale_convert()
 			);
 		}
 

@@ -8,8 +8,126 @@
 
 namespace baldzarika { namespace ucv {
 
-	template <typename SVT, typename DVT, typename PT>
-	bool convert_scale(SVT src, DVT dst, PT scale=1.0f, typename gil::channel_type<typename DVT::value_type>::type &mv=typename gil::channel_type<typename DVT::value_type>::type())
+	namespace detail {
+
+		struct convert
+		{
+			inline void begin() {}
+			inline void begin_row() {}
+			inline void end_row() {}
+			inline void end() {}
+
+			template < typename ST, typename DT >
+			inline void operator()(ST const &src, DT &dst)
+			{
+				dst=static_cast<DT>(src);
+			}
+
+			template < typename PT >
+			inline void operator()(PT const &src, PT &dst)
+			{
+				dst=src;
+			}
+
+		};
+
+		struct grayscale_convert
+		{
+			inline void begin() {}
+			inline void begin_row() {}
+			inline void end_row() {}
+			inline void end() {}
+						
+			template < boost::uint32_t I, boost::uint32_t F >
+			inline void operator()(fixed_point<I,F> const &src, boost::uint8_t &dst)
+			{
+				dst=boost::uint8_t(
+					adjuster< (F<8) >::
+						template adjust<
+							typename fixed_point< I, F >::value_type,
+							typename fixed_point< I, F >::value_type,
+							8,
+							F
+						>(src.get()) & 0xFF
+				);
+			}
+
+			template < boost::uint32_t I, boost::uint32_t F >
+			inline void operator()(boost::uint8_t const &src, fixed_point<I,F> &dst)
+			{
+				dst=fixed_point<I,F>(
+					adjuster< (F>8) >::
+						template adjust<
+							typename fixed_point< I, F >::value_type,
+							typename fixed_point< I, F >::value_type,
+							F,
+							8
+						>(typename fixed_point< I, F >::value_type(src)),
+					fp_explicit_tag()
+				);
+			}
+		};
+
+		template < typename MT >
+		struct grayscale_convert_and_median
+			: grayscale_convert
+		{
+			grayscale_convert_and_median(MT &mv, boost::uint32_t width, boost::uint32_t height)
+				: m_median_value(mv)
+				, m_inv_width(constant::one<MT>()/MT(width))
+				, m_inv_height(constant::one<MT>()/MT(height))
+			{
+
+			}
+
+			grayscale_convert_and_median(grayscale_convert_and_median const &that)
+				: m_median_value(that.m_median_value)
+				, m_inv_width(that.m_inv_width)
+				, m_inv_height(that.m_inv_height)
+			{
+			}
+
+			inline void begin()
+			{
+				m_median_value=constant::zero<MT>();
+			}
+
+			inline void begin_row()
+			{
+				m_row_sum=constant::zero<MT>();
+
+			}
+
+			inline void end_row()
+			{
+				m_median_value+=m_row_sum*m_inv_width;
+			}
+
+
+			inline void end()
+			{
+				m_median_value*=m_inv_height;
+			}
+
+			template < typename ST, typename DT >
+			inline void operator()(ST const &src, DT &dst)
+			{
+				DT tmp;
+				grayscale_convert::operator()(src,tmp);
+				m_row_sum+=MT(tmp);
+				dst=tmp;
+			}
+
+			MT &m_median_value;
+			MT m_row_sum;
+			MT m_inv_width;
+			MT m_inv_height;
+		};
+
+	} //namesapce detail
+
+	template < typename SVT, typename DVT, typename CV >
+	bool convert(SVT src, DVT dst, CV converter)
 	{
 		typedef typename SVT::value_type	src_pixel_t;
 		typedef typename DVT::value_type	dst_pixel_t;
@@ -20,24 +138,21 @@ namespace baldzarika { namespace ucv {
 		if(src.width()!=dst.width() || src.height()!=dst.height() || !src.width()*dst.width())
 			return false;
 
-		dst_channel_t const inv_width=detail::constant::one<dst_channel_t>()/dst_channel_t(dst.width());
-		dst_channel_t const inv_height=detail::constant::one<dst_channel_t>()/dst_channel_t(dst.height());
+		boost::int32_t const width=src.width();
+		boost::int32_t const height=src.height();
 
-		mv=detail::constant::zero<dst_channel_t>();
-
-		for(std::size_t y=0;y<static_cast<std::size_t>(src.height());++y)
+		converter.begin();
+		for(boost::int32_t y=0;y<height;++y)
 		{
-			dst_channel_t row_median=detail::constant::zero<dst_channel_t>();
 			src_channel_t const *src_row=reinterpret_cast<src_channel_t const *>(src.row_begin(y));
 			dst_channel_t *dst_row=reinterpret_cast<dst_channel_t *>(dst.row_begin(y));
-			for(std::size_t x=0;x<static_cast<std::size_t>(src.width());++x, ++src_row, ++dst_row)
-			{
-				dst_channel_t v=static_cast<dst_channel_t>(PT(*src_row)*scale);
-				*dst_row=v;
-				row_median+=v*inv_width;
-			}
-			mv+=row_median*inv_height;
+			
+			converter.begin_row();
+			for(boost::int32_t x=0;x<width;++x)
+				converter(*src_row++, *dst_row++);
+			converter.end_row();
 		}
+		converter.end();
 		return true;
 	}
 

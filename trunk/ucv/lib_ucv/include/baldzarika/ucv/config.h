@@ -1,11 +1,7 @@
 #ifndef BALDZARIKA_UCV_CONFIG_H
 #define BALDZARIKA_UCV_CONFIG_H
 
-//#define BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_ATAN2
-//#define BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_EXP
-//#define BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_COS
-//#define BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_SIN
-#define BALDZARIKA_UCV_FIXED_POINT_TRIGONO_USE_FPU_SQRT
+
 
 
 
@@ -29,11 +25,7 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 
-//#define BOOST_UBLAS_SCALED_NORM
 #define BOOST_UBLAS_SHALLOW_ARRAY_ADAPTOR
-
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/vector.hpp>
 
 #include <boost/random.hpp>
 
@@ -56,7 +48,6 @@
 namespace baldzarika { namespace ucv {
 	
 	namespace gil=::boost::gil;
-	namespace ublas=::boost::numeric::ublas;
 
 } //namespace ucv
 } //namespace baldzarika

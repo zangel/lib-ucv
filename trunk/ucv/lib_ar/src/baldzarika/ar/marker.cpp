@@ -46,11 +46,14 @@ namespace baldzarika { namespace ar {
 		: m_img(gv.width(), gv.height())
 		, m_median(-1)
 	{
-		ucv::convert_scale(
+		ucv::convert(
 			gv,
 			ucv::gil::view(m_img),
-			1.0f/255.0f,
-			m_median
+			ucv::detail::grayscale_convert_and_median<gray_t>(
+				m_median,
+				m_img.width(),
+				m_img.height()
+			)
 		);
 	}
 
@@ -73,11 +76,14 @@ namespace baldzarika { namespace ar {
 			if(marker_img.width()*marker_img.height())
 			{
 				m_img.recreate(marker_img.width(),marker_img.height());
-				ucv::convert_scale(
+				ucv::convert(
 					ucv::gil::const_view(marker_img),
 					ucv::gil::view(m_img),
-					gray_t(1.0f/255.0f),
-					m_median
+					ucv::detail::grayscale_convert_and_median<gray_t>(
+						m_median,
+						m_img.width(),
+						m_img.height()
+					)
 				);
 				return true;
 			}
@@ -92,12 +98,10 @@ namespace baldzarika { namespace ar {
 			if(m_img.width()*m_img.height())
 			{
 				ucv::gil::gray8_image_t save_img(m_img.width(),m_img.height());
-				unsigned char mv(0);
-				ucv::convert_scale(
+				ucv::convert(
 					ucv::gil::const_view(m_img),
 					ucv::gil::view(save_img),
-					255.0f,
-					mv
+					ucv::detail::grayscale_convert()
 				);
 				
 				ucv::gil::png_write_view(fn, ucv::gil::const_view(save_img));
@@ -112,11 +116,14 @@ namespace baldzarika { namespace ar {
 		if(gv.width()*gv.height())
 		{
 			m_img.recreate(gv.width(),gv.height());
-			ucv::convert_scale(
+			ucv::convert(
 				gv,
 				ucv::gil::view(m_img),
-				1.0f/255.0f,
-				m_median
+				ucv::detail::grayscale_convert_and_median<gray_t>(
+					m_median,
+					m_img.width(),
+					m_img.height()
+				)
 			);
 			return true;
 		}

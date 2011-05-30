@@ -92,8 +92,7 @@
     <ClInclude Include="include\baldzarika\ucv\canny.h" />
     <ClInclude Include="include\baldzarika\ucv\config.h" />
     <ClInclude Include="include\baldzarika\ucv\contour.h" />
-    <ClInclude Include="include\baldzarika\ucv\convert_scale.h" />
-    <ClInclude Include="include\baldzarika\ucv\copy_pixels.h" />
+    <ClInclude Include="include\baldzarika\ucv\convert.h" />
     <ClInclude Include="include\baldzarika\ucv\corners_subpixel.h" />
     <ClInclude Include="include\baldzarika\ucv\feature_point.h" />
     <ClInclude Include="include\baldzarika\ucv\gaussian_blur.h" />

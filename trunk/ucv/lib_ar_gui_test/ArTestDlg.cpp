@@ -1,6 +1,5 @@
 #include "Prec.h"
 #include "ArTestDlg.h"
-#include <baldzarika/ucv/convert_scale.h>
 
 
 ucv::size2ui const ArTestDlg::PREVIEW_SIZES[2]=
@@ -233,11 +232,14 @@ void ArTestDlg::onGrabFrame()
 			ucv::gil::view(m_gray8_frame)
 		);
 		ar::tracker::gray_t median_value;
-		ucv::convert_scale(
+		ucv::convert(
 			ucv::gil::const_view(m_gray8_frame),
 			ucv::gil::view(m_gray_frame),
-			1.0f/255.0f,
-			median_value
+			ucv::detail::grayscale_convert_and_median<ar::tracker::gray_t>(
+				median_value,
+				m_gray8_frame.width(),
+				m_gray8_frame.height()
+			)
 		);
 		m_tracker->update(ucv::gil::const_view(m_gray_frame), median_value);
 	}

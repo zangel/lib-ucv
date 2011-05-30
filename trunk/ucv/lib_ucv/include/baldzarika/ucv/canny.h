@@ -200,13 +200,13 @@ namespace baldzarika { namespace ucv {
 				{
 					mag[-1]=detail::constant::zero<gray_t>();
 					mag[m_frame_size.width()]=detail::constant::zero<gray_t>();
-					for(boost::uint32_t x=0;x<width;++x)
+					for(boost::int32_t x=0;x<width;++x)
 						mag[x]=std::abs(dx_row[x])+std::abs(dy_row[x]);
 				}
 				else
 				{
 					mag--;
-					for(boost::uint32_t x=0;x<width+2;++x)
+					for(boost::int32_t x=0;x<width+2;++x)
 						mag[x]=detail::constant::zero<gray_t>();
 					mag++;
 				}
