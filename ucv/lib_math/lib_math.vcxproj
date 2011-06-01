@@ -86,6 +86,9 @@
     <ClInclude Include="include\baldzarika\math\fixed_point.h" />
     <ClInclude Include="include\baldzarika\math\matrix.h" />
     <ClInclude Include="include\baldzarika\math\matrix_ops.h" />
+    <ClInclude Include="include\baldzarika\math\point2.h" />
+    <ClInclude Include="include\baldzarika\math\vector.h" />
+    <ClInclude Include="include\baldzarika\math\vector_ops.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\math\config.cpp" />

@@ -10,7 +10,8 @@ namespace baldzarika { namespace math {
 	{
 	public:
 		template < typename T2, boost::uint32_t R2, boost::uint32_t C2 > friend class matrix;
-
+		template < typename T2, boost::uint32_t R2, boost::uint32_t C2 > friend struct matrix_ops;
+		
 		enum { RXC=R*C };
 
 		static inline matrix const& zero() { return matrix_ops<T, R, C>::zero(); }
@@ -20,40 +21,16 @@ namespace baldzarika { namespace math {
 		{
 		}
 
-		inline matrix(matrix const &that)
-		{
-			*this=that;
-		}
-
-		inline matrix(T(&aa)[R][C])
-		{
-			*this=*reinterpret_cast< matrix const *>(aa);
-		}
-
 		template < typename RT >
 		inline matrix(matrix<RT,R,C> const &that)
 		{
-			*this=that;
+			matrix_ops<T, R, C>::assign(*this,that);
 		}
 
 		template < typename RT >
-		inline matrix(RT(&aa)[R][C])
+		inline matrix(RT(&ma)[R][C])
 		{
-			*this=*reinterpret_cast< matrix<RT,R,C> const *>(aa);
-		}
-
-		inline matrix& operator=(matrix const &rhs)
-		{
-			std::copy(rhs.m._1d, rhs.m._1d+RXC, m._1d);
-			return *this;
-		}
-
-		template < typename RT >
-		inline matrix& operator=(matrix<RT,R,C> const &rhs)
-		{
-			for(boost::uint32_t i=0;i<RXC;++i)
-				m._1d[i]=static_cast<T>(rhs.m._1d[i]);
-			return *this;
+			matrix_ops<T, R, C>::assign(*this,*reinterpret_cast< matrix<RT,R,C> const *>(ma));
 		}
 
 		inline T& operator()(boost::int32_t r, boost::uint32_t c)
@@ -76,6 +53,80 @@ namespace baldzarika { namespace math {
 			return m._1d[n];
 		}
 
+		template < typename RT >
+		inline matrix& operator=(matrix<RT,R,C> const &rhs)
+		{
+			return matrix_ops<T, R, C>::assign(*this,rhs);
+		}
+		
+		template < typename RT >
+		inline matrix& operator+=(matrix<RT,R,C> const &rhs)
+		{
+			return matrix_ops<T,R,C>::plus_assign(*this,rhs);
+		}
+
+		template < typename RT >
+		inline matrix operator +(matrix<RT,R,C> const &rhs) const
+		{
+			return matrix(*this)+=rhs;
+		}
+
+		template < typename RT >
+		inline matrix& operator-=(matrix<RT,R,C> const &rhs)
+		{
+			return matrix_ops<T,R,C>::minus_assign(*this,rhs);
+		}
+
+		template < typename RT >
+		inline matrix operator -(matrix<RT,R,C> const &rhs) const
+		{
+			return matrix(*this)-=rhs;
+		}
+
+		template < typename RT >
+		inline matrix& operator*=(matrix<RT,R,C> const &rhs)
+		{
+			return matrix_ops<T, R, C>::prod_assign(*this, rhs);
+		}
+
+		template < typename RT >
+		inline matrix operator *(matrix<RT,R,C> const &rhs) const
+		{
+			return matrix(*this)*=rhs;
+		}
+
+		template < typename RST >
+		inline matrix& operator*=(RST const &v)
+		{
+			return matrix_ops<T,R,C>::scalar_multiply_assign(*this, v);
+		}
+
+		template < typename RST >
+		inline matrix operator *(RST const &v) const
+		{
+			return matrix(*this)*=v;
+		}
+
+		inline matrix& tanspose()
+		{
+			return matrix_ops<T,R,C>::transpose(*this);
+		}
+
+		inline matrix& tansposed() const
+		{
+			return matrix(*this).transpose();
+		}
+
+		inline matrix& invert()
+		{
+			return matrix_ops<T,R,C>::invert(*this);
+		}
+
+		inline matrix inverted() const
+		{
+			return matrix(*this).invert();
+		}
+	
 	private:
 		union
 		{

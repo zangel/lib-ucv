@@ -5,7 +5,11 @@
 #include <baldzarika/math/fixed_point.h>
 #include <baldzarika/math/constant.h>
 #include <baldzarika/math/matrix.h>
+#include <baldzarika/math/vector.h>
+#include <baldzarika/math/point2.h>
 #include <boost/date_time.hpp>
+
+#if 0
 
 BOOST_AUTO_TEST_CASE( test_fixed_point )
 {
@@ -94,12 +98,37 @@ BOOST_AUTO_TEST_CASE( test_fixed_point_atan2_speed )
 	std::cout << "fixed_point speed=" << float((cp_3-cp_2).total_microseconds())/float((cp_2-cp_1).total_microseconds()) << " " << f_res << " " << static_cast<float>(fp_res) << std::endl;
 }
 
+#endif
+
+BOOST_AUTO_TEST_CASE( test_vector )
+{
+	namespace bmath=baldzarika::math;
+	typedef bmath::vector<float,3> vec3f;
+	typedef bmath::vector<float,2> vec2f;
+
+	vec3f z=vec3f::unit<0>().cross(vec3f::unit<1>());
+	float one=vec2f::unit<0>().cross(vec2f::unit<1>());
+	float mins_one=vec2f::unit<1>().cross(vec2f::unit<0>());
+}
+
+BOOST_AUTO_TEST_CASE( test_point2 )
+{
+
+	namespace bmath=baldzarika::math;
+
+	typedef bmath::point2<float> point2f;
+
+	point2f f(0.0f,1.0f);
+
+	f.x()=10.0f;
+
+	bmath::vector<float,3> vec3=f;
+
+	
+}
+
+
 BOOST_AUTO_TEST_CASE( test_matrix )
 {
 	namespace bmath=baldzarika::math;
-
-	bmath::matrix<float,3,3> m1=bmath::matrix<double,3,3>();
-
-
-	bmath::matrix<float,3,3> zero=bmath::matrix<float,3,3>::zero();
 }
