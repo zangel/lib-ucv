@@ -45,6 +45,15 @@
     <ClInclude Include="include\baldzarika\math\matrix_ops.h">
       <Filter>Header Files\baldzarika\math</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\math\vector.h">
+      <Filter>Header Files\baldzarika\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\math\vector_ops.h">
+      <Filter>Header Files\baldzarika\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\math\point2.h">
+      <Filter>Header Files\baldzarika\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\math\config.cpp">
