@@ -10,6 +10,11 @@ namespace baldzarika { namespace math {
 		: public vector<T, 2>
 	{
 	public:
+		point2()
+		{
+			m_data[0]=m_data[1]=constant::zero<T>();
+		}
+
 		point2(T px, T py)
 		{
 			m_data[0]=px;
@@ -21,9 +26,11 @@ namespace baldzarika { namespace math {
 
 		inline T& y() { return m_data[1]; }
 		inline T const& y() const { return m_data[1]; }
-
-
 	};
+
+	typedef point2<float>			point2f;
+	typedef point2<boost::uint32_t>	point2ui;
+	typedef point2<boost::int32_t>	point2i;
 
 } //namespace math
 } //namespace baldzarika

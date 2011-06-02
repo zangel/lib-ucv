@@ -81,12 +81,18 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\baldzarika\math\box2.h" />
     <ClInclude Include="include\baldzarika\math\config.h" />
     <ClInclude Include="include\baldzarika\math\constant.h" />
     <ClInclude Include="include\baldzarika\math\fixed_point.h" />
+    <ClInclude Include="include\baldzarika\math\jacobi.h" />
     <ClInclude Include="include\baldzarika\math\matrix.h" />
     <ClInclude Include="include\baldzarika\math\matrix_ops.h" />
     <ClInclude Include="include\baldzarika\math\point2.h" />
+    <ClInclude Include="include\baldzarika\math\size2.h" />
+    <ClInclude Include="include\baldzarika\math\solve.h" />
+    <ClInclude Include="include\baldzarika\math\svd.h" />
+    <ClInclude Include="include\baldzarika\math\utils.h" />
     <ClInclude Include="include\baldzarika\math\vector.h" />
     <ClInclude Include="include\baldzarika\math\vector_ops.h" />
   </ItemGroup>

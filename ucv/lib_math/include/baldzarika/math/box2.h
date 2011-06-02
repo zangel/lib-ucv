@@ -1,10 +1,11 @@
-#ifndef BALDZARIKA_UCV_BOX2_H
-#define BALDZARIKA_UCV_BOX2_H
+#ifndef BALDZARIKA_MATH_BOX2_H
+#define BALDZARIKA_MATH_BOX2_H
 
-#include <baldzarika/ucv/point2.h>
-#include <baldzarika/ucv/size2.h>
+#include <baldzarika/math/point2.h>
+#include <baldzarika/math/size2.h>
+#include <baldzarika/math/constant.h>
 
-namespace baldzarika { namespace ucv {
+namespace baldzarika { namespace math {
 
 	template < typename T >
 	class box2
@@ -14,8 +15,8 @@ namespace baldzarika { namespace ucv {
 		typedef size2<T> size2_t;
 
 		box2()
-			: m_top_left(detail::constant::zero<T>(), detail::constant::zero<T>())
-			, m_size(detail::constant::zero<T>(), detail::constant::zero<T>())
+			: m_top_left(constant::zero<T>(), constant::zero<T>())
+			, m_size(constant::zero<T>(), constant::zero<T>())
 		{
 		}
 
@@ -24,7 +25,7 @@ namespace baldzarika { namespace ucv {
 			, m_size(that.m_size)
 		{
 		}
-		
+
 		box2(point2_t const &min_corner, point2_t const &max_corner)
 			: m_top_left(min_corner)
 			, m_size(max_corner-min_corner)
@@ -36,7 +37,7 @@ namespace baldzarika { namespace ucv {
 			, m_size(size)
 		{
 		}
-		
+
 		T width() const
 		{
 			return m_size.width();
@@ -59,11 +60,11 @@ namespace baldzarika { namespace ucv {
 
 		bool intersects(box2 const &rhs) const
 		{
-			T tlx=std::max(m_top_left.x, rhs.m_top_left.x);
-			T tly=std::max(m_top_left.y, rhs.m_top_left.y);
+			T tlx=std::max(m_top_left.x(), rhs.m_top_left.x());
+			T tly=std::max(m_top_left.y(), rhs.m_top_left.y());
 
-			T brx=std::min(m_top_left.x+m_size.width(), rhs.m_top_left.x+rhs.m_size.width());
-			T bry=std::min(m_top_left.y+m_size.height(), rhs.m_top_left.y+rhs.m_size.height());
+			T brx=std::min(m_top_left.x()+m_size.width(), rhs.m_top_left.x+rhs.m_size.width());
+			T bry=std::min(m_top_left.y()+m_size.height(), rhs.m_top_left.y+rhs.m_size.height());
 
 			return tlx<=brx && tly<=bry;
 		}
@@ -72,7 +73,7 @@ namespace baldzarika { namespace ucv {
 		size2_t		m_size;
 	};
 
-} //namespace ucv
+} //namespace math
 } //namespace baldzarika
 
-#endif //BALDZARIKA_UCV_BOX2_H
+#endif //BALDZARIKA_MATH_BOX2_H

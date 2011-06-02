@@ -126,7 +126,7 @@ namespace baldzarika { namespace ucv  {
 		*this=that;
 	}
 
-	surf::response_layer::response_layer(surf &sr, point2ui const &ro, surf::response_view_t rv, surf::laplacian_view_t lv, boost::uint32_t ss, boost::uint32_t fs)
+	surf::response_layer::response_layer(surf &sr, math::point2ui const &ro, surf::response_view_t rv, surf::laplacian_view_t lv, boost::uint32_t ss, boost::uint32_t fs)
 		: m_surf(sr)
 		, m_response_offset(ro)
 		, m_response_view(rv)
@@ -190,18 +190,18 @@ namespace baldzarika { namespace ucv  {
 				boost::int32_t ix5=ix+1;
 
 				response_t d_xx=
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, point2i(ix4, iy2), size2ui(w, l1))-
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, point2i(ix3, iy2), size2ui(l, l1))*three;
+					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix4, iy2), math::size2ui(w, l1))-
+					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix3, iy2), math::size2ui(l, l1))*three;
 				
 				response_t d_yy=
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, point2i(ix2, iy4), size2ui(l1, w))-
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, point2i(ix2, iy3), size2ui(l1, l))*three;
+					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix2, iy4), math::size2ui(l1, w))-
+					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix2, iy3), math::size2ui(l1, l))*three;
 				
 				response_t d_xy=
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, point2i(ix5, iy1), size2ui(l, l))+
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, point2i(ix1, iy5), size2ui(l, l))-
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, point2i(ix1, iy1), size2ui(l, l))-
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, point2i(ix5, iy5), size2ui(l, l));
+					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix5, iy1), math::size2ui(l, l))+
+					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix1, iy5), math::size2ui(l, l))-
+					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix1, iy1), math::size2ui(l, l))-
+					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix5, iy5), math::size2ui(l, l));
 	
 				d_xx*=s_coeff;
 				d_yy*=s_coeff;
@@ -226,10 +226,10 @@ namespace baldzarika { namespace ucv  {
 		boost::int32_t border=(m_filter_size+1)/(2*m_sample_step);
 
 
-		boost::int32_t min_x=std::max<boost::int32_t>(border+1, rdp.first.first.x/m_sample_step);
-		boost::int32_t max_x=std::min<boost::int32_t>(m_response_view.width()-border, (rdp.first.first.x+rdp.first.second.width())/m_sample_step);
-		boost::int32_t min_y=std::max<boost::int32_t>(border+1, rdp.first.first.y/m_sample_step);
-		boost::int32_t max_y=std::min<boost::int32_t>(m_response_view.height()-border, (rdp.first.first.y+rdp.first.second.height())/m_sample_step);
+		boost::int32_t min_x=std::max<boost::int32_t>(border+1, rdp.first.first.x()/m_sample_step);
+		boost::int32_t max_x=std::min<boost::int32_t>(m_response_view.width()-border, (rdp.first.first.x()+rdp.first.second.width())/m_sample_step);
+		boost::int32_t min_y=std::max<boost::int32_t>(border+1, rdp.first.first.y()/m_sample_step);
+		boost::int32_t max_y=std::min<boost::int32_t>(m_response_view.height()-border, (rdp.first.first.y()+rdp.first.second.height())/m_sample_step);
 		
 		for(boost::int32_t y=min_y;y<max_y;++y)
 		{
@@ -345,14 +345,14 @@ namespace baldzarika { namespace ucv  {
 		return gil::get_color(m_laplacian_view(scale*x, scale*y), gil::gray_color_t())?true:false;
 	}
 
-	point2ui surf::response_layer::get_offset() const
+	math::point2ui surf::response_layer::get_offset() const
 	{
 		return m_response_offset;
 	}
 
-	size2ui surf::response_layer::get_size() const
+	math::size2ui surf::response_layer::get_size() const
 	{
-		return size2ui(m_response_view.width(), m_response_view.height());
+		return math::size2ui(m_response_view.width(), m_response_view.height());
 	}
 
 	boost::uint32_t surf::response_layer::get_sample_step() const
@@ -374,7 +374,7 @@ namespace baldzarika { namespace ucv  {
 		{	7,	9,	10,	11	}
 	};
 	
-	surf::surf(size2ui const &fs, boost::uint32_t o, boost::uint32_t i, boost::uint32_t s, float t, boost::uint32_t mf/* =64 */)
+	surf::surf(math::size2ui const &fs, boost::uint32_t o, boost::uint32_t i, boost::uint32_t s, float t, boost::uint32_t mf/* =64 */)
 		: m_frame_size()
 		, m_octaves(o)
 		, m_intervals(i)
@@ -414,7 +414,7 @@ namespace baldzarika { namespace ucv  {
 		m_treshold=t;
 	}
 	
-	bool surf::resize(size2ui const &fs)
+	bool surf::resize(math::size2ui const &fs)
 	{
 		if(fs.empty())
 			return false;
@@ -433,7 +433,7 @@ namespace baldzarika { namespace ucv  {
 			m_response_layers.push_back(
 				response_layer(
 					*this,
-					point2ui(0, 0),
+					math::point2ui(0, 0),
 					gil::subimage_view(gil::view(m_response_img), 0, 0, width, height),
 					gil::subimage_view(gil::view(m_laplacian_img), 0, 0, width, height),
 					m_sample_step, 9
@@ -442,7 +442,7 @@ namespace baldzarika { namespace ucv  {
 			m_response_layers.push_back(
 				response_layer(
 					*this,
-					point2ui(width, 0),
+					math::point2ui(width, 0),
 					gil::subimage_view(gil::view(m_response_img), width, 0, width, height),
 					gil::subimage_view(gil::view(m_laplacian_img), width, 0, width, height),
 					m_sample_step, 15
@@ -451,7 +451,7 @@ namespace baldzarika { namespace ucv  {
 			m_response_layers.push_back(
 				response_layer(
 					*this,
-					point2ui(0, height),
+					math::point2ui(0, height),
 					gil::subimage_view(gil::view(m_response_img), 0, height, width, height),
 					gil::subimage_view(gil::view(m_laplacian_img), 0, height, width, height),
 					m_sample_step, 21
@@ -460,7 +460,7 @@ namespace baldzarika { namespace ucv  {
 			m_response_layers.push_back(
 				response_layer(
 					*this,
-					point2ui(width, height),
+					math::point2ui(width, height),
 					gil::subimage_view(gil::view(m_response_img), width, height, width, height),
 					gil::subimage_view(gil::view(m_laplacian_img), width, height, width, height),
 					m_sample_step, 27
@@ -473,7 +473,7 @@ namespace baldzarika { namespace ucv  {
 			m_response_layers.push_back(
 				response_layer(
 					*this,
-					point2ui(0, 2*height),
+					math::point2ui(0, 2*height),
 					gil::subimage_view(gil::view(m_response_img), 0, 2*height, width/2, height/2),
 					gil::subimage_view(gil::view(m_laplacian_img), 0, 2*height, width/2, height/2),
 					m_sample_step*2, 39
@@ -482,7 +482,7 @@ namespace baldzarika { namespace ucv  {
 			m_response_layers.push_back(
 				response_layer(
 					*this,
-					point2ui(width/2, 2*height),
+					math::point2ui(width/2, 2*height),
 					gil::subimage_view(gil::view(m_response_img), width/2, 2*height, width/2, height/2),
 					gil::subimage_view(gil::view(m_laplacian_img), width/2, 2*height, width/2, height/2),
 
@@ -496,7 +496,7 @@ namespace baldzarika { namespace ucv  {
 			m_response_layers.push_back(
 				response_layer(
 					*this,
-					point2ui(2*(width/2), 2*height),
+					math::point2ui(2*(width/2), 2*height),
 					gil::subimage_view(gil::view(m_response_img), 2*(width/2), 2*height, width/4, height/4),
 					gil::subimage_view(gil::view(m_laplacian_img), 2*(width/2), 2*height, width/4, height/4),
 					m_sample_step*4, 75
@@ -505,7 +505,7 @@ namespace baldzarika { namespace ucv  {
 			m_response_layers.push_back(
 				response_layer(
 					*this,
-					point2ui(2*(width/2)+width/4, 2*height),
+					math::point2ui(2*(width/2)+width/4, 2*height),
 					gil::subimage_view(gil::view(m_response_img), 2*(width/2)+width/4, 2*height, width/4, height/4),
 					gil::subimage_view(gil::view(m_laplacian_img), 2*(width/2)+width/4, 2*height, width/4, height/4),
 					m_sample_step*4, 99
@@ -518,7 +518,7 @@ namespace baldzarika { namespace ucv  {
 			m_response_layers.push_back(
 				response_layer(
 					*this,
-					point2ui(2*(width/2)+2*(width/4), 2*height),
+					math::point2ui(2*(width/2)+2*(width/4), 2*height),
 					gil::subimage_view(gil::view(m_response_img), 2*(width/2)+2*(width/4), 2*height, width/8, height/8),
 					gil::subimage_view(gil::view(m_laplacian_img), 2*(width/2)+2*(width/4), 2*height, width/8, height/8),
 					m_sample_step*8, 147
@@ -527,7 +527,7 @@ namespace baldzarika { namespace ucv  {
 			m_response_layers.push_back(
 				response_layer(
 					*this,
-					point2ui(2*(width/2)+2*(width/4)+width/8, 2*height),
+					math::point2ui(2*(width/2)+2*(width/4)+width/8, 2*height),
 					gil::subimage_view(gil::view(m_response_img), 2*(width/2)+2*(width/4)+width/8, 2*height, width/8, height/8),
 					gil::subimage_view(gil::view(m_laplacian_img), 2*(width/2)+2*(width/4)+width/8, 2*height, width/8, height/8),
 					m_sample_step*8, 195
@@ -540,7 +540,7 @@ namespace baldzarika { namespace ucv  {
 			m_response_layers.push_back(
 				response_layer(
 					*this,
-					point2ui(2*(width/2)+2*(width/4)+width/8+2*(width/8), 2*height),
+					math::point2ui(2*(width/2)+2*(width/4)+width/8+2*(width/8), 2*height),
 					gil::subimage_view(gil::view(m_response_img), 2*(width/2)+2*(width/4)+width/8+2*(width/8), 2*height, width/16, height/16),
 					gil::subimage_view(gil::view(m_laplacian_img), 2*(width/2)+2*(width/4)+width/8+2*(width/8), 2*height, width/16, height/16),
 					m_sample_step*16, 291
@@ -549,7 +549,7 @@ namespace baldzarika { namespace ucv  {
 			m_response_layers.push_back(
 				response_layer(
 					*this,
-					point2ui(2*(width/2)+2*(width/4)+width/8+2*(width/8)+width/16, 2*height),
+					math::point2ui(2*(width/2)+2*(width/4)+width/8+2*(width/8)+width/16, 2*height),
 					gil::subimage_view(gil::view(m_response_img), 2*(width/2)+2*(width/4)+width/8+2*(width/8)+width/16, 2*height, width/16, height/16),
 					gil::subimage_view(gil::view(m_laplacian_img), 2*(width/2)+2*(width/4)+width/8+2*(width/8)+width/16, 2*height, width/16, height/16),
 					m_sample_step*16, 387
@@ -559,7 +559,7 @@ namespace baldzarika { namespace ucv  {
 		return true;
 	}
 
-	size2ui const& surf::size() const
+	math::size2ui const& surf::size() const
 	{
 		return m_frame_size;
 	}
@@ -586,7 +586,7 @@ namespace baldzarika { namespace ucv  {
 		full_range_detect.push_back(
 			std::make_pair(
 				std::make_pair(
-					point2i(0,0),
+					math::point2i(0,0),
 					size()
 				),
 				boost::bind<void>(&append_feature_point, _1, _2, _3, boost::ref(fps) )
@@ -602,7 +602,7 @@ namespace baldzarika { namespace ucv  {
 		full_range_detect.push_back(
 			std::make_pair(
 				std::make_pair(
-					point2i(0,0),
+					math::point2i(0,0),
 					size()
 				),
 				boost::bind<void>(&append_feature_point2<fps_by_pos_tree_t>, _1, _2, _3, boost::ref(fps) )
@@ -618,7 +618,7 @@ namespace baldzarika { namespace ucv  {
 		full_range_detect.push_back(
 			std::make_pair(
 				std::make_pair(
-					point2i(0,0),
+					math::point2i(0,0),
 					size()
 				),
 				boost::bind<void>(&append_feature_point2<fps_by_desc_tree_t>, _1, _2, _3, boost::ref(fps) )
@@ -634,7 +634,7 @@ namespace baldzarika { namespace ucv  {
 		find_ranged_detect.push_back(
 			std::make_pair(
 				std::make_pair(
-					point2i(0,0),
+					math::point2i(0,0),
 					size()
 				),
 				boost::bind<void>(&append_feature_point2, _1, _2, boost::ref(fps))
@@ -645,13 +645,13 @@ namespace baldzarika { namespace ucv  {
 
 		for(std::size_t gpid=0;gpid<gp.size();++gpid)
 		{
-			boost::int32_t x=round<boost::int32_t>(gp[gpid].x);
-			boost::int32_t y=round<boost::int32_t>(gp[gpid].y);
+			boost::int32_t x=round<boost::int32_t>(gp[gpid].x());
+			boost::int32_t y=round<boost::int32_t>(gp[gpid].y());
 			find_ranged_detect.push_back(
 				std::make_pair(
 					std::make_pair(
-						point2i(x-ws, y-ws),
-						size2ui(2*ws, 2*ws)
+						math::point2i(x-ws, y-ws),
+						math::size2ui(2*ws, 2*ws)
 					),
 					boost::bind<void>(&append_feature_point2, _1, _2, boost::ref(fps))
 				)
@@ -663,18 +663,18 @@ namespace baldzarika { namespace ucv  {
 		std::list<ranged_detect_params_t>::iterator end_r=find_ranged_detect.end();
 		while(begin_r!=end_r)
 		{
-			boost::int32_t min_x1=begin_r->first.first.x;
-			boost::int32_t max_x1=begin_r->first.first.x+begin_r->first.second.width();
+			boost::int32_t min_x1=begin_r->first.first.x();
+			boost::int32_t max_x1=begin_r->first.first.x()+begin_r->first.second.width();
 
-			boost::int32_t min_y1=begin_r->first.first.y;
-			boost::int32_t max_y1=begin_r->first.first.y+begin_r->first.second.height();
+			boost::int32_t min_y1=begin_r->first.first.y();
+			boost::int32_t max_y1=begin_r->first.first.y()+begin_r->first.second.height();
 			
 			std::list<ranged_detect_params_t>::iterator cmp_r=begin_r; ++cmp_r;
 			bool restarted=false;
 			while(cmp_r!=end_r && !restarted)
 			{
-				boost::int32_t min_x2=cmp_r->first.first.x; boost::int32_t max_x2=cmp_r->first.first.x+cmp_r->first.second.width();
-				boost::int32_t min_y2=cmp_r->first.first.y; boost::int32_t max_y2=cmp_r->first.first.y+cmp_r->first.second.height();
+				boost::int32_t min_x2=cmp_r->first.first.x(); boost::int32_t max_x2=cmp_r->first.first.x()+cmp_r->first.second.width();
+				boost::int32_t min_y2=cmp_r->first.first.y(); boost::int32_t max_y2=cmp_r->first.first.y()+cmp_r->first.second.height();
 
 				if(intersects(min_x1,max_x1,min_y1,max_y1,min_x2,max_x2,min_y2,max_y2))
 				{
@@ -692,8 +692,8 @@ namespace baldzarika { namespace ucv  {
 									find_ranged_detect.end(),
 									std::make_pair(
 										std::make_pair(
-											point2i(xvals[x], yvals[y]),
-											size2ui(xvals[x+1]-xvals[x],yvals[y+1]-yvals[y])
+											math::point2i(xvals[x], yvals[y]),
+											math::size2ui(xvals[x+1]-xvals[x],yvals[y+1]-yvals[y])
 										),
 										std::vector<point_detected_t>()
 									)
@@ -770,9 +770,9 @@ namespace baldzarika { namespace ucv  {
 		static dec_t const r_3i2_sq=2.25f;
 
 		
-		point2ui pt(
-			static_cast<boost::uint32_t>(std::floor(fp.x+detail::constant::half<feature_point_t::value_type>())),
-			static_cast<boost::uint32_t>(std::floor(fp.y+detail::constant::half<feature_point_t::value_type>()))
+		math::point2ui pt(
+			static_cast<boost::uint32_t>(std::floor(fp.x()+detail::constant::half<feature_point_t::value_type>())),
+			static_cast<boost::uint32_t>(std::floor(fp.y()+detail::constant::half<feature_point_t::value_type>()))
 		);
 		boost::uint32_t s=static_cast<boost::uint32_t>(std::floor(fp.m_scale+detail::constant::half<dec_t>()));
 
@@ -783,16 +783,16 @@ namespace baldzarika { namespace ucv  {
 			dec_t gauss=dec_t(gauss_25[std::abs(orientation_indices::get().m_values[k][0])][std::abs(orientation_indices::get().m_values[k][1])]);
 				
 			res_x[k]=gauss*haar_x<dec_t>(
-				point2i(
-					pt.x+orientation_indices::get().m_values[k][0]*s,
-					pt.y+orientation_indices::get().m_values[k][1]*s
+				math::point2i(
+					pt.x()+orientation_indices::get().m_values[k][0]*s,
+					pt.y()+orientation_indices::get().m_values[k][1]*s
 				),
 				4*s
 			);
 			res_y[k]=gauss*haar_y<dec_t>(
-				point2i(
-					pt.x+orientation_indices::get().m_values[k][0]*s,
-					pt.y+orientation_indices::get().m_values[k][1]*s
+				math::point2i(
+					pt.x()+orientation_indices::get().m_values[k][0]*s,
+					pt.y()+orientation_indices::get().m_values[k][1]*s
 				),
 				4*s
 			);
@@ -846,9 +846,9 @@ namespace baldzarika { namespace ucv  {
 		static dec_t const c_3i2=1.5f;
 		static dec_t const c_3i2_sq=2.25f;
 		
-		point2ui pt(
-			static_cast<boost::uint32_t>(std::floor(fp.x+detail::constant::half<feature_point_t::value_type>())),
-			static_cast<boost::uint32_t>(std::floor(fp.y+detail::constant::half<feature_point_t::value_type>()))
+		math::point2ui pt(
+			static_cast<boost::uint32_t>(std::floor(fp.x()+detail::constant::half<feature_point_t::value_type>())),
+			static_cast<boost::uint32_t>(std::floor(fp.y()+detail::constant::half<feature_point_t::value_type>()))
 		);
 
 		boost::uint32_t ui_scale=static_cast<boost::uint32_t>(std::floor(fp.m_scale+detail::constant::half<dec_t>()));
@@ -890,12 +890,12 @@ namespace baldzarika { namespace ucv  {
 				boost::int32_t jx=j+5;
 					
 				boost::int32_t xs=static_cast<boost::int32_t>(
-					std::floor(fp.x+feature_point_t::value_type(-jx)*ssi+feature_point_t::value_type(ix)*sco+
+					std::floor(fp.x()+feature_point_t::value_type(-jx)*ssi+feature_point_t::value_type(ix)*sco+
 						detail::constant::half<feature_point_t::value_type>()
 					)
 				);
 				boost::int32_t ys=static_cast<boost::int32_t>(
-					std::floor(fp.y+feature_point_t::value_type(jx)*sco+feature_point_t::value_type(ix)*ssi+
+					std::floor(fp.y()+feature_point_t::value_type(jx)*sco+feature_point_t::value_type(ix)*ssi+
 						detail::constant::half<feature_point_t::value_type>()
 					)
 				);
@@ -905,12 +905,12 @@ namespace baldzarika { namespace ucv  {
 					for(boost::int32_t l=j;l<j+9;++l) 
 					{
 						boost::int32_t sample_x=static_cast<boost::int32_t>(
-							std::floor(fp.x+feature_point_t::value_type(-l)*ssi+feature_point_t::value_type(k)*sco+
+							std::floor(fp.x()+feature_point_t::value_type(-l)*ssi+feature_point_t::value_type(k)*sco+
 								detail::constant::half<feature_point_t::value_type>()
 							)
 						);
 						boost::int32_t sample_y=static_cast<boost::int32_t>(
-							std::floor(fp.y+feature_point_t::value_type(l)*sco+feature_point_t::value_type(k)*ssi+
+							std::floor(fp.y()+feature_point_t::value_type(l)*sco+feature_point_t::value_type(k)*ssi+
 								detail::constant::half<feature_point_t::value_type>()
 							)
 						);
@@ -923,12 +923,12 @@ namespace baldzarika { namespace ucv  {
 						//dec_t gauss_s1=gauss_25_lut<dec_t::IS,dec_t::FS, 16, 2>::get()(dec_t(xs-sample_x)*inv_scale,dec_t(ys-sample_y)*inv_scale);
 
 						dec_t rx=haar_x<dec_t>(
-							point2i(sample_x, sample_y),
+							math::point2i(sample_x, sample_y),
 							2*ui_scale
 						);
 							
 						dec_t ry=haar_y<dec_t>(
-							point2i(sample_x, sample_y),
+							math::point2i(sample_x, sample_y),
 							2*ui_scale
 						);
 
@@ -979,17 +979,17 @@ namespace baldzarika { namespace ucv  {
 	}
 
 	template < typename T >
-	T surf::haar_x(point2i const &p, boost::uint32_t s)
+	T surf::haar_x(math::point2i const &p, boost::uint32_t s)
 	{
-		return	box_integral<const_integral_view_t, T>(m_integral_view, point2i(p.x,p.y-s/2), size2ui(s/2, s))-
-				box_integral<const_integral_view_t, T>(m_integral_view, point2i(p.x-s/2,p.y-s/2), size2ui(s/2, s));
+		return	box_integral<const_integral_view_t, T>(m_integral_view, math::point2i(p.x(),p.y()-s/2), math::size2ui(s/2, s))-
+				box_integral<const_integral_view_t, T>(m_integral_view, math::point2i(p.x()-s/2,p.y()-s/2), math::size2ui(s/2, s));
 	}
 	
 	template < typename T >
-	T surf::haar_y(point2i const &p, boost::uint32_t s)
+	T surf::haar_y(math::point2i const &p, boost::uint32_t s)
 	{
-		return	box_integral<const_integral_view_t, T>(m_integral_view, point2i(p.x-s/2,p.y), size2ui(s, s/2))-
-				box_integral<const_integral_view_t, T>(m_integral_view, point2i(p.x-s/2,p.y-s/2), size2ui(s, s/2));
+		return	box_integral<const_integral_view_t, T>(m_integral_view, math::point2i(p.x()-s/2,p.y()), math::size2ui(s, s/2))-
+				box_integral<const_integral_view_t, T>(m_integral_view, math::point2i(p.x()-s/2,p.y()-s/2), math::size2ui(s, s/2));
 	}
 
 	template < boost::uint32_t I, boost::uint32_t F >

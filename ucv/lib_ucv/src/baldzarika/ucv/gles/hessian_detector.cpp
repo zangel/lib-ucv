@@ -1403,7 +1403,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 				response_layer const &top_layer=m_response_layers[filter_map[octave][i+2]];
 				detection_layer const &top_det_layer=m_detection_layers[2*octave+i];
 
-				point2f tl_offset(
+				math::point2f tl_offset(
 					float(top_layer.get_offset().x)/float(m_response_texture.get_size().width()),
 					float(top_layer.get_offset().y)/float(m_response_texture.get_size().height())
 				);
@@ -1414,7 +1414,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 				glUniform2f(u_top_resp_off.get_location(), tl_offset.x, tl_offset.y);
 				glUniform2f(u_top_resp_sz.get_location(), tl_size.width(), tl_size.height());
 
-				point2f ml_offset(
+				math::point2f ml_offset(
 					float(middle_layer.get_offset().x)/float(m_response_texture.get_size().width()),
 					float(middle_layer.get_offset().y)/float(m_response_texture.get_size().height())
 				);
@@ -1425,7 +1425,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 				glUniform2f(u_mid_resp_off.get_location(), ml_offset.x, ml_offset.y);
 				glUniform2f(u_mid_resp_sz.get_location(), ml_size.width(), ml_size.height());
 
-				point2f bl_offset(
+				math::point2f bl_offset(
 					float(bottom_layer.get_offset().x)/float(m_response_texture.get_size().width()),
 					float(bottom_layer.get_offset().y)/float(middle_layer.get_size().height())
 				);
@@ -1511,7 +1511,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 							float fpt_x=((float(p_row[0]+((p_row[2]&0x0f)<<8))/float(0x0fff)-0.5f)+x)*float(top_layer.m_sample_step);
 							float fpt_y=((float(p_row[1]+((p_row[2]&0xf0)<<4))/float(0x0fff)-0.5f)+y)*float(top_layer.m_sample_step);
 							float fpt_scale=0.1333f*(middle_layer.m_filter_size+(float(p_row[3])/255.0f-0.5f)*filter_step);
-							fps.push_back(feature_point(point2f(fpt_x,fpt_y),fpt_scale));
+							fps.push_back(feature_point(math::point2f(fpt_x,fpt_y),fpt_scale));
 						}
 						p_row+=4;
 					}
