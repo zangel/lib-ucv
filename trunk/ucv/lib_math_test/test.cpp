@@ -113,18 +113,10 @@ BOOST_AUTO_TEST_CASE( test_vector )
 
 BOOST_AUTO_TEST_CASE( test_point2 )
 {
-
 	namespace bmath=baldzarika::math;
-
 	typedef bmath::point2<float> point2f;
-
-	point2f f(0.0f,1.0f);
-
-	f.x()=10.0f;
-
-	bmath::vector<float,3> vec3=f;
-
-	
+	typedef bmath::vector<float,3> vector3f;
+	typedef bmath::matrix<float,3,3> matrix33f;
 }
 
 

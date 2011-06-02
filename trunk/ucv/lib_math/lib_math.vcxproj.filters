@@ -54,6 +54,24 @@
     <ClInclude Include="include\baldzarika\math\point2.h">
       <Filter>Header Files\baldzarika\math</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\math\size2.h">
+      <Filter>Header Files\baldzarika\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\math\box2.h">
+      <Filter>Header Files\baldzarika\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\math\jacobi.h">
+      <Filter>Header Files\baldzarika\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\math\solve.h">
+      <Filter>Header Files\baldzarika\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\math\svd.h">
+      <Filter>Header Files\baldzarika\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\math\utils.h">
+      <Filter>Header Files\baldzarika\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\math\config.cpp">

@@ -5,6 +5,8 @@
 
 namespace baldzarika { namespace math {
 
+	template < typename T, boost::uint32_t D > class vector;
+
 	template < typename T, boost::uint32_t R, boost::uint32_t C >
 	class matrix
 	{
@@ -53,6 +55,28 @@ namespace baldzarika { namespace math {
 			return m._1d[n];
 		}
 
+		inline vector<T,C> get_row(boost::int32_t r) const
+		{
+			return matrix_ops<T,R,C>::get_row(*this,r);
+		}
+
+		inline vector<T,R> get_col(boost::int32_t c) const
+		{
+			return matrix_ops<T,R,C>::get_col(*this,r);
+		}
+
+		template < typename RVT >
+		inline matrix& set_row(boost::int32_t r, vector<RVT,C> const &row_vec)
+		{
+			return matrix_ops<T,R,C>::set_row(*this,r,row_vec);
+		}
+
+		template < typename CVT >
+		inline matrix& set_col(boost::int32_t c, vector<CVT,R> const &col_vec)
+		{
+			return matrix_ops<T,R,C>::set_col(*this,c,col_vec);
+		}
+
 		template < typename RT >
 		inline matrix& operator=(matrix<RT,R,C> const &rhs)
 		{
@@ -89,10 +113,10 @@ namespace baldzarika { namespace math {
 			return matrix_ops<T, R, C>::prod_assign(*this, rhs);
 		}
 
-		template < typename RT >
-		inline matrix operator *(matrix<RT,R,C> const &rhs) const
+		template < typename RT, boost::uint32_t RR, boost::uint32_t RC >
+		inline typename matrix_ops<T,R,C>::prod_result<RT,RR,RC>::type operator *(matrix<RT,RR,RC> const &rhs) const
 		{
-			return matrix(*this)*=rhs;
+			return matrix_ops<T,R,C>::prod(*this,rhs);
 		}
 
 		template < typename RST >
@@ -105,6 +129,12 @@ namespace baldzarika { namespace math {
 		inline matrix operator *(RST const &v) const
 		{
 			return matrix(*this)*=v;
+		}
+
+		template < typename VT >
+		inline vector<VT,R> operator *(vector<VT,C> const &vec) const
+		{
+			return matrix_ops<T,R,C>::vector_multiply(*this, vec);
 		}
 
 		inline matrix& tanspose()
@@ -134,6 +164,8 @@ namespace baldzarika { namespace math {
 			T	_1d[RXC];
 		} m;
 	};
+
+	typedef matrix<float,3,3> matrix33f;
 
 
 } //namespace math

@@ -45,12 +45,6 @@
     <ClInclude Include="include\baldzarika\ucv\integral.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\point2.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\size2.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\gil_channel_traits.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
@@ -84,12 +78,6 @@
     <ClInclude Include="include\baldzarika\ucv\good_features_detector.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\matrix.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\vector.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\norm.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
@@ -111,25 +99,10 @@
     <ClInclude Include="include\baldzarika\ucv\approximate_polygon.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\box2.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\svd.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\solve.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\perspective_transform.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\warp.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\jacobi.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\utils.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\threshold.h">

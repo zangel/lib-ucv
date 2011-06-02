@@ -3,8 +3,6 @@
 
 #include <baldzarika/ucv/fixed_point.h>
 #include <baldzarika/ucv/feature_point.h>
-#include <baldzarika/ucv/point2.h>
-#include <baldzarika/ucv/size2.h>
 #include <baldzarika/ucv/gil_channel_traits.h>
 
 namespace baldzarika { namespace ucv {
@@ -40,7 +38,7 @@ namespace baldzarika { namespace ucv {
 
 
 		typedef boost::function<void (feature_point_t::point2_t const&, feature_point_t::desc_value_type const&, bool)> point_detected_t;
-		typedef std::pair<point2i,size2ui> range_t;
+		typedef std::pair<math::point2i,math::size2ui> range_t;
 		typedef std::pair<range_t, point_detected_t> ranged_detect_params_t;
 
 		
@@ -50,7 +48,7 @@ namespace baldzarika { namespace ucv {
 			friend class surf;
 		public:
 			response_layer(response_layer const &that);
-			response_layer(surf &sr, point2ui const &ro, response_view_t rv, laplacian_view_t lv, boost::uint32_t ss, boost::uint32_t fs);
+			response_layer(surf &sr, math::point2ui const &ro, response_view_t rv, laplacian_view_t lv, boost::uint32_t ss, boost::uint32_t fs);
 			~response_layer();
 
 			operator bool() const;
@@ -61,8 +59,8 @@ namespace baldzarika { namespace ucv {
 			response_t			get_response(boost::int32_t x, boost::int32_t y, response_layer const &src) const;
 			bool				get_laplacian(boost::int32_t x, boost::int32_t y, response_layer const &src) const;
 			
-			point2ui			get_offset() const;
-			size2ui				get_size() const;
+			math::point2ui		get_offset() const;
+			math::size2ui		get_size() const;
 			response_view_t		get_response_view() const;
 			boost::uint32_t		get_sample_step() const;
 			boost::uint32_t		get_filter_size() const;
@@ -71,7 +69,7 @@ namespace baldzarika { namespace ucv {
 
 		protected:
 			surf				&m_surf;
-			point2ui			m_response_offset;
+			math::point2ui		m_response_offset;
 			response_view_t		m_response_view;
 			laplacian_view_t	m_laplacian_view;
 			
@@ -86,7 +84,7 @@ namespace baldzarika { namespace ucv {
 		static boost::uint32_t const 	FILTER_MAP[MAX_OCTAVES][MAX_INTERVALS];
 		
 
-		surf(size2ui const &fs, boost::uint32_t o, boost::uint32_t i, boost::uint32_t s, float t, boost::uint32_t mf=64);
+		surf(math::size2ui const &fs, boost::uint32_t o, boost::uint32_t i, boost::uint32_t s, float t, boost::uint32_t mf=64);
 		~surf();
 
 		boost::uint32_t				octaves() const;
@@ -96,8 +94,8 @@ namespace baldzarika { namespace ucv {
 		float						treshold() const;
 		void						set_treshold(float t);
 
-		size2ui	const&				size() const;
-		bool						resize(size2ui const &fs);
+		math::size2ui	const&		size() const;
+		bool						resize(math::size2ui const &fs);
 
 		bool						set_integral_view(const_integral_view_t iv);
 		void						build_response_layers();
@@ -121,8 +119,8 @@ namespace baldzarika { namespace ucv {
 		
 
 
-		template < typename T > T			haar_x(point2i const &p, boost::uint32_t s);
-		template < typename T > T			haar_y(point2i const &p, boost::uint32_t s);
+		template < typename T > T			haar_x(math::point2i const &p, boost::uint32_t s);
+		template < typename T > T			haar_y(math::point2i const &p, boost::uint32_t s);
 
 		template < boost::uint32_t I, boost::uint32_t F >
 		fixed_point<I,F>					get_angle(fixed_point<I,F> const &x, fixed_point<I,F> const &y);
@@ -136,7 +134,7 @@ namespace baldzarika { namespace ucv {
 		static fixed_point<I,F>				gaussian(fixed_point<I,F> const &x, fixed_point<I,F> const &y, fixed_point<I,F> const &sig);
 
 	private:
-		size2ui					m_frame_size;
+		math::size2ui			m_frame_size;
 		const_integral_view_t	m_integral_view;
 		boost::uint32_t			m_octaves;
 		boost::uint32_t			m_intervals;

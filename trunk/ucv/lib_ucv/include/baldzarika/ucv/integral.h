@@ -1,14 +1,12 @@
 #ifndef BALDZARIKA_UCV_INTEGRAL_H
 #define BALDZARIKA_UCV_INTEGRAL_H
 
-#include <baldzarika/ucv/point2.h>
-#include <baldzarika/ucv/size2.h>
 #include <baldzarika/ucv/gil_channel_traits.h>
 
 namespace baldzarika { namespace ucv {
 		
 	template <typename IVT, typename RT>
-	RT box_integral(IVT const &iv, point2i const &p, size2ui const &s)
+	RT box_integral(IVT const &iv, math::point2i const &p, math::size2ui const &s)
 	{
 		typedef typename IVT::value_type iv_pixel_t;
 		typedef typename gil::channel_type<iv_pixel_t>::type iv_channel_t;
@@ -16,10 +14,10 @@ namespace baldzarika { namespace ucv {
 		static RT const _zero_rt=0;
 		static iv_channel_t const _zero_iv=0;
 
-		boost::int32_t x1=std::min<boost::int32_t>(p.x,iv.width())-1;
-		boost::int32_t y1=std::min<boost::int32_t>(p.y,iv.height())-1;
-		boost::int32_t x2=std::min<boost::int32_t>(p.x+s.width(),iv.width())-1;
-		boost::int32_t y2=std::min<boost::int32_t>(p.y+s.height(),iv.height())-1;
+		boost::int32_t x1=std::min<boost::int32_t>(p.x(),iv.width())-1;
+		boost::int32_t y1=std::min<boost::int32_t>(p.y(),iv.height())-1;
+		boost::int32_t x2=std::min<boost::int32_t>(p.x()+s.width(),iv.width())-1;
+		boost::int32_t y2=std::min<boost::int32_t>(p.y()+s.height(),iv.height())-1;
 
 		iv_channel_t A=((y1>=0 && x1>=0)?iv(x1,y1).operator iv_channel_t():_zero_iv);
 		iv_channel_t B=((y1>=0 && x2>=0)?iv(x2,y1).operator iv_channel_t():_zero_iv);

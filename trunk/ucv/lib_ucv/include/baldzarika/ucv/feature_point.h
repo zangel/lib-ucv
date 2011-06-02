@@ -1,19 +1,16 @@
 #ifndef BALDZARIKA_UCV_FEATURE_POINT_H
 #define BALDZARIKA_UCV_FEATURE_POINT_H
 
-#include <baldzarika/ucv/point2.h>
-
-
 namespace baldzarika { namespace ucv {
 
 	template < typename T,  typename DT, boost::uint32_t BS >
 	class feature_point
-		: public point2<T>
+		: public math::point2<T>
 	{
 	public:
 		static boost::uint32_t const DESCRIPTOR_SIZE=4*BS*BS;
 		typedef T value_type;
-		typedef point2<value_type> point2_t;
+		typedef math::point2<value_type> point2_t;
 		typedef DT desc_value_type;
 
 		struct position_accessor

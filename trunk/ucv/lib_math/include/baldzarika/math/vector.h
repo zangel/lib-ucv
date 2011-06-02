@@ -3,12 +3,16 @@
 
 namespace baldzarika { namespace math {
 
+	template < typename T, boost::uint32_t R, boost::uint32_t C> class matrix;
+	template < typename T, boost::uint32_t R, boost::uint32_t C> struct matrix_ops;
+
 	template < typename T, boost::uint32_t D >
 	class vector
 	{
 	public:
 		template < typename T2, boost::uint32_t D2 > friend class vector;
 		template < typename T2, boost::uint32_t D2 > friend struct vector_ops;
+		template < typename T2, boost::uint32_t R2, boost::uint32_t C2 > friend struct matrix_ops;
 
 		static inline vector const& zero() { return vector_ops<T,D>::zero(); }
 
@@ -121,6 +125,16 @@ namespace baldzarika { namespace math {
 		inline vector operator *(RT const &rhs) const
 		{
 			return vector(*this)*=rhs;
+		}
+
+
+		template < typename MT >
+		inline vector& operator*=(matrix<MT,D,D> const &mat)
+		{
+			return vector_ops<T,D>::assign(
+				*this,
+				matrix_ops<MT,D,D>::vector_multiply(mat, *this)
+			);
 		}
 
 		template < typename RT >
