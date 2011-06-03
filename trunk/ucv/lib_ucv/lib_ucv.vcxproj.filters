@@ -39,9 +39,6 @@
     <ClInclude Include="include\baldzarika\ucv\config.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\fixed_point.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\integral.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>

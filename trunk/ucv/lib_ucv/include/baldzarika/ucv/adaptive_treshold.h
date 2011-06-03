@@ -1,8 +1,6 @@
 #ifndef BALDZARIKA_UCV_ADAPTIVE_TRESHOLD_H
 #define BALDZARIKA_UCV_ADAPTIVE_TRESHOLD_H
 
-#include <baldzarika/ucv/size2.h>
-
 namespace baldzarika { namespace ucv {
 
 	template < typename PT, boost::uint32_t MS , bool IBT=false >
@@ -25,7 +23,7 @@ namespace baldzarika { namespace ucv {
 		{
 		}
 
-		adaptive_treshold(size2ui const &fs, gray_t const &max_value, gray_t const &delta=gray_t(0.2) )
+		adaptive_treshold(math::size2ui const &fs, gray_t const &max_value, gray_t const &delta=gray_t(0.2) )
 			: m_frame_size(0,0)
 			, m_max_value(max_value)
 			, m_delta(delta)
@@ -37,12 +35,12 @@ namespace baldzarika { namespace ucv {
 		{
 		}
 
-		size2ui const& get_frame_size() const
+		math::size2ui const& get_frame_size() const
 		{
 			return m_frame_size;
 		}
 
-		void set_frame_size(size2ui const &fs)
+		void set_frame_size(math::size2ui const &fs)
 		{
 			if(m_frame_size==fs)
 				return;
@@ -92,7 +90,7 @@ namespace baldzarika { namespace ucv {
 		}
 
 	private:
-		size2ui				m_frame_size;
+		math::size2ui				m_frame_size;
 		gray_t				m_max_value;
 		gray_t				m_delta;
 		gray_image_t		m_median_img;

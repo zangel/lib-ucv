@@ -1,8 +1,6 @@
 #ifndef BALDZARIKA_UCV_SOBEL_H
 #define BALDZARIKA_UCV_SOBEL_H
 
-#include <baldzarika/ucv/size2.h>
-
 namespace baldzarika { namespace ucv {
 
 	namespace detail {
@@ -74,18 +72,18 @@ namespace baldzarika { namespace ucv {
 		{
 		}
 
-		sobel(size2ui const &fs)
+		sobel(math::size2ui const &fs)
 			: m_frame_size(0,0)
 		{
 			set_frame_size(fs);
 		}
 
-		size2ui const &get_frame_size() const
+		math::size2ui const &get_frame_size() const
 		{
 			return m_frame_size;
 		}
 
-		void set_frame_size(size2ui const &fs)
+		void set_frame_size(math::size2ui const &fs)
 		{
 			if(m_frame_size==fs)
 				return;
@@ -139,7 +137,7 @@ namespace baldzarika { namespace ucv {
 		}
 	
 	private:
-		size2ui			m_frame_size;
+		math::size2ui			m_frame_size;
 		gray_image_t	m_ring_buffer_img;
 	};
 

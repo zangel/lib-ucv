@@ -15,7 +15,7 @@ namespace baldzarika { namespace math {
 
 		boost::int32_t i, j, k, m, it;
 
-		vector9f maxSR, maxSC;
+		vector<T,N> maxSR, maxSC;
 		boost::int32_t indR[N], indC[N];
 
 		matrix<T, N, N> S(S0);

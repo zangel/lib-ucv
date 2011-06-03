@@ -4,9 +4,9 @@
 namespace baldzarika { namespace ucv {
 
 	template < typename T >
-	void camera_pose(T const &fx, T const &fy, point2<T> const &cc, matrix<T, 3, 3> const &hm, matrix<T, 4, 4> &pose)
+	void camera_pose(T const &fx, T const &fy, math::point2<T> const &cc, math::matrix<T, 3, 3> const &hm, math::matrix<T, 4, 4> &pose)
 	{
-		matrix<T, 3, 3> inv_intrinsics=matrix<T, 3, 3>::identity();
+		math::matrix<T, 3, 3> inv_intrinsics=math::matrix<T, 3, 3>::identity();
 		inv_intrinsics(0,0)=detail::constant::one<T>()/fx;
 		inv_intrinsics(0,2)=-cc.x/fx;
 

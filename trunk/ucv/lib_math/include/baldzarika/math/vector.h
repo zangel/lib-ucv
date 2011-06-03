@@ -202,6 +202,10 @@ namespace baldzarika { namespace math {
 		T m_data[D];
 	};
 
+	typedef vector<float,2> vector2f;
+	typedef vector<float,3> vector3f;
+
+
 } //namespace math
 } //namespace baldzarika
 

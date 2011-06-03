@@ -496,7 +496,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 	{
 	}
 
-	hessian_detector::response_layer::response_layer(point2ui const &ro, size2ui const &rs, boost::uint32_t ss, boost::uint32_t fs)
+	hessian_detector::response_layer::response_layer(point2ui const &ro, math::size2ui const &rs, boost::uint32_t ss, boost::uint32_t fs)
 		: m_response_offset(ro)
 		, m_response_size(rs)
 		, m_sample_step(ss)
@@ -532,7 +532,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 		return m_response_offset;
 	}
 
-	size2ui const& hessian_detector::response_layer::get_size() const
+	math::size2ui const& hessian_detector::response_layer::get_size() const
 	{
 		return m_response_size;
 	}
@@ -549,7 +549,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 	{
 	}
 
-	hessian_detector::detection_layer::detection_layer(point2ui const &o, size2ui const &s)
+	hessian_detector::detection_layer::detection_layer(point2ui const &o, math::size2ui const &s)
 		: m_detection_offset(o)
 		, m_detection_size(s)
 	{
@@ -581,12 +581,12 @@ namespace baldzarika { namespace ucv { namespace gles {
 		return m_detection_offset;
 	}
 
-	size2ui const& hessian_detector::detection_layer::get_size() const
+	math::size2ui const& hessian_detector::detection_layer::get_size() const
 	{
 		return m_detection_size;
 	}
 
-	hessian_detector::hessian_detector(size2ui const &is, boost::uint32_t o, boost::uint32_t i, boost::uint32_t s, float t, boost::uint32_t mf)
+	hessian_detector::hessian_detector(math::size2ui const &is, boost::uint32_t o, boost::uint32_t i, boost::uint32_t s, float t, boost::uint32_t mf)
 		: m_integral_img_size(0,0)
 		, m_octaves(o)
 		, m_intervals(i)
@@ -781,7 +781,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 	}
 
 	
-	bool hessian_detector::resize(size2ui const &is)
+	bool hessian_detector::resize(math::size2ui const &is)
 	{
 		if(!m_integral_texture)
 			return false;
@@ -794,7 +794,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 		
 		m_integral_img_size=is;
 
-		size2ui integral_texture_size(
+		math::size2ui integral_texture_size(
 			static_cast<boost::uint32_t>(
 				std::pow(2.0f,
 					std::ceil(
@@ -838,12 +838,12 @@ namespace baldzarika { namespace ucv { namespace gles {
 		boost::uint32_t	height=m_integral_img_size.height()/m_sample_step;
 		
 
-		size2ui response_img_sz_1(
+		math::size2ui response_img_sz_1(
 			2*width+width/2,
 			2*height
 		);
 
-		size2ui response_img_sz_1_pow2(
+		math::size2ui response_img_sz_1_pow2(
 			static_cast<boost::uint32_t>(
 				std::pow(2.0f,
 					std::ceil(
@@ -862,12 +862,12 @@ namespace baldzarika { namespace ucv { namespace gles {
 			)
 		);
 
-		size2ui response_img_sz_2(
+		math::size2ui response_img_sz_2(
 			2*width,
 			2*height+height/2
 		);
 
-		size2ui response_img_sz_2_pow2(
+		math::size2ui response_img_sz_2_pow2(
 			static_cast<boost::uint32_t>(
 				std::pow(2.0f,
 					std::ceil(
@@ -901,34 +901,34 @@ namespace baldzarika { namespace ucv { namespace gles {
 
 			if(m_octaves>=1)
 			{
-				m_response_layers.push_back(response_layer(point2ui(0, 0), size2ui(width, height), m_sample_step, 9));
-				m_response_layers.push_back(response_layer(point2ui(width, 0), size2ui(width, height), m_sample_step, 15));
-				m_response_layers.push_back(response_layer(point2ui(0, height), size2ui(width, height), m_sample_step, 21));
-				m_response_layers.push_back(response_layer(point2ui(width, height), size2ui(width, height), m_sample_step, 27));
+				m_response_layers.push_back(response_layer(point2ui(0, 0), math::size2ui(width, height), m_sample_step, 9));
+				m_response_layers.push_back(response_layer(point2ui(width, 0), math::size2ui(width, height), m_sample_step, 15));
+				m_response_layers.push_back(response_layer(point2ui(0, height), math::size2ui(width, height), m_sample_step, 21));
+				m_response_layers.push_back(response_layer(point2ui(width, height), math::size2ui(width, height), m_sample_step, 27));
 			}
 
 			if(m_octaves>=2)
 			{
-				m_response_layers.push_back(response_layer(point2ui(2*width, 0), size2ui(width/2, height/2), m_sample_step*2, 39));
-				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)), size2ui(width/2, height/2), m_sample_step*2, 51));
+				m_response_layers.push_back(response_layer(point2ui(2*width, 0), math::size2ui(width/2, height/2), m_sample_step*2, 39));
+				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)), math::size2ui(width/2, height/2), m_sample_step*2, 51));
 			}
 
 			if(m_octaves>=3)
 			{
-				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)), size2ui(width/4, height/4), m_sample_step*4, 75));
-				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)+height/4), size2ui(width/4, height/4), m_sample_step*4, 99));
+				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)), math::size2ui(width/4, height/4), m_sample_step*4, 75));
+				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)+height/4), math::size2ui(width/4, height/4), m_sample_step*4, 99));
 			}
 
 			if(m_octaves>=4)
 			{
-				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)+2*(height/4)), size2ui(width/8, height/8), m_sample_step*8, 147));
-				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)+2*(height/4)+height/8), size2ui(width/8, height/8), m_sample_step*8, 195));
+				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)+2*(height/4)), math::size2ui(width/8, height/8), m_sample_step*8, 147));
+				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)+2*(height/4)+height/8), math::size2ui(width/8, height/8), m_sample_step*8, 195));
 			}
 
 			if(m_octaves>=5)
 			{
-				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)+2*(height/4)+2*(height/8)), size2ui(width/16, height/16), m_sample_step*16, 291));
-				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)+2*(height/4)+2*(height/8)+height/16), size2ui(width/16, height/16), m_sample_step*16, 387));
+				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)+2*(height/4)+2*(height/8)), math::size2ui(width/16, height/16), m_sample_step*16, 291));
+				m_response_layers.push_back(response_layer(point2ui(2*width, 2*(height/2)+2*(height/4)+2*(height/8)+height/16), math::size2ui(width/16, height/16), m_sample_step*16, 387));
 			}
 		}
 		else
@@ -946,34 +946,34 @@ namespace baldzarika { namespace ucv { namespace gles {
 
 			if(m_octaves>=1)
 			{
-				m_response_layers.push_back(response_layer(point2ui(0, 0), size2ui(width, height), m_sample_step, 9));
-				m_response_layers.push_back(response_layer(point2ui(width, 0), size2ui(width, height), m_sample_step, 15));
-				m_response_layers.push_back(response_layer(point2ui(0, height), size2ui(width, height), m_sample_step, 21));
-				m_response_layers.push_back(response_layer(point2ui(width, height), size2ui(width, height), m_sample_step, 27));
+				m_response_layers.push_back(response_layer(point2ui(0, 0), math::size2ui(width, height), m_sample_step, 9));
+				m_response_layers.push_back(response_layer(point2ui(width, 0), math::size2ui(width, height), m_sample_step, 15));
+				m_response_layers.push_back(response_layer(point2ui(0, height), math::size2ui(width, height), m_sample_step, 21));
+				m_response_layers.push_back(response_layer(point2ui(width, height), math::size2ui(width, height), m_sample_step, 27));
 			}
 
 			if(m_octaves>=2)
 			{
-				m_response_layers.push_back(response_layer(point2ui(0, 2*height), size2ui(width/2, height/2), m_sample_step*2, 39));
-				m_response_layers.push_back(response_layer(point2ui(width/2, 2*height), size2ui(width/2, height/2), m_sample_step*2, 51));
+				m_response_layers.push_back(response_layer(point2ui(0, 2*height), math::size2ui(width/2, height/2), m_sample_step*2, 39));
+				m_response_layers.push_back(response_layer(point2ui(width/2, 2*height), math::size2ui(width/2, height/2), m_sample_step*2, 51));
 			}
 
 			if(m_octaves>=3)
 			{
-				m_response_layers.push_back(response_layer(point2ui(2*(width/2), 2*height), size2ui(width/4, height/4), m_sample_step*4, 75));
-				m_response_layers.push_back(response_layer(point2ui(2*(width/2)+width/4, 2*height), size2ui(width/4, height/4), m_sample_step*4, 99));
+				m_response_layers.push_back(response_layer(point2ui(2*(width/2), 2*height), math::size2ui(width/4, height/4), m_sample_step*4, 75));
+				m_response_layers.push_back(response_layer(point2ui(2*(width/2)+width/4, 2*height), math::size2ui(width/4, height/4), m_sample_step*4, 99));
 			}
 
 			if(m_octaves>=4)
 			{
-				m_response_layers.push_back(response_layer(point2ui(2*(width/2)+2*(width/4), 2*height), size2ui(width/8, height/8), m_sample_step*8, 147));
-				m_response_layers.push_back(response_layer(point2ui(2*(width/2)+2*(width/4)+width/8, 2*height), size2ui(width/8, height/8), m_sample_step*8, 195));
+				m_response_layers.push_back(response_layer(point2ui(2*(width/2)+2*(width/4), 2*height), math::size2ui(width/8, height/8), m_sample_step*8, 147));
+				m_response_layers.push_back(response_layer(point2ui(2*(width/2)+2*(width/4)+width/8, 2*height), math::size2ui(width/8, height/8), m_sample_step*8, 195));
 			}
 
 			if(m_octaves>=5)
 			{
-				m_response_layers.push_back(response_layer(point2ui(2*(width/2)+2*(width/4)+width/8+2*(width/8), 2*height), size2ui(width/16, height/16), m_sample_step*16, 291));
-				m_response_layers.push_back(response_layer(point2ui(2*(width/2)+2*(width/4)+width/8+2*(width/8)+width/16, 2*height), size2ui(width/16, height/16), m_sample_step*16, 387));
+				m_response_layers.push_back(response_layer(point2ui(2*(width/2)+2*(width/4)+width/8+2*(width/8), 2*height), math::size2ui(width/16, height/16), m_sample_step*16, 291));
+				m_response_layers.push_back(response_layer(point2ui(2*(width/2)+2*(width/4)+width/8+2*(width/8)+width/16, 2*height), math::size2ui(width/16, height/16), m_sample_step*16, 387));
 			}
 		}
 		return true;
@@ -991,12 +991,12 @@ namespace baldzarika { namespace ucv { namespace gles {
 		boost::uint32_t	height=m_integral_img_size.height()/m_sample_step;
 
 
-		size2ui detection_sz_1(
+		math::size2ui detection_sz_1(
 			width+width/2,
 			2*height
 		);
 
-		size2ui detection_sz_1_pow2(
+		math::size2ui detection_sz_1_pow2(
 			static_cast<boost::uint32_t>(
 				std::pow(2.0f,
 					std::ceil(
@@ -1015,12 +1015,12 @@ namespace baldzarika { namespace ucv { namespace gles {
 			)
 		);
 
-		size2ui detection_sz_2(
+		math::size2ui detection_sz_2(
 			2*width,
 			height+height/2
 		);
 
-		size2ui detection_sz_2_pow2(
+		math::size2ui detection_sz_2_pow2(
 			static_cast<boost::uint32_t>(
 				std::pow(2.0f,
 					std::ceil(
@@ -1055,32 +1055,32 @@ namespace baldzarika { namespace ucv { namespace gles {
 
 			if(m_octaves>=1)
 			{
-				m_detection_layers.push_back(detection_layer(point2ui(0,0), size2ui(width, height)));
-				m_detection_layers.push_back(detection_layer(point2ui(0,height), size2ui(width, height)));
+				m_detection_layers.push_back(detection_layer(point2ui(0,0), math::size2ui(width, height)));
+				m_detection_layers.push_back(detection_layer(point2ui(0,height), math::size2ui(width, height)));
 			}
 
 			if(m_octaves>=2)
 			{
-				m_detection_layers.push_back(detection_layer(point2ui(width,0), size2ui(width/2, height/2)));
-				m_detection_layers.push_back(detection_layer(point2ui(width,height/2), size2ui(width/2, height/2)));
+				m_detection_layers.push_back(detection_layer(point2ui(width,0), math::size2ui(width/2, height/2)));
+				m_detection_layers.push_back(detection_layer(point2ui(width,height/2), math::size2ui(width/2, height/2)));
 			}
 
 			if(m_octaves>=3)
 			{
-				m_detection_layers.push_back(detection_layer(point2ui(width, 2*(height/2)), size2ui(width/4, height/4)));
-				m_detection_layers.push_back(detection_layer(point2ui(width, 2*(height/2)+height/4), size2ui(width/4, height/4)));
+				m_detection_layers.push_back(detection_layer(point2ui(width, 2*(height/2)), math::size2ui(width/4, height/4)));
+				m_detection_layers.push_back(detection_layer(point2ui(width, 2*(height/2)+height/4), math::size2ui(width/4, height/4)));
 			}
 
 			if(m_octaves>=4)
 			{
-				m_detection_layers.push_back(detection_layer(point2ui(width, 2*(height/2)+2*(height/4)), size2ui(width/8, height/8)));
-				m_detection_layers.push_back(detection_layer(point2ui(width, 2*(height/2)+2*(height/4)+height/8), size2ui(width/8, height/8)));
+				m_detection_layers.push_back(detection_layer(point2ui(width, 2*(height/2)+2*(height/4)), math::size2ui(width/8, height/8)));
+				m_detection_layers.push_back(detection_layer(point2ui(width, 2*(height/2)+2*(height/4)+height/8), math::size2ui(width/8, height/8)));
 			}
 
 			if(m_octaves>=4)
 			{
-				m_detection_layers.push_back(detection_layer(point2ui(width, 2*(height/2)+2*(height/4)+2*(height/8)), size2ui(width/16, height/16)));
-				m_detection_layers.push_back(detection_layer(point2ui(width, 2*(height/2)+2*(height/4)+2*(height/8)+height/16), size2ui(width/16, height/16)));
+				m_detection_layers.push_back(detection_layer(point2ui(width, 2*(height/2)+2*(height/4)+2*(height/8)), math::size2ui(width/16, height/16)));
+				m_detection_layers.push_back(detection_layer(point2ui(width, 2*(height/2)+2*(height/4)+2*(height/8)+height/16), math::size2ui(width/16, height/16)));
 			}
 		}
 		else
@@ -1099,32 +1099,32 @@ namespace baldzarika { namespace ucv { namespace gles {
 
 			if(m_octaves>=1)
 			{
-				m_detection_layers.push_back(detection_layer(point2ui(0,0), size2ui(width, height)));
-				m_detection_layers.push_back(detection_layer(point2ui(width,0), size2ui(width, height)));
+				m_detection_layers.push_back(detection_layer(point2ui(0,0), math::size2ui(width, height)));
+				m_detection_layers.push_back(detection_layer(point2ui(width,0), math::size2ui(width, height)));
 			}
 
 			if(m_octaves>=2)
 			{
-				m_detection_layers.push_back(detection_layer(point2ui(0,height), size2ui(width/2, height/2)));
-				m_detection_layers.push_back(detection_layer(point2ui(width/2,height), size2ui(width/2, height/2)));
+				m_detection_layers.push_back(detection_layer(point2ui(0,height), math::size2ui(width/2, height/2)));
+				m_detection_layers.push_back(detection_layer(point2ui(width/2,height), math::size2ui(width/2, height/2)));
 			}
 
 			if(m_octaves>=3)
 			{
-				m_detection_layers.push_back(detection_layer(point2ui(2*(width/2), height), size2ui(width/4, height/4)));
-				m_detection_layers.push_back(detection_layer(point2ui(2*(width/2)+width/4, height), size2ui(width/4, height/4)));
+				m_detection_layers.push_back(detection_layer(point2ui(2*(width/2), height), math::size2ui(width/4, height/4)));
+				m_detection_layers.push_back(detection_layer(point2ui(2*(width/2)+width/4, height), math::size2ui(width/4, height/4)));
 			}
 
 			if(m_octaves>=4)
 			{
-				m_detection_layers.push_back(detection_layer(point2ui(2*(width/2)+2*(width/4), height), size2ui(width/8, height/8)));
-				m_detection_layers.push_back(detection_layer(point2ui(2*(width/2)+2*(width/4)+width/8, height), size2ui(width/8, height/8)));
+				m_detection_layers.push_back(detection_layer(point2ui(2*(width/2)+2*(width/4), height), math::size2ui(width/8, height/8)));
+				m_detection_layers.push_back(detection_layer(point2ui(2*(width/2)+2*(width/4)+width/8, height), math::size2ui(width/8, height/8)));
 			}
 
 			if(m_octaves>=5)
 			{
-				m_detection_layers.push_back(detection_layer(point2ui(2*(width/2)+2*(width/4)+2*(width/8), height), size2ui(width/16, height/16)));
-				m_detection_layers.push_back(detection_layer(point2ui(2*(width/2)+2*(width/4)+2*(width/8)+width/16, height), size2ui(width/16, height/16)));
+				m_detection_layers.push_back(detection_layer(point2ui(2*(width/2)+2*(width/4)+2*(width/8), height), math::size2ui(width/16, height/16)));
+				m_detection_layers.push_back(detection_layer(point2ui(2*(width/2)+2*(width/4)+2*(width/8)+width/16, height), math::size2ui(width/16, height/16)));
 			}
 		}
 		return true;
@@ -1152,21 +1152,21 @@ namespace baldzarika { namespace ucv { namespace gles {
 		m_orientation_1_texture.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		m_orientation_1_texture.set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		m_orientation_1_texture.set_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		m_orientation_1_texture.resize(size2ui(128, max_features_pow2));
+		m_orientation_1_texture.resize(math::size2ui(128, max_features_pow2));
 
 		m_orientation_2_texture.bind();
 		m_orientation_2_texture.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		m_orientation_2_texture.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		m_orientation_2_texture.set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		m_orientation_2_texture.set_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		m_orientation_2_texture.resize(size2ui(1, max_features_pow2));
+		m_orientation_2_texture.resize(math::size2ui(1, max_features_pow2));
 
 		m_descript_texture.bind();
 		m_descript_texture.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		m_descript_texture.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		m_descript_texture.set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		m_descript_texture.set_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		m_descript_texture.resize(size2ui(16, max_features_pow2));
+		m_descript_texture.resize(math::size2ui(16, max_features_pow2));
 		ucv::gles::rgba8_texture_2d::bind(old_tex);
 		return true;
 	}

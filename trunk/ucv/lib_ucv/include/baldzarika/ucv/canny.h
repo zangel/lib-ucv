@@ -1,7 +1,6 @@
 #ifndef BALDZARIKA_UCV_CANNY_H
 #define BALDZARIKA_UCV_CANNY_H
 
-#include <baldzarika/ucv/size2.h>
 #include <baldzarika/ucv/sobel.h>
 #include <baldzarika/ucv/contour.h>
 
@@ -35,7 +34,7 @@ namespace baldzarika { namespace ucv {
 		{
 		}
 
-		canny(size2ui const &fs, gray_t const &low=gray_t(0.1), gray_t const &hi=gray_t(0.3))
+		canny(math::size2ui const &fs, gray_t const &low=gray_t(0.1), gray_t const &hi=gray_t(0.3))
 			: m_frame_size(0,0)
 			, m_low_treshold(low)
 			, m_high_treshold(hi)
@@ -48,12 +47,12 @@ namespace baldzarika { namespace ucv {
 		{
 		}
 
-		size2ui const& get_frame_size() const
+		math::size2ui const& get_frame_size() const
 		{
 			return m_frame_size;
 		}
 
-		void set_frame_size(size2ui const &fs)
+		void set_frame_size(math::size2ui const &fs)
 		{
 			if(m_frame_size==fs)
 				return;
@@ -352,8 +351,8 @@ namespace baldzarika { namespace ucv {
 				map_t const nbd=4;
 				map_t const bit_7=128;
 				
-				point2<CT> pt_origin=point2<CT>(map_x-1, map_y-1);
-				point2<CT> pt=pt_origin;
+				math::point2<CT> pt_origin=math::point2<CT>(map_x-1, map_y-1);
+				math::point2<CT> pt=pt_origin;
 
 				CT min_x=pt_origin.x;
 				CT max_x=pt_origin.x;
@@ -444,9 +443,9 @@ namespace baldzarika { namespace ucv {
 					}  
 				}
 
-				cont.m_bbox=box2<CT>(
-					point2<CT>(min_x,min_y),
-					point2<CT>(max_x,max_y)
+				cont.m_bbox=math::box2<CT>(
+					math::point2<CT>(min_x,min_y),
+					math::point2<CT>(max_x,max_y)
 				);
 				cont.m_is_closed=contour<CT>::check_is_closed(cont.m_points, detail::constant::two<CT>());
 				cont.m_is_clockwise=n_ori<=0;
@@ -513,7 +512,7 @@ namespace baldzarika { namespace ucv {
 		}
 
 	private:
-		size2ui				m_frame_size;
+		math::size2ui				m_frame_size;
 		gray_t				m_low_treshold;
 		gray_t				m_high_treshold;
 		sobel_t				m_sobel;

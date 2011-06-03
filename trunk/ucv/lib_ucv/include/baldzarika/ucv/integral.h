@@ -47,15 +47,15 @@ namespace baldzarika { namespace ucv {
 			return false;
 
 		src_channel_t src_median=sm;
-		if(src_median<detail::constant::zero<src_channel_t>())
+		if(src_median<math::constant::zero<src_channel_t>())
 		{
-			typedef fixed_point<10,21> median_t;
+			typedef math::fixed_point<10,21> median_t;
 
-			median_t median_sum=detail::constant::zero<median_t>();
+			median_t median_sum=math::constant::zero<median_t>();
 
 			for(std::size_t y=0;y<static_cast<std::size_t>(src.height());++y)
 			{
-				median_t row_sum=detail::constant::zero<median_t>();
+				median_t row_sum=math::constant::zero<median_t>();
 				src_channel_t const *src_row=reinterpret_cast<src_channel_t const *>(src.row_begin(y));
 				for(std::size_t x=0;x<static_cast<std::size_t>(src.width());++x)
 					row_sum+=median_t(*src_row++);

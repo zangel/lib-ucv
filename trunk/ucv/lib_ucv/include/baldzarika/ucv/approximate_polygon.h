@@ -1,13 +1,10 @@
 #ifndef BALDZARIKA_UCV_APPROXIMATE_POLYGON_H
 #define BALDZARIKA_UCV_APPROXIMATE_POLYGON_H
 
-#include <baldzarika/ucv/point2.h>
-#include <baldzarika/ucv/box2.h>
-
 namespace baldzarika { namespace ucv {
 
 	template < typename PT >
-	void approximate_polygon(std::vector< point2<PT> > &poly, box2<PT> const &bbox, bool is_closed, PT const &epsilon)
+	void approximate_polygon(std::vector< math::point2<PT> > &poly, math::box2<PT> const &bbox, bool is_closed, PT const &epsilon)
 	{
 		typedef std::pair<boost::int32_t, boost::int32_t> slice_t;
 		typedef std::stack<slice_t> slices_t;
@@ -16,7 +13,7 @@ namespace baldzarika { namespace ucv {
 			return;
 		
 		boost::int32_t count=poly.size();
-		std::vector< point2<PT> > input(poly);
+		std::vector< math::point2<PT> > input(poly);
 		
 		PT const scale_coeff=1.0;
 
@@ -44,7 +41,7 @@ namespace baldzarika { namespace ucv {
 				for(boost::int32_t j=1;j<count;++j)
 				{
 					boost::int32_t pt_idx=(slice.first+j)%count;
-					point2<PT> diff=input[pt_idx]-input[slice.first];
+					math::point2<PT> diff=input[pt_idx]-input[slice.first];
 					diff.x*=inv_width;
 					diff.y*=inv_height;
 
@@ -87,7 +84,7 @@ namespace baldzarika { namespace ucv {
 			boost::int32_t num_pts=(slice.second-slice.first+count)%count;
 			if(num_pts>1)
 			{
-				point2<PT> diff=input[slice.second]-input[slice.first];
+				math::point2<PT> diff=input[slice.second]-input[slice.first];
 
 				diff.x*=inv_width;
 				diff.y*=inv_height;
@@ -97,7 +94,7 @@ namespace baldzarika { namespace ucv {
 				for(boost::int32_t pt=1;pt<num_pts;++pt)
 				{
 					boost::int32_t pt_idx=(slice.first+pt)%count;
-					point2<PT> diff_start=input[pt_idx]-input[slice.first];
+					math::point2<PT> diff_start=input[pt_idx]-input[slice.first];
 					diff_start.x*=inv_width;
 					diff_start.y*=inv_height;
 
@@ -138,21 +135,21 @@ namespace baldzarika { namespace ucv {
 		if(!is_closed)
 			poly.push_back(input[indices.front()]);
 
-		point2<PT> prev_pt=is_closed?input[indices.back()]:input[indices[0]];
+		math::point2<PT> prev_pt=is_closed?input[indices.back()]:input[indices[0]];
 
-		point2<PT> curr_pt=is_closed?input[indices[0]]:input[indices[1]];
+		math::point2<PT> curr_pt=is_closed?input[indices[0]]:input[indices[1]];
 
 
 
 		for(boost::int32_t i=is_closed?0:1;i<count-(is_closed?0:1);++i)
 		{
-			point2<PT> next_pt=input[indices[(i+1+count)%count]];
-			point2<PT> diff=next_pt-prev_pt;
+			math::point2<PT> next_pt=input[indices[(i+1+count)%count]];
+			math::point2<PT> diff=next_pt-prev_pt;
 			
 			diff.x*=inv_width;
 			diff.y*=inv_height;
 
-			point2<PT> diff_start=curr_pt-prev_pt;
+			math::point2<PT> diff_start=curr_pt-prev_pt;
 			diff_start.x*=inv_width;
 			diff_start.y*=inv_height;
 

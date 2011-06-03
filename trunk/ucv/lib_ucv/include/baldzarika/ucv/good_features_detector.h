@@ -9,14 +9,14 @@ namespace baldzarika { namespace ucv {
 	class good_features_detector
 	{
 	public:
-		typedef fixed_point<I, F> integral_t;
+		typedef math::fixed_point<I, F> integral_t;
 		typedef gil::pixel<integral_t, ucv::gil::gray_layout_t> integral_pixel_t;
 		typedef gil::image< integral_pixel_t, false, std::allocator<unsigned char> > integral_image_t;
 		typedef typename integral_image_t::view_t integral_view_t;
 
 	protected:
 		template < boost::uint32_t I2, boost::uint32_t F2 >
-		static bool compare_points(std::pair< integral_t, point2< fixed_point< I2, F2 > > > const &a, std::pair< integral_t, point2< fixed_point< I2, F2 > > > const &b)
+		static bool compare_points(std::pair< integral_t, math::point2< math::fixed_point< I2, F2 > > > const &a, std::pair< integral_t, math::point2< math::fixed_point< I2, F2 > > > const &b)
 		{
 			return a.first < b.first;
 		}
@@ -24,15 +24,15 @@ namespace baldzarika { namespace ucv {
 		template < boost::uint32_t I2, boost::uint32_t F2 >
 		struct point2_accessor
 		{
-			typedef fixed_point<I2,F2> result_type;
-			typedef point2<result_type> point2_t;
+			typedef math::fixed_point<I2,F2> result_type;
+			typedef math::point2<result_type> point2_t;
 
 			result_type operator()(point2_t const &t, size_t k) const { return t[k]; }
 		};
 
 	public:
 		
-		good_features_detector(size2ui const &fs, boost::uint32_t bs=3, integral_t const &q=integral_t(1.0e-2f))
+		good_features_detector(math::size2ui const &fs, boost::uint32_t bs=3, integral_t const &q=integral_t(1.0e-2f))
 			: m_frame_size(fs)
 			, m_block_size(bs)
 			, m_quality(q)
@@ -45,10 +45,10 @@ namespace baldzarika { namespace ucv {
 		}
 
 		template < boost::uint32_t I2, boost::uint32_t F2 >
-		bool operator()(integral_view_t im, std::vector< point2< fixed_point< I2, F2 > > > &dps, boost::uint32_t md=5, boost::uint32_t mp=100)
+		bool operator()(integral_view_t im, std::vector< math::point2< math::fixed_point< I2, F2 > > > &dps, boost::uint32_t md=5, boost::uint32_t mp=100)
 		{
-			typedef fixed_point< I2, F2 > point_real_t;
-			typedef point2<point_real_t> point2_t;
+			typedef math::fixed_point< I2, F2 > point_real_t;
+			typedef math::point2<point_real_t> point2_t;
 			
 			point_real_t const min_dist=md;
 
@@ -133,7 +133,7 @@ namespace baldzarika { namespace ucv {
 					integral_t pixel_val=sobel_scale*box_integral<integral_view_t,integral_t>(
 						im,
 						point2i(x-1, y-1),
-						size2ui(1,1)
+						math::size2ui(1,1)
 					);
 					integral_t pixel_val_2=pixel_val*detail::constant::two<integral_t>();
 
@@ -212,10 +212,10 @@ namespace baldzarika { namespace ucv {
 		}
 
 		template < boost::uint32_t I2, boost::uint32_t F2 >
-		void collect_points(integral_t const &mev, std::vector< std::pair< integral_t, point2< fixed_point<I2, F2> > > > &pts)
+		void collect_points(integral_t const &mev, std::vector< std::pair< integral_t, math::point2< math::fixed_point<I2, F2> > > > &pts)
 		{
-			typedef fixed_point< I2, F2 > point_real_t;
-			typedef point2<point_real_t> point2_t;
+			typedef math::fixed_point< I2, F2 > point_real_t;
+			typedef math::point2<point_real_t> point2_t;
 
 			boost::uint32_t half_bs=m_block_size/2;
 			
@@ -236,7 +236,7 @@ namespace baldzarika { namespace ucv {
 		}
 	
 	private:
-		size2ui				m_frame_size;
+		math::size2ui				m_frame_size;
 		boost::uint32_t		m_block_size;
 		integral_t			m_quality;
 		integral_image_t	m_gradients;

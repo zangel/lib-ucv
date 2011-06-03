@@ -1,13 +1,10 @@
 #ifndef BALDZARIKA_UCV_WARP_H
 #define BALDZARIKA_UCV_WARP_H
 
-#include <baldzarika/ucv/matrix.h>
-
-
 namespace baldzarika { namespace ucv {
 	
 	template < typename SVT, typename DVT, typename MT >
-	bool warp(SVT src, DVT dst, matrix<MT, 3, 3> const &m, bool inv=false)
+	bool warp(SVT src, DVT dst, math::matrix<MT, 3, 3> const &m, bool inv=false)
 	{
 		typedef typename SVT::value_type	src_pixel_t;
 		typedef typename DVT::value_type	dst_pixel_t;
@@ -15,7 +12,7 @@ namespace baldzarika { namespace ucv {
 		typedef typename gil::channel_type<src_pixel_t>::type src_channel_t;
 		typedef typename gil::channel_type<dst_pixel_t>::type dst_channel_t;
 
-		typedef matrix<MT, 3, 3> matrix_t;
+		typedef math::matrix<MT, 3, 3> matrix_t;
 
 		matrix_t mat=inv?m:m.inverse();
 

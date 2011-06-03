@@ -34,7 +34,7 @@ namespace baldzarika { namespace ucv {
 					d2=dist;
 			}
 
-			if(match!=fps2.end() && (d1==detail::constant::zero<typename FP::value_type>() || (d2!=detail::constant::zero<typename FP::value_type>() && d1/d2<d)))
+			if(match!=fps2.end() && (d1==math::constant::zero<typename FP::value_type>() || (d2!=math::constant::zero<typename FP::value_type>() && d1/d2<d)))
 				m.push_back(std::make_pair(ifp1,match));
 		}
 	}

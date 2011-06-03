@@ -145,18 +145,18 @@ namespace baldzarika { namespace ucv {
 		{
 		}
 
-		gaussian_blur(size2ui const &fs)
+		gaussian_blur(math::size2ui const &fs)
 			: m_frame_size(0,0)
 		{
 			set_frame_size(fs);
 		}
 
-		size2ui const &get_frame_size() const
+		math::size2ui const &get_frame_size() const
 		{
 			return m_frame_size;
 		}
 
-		void set_frame_size(size2ui const &fs)
+		void set_frame_size(math::size2ui const &fs)
 		{
 			if(m_frame_size==fs)
 				return;
@@ -226,7 +226,7 @@ namespace baldzarika { namespace ucv {
 		}
 
 	private:
-		size2ui			m_frame_size;
+		math::size2ui			m_frame_size;
 		gray_image_t	m_ring_buffer_img;
 	};
 

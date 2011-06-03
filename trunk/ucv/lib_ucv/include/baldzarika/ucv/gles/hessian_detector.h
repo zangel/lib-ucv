@@ -21,13 +21,13 @@ namespace baldzarika { namespace ucv { namespace gles {
 		public:
 			response_layer();
 			response_layer(response_layer const &that);
-			response_layer(point2ui const &ro, size2ui const &rs, boost::uint32_t ss, boost::uint32_t fs);
+			response_layer(point2ui const &ro, math::size2ui const &rs, boost::uint32_t ss, boost::uint32_t fs);
 			~response_layer();
 
 			operator bool() const;
 
 			point2ui const&		get_offset() const;
-			size2ui const&		get_size() const;
+			math::size2ui const&		get_size() const;
 			boost::uint32_t		get_sample_step() const;
 			
 
@@ -36,7 +36,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 
 		protected:
 			point2ui			m_response_offset;
-			size2ui				m_response_size;
+			math::size2ui				m_response_size;
 
 			boost::uint32_t		m_sample_step;
 			boost::uint32_t		m_filter_size;
@@ -50,24 +50,24 @@ namespace baldzarika { namespace ucv { namespace gles {
 		public:
 			detection_layer();
 			detection_layer(detection_layer const &that);
-			detection_layer(point2ui const &o, size2ui const &s);
+			detection_layer(point2ui const &o, math::size2ui const &s);
 			~detection_layer();
 
 			operator bool() const;
 
 			point2ui const&		get_offset() const;
-			size2ui const&		get_size() const;
+			math::size2ui const&		get_size() const;
 			detection_layer&	operator =(detection_layer const &rhs);
 
 		protected:
 			point2ui			m_detection_offset;
-			size2ui				m_detection_size;
+			math::size2ui				m_detection_size;
 		};
 
 		typedef std::vector<detection_layer> detection_layers_t;
 
 	public:
-		hessian_detector(size2ui const &is, boost::uint32_t o, boost::uint32_t i, boost::uint32_t s, float t, boost::uint32_t mf=64);
+		hessian_detector(math::size2ui const &is, boost::uint32_t o, boost::uint32_t i, boost::uint32_t s, float t, boost::uint32_t mf=64);
 		~hessian_detector();
 
 		operator bool() const;
@@ -78,7 +78,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 		bool			create_hessian_response_program();
 		bool			create_feature_detection_program();
 		bool			create_orientation_program();
-		bool			resize(size2ui const &is);
+		bool			resize(math::size2ui const &is);
 		bool			resize_response();
 		bool			resize_detection();
 		bool			resize_descript();
@@ -101,7 +101,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 		detection_layers_t const&	get_detection_layers() const;
 			
 	private:
-		size2ui						m_integral_img_size;
+		math::size2ui						m_integral_img_size;
 		boost::uint32_t				m_octaves;
 		boost::uint32_t				m_intervals;
 		boost::uint32_t				m_sample_step;

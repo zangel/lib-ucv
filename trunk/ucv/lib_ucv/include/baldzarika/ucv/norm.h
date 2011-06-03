@@ -11,7 +11,7 @@ namespace baldzarika { namespace ucv {
 		if(i1.width()!=i2.width() || i1.height()!=i2.height() || !s)
 			return std::numeric_limits<RT>::max();
 		
-		size2ui const sample_size(s,s);
+		math::size2ui const sample_size(s,s);
 
 		RT const inv_s_area=detail::constant::one<RT>()/RT(s*s);
 
