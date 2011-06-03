@@ -1,7 +1,6 @@
 #ifndef BALDZARIKA_UCV_SURF_H
 #define BALDZARIKA_UCV_SURF_H
 
-#include <baldzarika/ucv/fixed_point.h>
 #include <baldzarika/ucv/feature_point.h>
 #include <baldzarika/ucv/gil_channel_traits.h>
 
@@ -13,20 +12,20 @@ namespace baldzarika { namespace ucv {
 	public:
 
 		static boost::uint32_t const SAMPLES_PER_BLOCK;
-		typedef feature_point< decimal_t, fixed_point<10, 21>, 4 > feature_point_t;
+		typedef feature_point< math::real_t, math::fixed_point<10, 21>, 4 > feature_point_t;
 
 		typedef std::vector< feature_point_t > fps_array_t;
 		typedef KDTree::KDTree<2, feature_point_t, feature_point_t::position_accessor> fps_by_pos_tree_t;
 		typedef KDTree::KDTree<feature_point_t::DESCRIPTOR_SIZE, feature_point_t, feature_point_t::description_accessor> fps_by_desc_tree_t;
 		
 		
-		typedef fixed_point<10, 21> integral_t;
+		typedef math::fixed_point<10, 21> integral_t;
 		typedef gil::pixel<integral_t, ucv::gil::gray_layout_t> integral_pixel_t;
 		typedef gil::image< integral_pixel_t, false, std::allocator<unsigned char> > integral_image_t;
 		typedef integral_image_t::view_t integral_view_t;
 		typedef integral_image_t::const_view_t const_integral_view_t;
 
-		typedef fixed_point<10, 21>	response_t;
+		typedef math::fixed_point<10, 21>	response_t;
 		typedef gil::pixel<response_t, ucv::gil::gray_layout_t> response_pixel_t;
 		typedef ucv::gil::image< response_pixel_t, false, std::allocator<unsigned char> > response_image_t;
 		typedef response_image_t::view_t response_view_t;
@@ -119,19 +118,19 @@ namespace baldzarika { namespace ucv {
 		
 
 
-		template < typename T > T			haar_x(math::point2i const &p, boost::uint32_t s);
-		template < typename T > T			haar_y(math::point2i const &p, boost::uint32_t s);
+		template < typename T > T		haar_x(math::point2i const &p, boost::uint32_t s);
+		template < typename T > T		haar_y(math::point2i const &p, boost::uint32_t s);
 
 		template < boost::uint32_t I, boost::uint32_t F >
-		fixed_point<I,F>					get_angle(fixed_point<I,F> const &x, fixed_point<I,F> const &y);
+		math::fixed_point<I,F>			get_angle(math::fixed_point<I,F> const &x, math::fixed_point<I,F> const &y);
 
-		float								get_angle(float x, float y);
-
-		template < boost::uint32_t I, boost::uint32_t F >
-		static fixed_point<I,F>				gaussian(boost::int32_t x, boost::int32_t y, fixed_point<I,F> const &sig);
+		float							get_angle(float x, float y);
 
 		template < boost::uint32_t I, boost::uint32_t F >
-		static fixed_point<I,F>				gaussian(fixed_point<I,F> const &x, fixed_point<I,F> const &y, fixed_point<I,F> const &sig);
+		static math::fixed_point<I,F>	gaussian(boost::int32_t x, boost::int32_t y, math::fixed_point<I,F> const &sig);
+
+		template < boost::uint32_t I, boost::uint32_t F >
+		static math::fixed_point<I,F>	gaussian(math::fixed_point<I,F> const &x, math::fixed_point<I,F> const &y, math::fixed_point<I,F> const &sig);
 
 	private:
 		math::size2ui			m_frame_size;

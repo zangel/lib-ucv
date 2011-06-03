@@ -84,19 +84,17 @@ namespace baldzarika { namespace ucv {
 		float rt=3.0f
 		)
 	{
-		BOOST_ASSERT(hm.size1()==3 && hm.size2()==3);
-
 		std::vector<math::point2f> obj_pts(oim.size()), img_pts(oim.size());
 		for(std::size_t p=0;p<oim.size();++p)
 		{
 			obj_pts[p]=math::point2f(
-				static_cast<float>(swap_dir?oim[p].second->x:oim[p].first->x),
-				static_cast<float>(swap_dir?oim[p].second->y:oim[p].first->y)
+				static_cast<float>(swap_dir?oim[p].second->x():oim[p].first->x()),
+				static_cast<float>(swap_dir?oim[p].second->y():oim[p].first->y())
 			);
 
 			img_pts[p]=math::point2f(
-				static_cast<float>(swap_dir?oim[p].first->x:oim[p].second->x),
-				static_cast<float>(swap_dir?oim[p].first->y:oim[p].second->y)
+				static_cast<float>(swap_dir?oim[p].first->x():oim[p].second->x()),
+				static_cast<float>(swap_dir?oim[p].first->y():oim[p].second->y())
 			);
 		}
 		math::matrix33f hmf;

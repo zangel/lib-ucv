@@ -10,13 +10,13 @@ namespace baldzarika { namespace ucv {
 	{
 	public:
 		
-		typedef fixed_point<I, F> integral_t;
+		typedef math::fixed_point<I, F> integral_t;
 		typedef gil::pixel<integral_t, ucv::gil::gray_layout_t> integral_pixel_t;
 		typedef gil::image< integral_pixel_t, false, std::allocator<unsigned char> > integral_image_t;
 		typedef typename integral_image_t::view_t integral_view_t;
 		typedef typename integral_image_t::const_view_t const_integral_view_t;
 		
-		klt_tracker(size2ui const &fs, size2ui const &hws=ucv::size2ui(5,5), boost::uint32_t nl=3, boost::uint32_t mi=5, integral_t const &e=integral_t(1.0e-4f), integral_t const &sd=integral_t(1.0e-3f))
+		klt_tracker(math::size2ui const &fs, math::size2ui const &hws=ucv::size2ui(5,5), boost::uint32_t nl=3, boost::uint32_t mi=5, integral_t const &e=integral_t(1.0e-4f), integral_t const &sd=integral_t(1.0e-3f))
 			: m_frame_size(fs)
 			, m_half_win_size(hws.width(), hws.height())
 			, m_window((2*m_half_win_size.width()+1+5)*3, 2*m_half_win_size.height()+1+5)
@@ -27,22 +27,22 @@ namespace baldzarika { namespace ucv {
 		{
 		}
 
-		size2ui const& get_frame_size() const
+		math::size2ui const& get_frame_size() const
 		{
 			return m_frame_size;
 		}
 
-		void set_frame_size(size2ui const &fs)
+		void set_frame_size(math::size2ui const &fs)
 		{
 			m_frame_size=fs;
 		}
 
-		size2ui const& get_half_win_size() const
+		math::size2ui const& get_half_win_size() const
 		{
 			return m_half_win_size;
 		}
 
-		void set_half_win_size(size2ui const& hws)
+		void set_half_win_size(math::size2ui const& hws)
 		{
 			m_half_win_size=hws;
 			m_window.recreate((2*m_half_win_size.width()+1+5)*3, 2*m_half_win_size.height()+1+5);
@@ -80,7 +80,7 @@ namespace baldzarika { namespace ucv {
 		}
 		
 		template < boost::uint32_t I2, boost::uint32_t F2 >
-		bool operator()(std::vector< point2< fixed_point<I2,F2> > > const &prev_fps, std::vector< point2< fixed_point<I2,F2> > > &curr_fps, std::vector<bool> &status)
+		bool operator()(std::vector< math::point2< math::fixed_point<I2,F2> > > const &prev_fps, std::vector< math::point2< math::fixed_point<I2,F2> > > &curr_fps, std::vector<bool> &status)
 		{
 			if(	m_frame_size.empty() ||
 				m_prev_view.width()!=m_curr_view.width() || m_prev_view.width()!=m_frame_size.width() ||
@@ -98,7 +98,7 @@ namespace baldzarika { namespace ucv {
 
 	protected:
 		template < boost::uint32_t I2, boost::uint32_t F2 >
-		bool operator()(point2< fixed_point<I2,F2> > const &prev_fp, point2< fixed_point<I2,F2> > &curr_fp)
+		bool operator()(math::point2< math::fixed_point<I2,F2> > const &prev_fp, math::point2< math::fixed_point<I2,F2> > &curr_fp)
 		{
 			integral_t const range_corr=detail::constant::one<integral_t>()/integral_t((2*m_half_win_size.width()+1)*(2*m_half_win_size.height()+1));
 			integral_t const step_factor=2.0f;
@@ -151,9 +151,9 @@ namespace baldzarika { namespace ucv {
 		}
 		
 		template < boost::uint32_t I2, boost::uint32_t F2 >
-		void compute_gradient_matrix_and_err_vector(fixed_point<I2,F2> &gxx, fixed_point<I2,F2> &gyy, fixed_point<I2,F2> &gxy, fixed_point<I2,F2> &ex, fixed_point<I2,F2> &ey)
+		void compute_gradient_matrix_and_err_vector(math::fixed_point<I2,F2> &gxx, math::fixed_point<I2,F2> &gyy, math::fixed_point<I2,F2> &gxy, math::fixed_point<I2,F2> &ex, math::fixed_point<I2,F2> &ey)
 		{
-			typedef fixed_point<I2,F2> real_t;
+			typedef math::fixed_point<I2,F2> real_t;
 			gxx=detail::constant::zero<real_t>();
 			gyy=detail::constant::zero<real_t>();
 			gxy=detail::constant::zero<real_t>();
@@ -186,10 +186,10 @@ namespace baldzarika { namespace ucv {
 		}
 
 		template < boost::uint32_t I2, boost::uint32_t F2 >
-		void compute_gradient_sum_and_img_diff(point2< fixed_point<I2,F2> > const &prev_pt, point2< fixed_point<I2,F2> > const &curr_pt, boost::uint32_t s)
+		void compute_gradient_sum_and_img_diff(math::point2< math::fixed_point<I2,F2> > const &prev_pt, math::point2< math::fixed_point<I2,F2> > const &curr_pt, boost::uint32_t s)
 		{
-			typedef fixed_point<I2,F2> real_t;
-			typedef point2<real_t> point2_t;
+			typedef math::fixed_point<I2,F2> real_t;
+			typedef math::point2<real_t> point2_t;
 
 			static integral_t const sobel_scale=0.5f/4.0f;
 			static integral_t const gauss_scale=1.0f/16.0f;
@@ -268,8 +268,8 @@ namespace baldzarika { namespace ucv {
 						static_cast<point2i::value_type>(curr_pt.y)+(y-m_half_win_size.height()-2)*s
 					);
 
-					integral_t prev_val=box_integral<const_integral_view_t,integral_t>(m_prev_view, prev_pos, size2ui(s,s))*inv_area;
-					integral_t curr_val=box_integral<const_integral_view_t,integral_t>(m_curr_view, curr_pos, size2ui(s,s))*inv_area;
+					integral_t prev_val=box_integral<const_integral_view_t,integral_t>(m_prev_view, prev_pos, math::size2ui(s,s))*inv_area;
+					integral_t curr_val=box_integral<const_integral_view_t,integral_t>(m_curr_view, curr_pos, math::size2ui(s,s))*inv_area;
 
 					//intensity difference
 					integral_t diff_00=gauss_scale*(prev_val*prev_c11-curr_val*curr_c11);
@@ -422,8 +422,8 @@ namespace baldzarika { namespace ucv {
 		}
 
 	private:
-		size2ui					m_frame_size;
-		size2ui					m_half_win_size;
+		math::size2ui					m_frame_size;
+		math::size2ui					m_half_win_size;
 		integral_image_t		m_window;
 		boost::uint32_t			m_num_levels;
 		boost::uint32_t			m_max_iters;

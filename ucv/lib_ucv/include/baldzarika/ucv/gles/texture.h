@@ -56,7 +56,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 		{
 		}
 
-		texture_2d(size2ui const &ts)
+		texture_2d(math::size2ui const &ts)
 			: texture()
 			, m_size(0,0)
 		{
@@ -105,12 +105,12 @@ namespace baldzarika { namespace ucv { namespace gles {
 				glBindTexture(GL_TEXTURE_2D, tex);
 		}
 
-		size2ui const& get_size() const
+		math::size2ui const& get_size() const
 		{
 			return m_size;
 		}
 
-		bool resize(size2ui const &ts)
+		bool resize(math::size2ui const &ts)
 		{
 			if(m_gl_handle==GL_INVALID_VALUE)
 				return false;
@@ -166,7 +166,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 
 	
 	private:
-		size2ui	m_size;
+		math::size2ui	m_size;
 	};
 
 	typedef texture_2d<ucv::gil::rgba8_pixel_t> rgba8_texture_2d;

@@ -51,7 +51,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 		{
 		}
 
-		depth_buffer(size2ui const &ds)
+		depth_buffer(math::size2ui const &ds)
 			: render_buffer()
 			, m_size(0,0)
 		{
@@ -70,12 +70,12 @@ namespace baldzarika { namespace ucv { namespace gles {
 		{
 		}
 
-		size2ui const& get_size() const
+		math::size2ui const& get_size() const
 		{
 			return m_size;
 		}
 
-		bool resize(size2ui const &ds)
+		bool resize(math::size2ui const &ds)
 		{
 			if(m_gl_handle==GL_INVALID_VALUE)
 				return false;
@@ -100,7 +100,7 @@ namespace baldzarika { namespace ucv { namespace gles {
 		}
 
 	private:
-		size2ui		m_size;
+		math::size2ui		m_size;
 	};
 
 	typedef depth_buffer<16> depth_buffer_16;

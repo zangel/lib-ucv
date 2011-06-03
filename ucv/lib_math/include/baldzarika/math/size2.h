@@ -29,7 +29,7 @@ namespace baldzarika { namespace math {
 		inline T const& height() const { return m_data[1]; }
 
 		inline T area() const { return m_data[0]*m_data[1]; }
-		inline bool empty() const { return m_data[0]*m_data[1]!=constant::zero<T>(); }
+		inline bool empty() const { return m_data[0]*m_data[1]==constant::zero<T>(); }
 	};
 
 	typedef size2<float>			size2f;

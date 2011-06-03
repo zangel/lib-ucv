@@ -6,7 +6,7 @@
 namespace baldzarika { namespace ucv {
 
 	template < typename SVT, typename PT >
-	void corners_subpixel(SVT src, std::vector< point2<PT> > &corners, boost::uint32_t max_iters=2, PT eps=1.0e-3)
+	void corners_subpixel(SVT src, std::vector< math::point2<PT> > &corners, boost::uint32_t max_iters=2, PT eps=1.0e-3)
 	{
 		typedef typename SVT::value_type	src_pixel_t;
 		typedef typename gil::channel_type<src_pixel_t>::type src_channel_t;
@@ -25,8 +25,8 @@ namespace baldzarika { namespace ucv {
 
 		for(boost::uint32_t p=0;p<corners.size();++p)
 		{
-			point2<PT> cT=corners[p];
-			point2<PT> cI=cT;
+			math::point2<PT> cT=corners[p];
+			math::point2<PT> cI=cT;
 			boost::uint32_t iter=0;
 			PT err=detail::constant::zero<PT>();
 
@@ -112,7 +112,7 @@ namespace baldzarika { namespace ucv {
 					PT t10=-b*det;
 					PT t11=a*det;
 
-					point2<PT> cI2=point2<PT>(
+					math::point2<PT> cI2=math::point2<PT>(
 						cI.x+t00*bb1+t01*bb2,
 						cI.y+t10*bb1+t11*bb2
 					);

@@ -1,9 +1,6 @@
 #ifndef BALDZARIKA_UCV_CONVERT_SCALE_H
 #define BALDZARIKA_UCV_CONVERT_SCALE_H
 
-
-#include <baldzarika/ucv/point2.h>
-#include <baldzarika/ucv/size2.h>
 #include <baldzarika/ucv/gil_channel_traits.h>
 
 namespace baldzarika { namespace ucv {
@@ -39,13 +36,13 @@ namespace baldzarika { namespace ucv {
 			inline void end() {}
 						
 			template < boost::uint32_t I, boost::uint32_t F >
-			inline void operator()(fixed_point<I,F> const &src, boost::uint8_t &dst)
+			inline void operator()(math::fixed_point<I,F> const &src, boost::uint8_t &dst)
 			{
 				dst=boost::uint8_t(
-					adjuster< (F<8) >::
+					math::detail::adjuster< (F<8) >::
 						template adjust<
-							typename fixed_point< I, F >::value_type,
-							typename fixed_point< I, F >::value_type,
+							typename math::fixed_point< I, F >::value_type,
+							typename math::fixed_point< I, F >::value_type,
 							8,
 							F
 						>(src.get()) & 0xFF
@@ -53,17 +50,17 @@ namespace baldzarika { namespace ucv {
 			}
 
 			template < boost::uint32_t I, boost::uint32_t F >
-			inline void operator()(boost::uint8_t const &src, fixed_point<I,F> &dst)
+			inline void operator()(boost::uint8_t const &src, math::fixed_point<I,F> &dst)
 			{
-				dst=fixed_point<I,F>(
-					adjuster< (F>8) >::
+				dst=math::fixed_point<I,F>(
+					math::detail::adjuster< (F>8) >::
 						template adjust<
-							typename fixed_point< I, F >::value_type,
-							typename fixed_point< I, F >::value_type,
+							typename math::fixed_point< I, F >::value_type,
+							typename math::fixed_point< I, F >::value_type,
 							F,
 							8
-						>(typename fixed_point< I, F >::value_type(src)),
-					fp_explicit_tag()
+						>(typename math::fixed_point< I, F >::value_type(src)),
+					math::detail::fp_explicit_tag()
 				);
 			}
 		};
@@ -74,8 +71,8 @@ namespace baldzarika { namespace ucv {
 		{
 			grayscale_convert_and_median(MT &mv, boost::uint32_t width, boost::uint32_t height)
 				: m_median_value(mv)
-				, m_inv_width(constant::one<MT>()/MT(width))
-				, m_inv_height(constant::one<MT>()/MT(height))
+				, m_inv_width(math::constant::one<MT>()/MT(width))
+				, m_inv_height(math::constant::one<MT>()/MT(height))
 			{
 
 			}
@@ -89,12 +86,12 @@ namespace baldzarika { namespace ucv {
 
 			inline void begin()
 			{
-				m_median_value=constant::zero<MT>();
+				m_median_value=math::constant::zero<MT>();
 			}
 
 			inline void begin_row()
 			{
-				m_row_sum=constant::zero<MT>();
+				m_row_sum=math::constant::zero<MT>();
 
 			}
 
@@ -173,17 +170,17 @@ namespace baldzarika { namespace ucv {
 		if(y.width()/2!=uv.width() || y.height()/2!=uv.height() || !uv.width()*uv.height() || y.width()!=dst.width() || y.height()!=dst.height())
 			return false;
 		
-		dst_channel_t const inv_width=detail::constant::one<dst_channel_t>()/dst_channel_t(dst.width());
-		dst_channel_t const inv_height=detail::constant::one<dst_channel_t>()/dst_channel_t(dst.height());
+		dst_channel_t const inv_width=math::constant::one<dst_channel_t>()/dst_channel_t(dst.width());
+		dst_channel_t const inv_height=math::constant::one<dst_channel_t>()/dst_channel_t(dst.height());
 
-		dst_channel_t median_sum=detail::constant::zero<dst_channel_t>();
+		dst_channel_t median_sum=math::constant::zero<dst_channel_t>();
 
 		for(std::size_t r=0;r<static_cast<std::size_t>(y.height());++r)
 		{
 			y_channel_t *y_row=reinterpret_cast<y_channel_t *>(y.row_begin(r));
 			uv_channel_t *uv_row=reinterpret_cast<uv_channel_t *>(uv.row_begin(r>>1));
 			dst_channel_t *dst_row=reinterpret_cast<dst_channel_t *>(dst.row_begin(r));
-			dst_channel_t median_row_sum=detail::constant::zero<dst_channel_t>();
+			dst_channel_t median_row_sum=math::constant::zero<dst_channel_t>();
 			for(std::size_t c=0;c<y.width();++c)
 			{
 				boost::int32_t Y=std::max<boost::int32_t>(0,static_cast<boost::int32_t>(*y_row)-16);
@@ -192,15 +189,15 @@ namespace baldzarika { namespace ucv {
 								
 				dst_channel_t B=dst_channel_t(
 						std::min<boost::int32_t>(262143, std::max<boost::int32_t>(1192*Y+2066*U, 0))>>10
-					)*detail::constant::i_255<dst_channel_t>();
+					)*math::constant::i_255<dst_channel_t>();
 
 				dst_channel_t G=dst_channel_t(
 						std::min<boost::int32_t>(262143, std::max<boost::int32_t>(1192*Y-833*V-400*U, 0))>>10
-					)*detail::constant::i_255<dst_channel_t>();
+					)*math::constant::i_255<dst_channel_t>();
 
 				dst_channel_t R=dst_channel_t(
 						std::min<boost::int32_t>(262143, std::max<boost::int32_t>(1192*Y+1634*V, 0))>>10
-					)*detail::constant::i_255<dst_channel_t>();
+					)*math::constant::i_255<dst_channel_t>();
 
 				dst_channel_t v=(B*b_s+G*g_s+R*r_s);
 				*dst_row=v;

@@ -13,9 +13,9 @@ namespace baldzarika { namespace ucv {
 		template < typename PT, typename MT >
 		bool normalize_points(std::vector< math::point2<PT> > const &pts, math::point2<PT> &translate, math::point2<PT> &scale, math::matrix<MT, 3, 3> &m3x3, bool inv)
 		{
-			PT const inv_size=constant::one<PT>()/PT(pts.size());
+			PT const inv_size=math::constant::one<PT>()/PT(pts.size());
 						
-			translate.x()=translate.y()=scale.x()=scale.y()=constant::zero<PT>();
+			translate.x()=translate.y()=scale.x()=scale.y()=math::constant::zero<PT>();
 
 			for(std::size_t p=0;p<pts.size();++p)
 			{
@@ -39,14 +39,14 @@ namespace baldzarika { namespace ucv {
 
 			
 
-			m3x3(0,0)=inv?constant::one<MT>()/MT(scale.x()):MT(scale.x());
-			m3x3(1,1)=inv?constant::one<MT>()/MT(scale.y()):MT(scale.y());
-			m3x3(2,2)=constant::one<MT>();
+			m3x3(0,0)=inv?math::constant::one<MT>()/MT(scale.x()):MT(scale.x());
+			m3x3(1,1)=inv?math::constant::one<MT>()/MT(scale.y()):MT(scale.y());
+			m3x3(2,2)=math::constant::one<MT>();
 
-			m3x3(0,2)=inv?MT(-constant::one<PT>()/scale.x()*translate.x()):MT(translate.x());
-			m3x3(1,2)=inv?MT(-constant::one<PT>()/scale.y()*translate.y()):MT(translate.y());
+			m3x3(0,2)=inv?MT(-math::constant::one<PT>()/scale.x()*translate.x()):MT(translate.x());
+			m3x3(1,2)=inv?MT(-math::constant::one<PT>()/scale.y()*translate.y()):MT(translate.y());
 
-			m3x3(0,1)=m3x3(1,0)=m3x3(2,0)=m3x3(2,1)=constant::zero<MT>();
+			m3x3(0,1)=m3x3(1,0)=m3x3(2,0)=m3x3(2,1)=math::constant::zero<MT>();
 			return true;
 		}
 
@@ -114,7 +114,7 @@ namespace baldzarika { namespace ucv {
 
 		// reverse normalization
 		pm=(dst_correct*pm)*src_correct;
-		pm.scale(math::constant::one<MT>()/pm(2,2));
+		pm*=math::constant::one<MT>()/pm(2,2);
 		return true;
 	}
 

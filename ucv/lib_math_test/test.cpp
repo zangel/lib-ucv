@@ -119,8 +119,34 @@ BOOST_AUTO_TEST_CASE( test_point2 )
 	typedef bmath::matrix<float,3,3> matrix33f;
 }
 
+template < typename T, boost::uint32_t MS >
+void test_square_matrix()
+{
+	namespace bmath=baldzarika::math;
+
+	typedef bmath::matrix<T, MS, MS> matrix_t;
+
+	BOOST_CHECK_EQUAL((matrix_t::identity()*matrix_t::identity().inverted()).determinant(), bmath::constant::one<T>());
+}
+
 
 BOOST_AUTO_TEST_CASE( test_matrix )
 {
 	namespace bmath=baldzarika::math;
+
+	//test_square_matrix<bmath::real_t,2>();
+	test_square_matrix<float,2>();
+	//test_square_matrix<double,2>();
+
+	//test_square_matrix<bmath::real_t,3>();
+	//test_square_matrix<float,3>();
+	//test_square_matrix<double,3>();
+
+	//test_square_matrix<bmath::real_t,4>();
+	//test_square_matrix<float,4>();
+	//test_square_matrix<double,4>();
+
+	//test_square_matrix<bmath::real_t,5>();
+	//test_square_matrix<float,5>();
+	//test_square_matrix<double,5>();
 }

@@ -1,9 +1,6 @@
 #ifndef BALDZARIKA_UCV_CONTOUR_H
 #define BALDZARIKA_UCV_CONTOUR_H
 
-#include <baldzarika/ucv/point2.h>
-#include <baldzarika/ucv/vector.h>
-#include <baldzarika/ucv/box2.h>
 #include <baldzarika/ucv/approximate_polygon.h>
 
 namespace baldzarika { namespace ucv {
@@ -12,8 +9,8 @@ namespace baldzarika { namespace ucv {
 	class contour
 	{
 	public:
-		typedef box2<T> box2_t;
-		typedef point2<T> point2_t;
+		typedef math::box2<T> box2_t;
+		typedef math::point2<T> point2_t;
 		typedef std::vector<point2_t> points_t;
 
 		static bool check_is_closed(points_t const &pts, T const &eps)
@@ -59,18 +56,18 @@ namespace baldzarika { namespace ucv {
 			bool all_positive=true;
 			bool all_negative=true;
 
-			point2<T> prev_pt=is_closed?pts.back():pts.front();
-			point2<T> curr_pt=is_closed?pts.front():pts[1];
+			math::point2<T> prev_pt=is_closed?pts.back():pts.front();
+			math::point2<T> curr_pt=is_closed?pts.front():pts[1];
 
 			for(boost::int32_t p=(is_closed?0:1);p<(count-(is_closed?0:1));++p)
 			{
-				point2<T> next_pt=pts[(p+1)%count];
+				math::point2<T> next_pt=pts[(p+1)%count];
 
-				point2<T> a=next_pt-curr_pt;
+				math::point2<T> a=next_pt-curr_pt;
 				a.x*=inv_width;
 				a.y*=inv_height;
 
-				point2<T> b=prev_pt-curr_pt;
+				math::point2<T> b=prev_pt-curr_pt;
 				b.x*=inv_width;
 				b.y*=inv_height;
 
