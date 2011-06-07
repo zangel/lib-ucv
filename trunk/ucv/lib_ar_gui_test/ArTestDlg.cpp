@@ -2,10 +2,10 @@
 #include "ArTestDlg.h"
 
 
-ucv::size2ui const ArTestDlg::PREVIEW_SIZES[2]=
+math::size2ui const ArTestDlg::PREVIEW_SIZES[2]=
 {
-	ucv::size2ui(320,240),
-	ucv::size2ui(640,480)
+	math::size2ui(320,240),
+	math::size2ui(640,480)
 };
 
 
@@ -19,7 +19,7 @@ ArTestDlg::ArTestDlg(QWidget *parent, Qt::WFlags flags)
 	setupUi(this);
 	setAcceptDrops(true);
 	QString strItemFmt("%1 x %2");
-	for(std::size_t sz=0;sz<sizeof(PREVIEW_SIZES)/sizeof(ucv::size2ui);++sz)
+	for(std::size_t sz=0;sz<sizeof(PREVIEW_SIZES)/sizeof(math::size2ui);++sz)
 		m_PreviewSize->addItem(strItemFmt.arg(PREVIEW_SIZES[sz].width()).arg(PREVIEW_SIZES[sz].height()));
 
 	
@@ -265,39 +265,39 @@ void ArTestDlg::onMarkerStateChanged(boost::shared_ptr<ar::tracker::marker_state
 			{
 				if(ms->is_detected())
 				{
-					ucv::matrix33f const &hm=ms->get_homography_matrix();
+					math::matrix33f const &hm=ms->get_homography_matrix();
 					ar::tracker::marker_state::points2_t marker_points(ms->get_frame_points());
 					
 					marker_points.insert(
 						marker_points.begin(),
-						hm*ar::tracker::feature_point_t::point2_t(
+						ar::tracker::feature_point_t::point2_t(
 							ms->get_marker()->get_size().width(),
 							ms->get_marker()->get_size().height()
-						)
+						).transformed(hm)
 					);
 
 					marker_points.insert(
 						marker_points.begin(),
-						hm*ar::tracker::feature_point_t::point2_t(
+						ar::tracker::feature_point_t::point2_t(
 							0,
 							ms->get_marker()->get_size().height()
-						)
+						).transformed(hm)
 					);
 
 					marker_points.insert(
 						marker_points.begin(),
-						hm*ar::tracker::feature_point_t::point2_t(
+						ar::tracker::feature_point_t::point2_t(
 							ms->get_marker()->get_size().width(),
 							0
-						)
+						).transformed(hm)
 					);
 
 					marker_points.insert(
 						marker_points.begin(),
-						hm*ar::tracker::feature_point_t::point2_t(
+						ar::tracker::feature_point_t::point2_t(
 							0,
 							0
-						)
+						).transformed(hm)
 					);
 					
 					m_VideoPreview->setTrackingFeatures(marker_points);

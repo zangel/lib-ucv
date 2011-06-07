@@ -13,11 +13,11 @@ namespace baldzarika { namespace ucv {
 
 		typedef typename gil::channel_type<typename VT::value_type>::type channel_t;
 
-		HT const hist_inc=detail::constant::one<HT>()/HT(iv.width())/HT(iv.height());
+		HT const hist_inc=math::constant::one<HT>()/HT(iv.width())/HT(iv.height());
 		
 		channel_t const bins_range=channel_t(N)/(max_val-min_val);
 
-		std::fill(bins.begin(), bins.end(), detail::constant::zero<HT>());
+		std::fill(bins.begin(), bins.end(), math::constant::zero<HT>());
 		
 		for(boost::int32_t y=0;y<iv.height();++y)
 		{

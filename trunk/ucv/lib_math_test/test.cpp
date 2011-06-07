@@ -136,6 +136,8 @@ BOOST_AUTO_TEST_CASE( test_matrix )
 
 	//test_square_matrix<bmath::real_t,2>();
 	test_square_matrix<float,2>();
+	test_square_matrix<float,3>();
+	test_square_matrix<float,4>();
 	//test_square_matrix<double,2>();
 
 	//test_square_matrix<bmath::real_t,3>();

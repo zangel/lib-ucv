@@ -22,6 +22,21 @@ namespace baldzarika { namespace math {
 			m_data[1]=h;
 		}
 
+		inline size2(vector<T,2> const &that)
+			: vector<T,2>(that)
+		{
+		}
+
+		inline bool operator==(size2 const &rhs) const
+		{
+			return m_data[0]==rhs.m_data[0] && m_data[1]==rhs.m_data[1];
+		}
+
+		inline bool operator!=(size2 const &rhs) const
+		{
+			return m_data[0]!=rhs.m_data[0] || m_data[1]!=rhs.m_data[1];
+		}
+		
 		inline T& width() { return m_data[0]; }
 		inline T const& width() const { return m_data[0]; }
 

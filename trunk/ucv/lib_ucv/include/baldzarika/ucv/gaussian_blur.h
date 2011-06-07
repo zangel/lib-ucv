@@ -18,19 +18,19 @@ namespace baldzarika { namespace ucv {
 
 				ring[0]=(
 					src[1]+
-					src[0]*constant::three<PT>()
+					src[0]*math::constant::three<PT>()
 				)*scale;
 
 				for(boost::int32_t x=1;x<width-1;++x)
 					ring[x]=(
 						src[x-1]+
-						src[x]*constant::two<PT>()+
+						src[x]*math::constant::two<PT>()+
 						src[x+1]
 					)*scale;
 
 				ring[width-1]=(
 					src[width-2]+
-					src[width-1]*constant::three<PT>()
+					src[width-1]*math::constant::three<PT>()
 				)*scale;
 			}
 
@@ -41,7 +41,7 @@ namespace baldzarika { namespace ucv {
 				for(boost::int32_t x=0;x<width;++x)
 					dst[x]=(
 						ring[0][x]+
-						ring[1][x]*constant::two<PT>()+
+						ring[1][x]*math::constant::two<PT>()+
 						ring[2][x]
 					)*scale;
 			}
@@ -56,37 +56,37 @@ namespace baldzarika { namespace ucv {
 				static PT const scale=0.0625;
 				
 				ring[0]=(
-					src[0]*constant::eleven<PT>()+
-					src[1]*constant::four<PT>()+
+					src[0]*math::constant::eleven<PT>()+
+					src[1]*math::constant::four<PT>()+
 					src[2]
 				)*scale;
 
 				ring[1]=(
-					src[0]*constant::five<PT>()+
-					src[1]*constant::six<PT>()+
-					src[2]*constant::four<PT>()+
+					src[0]*math::constant::five<PT>()+
+					src[1]*math::constant::six<PT>()+
+					src[2]*math::constant::four<PT>()+
 					src[3]
 				)*scale;
 				
 				for(boost::int32_t x=2;x<width-2;++x)
 					ring[x]=(
 						src[x-2]+
-						src[x-1]*constant::four<PT>()+
-						src[x+0]*constant::six<PT>()+
-						src[x+1]*constant::four<PT>()+
+						src[x-1]*math::constant::four<PT>()+
+						src[x+0]*math::constant::six<PT>()+
+						src[x+1]*math::constant::four<PT>()+
 						src[x+2]
 					)*scale;
 				
 				ring[width-2]=(
-					src[width-1]*constant::five<PT>()+
-					src[width-2]*constant::six<PT>()+
-					src[width-3]*constant::four<PT>()+
+					src[width-1]*math::constant::five<PT>()+
+					src[width-2]*math::constant::six<PT>()+
+					src[width-3]*math::constant::four<PT>()+
 					src[width-4]
 				)*scale;
 
 				ring[width-1]=(
-					src[width-1]*constant::eleven<PT>()+
-					src[width-2]*constant::four<PT>()+
+					src[width-1]*math::constant::eleven<PT>()+
+					src[width-2]*math::constant::four<PT>()+
 					src[width-3]
 				)*scale;
 			}
@@ -98,9 +98,9 @@ namespace baldzarika { namespace ucv {
 				for(boost::int32_t x=0;x<width;++x)
 					dst[x]=(
 						ring[0][x]+
-						ring[1][x]*constant::four<PT>()+
-						ring[2][x]*constant::six<PT>()+
-						ring[3][x]*constant::four<PT>()+
+						ring[1][x]*math::constant::four<PT>()+
+						ring[2][x]*math::constant::six<PT>()+
+						ring[3][x]*math::constant::four<PT>()+
 						ring[4][x]
 					)*scale;
 			}
@@ -116,12 +116,6 @@ namespace baldzarika { namespace ucv {
 			}
 
 		};
-
-
-		/*
-		template < typename PT >
-		PT const gaussian_blur_filter_traits< PT, 7 >::SEPARABLE_KERNEL[7]={0.03125, 0.109375, 0.21875, 0.28125, 0.21875, 0.109375, 0.03125};
-		*/
 	}
 
 	template < typename PT, boost::uint32_t KS >

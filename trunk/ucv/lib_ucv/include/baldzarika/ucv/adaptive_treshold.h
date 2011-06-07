@@ -80,13 +80,13 @@ namespace baldzarika { namespace ucv {
 		template <>
 		inline gray_t const& treshold<false>(gray_t const &d) const
 		{
-			return d>=-m_delta?m_max_value:detail::constant::zero<gray_t>();
+			return d>=-m_delta?m_max_value:math::constant::zero<gray_t>();
 		}
 
 		template <>
 		inline gray_t const& treshold<true>(gray_t const &d) const
 		{
-			return d<-m_delta?m_max_value:detail::constant::zero<gray_t>();
+			return d<-m_delta?m_max_value:math::constant::zero<gray_t>();
 		}
 
 	private:

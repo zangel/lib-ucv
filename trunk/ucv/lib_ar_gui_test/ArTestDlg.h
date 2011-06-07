@@ -11,7 +11,7 @@ class ArTestDlg
 	Q_OBJECT
 
 public:
-	static ucv::size2ui	const			PREVIEW_SIZES[2];
+	static math::size2ui	const			PREVIEW_SIZES[2];
 
 
 	ArTestDlg(QWidget *parent = 0, Qt::WFlags flags = 0);

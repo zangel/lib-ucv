@@ -73,10 +73,10 @@ void PreviewWidget::paintGL()
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	
 
-	ucv::size2ui vtex_size(0,0);
+	math::size2ui vtex_size(0,0);
 	{
 		boost::mutex::scoped_lock lock_vt(m_VideoTextureSync);
-		ucv::size2ui view_size(m_VideoTextureView.width(),m_VideoTextureView.height());
+		math::size2ui view_size(m_VideoTextureView.width(),m_VideoTextureView.height());
 		if(m_VideoTextureDirty)
 		{
 			glBindTexture(GL_TEXTURE_2D, m_VideoTexture);
@@ -133,8 +133,8 @@ void PreviewWidget::paintGL()
 			float *p_coords=feature_coords.get();
 			for(std::size_t p=0;p<m_TrackingFeatures.size();++p)
 			{
-				p_coords[0]= 2.0f*(static_cast<float>(m_TrackingFeatures[p].x)/float(vtex_size.width())-0.5f);
-				p_coords[1]=-2.0f*(static_cast<float>(m_TrackingFeatures[p].y)/float(vtex_size.height())-0.5f);
+				p_coords[0]= 2.0f*(static_cast<float>(m_TrackingFeatures[p].x())/float(vtex_size.width())-0.5f);
+				p_coords[1]=-2.0f*(static_cast<float>(m_TrackingFeatures[p].y())/float(vtex_size.height())-0.5f);
 				p_coords[2]=0.0;
 				p_coords+=3;
 			}

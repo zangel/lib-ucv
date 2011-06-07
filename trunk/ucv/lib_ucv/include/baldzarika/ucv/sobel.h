@@ -18,7 +18,7 @@ namespace baldzarika { namespace ucv {
 			static inline void x_filter(PT const *src, PT *ring_x, PT *ring_y, boost::int32_t width)
 			{
 				ring_x[0]=src[1]-src[0];
-				ring_y[0]=src[1]+src[0]*constant::three<PT>();
+				ring_y[0]=src[1]+src[0]*math::constant::three<PT>();
 				
 				for(boost::int32_t x=1;x<width-1;++x)
 				{
@@ -27,7 +27,7 @@ namespace baldzarika { namespace ucv {
 				}
 
 				ring_x[width-1]=src[width-1]-src[width-2];
-				ring_y[width-1]=src[width-2]+constant::three<PT>()*src[width-1];
+				ring_y[width-1]=src[width-2]+math::constant::three<PT>()*src[width-1];
 			}
 
 			static inline void y_filter(PT const *ring_x[3], PT const *ring_y[3], PT *dst_x, PT *dst_y, boost::int32_t width)

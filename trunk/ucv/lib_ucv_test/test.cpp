@@ -42,7 +42,6 @@
 
 using namespace boost;
 
-
 BOOST_AUTO_TEST_CASE( create_open_cv_window )
 {
 	cv::namedWindow(OPENCV_WND_NAME);
@@ -422,7 +421,6 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	cv::waitKey();
 }
 
-#if 0
 BOOST_AUTO_TEST_CASE( test_klt_tracker )
 {
 	namespace ucv=baldzarika::ucv;
@@ -451,8 +449,8 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 
 
 	gray_image_t gray_img(marker_img.width(), marker_img.height()), shifted_gray_img(marker_img.width(), marker_img.height());
-	ucv::convert_scale(ucv::gil::view(marker_img), ucv::gil::view(gray_img), 1.0f/255.0f);
-	ucv::convert_scale(ucv::gil::view(shifted_marker_img), ucv::gil::view(shifted_gray_img), 1.0f/255.0f);
+	ucv::convert(ucv::gil::view(marker_img), ucv::gil::view(gray_img), ucv::detail::grayscale_convert());
+	ucv::convert(ucv::gil::view(shifted_marker_img), ucv::gil::view(shifted_gray_img), ucv::detail::grayscale_convert());
 	
 	ucv::surf::integral_image_t integral_img(marker_img.width(), marker_img.height()), shifted_integral_img(marker_img.width(), marker_img.height());
 	ucv::integral(ucv::gil::view(gray_img), ucv::gil::view(integral_img));
@@ -461,7 +459,7 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 	typedef ucv::good_features_detector<ucv::surf::integral_t::IS,ucv::surf::integral_t::FS> good_features_detector_t;
 
 	good_features_detector_t gfd(
-		ucv::size2ui(marker_img.width(), marker_img.height())
+		math::size2ui(marker_img.width(), marker_img.height())
 	);
 
 
@@ -515,7 +513,7 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 		{
 			
 			detector_name="fpSURF";
-			ucv::surf surf_detector(ucv::size2ui(integral_img.width(), integral_img.height()), 3, 4, 2, 1.0e-4f);
+			ucv::surf surf_detector(math::size2ui(integral_img.width(), integral_img.height()), 3, 4, 2, 1.0e-4f);
 			std::vector<ucv::surf::feature_point_t> key_points;
 
 			detect_start=boost::posix_time::microsec_clock::local_time();
@@ -531,8 +529,8 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 			for(std::size_t ifp=0;ifp<key_points.size();++ifp)
 				prev_pts.push_back(
 					ucv::surf::feature_point_t::point2_t(
-						key_points[ifp].x,
-						key_points[ifp].y
+						key_points[ifp].x(),
+						key_points[ifp].y()
 					)
 				);
 		}
@@ -541,7 +539,7 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 		{
 			detector_name="fpGFTT";
 			good_features_detector_t gfd(
-				ucv::size2ui(marker_img.width(), marker_img.height())
+				math::size2ui(marker_img.width(), marker_img.height())
 			);
 
 
@@ -554,14 +552,14 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 			for(std::size_t ifp=0;ifp<key_points.size();++ifp)
 				prev_pts.push_back(
 					ucv::surf::feature_point_t::point2_t(
-						key_points[ifp].x,
-						key_points[ifp].y
+						key_points[ifp].x(),
+						key_points[ifp].y()
 					)
 				);
 		}
 
 		typedef ucv::klt_tracker<ucv::surf::integral_t::IS,ucv::surf::integral_t::FS> klt_tracker_t;
-		klt_tracker_t feature_point_tracker(ucv::size2ui(integral_img.width(), integral_img.height()), ucv::size2ui(7,7), 4, 100);
+		klt_tracker_t feature_point_tracker(math::size2ui(integral_img.width(), integral_img.height()), math::size2ui(7,7), 4, 100);
 		feature_point_tracker.set_integral_views(
 			ucv::gil::const_view(integral_img),
 			ucv::gil::const_view(shifted_integral_img)
@@ -576,8 +574,8 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 		float er=0.0f;
 		for(std::size_t ifp=0;ifp<next_pts.size();++ifp)
 		{
-			float dx=std::abs(static_cast<float>(next_pts[ifp].x-prev_pts[ifp].x)+5.0f);
-			float dy=std::abs(static_cast<float>(next_pts[ifp].y-prev_pts[ifp].y)-2.0f);
+			float dx=std::abs(static_cast<float>(next_pts[ifp].x()-prev_pts[ifp].x())+5.0f);
+			float dy=std::abs(static_cast<float>(next_pts[ifp].y()-prev_pts[ifp].y())-2.0f);
 
 			er+=dx*dx+dy*dy;
 		}
@@ -592,144 +590,13 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 }
 
 
-
-BOOST_AUTO_TEST_CASE( test_matrix )
-{
-	namespace ucv=baldzarika::ucv;
-
-	ucv::matrix33f h1, h2, h3;
-	h1(0,0)=1.0f;
-
-	h2=ucv::matrix33f::identity();
-	h3=ucv::matrix33f::identity();
-	h1*=h3;
-	h1=h2*h3;
-	h1.scale(2.0f);
-
-	h1=ucv::matrix<int, 3, 3>::identity().scaled(3.0f);
-
-	ucv::matrix< math::fixed_point<15,16>, 3, 3 > m1,m2;
-	m1=ucv::matrix< math::fixed_point<15,16>, 3, 3 >::identity().scaled(math::fixed_point<15,16>(3.0f));
-	m1=m1.inverse();
-
-	h1=h1.inverse();
-}
-
-BOOST_AUTO_TEST_CASE( test_vector )
-{
-	namespace ucv=baldzarika::ucv;
-
-	typedef ucv::vector< math::fixed_point<15,16>, 2> vector_fp2;
-	typedef ucv::vector< math::fixed_point<15,16>, 3> vector_fp3;
-
-	ucv::vector3f axes[3]=
-	{
-		ucv::vector3f::unit<0>(),
-		ucv::vector3f::unit<1>(),
-		ucv::vector3f::unit<2>()
-	};
-
-	float d1=axes[0].dot(axes[1]), d2=axes[1].dot(axes[2]), d3=axes[2].dot(axes[0]);
-	float d11=axes[0].dot(axes[0]);
-	float d22=axes[1].dot(axes[1]);
-	float d33=axes[2].dot(axes[2]);
-
-	vector_fp2 v1=vector_fp2::zero();
-	vector_fp2 v2=vector_fp2::unit<0>();
-	vector_fp2 v3=vector_fp2::unit<1>();
-	vector_fp2 v4=v2*v3;
-
-	ucv::matrix33f m1=ucv::matrix33f::identity(), m2=ucv::matrix33f::identity(), m3=m1*m2;
-
-
-	vector_fp3 v5;
-	vector_fp3 v6=m1*v5;
-}
-
-#endif
-
-#if 0
-BOOST_AUTO_TEST_CASE( svd_test )
-{
-	namespace ucv=baldzarika::ucv;
-
-	typedef ucv::matrix< float, 8, 8> matrix0_t;
-	typedef ucv::vector< float, 8 > vector0_t;
-
-	typedef ucv::matrix< math::fixed_point<15,16>, 8, 8> matrix1_t;
-	typedef ucv::vector< math::fixed_point<15,16>, 8 > vector1_t;
-
-	matrix0_t mat0, u0, v0;
-	vector0_t w0;
-
-	matrix1_t mat1, u1, v1;
-	vector1_t w1;
-
-	float s=1.0f;
-
-	for(int i=0;i<8*8;++i)
-	{
-		mat0(i/8, i%8)=s;
-		mat1(i/8, i%8)=math::fixed_point<10,21>(s++);
-	}
-
-	ucv::svd(mat0, u0, w0, v0);
-	ucv::svd(mat1, u1, w1, v1);
-
-	for(int i=0;i<8;++i)
-	{
-		float val0=w0[i];
-		float val1=w1[i];
-		float delta=val1-val0;
-		int c=0;
-	}
-	
-	ucv::matrix33f mat2_0;
-	ucv::matrix33f mat2_1=ucv::matrix33f::identity();
-
-	s=1.0f;
-	for(boost::uint32_t i=0;i<9;++i)
-		mat2_0(i/3, i%3)=s++;
-	
-	mat2_1(0,0)=1.0f; mat2_1(1,1)=2.0f; mat2_1(2,2)=3.0f;
-
-	ucv::matrix33f mat2_2=mat2_0*mat2_1;
-
-	int c=0;
-
-}
-
-
-BOOST_AUTO_TEST_CASE( solve_test )
-{
-	namespace ucv=baldzarika::ucv;
-
-	typedef ucv::matrix< float, 2, 2> matrix_t;
-	typedef ucv::vector< float, 2> vector_t;
-
-	matrix_t a;
-	a(0,0)=2.0f; a(0,1)=1.0f;
-	a(1,0)=2.0f; a(1,1)=-1.0f;
-
-	vector_t b;
-	b[0]=4.0f;
-	b[1]=8.0f;
-
-	vector_t x;
-	
-	BOOST_CHECK(ucv::solve(a, b, x, ucv::detail::svd_solver()));
-
-	BOOST_CHECK_LT( std::abs(x[0]-( 3.0f)), 1.0e-6f);
-	BOOST_CHECK_LT( std::abs(x[1]-(-2.0f)), 1.0e-6f);
-}
-
-
 BOOST_AUTO_TEST_CASE( perspective_transform_test )
 {
 	namespace ucv=baldzarika::ucv;
-	typedef ucv::point2<float> point_t;
-	typedef ucv::vector<float,3> vector_t;
-	typedef ucv::matrix<float,3,3> matrix_t;
+	namespace math=baldzarika::math;
+	typedef math::point2<float> point_t;
+	typedef math::vector<float,3> vector_t;
+	typedef math::matrix<float,3,3> matrix_t;
 
 	std::vector<point_t> src(4),dst(4);
 
@@ -742,7 +609,7 @@ BOOST_AUTO_TEST_CASE( perspective_transform_test )
 	matrix_t pm;
 	BOOST_CHECK(ucv::perspective_transform(src,dst,pm));
 
-	matrix_t identity=pm*pm.inverse();
+	matrix_t identity=pm*pm.inverted();
 
 	BOOST_CHECK_LT( std::abs((pm*vector_t(src[0]))[0]-dst[0][0]), 5.0e-2f);
 	BOOST_CHECK_LT( std::abs((pm*vector_t(src[0]))[1]-dst[0][1]), 5.0e-2f);
@@ -752,6 +619,7 @@ BOOST_AUTO_TEST_CASE( perspective_transform_test )
 BOOST_AUTO_TEST_CASE( warp_test )
 {
 	namespace ucv=baldzarika::ucv;
+	namespace math=baldzarika::math;
 	
 
 	typedef math::fixed_point<10,21> gray_t;
@@ -765,15 +633,15 @@ BOOST_AUTO_TEST_CASE( warp_test )
 
 	gray_image_t src_img(src8_img.width(), src8_img.height());
 
-	ucv::convert_scale(
+	ucv::convert(
 		ucv::gil::const_view(src8_img),
 		ucv::gil::view(src_img),
-		gray_t(1.0f/255.0f)
+		ucv::detail::grayscale_convert()
 	);
 
-	typedef ucv::point2<float> point_t;
-	typedef ucv::vector<float,3> vector_t;
-	typedef ucv::matrix<float,3,3> matrix_t;
+	typedef math::point2<float> point_t;
+	typedef math::vector<float,3> vector_t;
+	typedef math::matrix<float,3,3> matrix_t;
 
 	std::vector<point_t> src(4),dst(4);
 
@@ -788,8 +656,8 @@ BOOST_AUTO_TEST_CASE( warp_test )
 
 	for(boost::uint32_t p=0;p<4;p++)
 	{
-		point_t delta=pm*src[p]-dst[p];
-		BOOST_CHECK_LT(std::sqrt(delta.x*delta.x+delta.y*delta.y), 1.0e-3f);
+		point_t delta=src[p].transformed(pm)-dst[p];
+		BOOST_CHECK_LT(delta.length(), 1.0e-3f);
 	}
 
 	gray_image_t dst_img(50, 50);
@@ -798,29 +666,25 @@ BOOST_AUTO_TEST_CASE( warp_test )
 
 	ucv::gil::gray8_image_t dst8_img(50, 50);
 
-
-	boost::uint8_t median;
-	BOOST_CHECK(ucv::convert_scale(
+	BOOST_CHECK(ucv::convert(
 		ucv::gil::const_view(dst_img),
 		ucv::gil::view(dst8_img),
-		255.0f,
-		median
+		ucv::detail::grayscale_convert()
 	));
 
 	ucv::gil::png_write_view("warped-image-test.png", ucv::gil::const_view(dst8_img));
 }
-#endif
 
-#if 0
 
 BOOST_AUTO_TEST_CASE( camera_pose_test )
 {
 	namespace ucv=baldzarika::ucv;
+	namespace math=baldzarika::math;
 
-	typedef ucv::point2<float> point2_t;
+	typedef math::point2<float> point2_t;
 	
-	ucv::size2ui const fs=ucv::size2ui(100,100);
-	ucv::size2ui const ms=ucv::size2ui(50,50);
+	math::size2ui const fs=math::size2ui(100,100);
+	math::size2ui const ms=math::size2ui(50,50);
 	
 	std::vector<point2_t> src(4),dst(4);
 
@@ -829,18 +693,18 @@ BOOST_AUTO_TEST_CASE( camera_pose_test )
 	src[2]=point2_t( ms.width(),	ms.height() );	dst[2]=point2_t( fs.width(),	fs.height() );
 	src[3]=point2_t( 0.0f,			ms.height() );	dst[3]=point2_t( 0.0f,			fs.height() );
 
-	ucv::matrix33f hm;
+	math::matrix33f hm;
 
 	ucv::perspective_transform(src,dst,hm);
 
 	float const fovy=45.0f;
-	float ty=std::tan(fovy*0.5f/360.0f*ucv::detail::constant::pi<float>());
+	float ty=std::tan(fovy*0.5f/360.0f*math::constant::pi<float>());
 	float fl=fs.height()/(2.0f*ty);
 	
-	ucv::matrix44f cam_matrix;
+	math::matrix44f cam_matrix;
 	ucv::camera_pose(fl, fl, point2_t(fs.width()/2,fs.height()/2), hm, cam_matrix);
 
-	ucv::matrix44f cam_adjust=ucv::matrix44f::identity();
+	math::matrix44f cam_adjust=math::matrix44f::identity();
 
 	cam_adjust(0,0)=ms.width()/2.0f;
 	cam_adjust(0,3)=ms.width()/2.0f;
@@ -858,12 +722,12 @@ BOOST_AUTO_TEST_CASE( camera_pose_test )
 		{ -1.0f, -1.0f,	0.0f, 1.0f }
 	};
 	
-	ucv::vector4f top_left=cam_matrix*ucv::vector4f(corners[0]);
-	ucv::vector4f top_right=cam_matrix*ucv::vector4f(corners[1]);
-	ucv::vector4f bottom_right=cam_matrix*ucv::vector4f(corners[2]);
-	ucv::vector4f bottom_left=cam_matrix*ucv::vector4f(corners[3]);
+	math::vector4f top_left=cam_matrix*math::vector4f(corners[0]);
+	math::vector4f top_right=cam_matrix*math::vector4f(corners[1]);
+	math::vector4f bottom_right=cam_matrix*math::vector4f(corners[2]);
+	math::vector4f bottom_left=cam_matrix*math::vector4f(corners[3]);
 
-	ucv::matrix44f cam_intr=ucv::matrix44f::identity();
+	math::matrix44f cam_intr=math::matrix44f::identity();
 	cam_intr(0,0)=fl;
 	cam_intr(0,2)=fs.width()/2;
 	cam_intr(1,1)=fl;
@@ -873,17 +737,14 @@ BOOST_AUTO_TEST_CASE( camera_pose_test )
 	top_right=cam_intr*top_right; top_right/=top_right[2];
 	bottom_right=cam_intr*bottom_right; bottom_right/=bottom_right[2];
 	bottom_left=cam_intr*bottom_left; bottom_left/=bottom_left[2];
-
-
-	
-
 }
 
 BOOST_AUTO_TEST_CASE( canny_test )
 {
 	namespace ucv=baldzarika::ucv;
+	namespace math=baldzarika::math;
 
-	typedef math::fixed_point<15,16> real_t;
+	typedef math::real_t real_t;
 	typedef ucv::sobel<real_t, 3, 1> sobel_t;
 	typedef ucv::gaussian_blur<real_t, 3> gaussian_blur_t;
 	typedef ucv::adaptive_treshold<real_t, 5, true > adaptive_treshold_t;
@@ -906,16 +767,16 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 	gaussian_blur_t::gray_image_t raw_img(gray8_img.width(), gray8_img.height());
 	
-	ucv::convert_scale(
+	ucv::convert(
 		ucv::gil::const_view(gray8_img),
 		ucv::gil::view(raw_img),
-		real_t(1.0f/255.0f)
+		ucv::detail::grayscale_convert()
 	);
 
 
 	gaussian_blur_t::gray_image_t gray_img(gray8_img.width(), gray8_img.height());
 
-	gaussian_blur_t gaussian_blur(ucv::size2ui(gray8_img.width(), gray8_img.height()));
+	gaussian_blur_t gaussian_blur(math::size2ui(gray8_img.width(), gray8_img.height()));
 	gaussian_blur(ucv::gil::const_view(raw_img), ucv::gil::view(gray_img));
 	//gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
 	//gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
@@ -925,7 +786,7 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	
 
 
-	sobel_t sobel(ucv::size2ui(gray8_img.width(), gray8_img.height()));
+	sobel_t sobel(math::size2ui(gray8_img.width(), gray8_img.height()));
 
 	sobel_t::gray_image_t dx_img(gray8_img.width(), gray8_img.height());
 	sobel_t::gray_image_t dy_img(gray8_img.width(), gray8_img.height());
@@ -941,13 +802,13 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 
 	gaussian_blur_t::gray_image_t treshold_img(gray8_img.width(), gray8_img.height());
-	adaptive_treshold_t adaptive_treshold(ucv::size2ui(gray8_img.width(), gray8_img.height()), ucv::detail::constant::one<real_t>(), real_t(0.01));
-	adaptive_treshold(ucv::gil::const_view(raw_img),ucv::gil::view(treshold_img));
+	adaptive_treshold_t adaptive_treshold(math::size2ui(gray8_img.width(), gray8_img.height()), math::constant::one<real_t>(), real_t(0.01));
+	adaptive_treshold(ucv::gil::const_view(raw_img), ucv::gil::view(treshold_img));
 
-	ucv::convert_scale(
+	ucv::convert(
 		ucv::gil::const_view(treshold_img),
 		ucv::gil::view(gray32f_img),
-		1.0f
+		ucv::detail::convert()
 	);
 
 	cv::imshow(OPENCV_WND_NAME, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
@@ -955,10 +816,10 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 
 
-	ucv::convert_scale(
+	ucv::convert(
 		ucv::gil::const_view(gray_img),
 		ucv::gil::view(gray32f_img),
-		1.0f
+		ucv::detail::convert()
 	);
 
 	cv::imshow(OPENCV_WND_NAME, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
@@ -979,10 +840,10 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	cv::Sobel(image,image_dy,CV_8UC1,0,1);
 	
 	
-	ucv::convert_scale(
+	ucv::convert(
 		ucv::gil::const_view(dx_img),
 		ucv::gil::view(gray32f_img),
-		1.0f
+		ucv::detail::convert()
 	);
 	cv::imshow(OPENCV_WND_NAME, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
 	cv::waitKey();
@@ -990,10 +851,10 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	//cv::imshow(OPENCV_WND_NAME, image_dx);
 	//cv::waitKey();
 
-	ucv::convert_scale(
+	ucv::convert(
 		ucv::gil::const_view(dy_img),
 		ucv::gil::view(gray32f_img),
-		1.0f
+		ucv::detail::convert()
 	);
 	cv::imshow(OPENCV_WND_NAME, cv::Mat(dy_img.height(), dy_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
 	cv::waitKey();
@@ -1005,13 +866,13 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 	{
 		typedef ucv::contour< real_t > contour_t;
-		canny_t canny(ucv::size2ui(gray8_img.width(), gray8_img.height()), 0.4, 1.2);
+		canny_t canny(math::size2ui(gray8_img.width(), gray8_img.height()), 0.4, 1.2);
 		std::list< contour_t > contours;
 
-		typedef ucv::matrix<ucv::decimal_t, 3, 3> matrix_t;
+		typedef math::matrix<math::real_t, 3, 3> matrix_t;
 		//typedef ucv::point2<ucv::decimal_t> point_t;
 
-		typedef ucv::point2f point_t;
+		typedef math::point2f point_t;
 		
 		std::vector<point_t> src(4),dst(4);
 
@@ -1036,12 +897,12 @@ BOOST_AUTO_TEST_CASE( canny_test )
 			if(!(contour.m_is_closed && contour.m_points.size()==4 && contour.m_is_convex))
 				continue;
 
-			dst[0]=point_t(contour.m_points[contour.m_is_clockwise?0:3].x, contour.m_points[contour.m_is_clockwise?0:3].y);
-			dst[1]=point_t(contour.m_points[contour.m_is_clockwise?1:2].x, contour.m_points[contour.m_is_clockwise?1:2].y);
-			dst[2]=point_t(contour.m_points[contour.m_is_clockwise?2:1].x, contour.m_points[contour.m_is_clockwise?2:1].y);
-			dst[3]=point_t(contour.m_points[contour.m_is_clockwise?3:0].x, contour.m_points[contour.m_is_clockwise?3:0].y);
+			dst[0]=point_t(contour.m_points[contour.m_is_clockwise?0:3].x(), contour.m_points[contour.m_is_clockwise?0:3].y());
+			dst[1]=point_t(contour.m_points[contour.m_is_clockwise?1:2].x(), contour.m_points[contour.m_is_clockwise?1:2].y());
+			dst[2]=point_t(contour.m_points[contour.m_is_clockwise?2:1].x(), contour.m_points[contour.m_is_clockwise?2:1].y());
+			dst[3]=point_t(contour.m_points[contour.m_is_clockwise?3:0].x(), contour.m_points[contour.m_is_clockwise?3:0].y());
 
-			ucv::matrix33f pmf;
+			math::matrix33f pmf;
 
 			if(!ucv::perspective_transform(src,dst,pmf))
 				continue;
@@ -1068,18 +929,16 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 
 
-			boost::uint8_t median;
-			ucv::convert_scale(
+			ucv::convert(
 				ucv::gil::const_view(warped_img),
 				ucv::gil::view(warped8_img),
-				255.0f,
-				median
+				ucv::detail::grayscale_convert()
 			);
 						
 
 			boost::scoped_array<cv::Point> cpts(new cv::Point[contour.m_points.size()]);
 			for(boost::uint32_t p=0;p<contour.m_points.size();++p)
-				cpts.get()[p]=cv::Point(contour.m_points[p].x,contour.m_points[p].y);
+				cpts.get()[p]=cv::Point(contour.m_points[p].x(),contour.m_points[p].y());
 
 			int const npts=contour.m_points.size();
 			cv::Point const *ppts=cpts.get();
@@ -1108,16 +967,16 @@ BOOST_AUTO_TEST_CASE( canny_test )
 		th+=real_t(0.1);
 		real_t th_hi=th*real_t(3.0);
 
-		canny_t canny(ucv::size2ui(gray8_img.width(), gray8_img.height()), th, th_hi);
+		canny_t canny(math::size2ui(gray8_img.width(), gray8_img.height()), th, th_hi);
 
 		gaussian_blur_t::gray_image_t edge_img(gray8_img.width(), gray8_img.height());
 	
 		canny(ucv::gil::const_view(gray_img), ucv::gil::view(edge_img));
 
-		ucv::convert_scale(
+		ucv::convert(
 			ucv::gil::const_view(edge_img),
 			ucv::gil::view(gray32f_img),
-		1.0f
+			ucv::detail::convert()
 		);
 
 		cv::imshow(OPENCV_WND_NAME, cv::Mat(edge_img.height(), edge_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
@@ -1129,5 +988,3 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	cv::waitKey();
 	
 }
-
-#endif

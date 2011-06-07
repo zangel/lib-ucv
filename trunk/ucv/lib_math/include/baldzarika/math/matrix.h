@@ -40,22 +40,22 @@ namespace baldzarika { namespace math {
 
 		inline T& operator()(boost::int32_t r, boost::uint32_t c)
 		{
-			return m._2d[r][c];
+			return m_data[r][c];
 		}
 
 		inline T const& operator()(boost::int32_t r, boost::uint32_t c) const
 		{
-			return m._2d[r][c];
+			return m_data[r][c];
 		}
 
 		inline T& operator[](boost::int32_t n)
 		{
-			return m._1d[n];
+			return reinterpret_cast<T*>(&m_data[0][0])[n];
 		}
 
 		inline T const& operator[](boost::int32_t n) const
 		{
-			return m._1d[n];
+			return reinterpret_cast<T const *>(&m_data[0][0])[n];
 		}
 
 		inline vector<T,C> get_row(boost::int32_t r) const
@@ -65,7 +65,7 @@ namespace baldzarika { namespace math {
 
 		inline vector<T,R> get_col(boost::int32_t c) const
 		{
-			return matrix_ops<T,R,C>::get_col(*this, r);
+			return matrix_ops<T,R,C>::get_col(*this, c);
 		}
 
 		template < typename RVT >
@@ -168,14 +168,11 @@ namespace baldzarika { namespace math {
 		}
 	
 	private:
-		union
-		{
-			T	_2d[R][C];
-			T	_1d[RXC];
-		} m;
+		T	m_data[R][C];
 	};
 
 	typedef matrix<float,3,3> matrix33f;
+	typedef matrix<float,4,4> matrix44f;
 
 
 } //namespace math

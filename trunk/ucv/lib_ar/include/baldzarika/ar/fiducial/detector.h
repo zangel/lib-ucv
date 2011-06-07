@@ -63,14 +63,14 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			boost::shared_ptr<detector>				get_detector() const;
 			boost::shared_ptr<marker_model>			get_marker_model() const;
 			marker_id_t								get_marker_id() const;
-			ucv::size2ui							get_marker_size() const;
+			math::size2ui							get_marker_size() const;
 			bool									is_detected() const;
-			ucv::matrix33f const&					get_homography() const;
-			ucv::matrix44f const&					get_camera_pose() const;
+			math::matrix33f const&					get_homography() const;
+			math::matrix44f const&					get_camera_pose() const;
 			
 		protected:
 			void									set_detected(bool d);
-			void									set_homography(ucv::matrix33f const &hm);
+			void									set_homography(math::matrix33f const &hm);
 					
 		private:
 			boost::weak_ptr<marker_model_holder>	m_marker_model_holder;
@@ -78,8 +78,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			
 			bool									m_is_detected;
 			boost::uint32_t							m_undetected_frame_count;
-			ucv::matrix33f							m_homography;
-			ucv::matrix44f							m_camera_pose;
+			math::matrix33f							m_homography;
+			math::matrix44f							m_camera_pose;
 
 		public:
 			mutable boost::any						m_any_data;
@@ -179,17 +179,17 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		
 	
 	public:
-		detector(ucv::size2ui const &fs);
+		detector(math::size2ui const &fs);
 		~detector();
 
-		ucv::size2ui							get_frame_size() const;
-		bool									set_frame_size(ucv::size2ui const &fs);
+		math::size2ui							get_frame_size() const;
+		bool									set_frame_size(math::size2ui const &fs);
 
 		float									get_camera_fovy() const;
 		bool									set_camera_fovy(float fovy);
 
 		float									get_camera_focal_length() const;
-		ucv::matrix44f const&					get_camera_projection() const;
+		math::matrix44f const&					get_camera_projection() const;
 		
 		bool									add_marker_model(boost::shared_ptr<marker_model> const &mm);
 		bool									remove_marker_model(boost::shared_ptr<marker_model> const &mm);
@@ -228,7 +228,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		float									m_z_near;
 		float									m_z_far;
 		float									m_camera_focal_length;
-		ucv::matrix44f							m_camera_projection;
+		math::matrix44f							m_camera_projection;
 		
 		mutable boost::asio::io_service			m_ios;
 		boost::asio::io_service::work			m_ios_work;

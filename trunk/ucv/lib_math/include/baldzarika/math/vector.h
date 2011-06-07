@@ -204,6 +204,7 @@ namespace baldzarika { namespace math {
 
 	typedef vector<float,2> vector2f;
 	typedef vector<float,3> vector3f;
+	typedef vector<float,4> vector4f;
 
 
 } //namespace math

@@ -24,7 +24,7 @@ private:
 	GLuint						m_VideoTexture;
 
 	boost::mutex				m_VideoTextureSync;
-	ucv::size2ui				m_VideoTextureSize;
+	math::size2ui				m_VideoTextureSize;
 	bool						m_VideoTextureDirty;
 	ucv::gil::rgb8c_view_t		m_VideoTextureView;
 

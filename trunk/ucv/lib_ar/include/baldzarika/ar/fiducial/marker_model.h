@@ -16,17 +16,17 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		public:
 			detect_info();
 			detect_info(detect_info const &rhs);
-			detect_info(marker_id_t mid, ucv::size2ui const &ms, ucv::matrix33f &hm);
+			detect_info(marker_id_t mid, math::size2ui const &ms, math::matrix33f &hm);
 
 			marker_id_t		m_marker_id;
-			ucv::size2ui	m_marker_size;
-			ucv::matrix33f	m_homography;
+			math::size2ui	m_marker_size;
+			math::matrix33f	m_homography;
 		};
 
 		marker_model();
 		virtual ~marker_model();
 
-		virtual ucv::size2ui		get_marker_size(marker_id_t mid) const=0;
+		virtual math::size2ui		get_marker_size(marker_id_t mid) const=0;
 		virtual bool				detect_markers(gray_const_view_t img, std::list<contour_t> const &cnts, std::list<detect_info> &dis) const=0;
 
 	public:

@@ -6,14 +6,14 @@ namespace baldzarika { namespace ar {
 	class marker
 	{
 	public:
-		typedef ucv::fixed_point<10, 21> gray_t;
+		typedef math::fixed_point<10, 21> gray_t;
 		typedef ucv::gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
 		typedef ucv::gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
 		typedef gray_image_t::view_t gray_view_t;
 		
 		marker();
 		marker(marker const &that);
-		marker(ucv::size2ui const &sz);
+		marker(math::size2ui const &sz);
 		marker(gray_image_t const &img);
 		marker(ucv::gil::gray8c_view_t gv);
 		marker(ucv::gil::rgb8c_view_t rgbv);
@@ -28,7 +28,7 @@ namespace baldzarika { namespace ar {
 		bool								set(ucv::gil::gray8c_view_t gv);
 		
 
-		ucv::size2ui						get_size() const;
+		math::size2ui						get_size() const;
 
 		gray_image_t const&					get_image() const;
 		gray_image_t&						get_image();

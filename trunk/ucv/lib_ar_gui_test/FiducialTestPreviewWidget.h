@@ -31,7 +31,8 @@ private:
 	boost::shared_ptr<ar::fiducial::detector>	m_detector;
 
 	bool						m_is_detected;
-	ucv::matrix44f				m_model_view;
+	boost::int32_t				m_marker_id;
+	math::matrix44f				m_model_view;
 
 };
 

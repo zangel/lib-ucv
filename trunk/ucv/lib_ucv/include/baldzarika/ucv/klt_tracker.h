@@ -16,7 +16,7 @@ namespace baldzarika { namespace ucv {
 		typedef typename integral_image_t::view_t integral_view_t;
 		typedef typename integral_image_t::const_view_t const_integral_view_t;
 		
-		klt_tracker(math::size2ui const &fs, math::size2ui const &hws=ucv::size2ui(5,5), boost::uint32_t nl=3, boost::uint32_t mi=5, integral_t const &e=integral_t(1.0e-4f), integral_t const &sd=integral_t(1.0e-3f))
+		klt_tracker(math::size2ui const &fs, math::size2ui const &hws=math::size2ui(5,5), boost::uint32_t nl=3, boost::uint32_t mi=5, integral_t const &e=integral_t(1.0e-4f), integral_t const &sd=integral_t(1.0e-3f))
 			: m_frame_size(fs)
 			, m_half_win_size(hws.width(), hws.height())
 			, m_window((2*m_half_win_size.width()+1+5)*3, 2*m_half_win_size.height()+1+5)
@@ -100,7 +100,7 @@ namespace baldzarika { namespace ucv {
 		template < boost::uint32_t I2, boost::uint32_t F2 >
 		bool operator()(math::point2< math::fixed_point<I2,F2> > const &prev_fp, math::point2< math::fixed_point<I2,F2> > &curr_fp)
 		{
-			integral_t const range_corr=detail::constant::one<integral_t>()/integral_t((2*m_half_win_size.width()+1)*(2*m_half_win_size.height()+1));
+			integral_t const range_corr=math::constant::one<integral_t>()/integral_t((2*m_half_win_size.width()+1)*(2*m_half_win_size.height()+1));
 			integral_t const step_factor=2.0f;
 			curr_fp=prev_fp;
 			for(boost::uint32_t l=0;l<m_num_levels;++l)
@@ -125,8 +125,8 @@ namespace baldzarika { namespace ucv {
 					integral_t dx=(gyy*ex-gxy*ey)/det;
 					integral_t dy=(gxx*ey-gxy*ex)/det;
 
-					curr_fp.x+=dx*level_scale;
-					curr_fp.y+=dy*level_scale;
+					curr_fp.x()+=dx*level_scale;
+					curr_fp.y()+=dy*level_scale;
 
 					if((dx*dx+dy*dy)<m_epsilon)
 						break;
@@ -154,11 +154,11 @@ namespace baldzarika { namespace ucv {
 		void compute_gradient_matrix_and_err_vector(math::fixed_point<I2,F2> &gxx, math::fixed_point<I2,F2> &gyy, math::fixed_point<I2,F2> &gxy, math::fixed_point<I2,F2> &ex, math::fixed_point<I2,F2> &ey)
 		{
 			typedef math::fixed_point<I2,F2> real_t;
-			gxx=detail::constant::zero<real_t>();
-			gyy=detail::constant::zero<real_t>();
-			gxy=detail::constant::zero<real_t>();
-			ex=detail::constant::zero<real_t>();
-			ey=detail::constant::zero<real_t>();
+			gxx=math::constant::zero<real_t>();
+			gyy=math::constant::zero<real_t>();
+			gxy=math::constant::zero<real_t>();
+			ex=math::constant::zero<real_t>();
+			ey=math::constant::zero<real_t>();
 						
 			integral_view_t img_diff_view=img_diff();
 			integral_view_t grad_sum_x_view=grad_sum_x();
@@ -198,19 +198,19 @@ namespace baldzarika { namespace ucv {
 			integral_t const inv_area=1.0f/float(s*s);
 
 
-			integral_t prev_ax=integral_t(prev_pt.x-real_t(static_cast<boost::int32_t>(prev_pt.x)))*inv_s;
-			integral_t prev_ay=integral_t(prev_pt.y-real_t(static_cast<boost::int32_t>(prev_pt.y)))*inv_s;
-			integral_t prev_c00=(detail::constant::one<integral_t>()-prev_ax)*(detail::constant::one<integral_t>()-prev_ay);
-			integral_t prev_c01=prev_ax*(detail::constant::one<integral_t>()-prev_ay);
-			integral_t prev_c10=(detail::constant::one<integral_t>()-prev_ax)*prev_ay;
+			integral_t prev_ax=integral_t(prev_pt.x()-real_t(static_cast<boost::int32_t>(prev_pt.x())))*inv_s;
+			integral_t prev_ay=integral_t(prev_pt.y()-real_t(static_cast<boost::int32_t>(prev_pt.y())))*inv_s;
+			integral_t prev_c00=(math::constant::one<integral_t>()-prev_ax)*(math::constant::one<integral_t>()-prev_ay);
+			integral_t prev_c01=prev_ax*(math::constant::one<integral_t>()-prev_ay);
+			integral_t prev_c10=(math::constant::one<integral_t>()-prev_ax)*prev_ay;
 			integral_t prev_c11=prev_ax*prev_ay;
 			
 
-			integral_t curr_ax=integral_t(curr_pt.x-real_t(static_cast<boost::int32_t>(curr_pt.x)))*inv_s;
-			integral_t curr_ay=integral_t(curr_pt.y-real_t(static_cast<boost::int32_t>(curr_pt.y)))*inv_s;
-			integral_t curr_c00=(detail::constant::one<integral_t>()-curr_ax)*(detail::constant::one<integral_t>()-curr_ay);
-			integral_t curr_c01=curr_ax*(detail::constant::one<integral_t>()-curr_ay);
-			integral_t curr_c10=(detail::constant::one<integral_t>()-curr_ax)*curr_ay;
+			integral_t curr_ax=integral_t(curr_pt.x()-real_t(static_cast<boost::int32_t>(curr_pt.x())))*inv_s;
+			integral_t curr_ay=integral_t(curr_pt.y()-real_t(static_cast<boost::int32_t>(curr_pt.y())))*inv_s;
+			integral_t curr_c00=(math::constant::one<integral_t>()-curr_ax)*(math::constant::one<integral_t>()-curr_ay);
+			integral_t curr_c01=curr_ax*(math::constant::one<integral_t>()-curr_ay);
+			integral_t curr_c10=(math::constant::one<integral_t>()-curr_ax)*curr_ay;
 			integral_t curr_c11=curr_ax*curr_ay;
 			
 			integral_view_t img_diff_view=img_diff();
@@ -224,9 +224,9 @@ namespace baldzarika { namespace ucv {
 				integral_t *grad_sum_y_row=reinterpret_cast<integral_t *>(grad_sum_y_view.row_begin(y));
 				for(boost::uint32_t x=0;x<2*m_half_win_size.width()+5+1;++x)
 				{
-					*img_diff_row++=detail::constant::zero<integral_t>();
-					*grad_sum_x_row++=detail::constant::zero<integral_t>();
-					*grad_sum_y_row++=detail::constant::zero<integral_t>();
+					*img_diff_row++=math::constant::zero<integral_t>();
+					*grad_sum_x_row++=math::constant::zero<integral_t>();
+					*grad_sum_y_row++=math::constant::zero<integral_t>();
 				}
 			}
 
@@ -258,14 +258,14 @@ namespace baldzarika { namespace ucv {
 
 				for(boost::uint32_t x=1;x<(2*m_half_win_size.width()+1)+2+1;++x)
 				{
-					point2i prev_pos(
-						static_cast<boost::int32_t>(prev_pt.x)+(x-m_half_win_size.width()-2)*s,
-						static_cast<boost::int32_t>(prev_pt.y)+(y-m_half_win_size.height()-2)*s
+					math::point2i prev_pos(
+						static_cast<boost::int32_t>(prev_pt.x())+(x-m_half_win_size.width()-2)*s,
+						static_cast<boost::int32_t>(prev_pt.y())+(y-m_half_win_size.height()-2)*s
 					);
 
-					point2i curr_pos(
-						static_cast<point2i::value_type>(curr_pt.x)+(x-m_half_win_size.width()-2)*s,
-						static_cast<point2i::value_type>(curr_pt.y)+(y-m_half_win_size.height()-2)*s
+					math::point2i curr_pos(
+						static_cast<math::point2i::value_type>(curr_pt.x())+(x-m_half_win_size.width()-2)*s,
+						static_cast<math::point2i::value_type>(curr_pt.y())+(y-m_half_win_size.height()-2)*s
 					);
 
 					integral_t prev_val=box_integral<const_integral_view_t,integral_t>(m_prev_view, prev_pos, math::size2ui(s,s))*inv_area;
@@ -277,10 +277,10 @@ namespace baldzarika { namespace ucv {
 					integral_t diff_10=gauss_scale*(prev_val*prev_c01-curr_val*curr_c01);
 					integral_t diff_11=gauss_scale*(prev_val*prev_c00-curr_val*curr_c00);
 
-					integral_t diff_00_2=detail::constant::two<integral_t>()*diff_00;
-					integral_t diff_01_2=detail::constant::two<integral_t>()*diff_01;
-					integral_t diff_10_2=detail::constant::two<integral_t>()*diff_10;
-					integral_t diff_11_2=detail::constant::two<integral_t>()*diff_11;
+					integral_t diff_00_2=math::constant::two<integral_t>()*diff_00;
+					integral_t diff_01_2=math::constant::two<integral_t>()*diff_01;
+					integral_t diff_10_2=math::constant::two<integral_t>()*diff_10;
+					integral_t diff_11_2=math::constant::two<integral_t>()*diff_11;
 
 					//[-1][-1]
 					img_diff_rows[0][-1]+=diff_00;
@@ -307,10 +307,10 @@ namespace baldzarika { namespace ucv {
 					img_diff_rows[2][+0]+=diff_11_2;
 
 					//[+0][+0]
-					img_diff_rows[1][+0]+=detail::constant::four<integral_t>()*diff_00;
-					img_diff_rows[1][+1]+=detail::constant::four<integral_t>()*diff_01;
-					img_diff_rows[2][+0]+=detail::constant::four<integral_t>()*diff_10;
-					img_diff_rows[2][+1]+=detail::constant::four<integral_t>()*diff_11;
+					img_diff_rows[1][+0]+=math::constant::four<integral_t>()*diff_00;
+					img_diff_rows[1][+1]+=math::constant::four<integral_t>()*diff_01;
+					img_diff_rows[2][+0]+=math::constant::four<integral_t>()*diff_10;
+					img_diff_rows[2][+1]+=math::constant::four<integral_t>()*diff_11;
 
 					//[+0][+1]
 					img_diff_rows[1][+1]+=diff_00_2;
@@ -343,10 +343,10 @@ namespace baldzarika { namespace ucv {
 					integral_t sum_10=sobel_scale*(prev_val*prev_c01+curr_val*curr_c01);
 					integral_t sum_11=sobel_scale*(prev_val*prev_c00+curr_val*curr_c00);
 
-					integral_t sum_00_2=detail::constant::two<integral_t>()*sum_00;
-					integral_t sum_01_2=detail::constant::two<integral_t>()*sum_01;
-					integral_t sum_10_2=detail::constant::two<integral_t>()*sum_10;
-					integral_t sum_11_2=detail::constant::two<integral_t>()*sum_11;
+					integral_t sum_00_2=math::constant::two<integral_t>()*sum_00;
+					integral_t sum_01_2=math::constant::two<integral_t>()*sum_01;
+					integral_t sum_10_2=math::constant::two<integral_t>()*sum_10;
+					integral_t sum_11_2=math::constant::two<integral_t>()*sum_11;
 
 					//[-1][-1]
 					grad_sum_x_rows[0][-1]+=sum_00;

@@ -30,7 +30,7 @@ namespace baldzarika { namespace ar {
 	{
 	}
 
-	marker::marker(ucv::size2ui const &sz)
+	marker::marker(math::size2ui const &sz)
 		: m_img(sz.width(), sz.height())
 		, m_median(-1)
 	{
@@ -130,9 +130,9 @@ namespace baldzarika { namespace ar {
 		return false;
 	}
 
-	ucv::size2ui marker::get_size() const 
+	math::size2ui marker::get_size() const 
 	{
-		return ucv::size2ui(m_img.width(), m_img.height());
+		return math::size2ui(m_img.width(), m_img.height());
 	}
 
 	marker::gray_image_t const& marker::get_image() const

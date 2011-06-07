@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'PreviewWidget.h'
 **
-** Created: Mon 30. May 11:39:53 2011
+** Created: Tue 7. Jun 14:10:37 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!
