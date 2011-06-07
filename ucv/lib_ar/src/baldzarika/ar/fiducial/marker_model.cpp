@@ -17,7 +17,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	}
 
-	marker_model::detect_info::detect_info(marker_id_t mid, ucv::size2ui const &ms, ucv::matrix33f &hm)
+	marker_model::detect_info::detect_info(marker_id_t mid, math::size2ui const &ms, math::matrix33f &hm)
 		: m_marker_id(mid)
 		, m_marker_size(ms)
 		, m_homography(hm)

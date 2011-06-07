@@ -46,16 +46,16 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		}
 
 		template < boost::uint32_t R >
-		inline ucv::matrix33f const& homography_rotation();
+		inline math::matrix33f const& homography_rotation();
 
 		template<>
-		inline ucv::matrix33f const& homography_rotation<0>()
+		inline math::matrix33f const& homography_rotation<0>()
 		{
-			return ucv::matrix33f::identity();
+			return math::matrix33f::identity();
 		}
 
 		template<>
-		inline ucv::matrix33f const& homography_rotation<1>()
+		inline math::matrix33f const& homography_rotation<1>()
 		{
 			static float const matd[3][3]=
 			{
@@ -64,12 +64,12 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				{  0.0f,  0.0f, 1.0f }
 			};
 
-			static ucv::matrix33f mat(matd);
+			static math::matrix33f mat(matd);
 			return mat;
 		}
 
 		template<>
-		inline ucv::matrix33f const& homography_rotation<2>()
+		inline math::matrix33f const& homography_rotation<2>()
 		{
 			static float const matd[3][3]=
 			{
@@ -78,12 +78,12 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				{  0.0f,  0.0f, 1.0f }
 			};
 
-			static ucv::matrix33f mat(matd);
+			static math::matrix33f mat(matd);
 			return mat;
 		}
 
 		template<>
-		inline ucv::matrix33f const& homography_rotation<3>()
+		inline math::matrix33f const& homography_rotation<3>()
 		{
 			static float const matd[3][3]=
 			{
@@ -92,16 +92,16 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				{  0.0f,  0.0f, 1.0f }
 			};
 
-			static ucv::matrix33f mat(matd);
+			static math::matrix33f mat(matd);
 			return mat;
 		}
 	}
 
-	ucv::size2ui const bch_marker_model::MARKER_CELL_SIZE=ucv::size2ui(7,7);
-	ucv::size2ui const bch_marker_model::MARKER_SIZE=ucv::size2ui(MARKER_CELL_SIZE.width()*7, MARKER_CELL_SIZE.height()*7);
+	math::size2ui const bch_marker_model::MARKER_CELL_SIZE=math::size2ui(7,7);
+	math::size2ui const bch_marker_model::MARKER_SIZE=math::size2ui(MARKER_CELL_SIZE.width()*7, MARKER_CELL_SIZE.height()*7);
 		
-	ucv::decimal_t const bch_marker_model::DEFAULT_ECCENTRICITY=0.70710678118654752440084436210485;
-	ucv::decimal_t const bch_marker_model::DEFAULT_MIN_SIDE_LENGTH=20.0;
+	math::real_t const bch_marker_model::DEFAULT_ECCENTRICITY=0.70710678118654752440084436210485;
+	math::real_t const bch_marker_model::DEFAULT_MIN_SIDE_LENGTH=20.0;
 
 	boost::uint8_t const bch_marker_model::HAMMING_CODEWORDS[4][5]=
 	{
@@ -164,7 +164,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	}
 
-	ucv::size2ui bch_marker_model::get_marker_size(marker_id_t mid) const
+	math::size2ui bch_marker_model::get_marker_size(marker_id_t mid) const
 	{
 		return MARKER_SIZE;
 	}
@@ -182,22 +182,22 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		if(!(contour.m_is_closed && contour.m_points.size()==4 && contour.m_is_convex))
 			return false;
 
-		ucv::decimal_t inv_scale=ucv::detail::constant::one<ucv::decimal_t>()/
-			ucv::decimal_t(std::max(contour.m_bbox.width(),contour.m_bbox.height()));
+		math::real_t inv_scale=math::constant::one<math::real_t>()/
+			math::real_t(std::max(contour.m_bbox.width(),contour.m_bbox.height()));
 
-		ucv::decimal_t min_side_length=m_min_side_length*inv_scale;
+		math::real_t min_side_length=m_min_side_length*inv_scale;
 
 		for(boost::uint32_t p=0;p<4;++p)
 		{
-			ucv::vector<ucv::decimal_t, 2> prev=contour.m_points[(p-1)%4]-contour.m_points[p];
+			math::vector<math::real_t, 2> prev=contour.m_points[(p-1)%4]-contour.m_points[p];
 			prev*=inv_scale;
 
-			ucv::decimal_t prev_length=prev.length();
+			math::real_t prev_length=prev.length();
 			if(prev_length<min_side_length)
 				return false;
 			
 			prev/=prev_length;
-			ucv::vector<ucv::decimal_t, 2> next=contour.m_points[(p+1)%4]-contour.m_points[p];
+			math::vector<math::real_t, 2> next=contour.m_points[(p+1)%4]-contour.m_points[p];
 			next*=inv_scale;
 
 			if(std::abs(next.normalized().dot(prev))>m_eccentricity)
@@ -250,7 +250,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		}
 	}
 
-	marker_id_t bch_marker_model::find_marker_id(ucv::matrix33f &homography) const
+	marker_id_t bch_marker_model::find_marker_id(math::matrix33f &homography) const
 	{
 		gray_const_view_t warped_view=ucv::gil::const_view(m_warped_img);
 		
@@ -309,18 +309,18 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			homography*=homography_rotation<3>(); break;
 		}
 #endif
-		homography.scale(1.0f/homography(2,2));
+		homography*=(math::constant::one<float>()/homography(2,2));
 		return mid_and_rot.first;
 	}
 	
 	bool bch_marker_model::detect_markers(gray_const_view_t img, std::list<std::list<contour_t>::const_iterator> const &candidates, std::list<detect_info> &dis) const
 	{
-		std::vector<ucv::point2f> src_pts(4), dst_pts(4);
+		std::vector<math::point2f> src_pts(4), dst_pts(4);
 
-		src_pts[0]=ucv::point2f( 0.0f,							0.0f );
-		src_pts[1]=ucv::point2f( float(MARKER_SIZE.width()),	0.0f);
-		src_pts[2]=ucv::point2f( float(MARKER_SIZE.width()),	float(MARKER_SIZE.height()));
-		src_pts[3]=ucv::point2f( 0.0f,							float(MARKER_SIZE.height()));
+		src_pts[0]=math::point2f( 0.0f,							0.0f );
+		src_pts[1]=math::point2f( float(MARKER_SIZE.width()),	0.0f);
+		src_pts[2]=math::point2f( float(MARKER_SIZE.width()),	float(MARKER_SIZE.height()));
+		src_pts[3]=math::point2f( 0.0f,							float(MARKER_SIZE.height()));
 		
 		for(std::list<std::list<contour_t>::const_iterator>::const_iterator candidate=candidates.begin();candidate!=candidates.end();++candidate)
 		{
@@ -329,17 +329,17 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			for(boost::uint32_t p=0;p<4;++p)
 			{
 				contour_t::point2_t const &pt=contour.m_points[contour.m_is_clockwise?p:3-p];
-				dst_pts[p]=ucv::point2f(pt.x, pt.y);
+				dst_pts[p]=math::point2f(pt.x(), pt.y());
 			}
 
 			ucv::corners_subpixel(img,dst_pts);
 			
-			ucv::matrix33f homography;
+			math::matrix33f homography;
 			if(!ucv::perspective_transform(src_pts,dst_pts,homography))
 				continue;
 
 			//use fixed_point based warp for performance reason
-			ucv::matrix<ucv::decimal_t, 3, 3> fp_homography=homography;
+			math::matrix<math::real_t, 3, 3> fp_homography=homography;
 			if(!ucv::warp(img, ucv::gil::view(m_warped_img), fp_homography, true))
 				continue;
 

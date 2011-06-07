@@ -72,39 +72,21 @@ namespace baldzarika { namespace ar {
 		return m_frame_points;
 	}
 
-	ucv::matrix33f const& tracker::marker_state::get_homography_matrix() const
+	math::matrix33f const& tracker::marker_state::get_homography_matrix() const
 	{
 		return m_hmatrix;
 	}
 
 	void tracker::marker_state::get_marker_corners(tracker::marker_state::points2_t &mcs) const
 	{
-		ucv::size2ui ms=m_marker->get_size();
+		math::size2ui ms=m_marker->get_size();
 		mcs.clear();
-		mcs.push_back(
-			m_hmatrix*feature_point_t::point2_t(
-				0,
-				0
-			)
-		);
-		mcs.push_back(
-			m_hmatrix*feature_point_t::point2_t(
-				ms.width(),
-				0
-			)
-		);
-		mcs.push_back(
-			m_hmatrix*feature_point_t::point2_t(
-				0,
-				ms.height()
-			)
-		);
-		mcs.push_back(
-			m_hmatrix*feature_point_t::point2_t(
-				ms.width(),
-				ms.height()
-			)
-		);
+
+		mcs.push_back(feature_point_t::point2_t(0,0).transformed(m_hmatrix));
+		mcs.push_back(feature_point_t::point2_t(ms.width(),0).transformed(m_hmatrix));
+		mcs.push_back(feature_point_t::point2_t(0,ms.height()).transformed(m_hmatrix));
+		mcs.push_back(feature_point_t::point2_t(ms.width(),ms.height()).transformed(m_hmatrix));
+
 	}
 
 	void tracker::marker_state::set_detected(bool d)
@@ -112,7 +94,7 @@ namespace baldzarika { namespace ar {
 		m_detected=d;
 	}
 
-	tracker::tracker(ucv::size2ui const &fs)
+	tracker::tracker(math::size2ui const &fs)
 		: m_min_marker_features(DEFAULT_TRACKER_MIN_MARKER_FEATURES)
 		, m_max_marker_features(DEFAULT_TRACKER_MAX_MARKER_FEATURES)
 		, m_select_fp_scale(DEFAULT_TRACKER_SELECT_FP_SCALE)
@@ -132,7 +114,7 @@ namespace baldzarika { namespace ar {
 			DEFAULT_SURF_TRESHOLD
 		)
 		, m_klt_tracker(fs,
-			ucv::size2ui(DEFAULT_KLT_HALF_WIN_SIZE,DEFAULT_KLT_HALF_WIN_SIZE),
+			math::size2ui(DEFAULT_KLT_HALF_WIN_SIZE,DEFAULT_KLT_HALF_WIN_SIZE),
 			DEFAULT_KLT_LEVELS,
 			DEFAULT_KLT_MAX_ITERATIONS,
 			DEFAULT_KLT_EPSILON
@@ -151,12 +133,12 @@ namespace baldzarika { namespace ar {
 		}
 	}
 
-	ucv::size2ui tracker::get_frame_size() const
+	math::size2ui tracker::get_frame_size() const
 	{
 		return m_surf.size();
 	}
 
-	bool tracker::set_frame_size(ucv::size2ui const &fs)
+	bool tracker::set_frame_size(math::size2ui const &fs)
 	{
 		if(is_active())
 			return false;
@@ -217,7 +199,7 @@ namespace baldzarika { namespace ar {
 	{
 		if(is_active())
 			return false;
-		m_klt_tracker.set_half_win_size(ucv::size2ui(thws,thws));
+		m_klt_tracker.set_half_win_size(math::size2ui(thws,thws));
 		return true;
 	}
 
@@ -527,9 +509,9 @@ namespace baldzarika { namespace ar {
 				feature_point_t::desc_value_type const select_scale=m_select_fp_scale;
 				feature_point_t::value_type const inv_select_fp_min_distance=1.0f/sqrt(m_surf.size().area()*m_select_fp_min_area);
 
-				feature_point_t::value_type const marker_left=ucv::detail::constant::zero<feature_point_t::value_type>();
+				feature_point_t::value_type const marker_left=math::constant::zero<feature_point_t::value_type>();
 				feature_point_t::value_type const marker_right=ms.get_marker()->get_size().width();
-				feature_point_t::value_type const marker_top=ucv::detail::constant::zero<feature_point_t::value_type>();
+				feature_point_t::value_type const marker_top=math::constant::zero<feature_point_t::value_type>();
 				feature_point_t::value_type const marker_bottom=ms.get_marker()->get_size().height();
 				
 				std::vector<
@@ -541,25 +523,25 @@ namespace baldzarika { namespace ar {
 
 				marker_state::points2_t marker_points(ffs.size());
 
-				ucv::matrix33f inv_hm(ms.m_hmatrix.inverse());
+				math::matrix33f inv_hm(ms.m_hmatrix.inverted());
 
 				for(std::size_t f=0;f<ffs.size();++f)
 				{
-					marker_points[f]=inv_hm*static_cast<feature_point_t::point2_t const &>(ffs[f]);
+					marker_points[f]=ffs[f].transformed(inv_hm);
 
-					if(	marker_points[f].x>marker_left && marker_points[f].x<marker_right &&
-						marker_points[f].y>marker_top && marker_points[f].y<marker_bottom
+					if(	marker_points[f].x()>marker_left && marker_points[f].x()<marker_right &&
+						marker_points[f].y()>marker_top && marker_points[f].y()<marker_bottom
 					)
 					{
-						boost::uint32_t fp_g_x=static_cast<boost::uint32_t>(ffs[f].x*inv_select_fp_min_distance);
-						boost::uint32_t fp_g_y=static_cast<boost::uint32_t>(ffs[f].y*inv_select_fp_min_distance);
+						boost::uint32_t fp_g_x=static_cast<boost::uint32_t>(ffs[f].x()*inv_select_fp_min_distance);
+						boost::uint32_t fp_g_y=static_cast<boost::uint32_t>(ffs[f].y()*inv_select_fp_min_distance);
 						feature_point_t::desc_value_type fp_sel_scale=std::abs(ffs[f].m_scale-select_scale);
 
 						std::size_t si;
 						for(si=0;si<marker_inliers.size();++si)
 						{
-							boost::uint32_t si_g_x=static_cast<boost::uint32_t>(ffs[marker_inliers[si].second].x*inv_select_fp_min_distance);
-							boost::uint32_t si_g_y=static_cast<boost::uint32_t>(ffs[marker_inliers[si].second].y*inv_select_fp_min_distance);
+							boost::uint32_t si_g_x=static_cast<boost::uint32_t>(ffs[marker_inliers[si].second].x()*inv_select_fp_min_distance);
+							boost::uint32_t si_g_y=static_cast<boost::uint32_t>(ffs[marker_inliers[si].second].y()*inv_select_fp_min_distance);
 							
 							if(fp_g_x==si_g_x && fp_g_y==si_g_y)
 							{

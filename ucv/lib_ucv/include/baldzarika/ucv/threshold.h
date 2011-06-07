@@ -35,7 +35,7 @@ namespace baldzarika { namespace ucv {
 			inline DT operator()(ST const &src) const
 			{
 				return src<binary_threshold<ST,DT>::m_threshold?
-					constant::zero<DT>():
+					math::constant::zero<DT>():
 					binary_threshold<ST,DT>::m_max_value;
 			}
 		};
@@ -54,7 +54,7 @@ namespace baldzarika { namespace ucv {
 			{
 				return src<binary_threshold<ST,DT>::m_threshold?
 					binary_threshold<ST,DT>::m_max_value:
-					constant::zero<DT>();
+					math::constant::zero<DT>();
 			}
 		};
 

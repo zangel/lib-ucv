@@ -5,29 +5,6 @@
 
 namespace baldzarika { namespace ucv {
 
-	namespace detail {
-#if 0
-		template
-		<
-			boost::uint32_t HBS
-			typename SVT,
-			template
-			<
-				typename gil::channel_type<typename SVT::value_type>::type,
-				typename DT
-			> class THTB
-		>
-		struct otsu_treshold
-			: THTB<typename gil::channel_type<typename SVT::value_type>::type,DT>
-		{
-			typedef typename gil::channel_type<typename SVT::value_type>::type src_channel_t;
-
-		};
-
-#endif
-
-	} //namespace detail
-
 	template < typename VT, boost::uint32_t HBS >
 	typename gil::channel_type<typename VT::value_type>::type find_otsu_threshold(VT iv,
 		typename gil::channel_type<typename VT::value_type>::type min_val,
@@ -41,23 +18,23 @@ namespace baldzarika { namespace ucv {
 		if(!ranged_histogram(iv,histogram, min_val, max_val))
 			return max_val;
 
-		channel_t mu=detail::constant::zero<channel_t>();
+		channel_t mu=math::constant::zero<channel_t>();
 
 		for(boost::uint32_t i=0;i<HBS;++i)
 			mu+=channel_t(i)*histogram[i];
 
-		channel_t mu1=detail::constant::zero<channel_t>();
-		channel_t q1=detail::constant::zero<channel_t>();
-		channel_t max_sigma=detail::constant::zero<channel_t>();
+		channel_t mu1=math::constant::zero<channel_t>();
+		channel_t q1=math::constant::zero<channel_t>();
+		channel_t max_sigma=math::constant::zero<channel_t>();
 		boost::uint32_t max_val_id=0;
 
 		for(boost::uint32_t i=0;i<HBS;i++)
 		{
 			mu1*=q1;
 			q1+=histogram[i];
-			channel_t q2=detail::constant::one<channel_t>()-q1;
+			channel_t q2=math::constant::one<channel_t>()-q1;
 
-			if(std::min(q1,q2)<std::numeric_limits<channel_t>::epsilon() || std::max(q1,q2)>(detail::constant::one<channel_t>()-std::numeric_limits<channel_t>::epsilon()))
+			if(std::min(q1,q2)<std::numeric_limits<channel_t>::epsilon() || std::max(q1,q2)>(math::constant::one<channel_t>()-std::numeric_limits<channel_t>::epsilon()))
 				continue;
 
 			mu1=(mu1+channel_t(i)*histogram[i])/q1;

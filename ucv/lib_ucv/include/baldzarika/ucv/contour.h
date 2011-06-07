@@ -16,7 +16,7 @@ namespace baldzarika { namespace ucv {
 		static bool check_is_closed(points_t const &pts, T const &eps)
 		{
 			if(pts.size()>4)
-				return (vector<T,2>(pts.back()-pts.front()).length()<=eps);
+				return (math::vector<T,2>(pts.back()-pts.front()).length()<=eps);
 			return false;
 		}
 		
@@ -49,10 +49,10 @@ namespace baldzarika { namespace ucv {
 		static void compute_orientation_and_convexity(points_t const &pts, box2_t const &bbox, bool is_closed, bool &cw, bool &convex)
 		{
 			boost::int32_t const count=boost::int32_t(pts.size());
-			T const inv_width=detail::constant::one<T>()/bbox.width();
-			T const inv_height=detail::constant::one<T>()/bbox.height();
+			T const inv_width=math::constant::one<T>()/bbox.width();
+			T const inv_height=math::constant::one<T>()/bbox.height();
 
-			T cross_sum=detail::constant::zero<T>();
+			T cross_sum=math::constant::zero<T>();
 			bool all_positive=true;
 			bool all_negative=true;
 
@@ -64,26 +64,26 @@ namespace baldzarika { namespace ucv {
 				math::point2<T> next_pt=pts[(p+1)%count];
 
 				math::point2<T> a=next_pt-curr_pt;
-				a.x*=inv_width;
-				a.y*=inv_height;
+				a.x()*=inv_width;
+				a.y()*=inv_height;
 
 				math::point2<T> b=prev_pt-curr_pt;
-				b.x*=inv_width;
-				b.y*=inv_height;
+				b.x()*=inv_width;
+				b.y()*=inv_height;
 
-				T cross_prod=a.x*b.y-a.y*b.x;
+				T cross_prod=a.x()*b.y()-a.y()*b.x();
 				cross_sum+=cross_prod;
-				all_positive=all_positive && cross_prod>=detail::constant::zero<T>();
-				all_negative=all_negative && cross_prod<=detail::constant::zero<T>();
+				all_positive=all_positive && cross_prod>=math::constant::zero<T>();
+				all_negative=all_negative && cross_prod<=math::constant::zero<T>();
 
 				prev_pt=curr_pt;
 				curr_pt=next_pt;
 			}
 
-			cw=cross_sum>=detail::constant::zero<T>();
+			cw=cross_sum>=math::constant::zero<T>();
 			convex=
-				(cross_sum>=detail::constant::zero<T>() && all_positive) ||
-				(cross_sum<=detail::constant::zero<T>() && all_negative);
+				(cross_sum>=math::constant::zero<T>() && all_positive) ||
+				(cross_sum<=math::constant::zero<T>() && all_negative);
 		}
 
 		contour()

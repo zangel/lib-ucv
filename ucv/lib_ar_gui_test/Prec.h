@@ -17,11 +17,15 @@
 #include <QDropEvent>
 #include <QUrl>
 #include <QTimer>
+#include <QMessageBox>
+#include <QFileInfo>
+#include <QDir>
 
 #include <videoInput.h>
 
 namespace ar=baldzarika::ar;
 namespace ucv=baldzarika::ucv;
+namespace math=baldzarika::math;
 
 
 #endif //PREC_H

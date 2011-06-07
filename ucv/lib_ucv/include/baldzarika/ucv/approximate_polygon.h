@@ -9,7 +9,7 @@ namespace baldzarika { namespace ucv {
 		typedef std::pair<boost::int32_t, boost::int32_t> slice_t;
 		typedef std::stack<slice_t> slices_t;
 
-		if(poly.empty() || bbox.width()==detail::constant::zero<PT>() || bbox.height()==detail::constant::zero<PT>())
+		if(poly.empty() || bbox.width()==math::constant::zero<PT>() || bbox.height()==math::constant::zero<PT>())
 			return;
 		
 		boost::int32_t count=poly.size();
@@ -37,15 +37,15 @@ namespace baldzarika { namespace ucv {
 			{
 				slice.first=slice.second;
 				slice.second=(slice.first+1)%count;
-				PT max_dist=detail::constant::zero<PT>();
+				PT max_dist=math::constant::zero<PT>();
 				for(boost::int32_t j=1;j<count;++j)
 				{
 					boost::int32_t pt_idx=(slice.first+j)%count;
 					math::point2<PT> diff=input[pt_idx]-input[slice.first];
-					diff.x*=inv_width;
-					diff.y*=inv_height;
+					diff.x()*=inv_width;
+					diff.y()*=inv_height;
 
-					PT dist=diff.x*diff.x+diff.y*diff.y;
+					PT dist=diff.x()*diff.x()+diff.y()*diff.y();
 
 					if(dist>max_dist)
 					{
@@ -86,20 +86,20 @@ namespace baldzarika { namespace ucv {
 			{
 				math::point2<PT> diff=input[slice.second]-input[slice.first];
 
-				diff.x*=inv_width;
-				diff.y*=inv_height;
+				diff.x()*=inv_width;
+				diff.y()*=inv_height;
 				
-				PT max_dist=detail::constant::zero<PT>();
+				PT max_dist=math::constant::zero<PT>();
 				
 				for(boost::int32_t pt=1;pt<num_pts;++pt)
 				{
 					boost::int32_t pt_idx=(slice.first+pt)%count;
 					math::point2<PT> diff_start=input[pt_idx]-input[slice.first];
-					diff_start.x*=inv_width;
-					diff_start.y*=inv_height;
+					diff_start.x()*=inv_width;
+					diff_start.y()*=inv_height;
 
 
-					PT dist=std::abs(diff_start.y*diff.x-diff_start.x*diff.y);
+					PT dist=std::abs(diff_start.y()*diff.x()-diff_start.x()*diff.y());
 					
 					if(dist>max_dist)
 					{
@@ -107,7 +107,7 @@ namespace baldzarika { namespace ucv {
 						right_slice.first=pt_idx;
 					}
 				}
-				le_eps=max_dist*max_dist<=eps*(diff.x*diff.x+diff.y*diff.y);
+				le_eps=max_dist*max_dist<=eps*(diff.x()*diff.x()+diff.y()*diff.y());
 			}
 
 			if(le_eps)
@@ -146,25 +146,25 @@ namespace baldzarika { namespace ucv {
 			math::point2<PT> next_pt=input[indices[(i+1+count)%count]];
 			math::point2<PT> diff=next_pt-prev_pt;
 			
-			diff.x*=inv_width;
-			diff.y*=inv_height;
+			diff.x()*=inv_width;
+			diff.y()*=inv_height;
 
 			math::point2<PT> diff_start=curr_pt-prev_pt;
-			diff_start.x*=inv_width;
-			diff_start.y*=inv_height;
+			diff_start.x()*=inv_width;
+			diff_start.y()*=inv_height;
 
-			PT dist=std::abs(diff_start.x*diff.y-diff_start.y*diff.x);
+			PT dist=std::abs(diff_start.x()*diff.y()-diff_start.y()*diff.x());
 			dist*=dist;
 			
 			float dist_f=dist;
 
-			PT dist_se=diff.x*diff.x+diff.y*diff.y;
+			PT dist_se=diff.x()*diff.x()+diff.y()*diff.y();
 			float dist_se_f=dist_se;
 			
 
 			if(	dist<=/*detail::constant::half<PT>()**/eps*dist_se &&
-				diff.x!=detail::constant::zero<PT>() &&
-				diff.y!=detail::constant::zero<PT>()
+				diff.x()!=math::constant::zero<PT>() &&
+				diff.y()!=math::constant::zero<PT>()
 			)
 			{
 				curr_pt=next_pt;
@@ -172,15 +172,15 @@ namespace baldzarika { namespace ucv {
 			}
 
 #if 0
-			PT dist_start=diff_start.x*diff_start.x+diff_start.y*diff_start.y;
+			PT dist_start=diff_start.x()*diff_start.x()+diff_start.y()*diff_start.y();
 			float dist_start_f=dist_start;
 
 			point2<PT> diff_end=next_pt-curr_pt;
-			diff_end.x*=inv_width;
-			diff_end.y*=inv_height;
+			diff_end.x()*=inv_width;
+			diff_end.y()*=inv_height;
 
 
-			PT dist_end=diff_end.x*diff_end.x+diff_end.y*diff_end.y;
+			PT dist_end=diff_end.x()*diff_end.x()+diff_end.y()*diff_end.y();
 			float dist_end_f=dist_end;
 
 			if(dist_start<eps || dist_end<eps)

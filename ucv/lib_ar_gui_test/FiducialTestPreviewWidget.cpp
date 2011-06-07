@@ -17,7 +17,7 @@ FiducialTestPreviewWidget::FiducialTestPreviewWidget(QWidget *parent/* =0 */)
 	m_vi.setIdealFramerate(0, 30);
 	m_vi.setupDevice(0, FIDUCIAL_PREVIEW_WIDTH, FIDUCIAL_PREVIEW_HEIGHT);
 
-	m_detector.reset(new ar::fiducial::detector(ucv::size2ui(FIDUCIAL_PREVIEW_WIDTH,FIDUCIAL_PREVIEW_HEIGHT)));
+	m_detector.reset(new ar::fiducial::detector(math::size2ui(FIDUCIAL_PREVIEW_WIDTH,FIDUCIAL_PREVIEW_HEIGHT)));
 	m_detector->add_marker_model(
 		boost::shared_ptr<ar::fiducial::marker_model>(
 			new ar::fiducial::bch_marker_model()
@@ -48,13 +48,18 @@ FiducialTestPreviewWidget::~FiducialTestPreviewWidget()
 
 void FiducialTestPreviewWidget::onMarkerStateChanged(boost::shared_ptr<ar::fiducial::detector::marker_state> const &ms, ar::fiducial::detector::marker_state::eSC sc)
 {
-	if(ms->get_marker_id()==477)
+	if(!m_is_detected && ms->is_detected())
+	{
+		m_marker_id=ms->get_marker_id();
+		m_is_detected=true;
+	}
+
+	if(m_is_detected && ms->get_marker_id()==m_marker_id)
 	{
 		m_is_detected=ms->is_detected();
 		m_model_view=ms->get_camera_pose();
 	}
-	else
-		m_is_detected=false;
+
 
 }
 
@@ -155,7 +160,7 @@ void FiducialTestPreviewWidget::paintGL()
 		glDisable(GL_TEXTURE_2D);
 		glPointSize(4.0f);
 
-		ucv::matrix44f converted=m_model_view;
+		math::matrix44f converted=m_model_view;
 		
 		GLfloat model_view[16]=
 		{
@@ -168,7 +173,7 @@ void FiducialTestPreviewWidget::paintGL()
 		glMatrixMode(GL_MODELVIEW);
 		glLoadMatrixf(model_view);
 		
-		ucv::matrix44f const &proj=m_detector->get_camera_projection();
+		math::matrix44f const &proj=m_detector->get_camera_projection();
 		GLfloat projection[16]=
 		{
 			proj(0,0), proj(1,0), proj(2,0), proj(3,0),

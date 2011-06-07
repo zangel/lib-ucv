@@ -182,7 +182,7 @@ namespace baldzarika { namespace ucv {
 			map_t *last_map_row=reinterpret_cast<map_t *>(map_view.row_begin(map_view.height()-1));
 			for(boost::int32_t i=0;i<width+2;++i)
 			{
-				mag_buf[0][i]=detail::constant::zero<gray_t>();
+				mag_buf[0][i]=math::constant::zero<gray_t>();
 				first_map_row[i]=1;
 				last_map_row[i]=1;
 			}
@@ -197,8 +197,8 @@ namespace baldzarika { namespace ucv {
 
 				if(y<height)
 				{
-					mag[-1]=detail::constant::zero<gray_t>();
-					mag[m_frame_size.width()]=detail::constant::zero<gray_t>();
+					mag[-1]=math::constant::zero<gray_t>();
+					mag[m_frame_size.width()]=math::constant::zero<gray_t>();
 					for(boost::int32_t x=0;x<width;++x)
 						mag[x]=std::abs(dx_row[x])+std::abs(dy_row[x]);
 				}
@@ -206,14 +206,14 @@ namespace baldzarika { namespace ucv {
 				{
 					mag--;
 					for(boost::int32_t x=0;x<width+2;++x)
-						mag[x]=detail::constant::zero<gray_t>();
+						mag[x]=math::constant::zero<gray_t>();
 					mag++;
 				}
 
 				if(y==0) continue;
 
 				map_t *map=reinterpret_cast<map_t *>(map_view.row_begin(y))+1;
-				map[-1]=map[width]=detail::constant::one<map_t>();
+				map[-1]=map[width]=math::constant::one<map_t>();
 
 
 				mag=mag_buf[1]+1;
@@ -354,11 +354,11 @@ namespace baldzarika { namespace ucv {
 				math::point2<CT> pt_origin=math::point2<CT>(map_x-1, map_y-1);
 				math::point2<CT> pt=pt_origin;
 
-				CT min_x=pt_origin.x;
-				CT max_x=pt_origin.x;
+				CT min_x=pt_origin.x();
+				CT max_x=pt_origin.x();
 
-				CT min_y=pt_origin.y;
-				CT max_y=pt_origin.y;
+				CT min_y=pt_origin.y();
+				CT max_y=pt_origin.y();
 
 				boost::int32_t n_ori=0;
 				bool all_positive=true;
@@ -382,7 +382,7 @@ namespace baldzarika { namespace ucv {
 				if(s==s_end)
 				{
 					*i0=nbd|bit_7;
-					cont.m_points.push_back(typename contour<CT>::point2_t(pt.x,pt.y));
+					cont.m_points.push_back(typename contour<CT>::point2_t(pt.x(),pt.y()));
 				}
 				else
 				{
@@ -420,21 +420,21 @@ namespace baldzarika { namespace ucv {
 
 
 							
-							cont.m_points.push_back(typename contour<CT>::point2_t(pt.x,pt.y));
-							min_x=std::min(min_x,pt.x); max_x=std::max(max_x,pt.x);
-							min_y=std::min(min_y,pt.y); max_y=std::max(max_y,pt.y);
+							cont.m_points.push_back(typename contour<CT>::point2_t(pt.x(),pt.y()));
+							min_x=std::min(min_x,pt.x()); max_x=std::max(max_x,pt.x());
+							min_y=std::min(min_y,pt.y()); max_y=std::max(max_y,pt.y());
 
 							prev_s = s;
 						}
 
-						pt.x+=DELTAS[s][0];
-						pt.y+=DELTAS[s][1];
+						pt.x()+=DELTAS[s][0];
+						pt.y()+=DELTAS[s][1];
 
 						if(i4==i0 && i3==i1)
 						{
-							cont.m_points.push_back(typename contour<CT>::point2_t(pt.x,pt.y));
-							min_x=std::min(min_x,pt.x); max_x=std::max(max_x,pt.x);
-							min_y=std::min(min_y,pt.y); max_y=std::max(max_y,pt.y);
+							cont.m_points.push_back(typename contour<CT>::point2_t(pt.x(),pt.y()));
+							min_x=std::min(min_x,pt.x()); max_x=std::max(max_x,pt.x());
+							min_y=std::min(min_y,pt.y()); max_y=std::max(max_y,pt.y());
 							break;
 						}
 
@@ -447,7 +447,7 @@ namespace baldzarika { namespace ucv {
 					math::point2<CT>(min_x,min_y),
 					math::point2<CT>(max_x,max_y)
 				);
-				cont.m_is_closed=contour<CT>::check_is_closed(cont.m_points, detail::constant::two<CT>());
+				cont.m_is_closed=contour<CT>::check_is_closed(cont.m_points, math::constant::two<CT>());
 				cont.m_is_clockwise=n_ori<=0;
 				cont.m_is_convex=(n_ori>=0 && all_positive) || (n_ori<=0 && all_negative);
 			}

@@ -14,7 +14,7 @@ namespace baldzarika { namespace ar {
 		typedef ucv::surf::feature_point_t feature_point_t;
 		typedef std::vector<feature_point_t> feature_points_t;
 		
-		typedef ucv::fixed_point<10, 21> gray_t;
+		typedef math::fixed_point<10, 21> gray_t;
 		typedef ucv::gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
 		typedef ucv::gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
 		typedef gray_image_t::view_t gray_view_t;
@@ -75,7 +75,7 @@ namespace baldzarika { namespace ar {
 			bool									is_detected() const;
 			boost::shared_ptr<marker> const&		get_marker() const;
 			points2_t const&						get_frame_points() const;
-			ucv::matrix33f const&					get_homography_matrix() const;
+			math::matrix33f const&					get_homography_matrix() const;
 			void									get_marker_corners(points2_t &mc) const;
 
 			
@@ -90,7 +90,7 @@ namespace baldzarika { namespace ar {
 			points2_t								m_marker_points;
 			points2_t								m_frame_points;
 			bool									m_detected;
-			ucv::matrix33f							m_hmatrix;
+			math::matrix33f							m_hmatrix;
 
 		public:
 			mutable boost::any						m_any_data;
@@ -124,11 +124,11 @@ namespace baldzarika { namespace ar {
 		> marker_states_t;
 	
 	public:
-		tracker(ucv::size2ui const &fs);
+		tracker(math::size2ui const &fs);
 		~tracker();
 
-		ucv::size2ui							get_frame_size() const;
-		bool									set_frame_size(ucv::size2ui const &fs);
+		math::size2ui							get_frame_size() const;
+		bool									set_frame_size(math::size2ui const &fs);
 
 		float									get_detection_treshold() const;
 		bool									set_detection_treshold(float dt);

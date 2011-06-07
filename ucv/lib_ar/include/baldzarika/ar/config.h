@@ -2,8 +2,6 @@
 #define BALDZARIKA_AR_CONFIG_H
 
 #include <baldzarika/ucv/config.h>
-#include <baldzarika/ucv/fixed_point.h>
-#include <baldzarika/ucv/matrix.h>
 #include <baldzarika/ucv/gil_channel_traits.h>
 #include <baldzarika/ucv/convert.h>
 #include <baldzarika/ucv/integral.h>
@@ -22,8 +20,6 @@
 #include <baldzarika/ucv/gaussian_blur.h>
 #include <baldzarika/ucv/canny.h>
 #include <baldzarika/ucv/pixel_count.h>
-
-
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/thread.hpp>

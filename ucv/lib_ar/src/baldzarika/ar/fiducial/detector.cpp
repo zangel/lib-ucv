@@ -96,7 +96,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		return m_marker_id;
 	}
 
-	ucv::size2ui detector::marker_state::get_marker_size() const
+	math::size2ui detector::marker_state::get_marker_size() const
 	{
 		boost::shared_ptr<marker_model_holder> mmh=m_marker_model_holder.lock();
 		BOOST_ASSERT(mmh);
@@ -109,12 +109,12 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		return m_is_detected;
 	}
 
-	ucv::matrix33f const& detector::marker_state::get_homography() const
+	math::matrix33f const& detector::marker_state::get_homography() const
 	{
 		return m_homography;
 	}
 
-	ucv::matrix44f const& detector::marker_state::get_camera_pose() const
+	math::matrix44f const& detector::marker_state::get_camera_pose() const
 	{
 		return m_camera_pose;
 	}
@@ -124,7 +124,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		m_is_detected=d;
 	}
 
-	void detector::marker_state::set_homography(ucv::matrix33f const &hm)
+	void detector::marker_state::set_homography(math::matrix33f const &hm)
 	{
 		boost::shared_ptr<marker_model_holder> mmh=m_marker_model_holder.lock();
 		BOOST_ASSERT(mmh);
@@ -134,13 +134,13 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 		m_homography=hm;
 
-		ucv::size2ui fs=det->get_frame_size();
-		ucv::size2ui ms=mmh->m_marker_model->get_marker_size(m_marker_id);
+		math::size2ui fs=det->get_frame_size();
+		math::size2ui ms=mmh->m_marker_model->get_marker_size(m_marker_id);
 		float focal_length=det->get_camera_focal_length();
 
-		ucv::camera_pose(focal_length, focal_length, ucv::point2f(float(fs.width())*0.5f,float(fs.height())*0.5f), m_homography, m_camera_pose);
+		ucv::camera_pose(focal_length, focal_length, math::point2f(float(fs.width())*0.5f,float(fs.height())*0.5f), m_homography, m_camera_pose);
 
-		ucv::matrix44f cam_adjust=ucv::matrix44f::identity();
+		math::matrix44f cam_adjust=math::matrix44f::identity();
 
 		//cam_adjust(0,0)=float(ms.width())*0.5f;
 		cam_adjust(0,3)=float(ms.width())*0.5f;
@@ -171,7 +171,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		return m_marker_model;
 	}
 
-	detector::detector(ucv::size2ui const &fs)
+	detector::detector(math::size2ui const &fs)
 		: m_polygon_approximation_eps(DEFAULT_POLYGON_APPROXIMATION_EPS)
 		, m_same_marker_max_area(DEFAULT_SAME_MARKER_MAX_AREA)
 		, m_keep_detected_frame_count(DEFAULT_KEEP_DETECTED_FRAME_COUNT)
@@ -197,12 +197,12 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		wait_to_stop();
 	}
 
-	ucv::size2ui detector::get_frame_size() const
+	math::size2ui detector::get_frame_size() const
 	{
-		return ucv::size2ui(m_frame.width(),m_frame.height());
+		return math::size2ui(m_frame.width(),m_frame.height());
 	}
 
-	bool detector::set_frame_size(ucv::size2ui const &fs)
+	bool detector::set_frame_size(math::size2ui const &fs)
 	{
 		if(m_running_state)
 			return false;
@@ -233,7 +233,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		return m_camera_focal_length;
 	}
 
-	ucv::matrix44f const& detector::get_camera_projection() const
+	math::matrix44f const& detector::get_camera_projection() const
 	{
 		return m_camera_projection;
 	}
@@ -460,7 +460,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 				float min_dist=std::numeric_limits<float>::max();
 				
-				ucv::point2f dm_pos(dm.m_homography(0,2), dm.m_homography(1,2));
+				math::point2f dm_pos(dm.m_homography(0,2), dm.m_homography(1,2));
 				for(marker_model_holder::marker_states_t::index<marker_state::marker_id_tag>::type::iterator dmci=existing_markers.first;
 					dmci!=existing_markers.second;
 					++dmci )
@@ -468,9 +468,9 @@ namespace baldzarika { namespace ar { namespace fiducial {
 					boost::shared_ptr<marker_state> const &cand_ms=*dmci;
 					if(!cand_ms->m_is_detected) continue;
 					
-					float dist=ucv::vector2f(
-						ucv::point2f(cand_ms->m_homography(0,2), cand_ms->m_homography(1,2))-
-						ucv::point2f(dm.m_homography(0,2), dm.m_homography(1,2))
+					float dist=math::vector2f(
+						math::point2f(cand_ms->m_homography(0,2), cand_ms->m_homography(1,2))-
+						math::point2f(dm.m_homography(0,2), dm.m_homography(1,2))
 					).length();
 					if(dist<max_dist && dist<min_dist)
 					{
@@ -562,10 +562,10 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	void detector::update_camera_projection()
 	{
-		float ty=std::tan(m_camera_fovy*0.5f/360.0f*ucv::detail::constant::pi<float>());
+		float ty=std::tan(m_camera_fovy*0.5f/360.0f*math::constant::pi<float>());
 		m_camera_focal_length=float(m_frame.height())/(2.0f*ty);
 
-		m_camera_projection=ucv::matrix44f::identity();
+		m_camera_projection=math::matrix44f::identity();
 
 		m_camera_projection(0,0)=2.0f*m_camera_focal_length/float(m_frame.width());
 		m_camera_projection(0,2)=2.0f*(float(m_frame.width())*0.5f)/float(m_frame.width())-1.0f;

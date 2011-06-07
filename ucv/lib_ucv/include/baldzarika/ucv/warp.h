@@ -14,7 +14,7 @@ namespace baldzarika { namespace ucv {
 
 		typedef math::matrix<MT, 3, 3> matrix_t;
 
-		matrix_t mat=inv?m:m.inverse();
+		matrix_t mat=inv?m:m.inverted();
 
 		for(boost::int32_t y=0;y<dst.height();++y)
 		{
@@ -32,8 +32,8 @@ namespace baldzarika { namespace ucv {
 
 				MT inv_w_src=x_dst*mat(2,0)+w_src_0;
 				inv_w_src=std::abs(inv_w_src)<std::numeric_limits<MT>::epsilon()?
-					detail::constant::zero<MT>():
-					detail::constant::one<MT>()/inv_w_src;
+					math::constant::zero<MT>():
+					math::constant::one<MT>()/inv_w_src;
 
 				MT x_src=(x_dst*mat(0,0)+x_src_0)*inv_w_src;
 				MT y_src=(x_dst*mat(1,0)+y_src_0)*inv_w_src;
@@ -46,7 +46,7 @@ namespace baldzarika { namespace ucv {
 
 				src_channel_t const *src_row=reinterpret_cast<src_channel_t const *>(src.row_begin(iy_src));
 				if(iy_src<0 || ix_src<0 || iy_src>=src.height() || ix_src>=src.width())
-					dst_row[x]=detail::constant::zero<dst_channel_t>();
+					dst_row[x]=math::constant::zero<dst_channel_t>();
 				else
 				{
 					//dst_row[x]=static_cast<dst_channel_t>(src_row[x]);
@@ -59,17 +59,17 @@ namespace baldzarika { namespace ucv {
 							dst_row[x]=static_cast<dst_channel_t>(
 								(
 									src_row[ix_src]*
-									(detail::constant::one<src_channel_t>()-frac_x)*
-									(detail::constant::one<src_channel_t>()-frac_y)
+									(math::constant::one<src_channel_t>()-frac_x)*
+									(math::constant::one<src_channel_t>()-frac_y)
 								)+
 								(
 									src_row[ix_src+1]*
 									frac_x*
-									(detail::constant::one<src_channel_t>()-frac_y)
+									(math::constant::one<src_channel_t>()-frac_y)
 								)+
 								(
 									next_src_row[ix_src]*
-									(detail::constant::one<src_channel_t>()-frac_x)*
+									(math::constant::one<src_channel_t>()-frac_x)*
 									frac_y
 								)+
 								(
@@ -84,7 +84,7 @@ namespace baldzarika { namespace ucv {
 							dst_row[x]=static_cast<dst_channel_t>(
 								(
 									src_row[ix_src]*
-									(detail::constant::one<src_channel_t>()-frac_y)
+									(math::constant::one<src_channel_t>()-frac_y)
 								)+
 								(
 									next_src_row[ix_src]*
@@ -100,7 +100,7 @@ namespace baldzarika { namespace ucv {
 							dst_row[x]=static_cast<dst_channel_t>(
 								(
 									src_row[ix_src]*
-									(detail::constant::one<src_channel_t>()-frac_x)
+									(math::constant::one<src_channel_t>()-frac_x)
 								)+
 								(
 									src_row[ix_src+1]*
