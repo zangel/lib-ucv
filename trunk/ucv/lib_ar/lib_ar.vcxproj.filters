@@ -31,18 +31,18 @@
     <Filter Include="Source Files\baldzarika\ar\fiducial">
       <UniqueIdentifier>{e6d3b1ce-2b16-4e22-a3ee-ccc808c195bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\baldzarika\ar\markerless">
+      <UniqueIdentifier>{e24c5fee-8347-439e-affa-8512e6a96278}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\baldzarika\ar\markerless">
+      <UniqueIdentifier>{02843918-de93-4a2a-bef5-203498e5a922}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\baldzarika\ar\config.h">
-      <Filter>Header Files\baldzarika\ar</Filter>
-    </ClInclude>
-    <ClInclude Include="include\baldzarika\ar\marker.h">
-      <Filter>Header Files\baldzarika\ar</Filter>
-    </ClInclude>
-    <ClInclude Include="include\baldzarika\ar\tracker.h">
       <Filter>Header Files\baldzarika\ar</Filter>
     </ClInclude>
     <ClInclude Include="include\baldzarika\ar\fiducial\typedefs.h">
@@ -54,18 +54,27 @@
     <ClInclude Include="include\baldzarika\ar\fiducial\bch_marker_model.h">
       <Filter>Header Files\baldzarika\ar\fiducial</Filter>
     </ClInclude>
-    <ClInclude Include="include\baldzarika\ar\fiducial\detector.h">
+    <ClInclude Include="include\baldzarika\ar\markerless\tracker.h">
+      <Filter>Header Files\baldzarika\ar\markerless</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\markerless\marker.h">
+      <Filter>Header Files\baldzarika\ar\markerless</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\common_typedefs.h">
+      <Filter>Header Files\baldzarika\ar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\markerless\typedefs.h">
+      <Filter>Header Files\baldzarika\ar\markerless</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\tracker.h">
+      <Filter>Header Files\baldzarika\ar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\fiducial\tracker.h">
       <Filter>Header Files\baldzarika\ar\fiducial</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ar\config.cpp">
-      <Filter>Source Files\baldzarika\ar</Filter>
-    </ClCompile>
-    <ClCompile Include="src\baldzarika\ar\marker.cpp">
-      <Filter>Source Files\baldzarika\ar</Filter>
-    </ClCompile>
-    <ClCompile Include="src\baldzarika\ar\tracker.cpp">
       <Filter>Source Files\baldzarika\ar</Filter>
     </ClCompile>
     <ClCompile Include="src\baldzarika\ar\fiducial\marker_model.cpp">
@@ -74,7 +83,16 @@
     <ClCompile Include="src\baldzarika\ar\fiducial\bch_marker_model.cpp">
       <Filter>Source Files\baldzarika\ar\fiducial</Filter>
     </ClCompile>
-    <ClCompile Include="src\baldzarika\ar\fiducial\detector.cpp">
+    <ClCompile Include="src\baldzarika\ar\markerless\marker.cpp">
+      <Filter>Source Files\baldzarika\ar\markerless</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ar\markerless\tracker.cpp">
+      <Filter>Source Files\baldzarika\ar\markerless</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ar\tracker.cpp">
+      <Filter>Source Files\baldzarika\ar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ar\fiducial\tracker.cpp">
       <Filter>Source Files\baldzarika\ar\fiducial</Filter>
     </ClCompile>
   </ItemGroup>

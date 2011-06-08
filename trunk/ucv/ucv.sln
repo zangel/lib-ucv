@@ -33,6 +33,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_math_test", "lib_math_t
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "lib_ar_gui_test_setup", "lib_ar_gui_test_setup\lib_ar_gui_test_setup.vdproj", "{85CEBC77-8A84-4B9D-9C74-2CC83FE84904}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_usg", "lib_usg\lib_usg.vcxproj", "{E6D47BE9-7271-4512-A2A2-4FD49A145C10}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -121,6 +123,16 @@ Global
 		{85CEBC77-8A84-4B9D-9C74-2CC83FE84904}.DVD-5|Win32.ActiveCfg = Debug
 		{85CEBC77-8A84-4B9D-9C74-2CC83FE84904}.Release|Win32.ActiveCfg = Release
 		{85CEBC77-8A84-4B9D-9C74-2CC83FE84904}.SingleImage|Win32.ActiveCfg = Release
+		{E6D47BE9-7271-4512-A2A2-4FD49A145C10}.CD_ROM|Win32.ActiveCfg = Release|Win32
+		{E6D47BE9-7271-4512-A2A2-4FD49A145C10}.CD_ROM|Win32.Build.0 = Release|Win32
+		{E6D47BE9-7271-4512-A2A2-4FD49A145C10}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E6D47BE9-7271-4512-A2A2-4FD49A145C10}.Debug|Win32.Build.0 = Debug|Win32
+		{E6D47BE9-7271-4512-A2A2-4FD49A145C10}.DVD-5|Win32.ActiveCfg = Debug|Win32
+		{E6D47BE9-7271-4512-A2A2-4FD49A145C10}.DVD-5|Win32.Build.0 = Debug|Win32
+		{E6D47BE9-7271-4512-A2A2-4FD49A145C10}.Release|Win32.ActiveCfg = Release|Win32
+		{E6D47BE9-7271-4512-A2A2-4FD49A145C10}.Release|Win32.Build.0 = Release|Win32
+		{E6D47BE9-7271-4512-A2A2-4FD49A145C10}.SingleImage|Win32.ActiveCfg = Release|Win32
+		{E6D47BE9-7271-4512-A2A2-4FD49A145C10}.SingleImage|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
