@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\baldzarika">
+      <UniqueIdentifier>{6d52d417-5105-45d5-8c61-6548e132ef30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\baldzarika\usg">
+      <UniqueIdentifier>{568bb181-127a-4fb5-afa3-27c991f1670b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\baldzarika">
+      <UniqueIdentifier>{9119cf38-899c-4ba0-a4a9-f27a05098221}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\baldzarika\usg">
+      <UniqueIdentifier>{83ffa88c-676f-450f-bbe2-fa88aa82e807}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+</Project>
