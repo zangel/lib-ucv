@@ -29,4 +29,14 @@
   <ItemGroup>
     <None Include="ReadMe.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\baldzarika\usg\config.h">
+      <Filter>Header Files\baldzarika\usg</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\baldzarika\usg\config.cpp">
+      <Filter>Source Files\baldzarika\usg</Filter>
+    </ClCompile>
+  </ItemGroup>
 </Project>

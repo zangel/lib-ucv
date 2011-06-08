@@ -71,6 +71,7 @@
       <AdditionalIncludeDirectories>$(BOOST_DIR);$(LIBPNG_DIR);../3rd_party/libkdtree;../lib_math/include;../lib_ucv/include;./include</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>baldzarika/ar/config.h</PrecompiledHeaderFile>
       <AdditionalOptions>/Zm180 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -83,12 +84,15 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\baldzarika\ar\common_typedefs.h" />
     <ClInclude Include="include\baldzarika\ar\config.h" />
     <ClInclude Include="include\baldzarika\ar\fiducial\bch_marker_model.h" />
     <ClInclude Include="include\baldzarika\ar\fiducial\marker_model.h" />
-    <ClInclude Include="include\baldzarika\ar\fiducial\detector.h" />
+    <ClInclude Include="include\baldzarika\ar\fiducial\tracker.h" />
     <ClInclude Include="include\baldzarika\ar\fiducial\typedefs.h" />
-    <ClInclude Include="include\baldzarika\ar\marker.h" />
+    <ClInclude Include="include\baldzarika\ar\markerless\marker.h" />
+    <ClInclude Include="include\baldzarika\ar\markerless\tracker.h" />
+    <ClInclude Include="include\baldzarika\ar\markerless\typedefs.h" />
     <ClInclude Include="include\baldzarika\ar\tracker.h" />
   </ItemGroup>
   <ItemGroup>
@@ -98,8 +102,9 @@
     </ClCompile>
     <ClCompile Include="src\baldzarika\ar\fiducial\bch_marker_model.cpp" />
     <ClCompile Include="src\baldzarika\ar\fiducial\marker_model.cpp" />
-    <ClCompile Include="src\baldzarika\ar\fiducial\detector.cpp" />
-    <ClCompile Include="src\baldzarika\ar\marker.cpp" />
+    <ClCompile Include="src\baldzarika\ar\fiducial\tracker.cpp" />
+    <ClCompile Include="src\baldzarika\ar\markerless\marker.cpp" />
+    <ClCompile Include="src\baldzarika\ar\markerless\tracker.cpp" />
     <ClCompile Include="src\baldzarika\ar\tracker.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
