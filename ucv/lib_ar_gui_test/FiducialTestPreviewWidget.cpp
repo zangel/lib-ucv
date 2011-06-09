@@ -17,18 +17,18 @@ FiducialTestPreviewWidget::FiducialTestPreviewWidget(QWidget *parent/* =0 */)
 	m_vi.setIdealFramerate(0, 30);
 	m_vi.setupDevice(0, FIDUCIAL_PREVIEW_WIDTH, FIDUCIAL_PREVIEW_HEIGHT);
 
-	m_detector.reset(new ar::fiducial::detector(math::size2ui(FIDUCIAL_PREVIEW_WIDTH,FIDUCIAL_PREVIEW_HEIGHT)));
-	m_detector->add_marker_model(
+	m_tracker.reset(new ar::fiducial::tracker(math::size2ui(FIDUCIAL_PREVIEW_WIDTH,FIDUCIAL_PREVIEW_HEIGHT)));
+	m_tracker->add_marker_model(
 		boost::shared_ptr<ar::fiducial::marker_model>(
 			new ar::fiducial::bch_marker_model()
 		)
 	);
 
-	m_detector->marker_state_changed().connect(
+	m_tracker->marker_state_changed().connect(
 		boost::bind(&FiducialTestPreviewWidget::onMarkerStateChanged, this, _1, _2)
 	);
 
-	m_detector->start();
+	m_tracker->start();
 
 	m_render_timer= new QTimer(this);
 
@@ -39,27 +39,29 @@ FiducialTestPreviewWidget::FiducialTestPreviewWidget(QWidget *parent/* =0 */)
 
 FiducialTestPreviewWidget::~FiducialTestPreviewWidget()
 {
-	m_detector->stop();
-	m_detector->wait_to_stop();
+	m_tracker->stop();
+	m_tracker->wait_to_stop();
 
 	m_render_timer->stop();
 	m_vi.stopDevice(0);
 }
 
-void FiducialTestPreviewWidget::onMarkerStateChanged(boost::shared_ptr<ar::fiducial::detector::marker_state> const &ms, ar::fiducial::detector::marker_state::eSC sc)
+void FiducialTestPreviewWidget::onMarkerStateChanged(boost::shared_ptr<ar::tracker::marker_state> const &ms, ar::tracker::marker_state::eSC sc)
 {
-	if(!m_is_detected && ms->is_detected())
+	if(boost::shared_ptr<ar::fiducial::tracker::marker_state> fms=boost::shared_ptr<ar::fiducial::tracker::marker_state>(ms, boost::detail::dynamic_cast_tag()))
 	{
-		m_marker_id=ms->get_marker_id();
-		m_is_detected=true;
-	}
+		if(!m_is_detected && fms->is_detected())
+		{
+			m_marker_id=fms->get_marker_id();
+			m_is_detected=true;
+		}
 
-	if(m_is_detected && ms->get_marker_id()==m_marker_id)
-	{
-		m_is_detected=ms->is_detected();
-		m_model_view=ms->get_camera_pose();
+		if(m_is_detected && fms->get_marker_id()==m_marker_id)
+		{
+			m_is_detected=fms->is_detected();
+			m_model_view=fms->get_camera_pose();
+		}
 	}
-
 
 }
 
@@ -92,20 +94,14 @@ void FiducialTestPreviewWidget::paintGL()
 	if(m_vi.isFrameNew(0))
 	{
 		m_vi.getPixels(0, &ucv::gil::view(m_frame)[0][0], true, true);
-		if(ar::fiducial::detector::locked_frame frame_lock=m_detector->lock_frame())
-		{
-			ucv::gil::copy_and_convert_pixels(
-				ucv::gil::const_view(m_frame),
-				ucv::gil::view(m_gray_frame)
-			);
 
-			ucv::convert(
-				ucv::gil::const_view(m_gray_frame),
-				frame_lock.get_view(),
-				ucv::detail::grayscale_convert()
-			);
-		}
+		ucv::gil::copy_and_convert_pixels(
+			ucv::gil::const_view(m_frame),
+			ucv::gil::view(m_gray_frame)
+		);
 
+		m_tracker->process_frame(ucv::gil::const_view(m_gray_frame));
+		
 		glBindTexture(GL_TEXTURE_2D, m_video_texture);
 		glTexSubImage2D(
 			GL_TEXTURE_2D,
@@ -160,20 +156,18 @@ void FiducialTestPreviewWidget::paintGL()
 		glDisable(GL_TEXTURE_2D);
 		glPointSize(4.0f);
 
-		math::matrix44f converted=m_model_view;
-		
 		GLfloat model_view[16]=
 		{
-			converted(0,0), converted(1,0), converted(2,0), converted(3,0),
-			converted(0,1), converted(1,1), converted(2,1), converted(3,1),
-			converted(0,2), converted(1,2), converted(2,2), converted(3,2),
-			converted(0,3), converted(1,3), converted(2,3), converted(3,3)
+			m_model_view(0,0), m_model_view(1,0), m_model_view(2,0), m_model_view(3,0),
+			m_model_view(0,1), m_model_view(1,1), m_model_view(2,1), m_model_view(3,1),
+			m_model_view(0,2), m_model_view(1,2), m_model_view(2,2), m_model_view(3,2),
+			m_model_view(0,3), m_model_view(1,3), m_model_view(2,3), m_model_view(3,3)
 		};
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadMatrixf(model_view);
 		
-		math::matrix44f const &proj=m_detector->get_camera_projection();
+		math::matrix44f const &proj=m_tracker->get_camera_projection();
 		GLfloat projection[16]=
 		{
 			proj(0,0), proj(1,0), proj(2,0), proj(3,0),

@@ -143,6 +143,9 @@ namespace baldzarika { namespace ar { namespace markerless {
 		bool									track_marker(marker_state &dms);
 		void									track_markers(std::vector<marker_states_t::iterator> const &dms);
 
+		template < typename I1, typename I2 >
+		void									find_marker_homography(std::vector< std::pair<I1, I2> > const &oim, math::size2ui const &ms, math::matrix33f &hm);
+	
 	private:
 		boost::uint32_t							m_min_marker_features;
 		boost::uint32_t							m_max_marker_features;

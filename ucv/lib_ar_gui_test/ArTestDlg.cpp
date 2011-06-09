@@ -77,8 +77,7 @@ void ArTestDlg::start()
 {
 	BOOST_ASSERT(m_marker);
 	BOOST_ASSERT(!m_tracker);
-	BOOST_ASSERT(!m_marker_state);
-
+	
 	int size_idx=m_PreviewSize->currentIndex();
 	
 	BOOST_ASSERT(
@@ -91,9 +90,11 @@ void ArTestDlg::start()
 		m_vi.setIdealFramerate(0, m_PreviewRate->value());
 		if(m_vi.setupDevice(0, PREVIEW_SIZES[size_idx].width(), PREVIEW_SIZES[size_idx].height()))
 		{
-			boost::shared_ptr<ar::tracker> new_tracker(
-				new ar::tracker(PREVIEW_SIZES[size_idx])
+			boost::shared_ptr<ar::markerless::tracker> new_tracker(
+				new ar::markerless::tracker(PREVIEW_SIZES[size_idx])
 			);
+
+			new_tracker->set_z_far(2000.0f);
 
 			new_tracker->marker_state_changed().connect(
 				boost::bind(
@@ -101,16 +102,17 @@ void ArTestDlg::start()
 				)
 			);
 
-			if(boost::shared_ptr<ar::tracker::marker_state> pms=new_tracker->add_marker(m_marker))
+
+			
+
+			if(new_tracker->add_marker(m_marker))
 			{
 				if(new_tracker->start())
 				{
 					m_tracker=new_tracker;
-					m_marker_state=pms;
-
+					
 					m_rgb8_frame.recreate(PREVIEW_SIZES[size_idx].width(),PREVIEW_SIZES[size_idx].height());
 					m_gray8_frame.recreate(PREVIEW_SIZES[size_idx].width(),PREVIEW_SIZES[size_idx].height());
-					m_gray_frame.recreate(PREVIEW_SIZES[size_idx].width(),PREVIEW_SIZES[size_idx].height());
 										
 					m_fg_worker=boost::thread(
 						boost::bind(
@@ -155,7 +157,6 @@ void ArTestDlg::stop()
 	m_tracker->wait_to_stop();
 
 	BOOST_ASSERT(!m_tracker->is_active());
-	m_marker_state.reset();
 	m_tracker.reset();
 	m_vi.stopDevice(0);
 }
@@ -182,7 +183,7 @@ void ArTestDlg::dragEnterEvent(QDragEnterEvent *e)
 				QByteArray asciiData=qstr_marker_fname.toAscii();
 				std::string str_marker_fname(asciiData.constBegin(), asciiData.constEnd());
 			
-				if(ar::marker::can_load(str_marker_fname))
+				if(ar::markerless::marker::can_load(str_marker_fname))
 				{
 					e->setAccepted(true);
 					break;
@@ -205,9 +206,9 @@ void ArTestDlg::dropEvent(QDropEvent *e)
 				QByteArray asciiData=qstr_marker_fname.toAscii();
 				std::string str_marker_fname(asciiData.constBegin(), asciiData.constEnd());
 
-				if(ar::marker::can_load(str_marker_fname))
+				if(ar::markerless::marker::can_load(str_marker_fname))
 				{
-					if(boost::shared_ptr<ar::marker> p_new_marker=ar::marker::create_from_file(str_marker_fname))
+					if(boost::shared_ptr<ar::markerless::marker> p_new_marker=ar::markerless::marker::create_from_file(str_marker_fname))
 					{
 						m_marker=p_new_marker;
 						m_MarkerPreview->setPixmap(QPixmap(qstr_marker_fname));
@@ -231,17 +232,7 @@ void ArTestDlg::onGrabFrame()
 			ucv::gil::const_view(m_rgb8_frame),
 			ucv::gil::view(m_gray8_frame)
 		);
-		ar::tracker::gray_t median_value;
-		ucv::convert(
-			ucv::gil::const_view(m_gray8_frame),
-			ucv::gil::view(m_gray_frame),
-			ucv::detail::grayscale_convert_and_median<ar::tracker::gray_t>(
-				median_value,
-				m_gray8_frame.width(),
-				m_gray8_frame.height()
-			)
-		);
-		m_tracker->update(ucv::gil::const_view(m_gray_frame), median_value);
+		m_tracker->process_frame(ucv::gil::const_view(m_gray8_frame));
 	}
 	m_fg_timer.expires_at(
 		m_fg_timer.expires_at()+boost::posix_time::microseconds(
@@ -257,56 +248,5 @@ void ArTestDlg::onGrabFrame()
 void ArTestDlg::onMarkerStateChanged(boost::shared_ptr<ar::tracker::marker_state> const &ms, ar::tracker::marker_state::eSC sc)
 {
 	if(ms)
-	{
-		switch(sc)
-		{
-		case ar::tracker::marker_state::SC_DETECTION:
-		case ar::tracker::marker_state::SC_POSE:
-			{
-				if(ms->is_detected())
-				{
-					math::matrix33f const &hm=ms->get_homography_matrix();
-					ar::tracker::marker_state::points2_t marker_points(ms->get_frame_points());
-					
-					marker_points.insert(
-						marker_points.begin(),
-						ar::tracker::feature_point_t::point2_t(
-							ms->get_marker()->get_size().width(),
-							ms->get_marker()->get_size().height()
-						).transformed(hm)
-					);
-
-					marker_points.insert(
-						marker_points.begin(),
-						ar::tracker::feature_point_t::point2_t(
-							0,
-							ms->get_marker()->get_size().height()
-						).transformed(hm)
-					);
-
-					marker_points.insert(
-						marker_points.begin(),
-						ar::tracker::feature_point_t::point2_t(
-							ms->get_marker()->get_size().width(),
-							0
-						).transformed(hm)
-					);
-
-					marker_points.insert(
-						marker_points.begin(),
-						ar::tracker::feature_point_t::point2_t(
-							0,
-							0
-						).transformed(hm)
-					);
-					
-					m_VideoPreview->setTrackingFeatures(marker_points);
-
-				}
-				else
-					m_VideoPreview->setTrackingFeatures(ar::tracker::marker_state::points2_t());
-			}
-			break;
-		}
-	}
+		m_VideoPreview->setDetectedCameraPose(ms->is_detected(), ms->get_camera_pose(), m_tracker->get_camera_projection(), ms->get_marker_size());
 }

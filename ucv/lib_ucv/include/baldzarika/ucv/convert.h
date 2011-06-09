@@ -39,13 +39,17 @@ namespace baldzarika { namespace ucv {
 			inline void operator()(math::fixed_point<I,F> const &src, boost::uint8_t &dst)
 			{
 				dst=boost::uint8_t(
-					math::detail::adjuster< (F<8) >::
-						template adjust<
-							typename math::fixed_point< I, F >::value_type,
-							typename math::fixed_point< I, F >::value_type,
-							8,
-							F
-						>(src.get()) & 0xFF
+					std::max<typename math::fixed_point< I, F >::value_type>(0,
+						std::min<typename math::fixed_point< I, F >::value_type>(255,
+							math::detail::adjuster< (F<8) >::
+								template adjust<
+								typename math::fixed_point< I, F >::value_type,
+								typename math::fixed_point< I, F >::value_type,
+								8,
+								F
+							>(src.get())
+						)
+					) & 0xFF
 				);
 			}
 

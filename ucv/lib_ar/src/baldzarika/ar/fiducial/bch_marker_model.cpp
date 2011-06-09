@@ -101,7 +101,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	math::size2ui const bch_marker_model::MARKER_SIZE=math::size2ui(MARKER_CELL_SIZE.width()*7, MARKER_CELL_SIZE.height()*7);
 		
 	math::real_t const bch_marker_model::DEFAULT_ECCENTRICITY=0.70710678118654752440084436210485;
-	math::real_t const bch_marker_model::DEFAULT_MIN_SIDE_LENGTH=20.0;
+	math::real_t const bch_marker_model::DEFAULT_MIN_SIDE_LENGTH=5.0;
 
 	boost::uint8_t const bch_marker_model::HAMMING_CODEWORDS[4][5]=
 	{
@@ -342,7 +342,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			math::matrix<math::real_t, 3, 3> fp_homography=homography;
 			if(!ucv::warp(img, ucv::gil::view(m_warped_img), fp_homography, true))
 				continue;
-
+			
 			if(	!ucv::threshold(
 					ucv::gil::const_view(m_warped_img),
 					ucv::gil::view(m_warped_img),
