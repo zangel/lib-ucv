@@ -4,9 +4,9 @@
 
 namespace baldzarika { namespace ar { namespace markerless {
 
-	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=3;
+	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=2;
 	boost::uint32_t const tracker::DEFAULT_SURF_INTERVALS=4;
-	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=2;
+	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=1;
 	float const tracker::DEFAULT_SURF_TRESHOLD=4.0e-4f;
 
 	boost::uint32_t const tracker::DEFAULT_KLT_HALF_WIN_SIZE=8;
@@ -16,19 +16,18 @@ namespace baldzarika { namespace ar { namespace markerless {
 
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=8;
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=16;
-	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=2.0f;
+	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=0.0f;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=1.3e-3f;
-	float const	tracker::DEFAULT_DETECTION_MAX_DIFF_NORM=1.0e-2f;
+	float const	tracker::DEFAULT_DETECTION_MAX_DIFF_NORM=5.0e-3f;
 	float const	tracker::DEFAULT_TRACKING_MAX_DIFF_NORM=1.0e-2f;
 
 	namespace {
 
 		struct compare_relative_fp_scales
 		{
-			bool operator()(
-				std::pair< tracker::feature_point_t::desc_value_type, std::size_t > const &a,
-				std::pair< tracker::feature_point_t::desc_value_type, std::size_t > const &b
-			) const
+			typedef std::pair< tracker::feature_point_t::desc_value_type, std::size_t > compare_t;
+			
+			bool operator()(compare_t const &a, compare_t const &b) const
 			{
 				return a.first<b.first;
 			}
@@ -347,10 +346,10 @@ namespace baldzarika { namespace ar { namespace markerless {
 		{
 			ucv::surf marker_surf(
 				ms.m_marker->get_size(),
-				3, //m_surf.octaves(),
+				2, //m_surf.octaves(),
 				4, //m_surf.intervals(),
-				2, //m_surf.sample_step(),
-				1.0e-3f//m_surf.treshold()
+				1, //m_surf.sample_step(),
+				4.0e-4f//m_surf.treshold()
 			);
 
 			ucv::surf::integral_image_t marker_integral_img(
@@ -392,11 +391,16 @@ namespace baldzarika { namespace ar { namespace markerless {
 		if(marker_matches.size()>=m_min_marker_features)
 		{
 			math::matrix33f hm;
+#if 1
+			find_marker_homography(marker_matches, ms.get_marker_size(), hm);
+
+#else
 			if(	ucv::find_homography_ransac(
 					marker_matches,
 					hm
 				)
 			)
+#endif
 			{
 
 				feature_point_t::desc_value_type const select_scale=m_select_fp_scale;
@@ -406,7 +410,15 @@ namespace baldzarika { namespace ar { namespace markerless {
 				feature_point_t::value_type const marker_right=ms.get_marker()->get_size().width();
 				feature_point_t::value_type const marker_top=math::constant::zero<feature_point_t::value_type>();
 				feature_point_t::value_type const marker_bottom=ms.get_marker()->get_size().height();
-				
+
+				feature_point_t::value_type const inv_marker_width=
+					math::constant::one<feature_point_t::value_type>()/
+					feature_point_t::value_type(ms.get_marker()->get_size().width());
+
+				feature_point_t::value_type const inv_marker_height=
+					math::constant::one<feature_point_t::value_type>()/
+					feature_point_t::value_type(ms.get_marker()->get_size().height());
+								
 				std::vector<
 					std::pair<
 						feature_point_t::desc_value_type,
@@ -428,7 +440,19 @@ namespace baldzarika { namespace ar { namespace markerless {
 					{
 						boost::uint32_t fp_g_x=static_cast<boost::uint32_t>(ffs[f].x()*inv_select_fp_min_distance);
 						boost::uint32_t fp_g_y=static_cast<boost::uint32_t>(ffs[f].y()*inv_select_fp_min_distance);
-						feature_point_t::desc_value_type fp_sel_scale=std::abs(ffs[f].m_scale-select_scale);
+
+						feature_point_t::desc_value_type mp_dist=math::point2<feature_point_t::desc_value_type>(
+							(
+								feature_point_t::desc_value_type(marker_points[f].x()*inv_marker_width)-
+								math::constant::half<feature_point_t::desc_value_type>()
+							).operator<<(1),
+							(
+								feature_point_t::desc_value_type(marker_points[f].y()*inv_marker_height)-
+								math::constant::half<feature_point_t::desc_value_type>()
+							).operator<<(1)
+						).length();
+						
+						feature_point_t::desc_value_type fp_sel_scale=std::abs(ffs[f].m_scale-select_scale)*(math::constant::one<feature_point_t::desc_value_type>()-mp_dist);
 
 						std::size_t si;
 						for(si=0;si<marker_inliers.size();++si)
@@ -453,7 +477,7 @@ namespace baldzarika { namespace ar { namespace markerless {
 
 						marker_inliers.push_back(
 							std::make_pair(
-								std::abs(ffs[f].m_scale-select_scale),
+								fp_sel_scale,
 								f
 							)
 						);
@@ -576,11 +600,16 @@ namespace baldzarika { namespace ar { namespace markerless {
 		if(matches.size()>=m_min_marker_features)
 		{
 			math::matrix33f hm;
+#if 1
+			find_marker_homography(matches,dms.get_marker_size(), hm);
+#else
 			if(	ucv::find_homography_ransac(
 					matches,
 					hm
 				)
 			)
+#endif
+
 			{
 				dms.m_marker_points.resize(matches.size());
 				dms.m_frame_points.resize(matches.size());
@@ -652,6 +681,98 @@ namespace baldzarika { namespace ar { namespace markerless {
 		//make room for next frames
 		while(m_integral_views.size()>1)
 			m_integral_views.pop_back();
+	}
+
+	template < typename I1, typename I2 >
+	void tracker::find_marker_homography(std::vector< std::pair<I1, I2> > const &oim, math::size2ui const &ms, math::matrix33f &hm)
+	{
+		typedef std::vector< std::pair< boost::uint32_t, feature_point_t::value_type> > averaged_corner_t;
+		averaged_corner_t averaged_corners[4];
+		
+		feature_point_t::value_type const inv_mwidth=
+			math::constant::one<feature_point_t::value_type>()/
+			feature_point_t::value_type(ms.width());
+
+		feature_point_t::value_type const inv_mheight=
+			math::constant::one<feature_point_t::value_type>()/
+			feature_point_t::value_type(ms.height());
+
+		feature_point_t::point2_t corners[4]=
+		{
+			feature_point_t::point2_t(
+				math::constant::zero<feature_point_t::value_type>(),
+				math::constant::zero<feature_point_t::value_type>()
+			),
+			feature_point_t::point2_t(
+				math::constant::one<feature_point_t::value_type>(),
+				math::constant::zero<feature_point_t::value_type>()
+			),
+			feature_point_t::point2_t(
+				math::constant::one<feature_point_t::value_type>(),
+				math::constant::one<feature_point_t::value_type>()
+			),
+			feature_point_t::point2_t(
+				math::constant::zero<feature_point_t::value_type>(), 
+				math::constant::one<feature_point_t::value_type>()
+			)
+		};
+
+		
+		for(boost::uint32_t m=0;m<oim.size();++m)
+		{
+			feature_point_t::point2_t normalized_pt(
+				oim[m].first->x()*inv_mwidth,
+				oim[m].first->y()*inv_mheight
+			);
+
+			for(boost::uint32_t c=0;c<4;++c)
+			{
+				feature_point_t::value_type corner_dist=(normalized_pt-corners[c]).length();
+
+				if(averaged_corners[c].empty())
+					averaged_corners[c].push_back( std::make_pair(m,corner_dist) );
+				else
+				{
+					averaged_corner_t::iterator iac=averaged_corners[c].begin();
+					while(iac!=averaged_corners[c].end() && corner_dist>=iac->second) iac++;
+
+					if(iac==averaged_corners[c].end())
+					{
+						if(averaged_corners[c].size()<3)
+							averaged_corners[c].push_back( std::make_pair(m,corner_dist) );
+					}
+					else
+						averaged_corners[c].insert(iac, std::make_pair(m,corner_dist));
+
+					while(averaged_corners[c].size()>3)
+						averaged_corners[c].pop_back();
+				}
+			}
+		}
+
+		std::vector<math::point2f> marker_points(4), image_points(4);
+		for(boost::uint32_t c=0;c<4;++c)
+		{
+			feature_point_t::value_type const inv_size=
+				math::constant::one<feature_point_t::value_type>()/
+				feature_point_t::value_type(averaged_corners[c].size());
+
+			math::point2f avg_mpoint=feature_point_t::point2_t::zero();
+			math::point2f avg_ipoint=feature_point_t::point2_t::zero();
+
+
+			for(boost::uint32_t i=0;i<averaged_corners[c].size();++i)
+			{
+				avg_mpoint+=*oim[averaged_corners[c][i].first].first;
+				avg_ipoint+=*oim[averaged_corners[c][i].first].second;
+			}
+			avg_mpoint/=float(averaged_corners[c].size());
+			avg_ipoint/=float(averaged_corners[c].size());
+			marker_points[c]=avg_mpoint;
+			image_points[c]=avg_ipoint;
+		}
+
+		ucv::perspective_transform(marker_points,image_points,hm);
 	}
 
 	

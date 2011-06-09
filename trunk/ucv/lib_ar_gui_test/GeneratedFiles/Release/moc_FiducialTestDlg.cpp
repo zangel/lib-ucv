@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FiducialTestDlg.h'
 **
-** Created: Tue 7. Jun 14:09:57 2011
+** Created: Thu 9. Jun 11:50:36 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!

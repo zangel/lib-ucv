@@ -164,7 +164,11 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	{
 		if(!m_frame_is_dirty)
 		{
-			ucv::convert(gv,ucv::gil::view(m_frame), ucv::detail::convert());
+			ucv::convert(
+				gv,
+				ucv::gil::view(m_frame),
+				ucv::detail::grayscale_convert()
+			);
 			//m_gaussian_blur(ucv::gil::const_view(m_frame), ucv::gil::view(m_blurred_frame));
 			m_frame_is_dirty=true;
 			return true;

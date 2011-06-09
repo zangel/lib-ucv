@@ -43,10 +43,9 @@ protected:
 
 	
 private:
-	boost::shared_ptr<ar::tracker>					m_tracker;
-	boost::shared_ptr<ar::marker>					m_marker;
-	boost::shared_ptr<ar::tracker::marker_state>	m_marker_state;
-
+	boost::shared_ptr<ar::markerless::tracker>		m_tracker;
+	boost::shared_ptr<ar::markerless::marker>		m_marker;
+	
 	videoInput										m_vi;
 
 	boost::asio::io_service							m_fg_ios;
@@ -57,7 +56,6 @@ private:
 	boost::mutex									m_frame_sync;
 	ucv::gil::rgb8_image_t							m_rgb8_frame;
 	ucv::gil::gray8_image_t							m_gray8_frame;
-	ar::tracker::gray_image_t						m_gray_frame;
 };
 
 #endif // ARTESTDLG_H

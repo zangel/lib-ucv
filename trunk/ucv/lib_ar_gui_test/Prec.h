@@ -4,8 +4,9 @@
 
 #include <baldzarika/ar/config.h>
 #include <baldzarika/ar/tracker.h>
-#include <baldzarika/ar/marker.h>
-#include <baldzarika/ar/fiducial/detector.h>
+#include <baldzarika/ar/markerless/tracker.h>
+#include <baldzarika/ar/markerless/marker.h>
+#include <baldzarika/ar/fiducial/tracker.h>
 #include <baldzarika/ar/fiducial/marker_model.h>
 #include <baldzarika/ar/fiducial/bch_marker_model.h>
 

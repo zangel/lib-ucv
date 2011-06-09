@@ -120,6 +120,34 @@ namespace baldzarika { namespace ar {
 		return true;
 	}
 
+	float tracker::get_z_near() const
+	{
+		return m_z_near;
+	}
+
+	bool tracker::set_z_near(float zn)
+	{
+		if(m_running_state)
+			return false;
+		m_z_near=zn;
+		update_camera_projection();
+		return true;
+	}
+
+	float tracker::get_z_far() const
+	{
+		return m_z_far;
+	}
+
+	bool tracker::set_z_far(float zf)
+	{
+		if(m_running_state)
+			return false;
+		m_z_far=zf;
+		update_camera_projection();
+		return true;
+	}
+	
 	float tracker::get_camera_focal_length() const
 	{
 		return m_camera_focal_length;

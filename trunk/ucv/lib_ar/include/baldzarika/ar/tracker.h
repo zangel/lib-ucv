@@ -72,12 +72,18 @@ namespace baldzarika { namespace ar {
 		tracker(math::size2ui const &fs);
 		virtual ~tracker();
 
-
 		math::size2ui const&					get_frame_size() const;
 		bool									set_frame_size(math::size2ui const &fs);
 
 		float									get_camera_fovy() const;
 		bool									set_camera_fovy(float fovy);
+
+		float									get_z_near() const;
+		bool									set_z_near(float zn);
+
+		float									get_z_far() const;
+		bool									set_z_far(float zf);
+
 
 		float									get_camera_focal_length() const;
 		math::matrix44f const&					get_camera_projection() const;

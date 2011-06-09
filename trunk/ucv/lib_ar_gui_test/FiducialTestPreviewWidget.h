@@ -17,22 +17,22 @@ protected:
 	void						resizeGL(int width,int height);
 	void						paintGL();
 
-	void						onMarkerStateChanged(boost::shared_ptr<ar::fiducial::detector::marker_state> const &ms, ar::fiducial::detector::marker_state::eSC sc);
+	void						onMarkerStateChanged(boost::shared_ptr<ar::tracker::marker_state> const &ms, ar::tracker::marker_state::eSC sc);
 
 
 private:
-	GLuint						m_video_texture;
-	ucv::gil::rgb8_image_t		m_frame;
-	ucv::gil::gray8_image_t		m_gray_frame;
-	videoInput					m_vi;
+	GLuint										m_video_texture;
+	ucv::gil::rgb8_image_t						m_frame;
+	ucv::gil::gray8_image_t						m_gray_frame;
+	videoInput									m_vi;
 
-	QTimer						*m_render_timer;
+	QTimer										*m_render_timer;
 
-	boost::shared_ptr<ar::fiducial::detector>	m_detector;
+	boost::shared_ptr<ar::fiducial::tracker>	m_tracker;
 
-	bool						m_is_detected;
-	boost::int32_t				m_marker_id;
-	math::matrix44f				m_model_view;
+	bool										m_is_detected;
+	boost::int32_t								m_marker_id;
+	math::matrix44f								m_model_view;
 
 };
 

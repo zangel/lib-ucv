@@ -6,6 +6,10 @@ PreviewWidget::PreviewWidget(QWidget *parent/* =0 */)
 	, m_VideoTexture(GL_INVALID_VALUE)
 	, m_VideoTextureDirty(false)
 	, m_VideoTextureSize(0,0)
+	, m_Detected(false)
+	, m_CameraPose(math::matrix44f::identity())
+	, m_CameraProjection(math::matrix44f::identity())
+	, m_MarkerSize(0,0)
 {
 
 }
@@ -23,10 +27,13 @@ void PreviewWidget::setVideoTextureView(ucv::gil::rgb8c_view_t rgb8v)
 	update();
 }
 
-void PreviewWidget::setTrackingFeatures(ar::tracker::marker_state::points2_t const &tfs)
+void PreviewWidget::setDetectedCameraPose(bool detected, math::matrix44f const &cpose, math::matrix44f const &cproj, math::size2ui const &ms)
 {
-	boost::mutex::scoped_lock lock_tfs(m_TrackingFeaturesSync);
-	m_TrackingFeatures=tfs;
+	boost::mutex::scoped_lock lock_cp(m_CameraPoseSync);
+	m_Detected=detected;
+	m_CameraPose=cpose;
+	m_CameraProjection=cproj;
+	m_MarkerSize=ms;
 }
 
 void PreviewWidget::initializeGL()
@@ -126,33 +133,87 @@ void PreviewWidget::paintGL()
 
 	glEnable(GL_BLEND);
 	{
-		boost::mutex::scoped_lock lock_tfs(m_TrackingFeaturesSync);
-		if(!m_TrackingFeatures.empty())
+		boost::mutex::scoped_lock lock_tfs(m_CameraPoseSync);
+		if(m_Detected)
 		{
-			boost::scoped_array<float> feature_coords( new float[3*m_TrackingFeatures.size()] );
-			float *p_coords=feature_coords.get();
-			for(std::size_t p=0;p<m_TrackingFeatures.size();++p)
-			{
-				p_coords[0]= 2.0f*(static_cast<float>(m_TrackingFeatures[p].x())/float(vtex_size.width())-0.5f);
-				p_coords[1]=-2.0f*(static_cast<float>(m_TrackingFeatures[p].y())/float(vtex_size.height())-0.5f);
-				p_coords[2]=0.0;
-				p_coords+=3;
-			}
-			
-			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnable(GL_BLEND);
 			glDisable(GL_TEXTURE_2D);
-
-
 			glPointSize(4.0f);
-			glVertexPointer(3, GL_FLOAT, 0, feature_coords.get());
 
-			glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+			GLfloat model_view[16]=
+			{
+				m_CameraPose(0,0), m_CameraPose(1,0), m_CameraPose(2,0), m_CameraPose(3,0),
+				m_CameraPose(0,1), m_CameraPose(1,1), m_CameraPose(2,1), m_CameraPose(3,1),
+				m_CameraPose(0,2), m_CameraPose(1,2), m_CameraPose(2,2), m_CameraPose(3,2),
+				m_CameraPose(0,3), m_CameraPose(1,3), m_CameraPose(2,3), m_CameraPose(3,3)
+			};
 
-			glColor4f(0.0f, 1.0f, 0.0f, 0.5f);
-			glDrawArrays(GL_POINTS, 0, m_TrackingFeatures.size());
-
+			glMatrixMode(GL_MODELVIEW);
+			glLoadMatrixf(model_view);
 			
+			GLfloat projection[16]=
+			{
+				m_CameraProjection(0,0), m_CameraProjection(1,0), m_CameraProjection(2,0), m_CameraProjection(3,0),
+				m_CameraProjection(0,1), m_CameraProjection(1,1), m_CameraProjection(2,1), m_CameraProjection(3,1),
+				m_CameraProjection(0,2), m_CameraProjection(1,2), m_CameraProjection(2,2), m_CameraProjection(3,2),
+				m_CameraProjection(0,3), m_CameraProjection(1,3), m_CameraProjection(2,3), m_CameraProjection(3,3)
+			};
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadMatrixf(projection);
+
+			float low_corners[]=
+			{
+				-float(m_MarkerSize.width())*0.5f,  float(m_MarkerSize.height())*0.5f, -std::sqrt(float(m_MarkerSize.area()))*0.5f,
+				 float(m_MarkerSize.width())*0.5f,  float(m_MarkerSize.height())*0.5f, -std::sqrt(float(m_MarkerSize.area()))*0.5f,
+				 float(m_MarkerSize.width())*0.5f, -float(m_MarkerSize.height())*0.5f, -std::sqrt(float(m_MarkerSize.area()))*0.5f,
+				-float(m_MarkerSize.width())*0.5f, -float(m_MarkerSize.height())*0.5f, -std::sqrt(float(m_MarkerSize.area()))*0.5f
+			};
+
+			float high_corners[]=
+			{
+				-float(m_MarkerSize.width())*0.5f,  float(m_MarkerSize.height())*0.5f, std::sqrt(float(m_MarkerSize.area()))*0.5f,
+				 float(m_MarkerSize.width())*0.5f,  float(m_MarkerSize.height())*0.5f, std::sqrt(float(m_MarkerSize.area()))*0.5f,
+				 float(m_MarkerSize.width())*0.5f, -float(m_MarkerSize.height())*0.5f, std::sqrt(float(m_MarkerSize.area()))*0.5f,
+				-float(m_MarkerSize.width())*0.5f, -float(m_MarkerSize.height())*0.5f, std::sqrt(float(m_MarkerSize.area()))*0.5f
+			};
+
+			float colors[]=
+			{
+				1.0f, 0.0f, 0.0f, 1.0f,
+				0.0f, 1.0f, 0.0f, 1.0f,
+				0.0f, 0.0f, 1.0f, 1.0f,
+				1.0f, 1.0f, 0.0f, 1.0f
+			};
+
+			for(int i=0;i<4;++i)
+			{
+				glBegin(GL_LINES);
+			
+				glColor4fv(colors+i*4);
+				glVertex3fv(low_corners+i*3);
+
+				glColor4fv(colors+((i+1)%4)*4);
+				glVertex3fv(low_corners+((i+1)%4)*3);
+
+				glEnd();
+
+#if 1
+				glBegin(GL_LINES);
+				glColor4fv(colors+i*4);
+				glVertex3fv(high_corners+i*3);
+
+				glColor4fv(colors+((i+1)%4)*4);
+				glVertex3fv(high_corners+((i+1)%4)*3);
+				glEnd();
+
+				glBegin(GL_LINES);
+				glColor4fv(colors+i*4);
+				glVertex3fv(low_corners+i*3);
+				glVertex3fv(high_corners+i*3);
+				glEnd();
+#endif
+			}
 		}
 	}
 	glDisable(GL_BLEND);

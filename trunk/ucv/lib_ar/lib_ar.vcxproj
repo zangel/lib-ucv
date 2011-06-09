@@ -54,6 +54,7 @@
       <AdditionalIncludeDirectories>$(BOOST_DIR);$(LIBPNG_DIR);../3rd_party/libkdtree;../lib_math/include;../lib_ucv/include;./include</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>baldzarika/ar/config.h</PrecompiledHeaderFile>
       <AdditionalOptions>/Zm180 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
