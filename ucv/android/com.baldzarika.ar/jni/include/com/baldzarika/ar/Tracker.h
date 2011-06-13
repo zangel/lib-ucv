@@ -4,9 +4,6 @@
 namespace com { namespace baldzarika { namespace ar {
 
 	class Size2;
-	class Point2;
-	class Frame;
-	class Marker;
 	class Tracker;
 
 	namespace _Tracker {
@@ -23,9 +20,7 @@ namespace com { namespace baldzarika { namespace ar {
 			typedef j2cpp::global_ref<MarkerState> jref_t;
 
 			J2CPP_DECLARE_CLASS
-
 			J2CPP_DECLARE_METHOD(0)
-
 			J2CPP_DECLARE_FIELD(0)
 
 			static jx_t					get(px_t const &px);
@@ -35,19 +30,18 @@ namespace com { namespace baldzarika { namespace ar {
 			explicit MarkerState(jobject jobj);
 			MarkerState(jlong px);
 
+			void						initialize(jlong px);
+			void						destroy();
+
+			j2cpp::local_ref<Tracker> 	getTracker();
 			jboolean					isDetected();
-			j2cpp::local_ref<Marker>	getMarker();
+			j2cpp::local_ref<Size2>		getMarkerSize();
+
 
 			j2cpp::local_ref<j2cpp::android::graphics::Matrix>
 										getHomography();
 
-			j2cpp::local_ref< j2cpp::array< j2cpp::local_ref< Point2 >, 1 > >
-										getMarkerCorners();
-			jint						getFeatureMatchesSize();
-
-
-			void						create(jlong px);
-			void						destroy();
+			jboolean					getCameraPose(j2cpp::local_ref< j2cpp::array<jfloat,1> > const &cameraPose);
 
 			j2cpp::field<
 				J2CPP_CLASS_NAME,
@@ -66,18 +60,14 @@ namespace com { namespace baldzarika { namespace ar {
 
 			J2CPP_DECLARE_METHOD(0)
 			J2CPP_DECLARE_METHOD(1)
-			J2CPP_DECLARE_METHOD(2)
-			J2CPP_DECLARE_METHOD(3)
 
 			explicit Callback(jobject jobj);
 
+			void	onRunningStateChanged(j2cpp::local_ref<Tracker> const &t, jint rs);
 			void	onMarkerStateChanged(j2cpp::local_ref<MarkerState> const &ms, jint sc);
-			void	onTrackerStart(j2cpp::local_ref<Tracker> const &t);
-			void	onTrackerStop(j2cpp::local_ref<Tracker> const &t);
-			void	onTrackerStats(j2cpp::local_ref<Tracker> const &t, jint nff);
 		};
 
-	} //namespace _Tracker
+	}// namespace _Tracker
 
 	class Tracker
 		: public j2cpp::object<Tracker>
@@ -97,57 +87,41 @@ namespace com { namespace baldzarika { namespace ar {
 
 		J2CPP_DECLARE_CLASS
 
-        J2CPP_DECLARE_FIELD(0)
+		J2CPP_DECLARE_FIELD(0)
 		J2CPP_DECLARE_FIELD(1)
 
 		static jx_t						get(px_t const &px);
 		static px_t						get(jx_t const &jx);
 
-		static void 					onTrackerStartStop(px_t const &t, bool ss);
-		static void 					onMarkerStateChanged(MarkerState::px_t const &ms, ::baldzarika::ar::tracker::marker_state::eSC sc);
-		static void 					onTrackerStats(px_t const &t, boost::uint32_t nff);
-
 		explicit Tracker(jobject jobj);
+		Tracker(jlong px);
+
+		void							initialize(jlong px);
+		void 							destroy();
 
 		j2cpp::local_ref<Size2>			getFrameSize();
 		jboolean						setFrameSize(j2cpp::local_ref<Size2> const &fs);
 
-		jfloat							getDetectionTreshold();
-		jboolean						setDetectionTreshold(jfloat dt);
+		jfloat							getCameraFovy();
+		jboolean						setCameraFovy(jfloat fovy);
 
-		jint							getDetectionMinFeatures();
-		jboolean						setDetectionMinFeatures(jint minFeatures);
+		jfloat							getCameraZNear();
+		jboolean						setCameraZNear(jfloat zNear);
 
-		jint							getTrackingMaxFeatures();
-		jboolean						setTrackingMaxFeatures(jint maxFeatures);
+		jfloat							getCameraZFar();
+		jboolean						setCameraZFar(jfloat zFar);
 
-		jint							getTrackingHalfWinSize();
-		jboolean						setTrackingHalfWinSize(jint halfWinSize);
-
-		jint							getTrackingNumLevels();
-		jboolean						setTrackingNumLevels(jint numLevels);
-
-		jint							getTrackingMaxIterations();
-		jboolean						setTrackingMaxIterations(jint maxIters);
-
-		jfloat							getDetectionMaxDiffNorm();
-		jboolean						setDetectionMaxDiffNorm(jfloat maxDiffNorm);
-
-		jfloat							getTrackingMaxDiffNorm();
-		jboolean						setTrackingMaxDiffNorm(jfloat maxDiffNorm);
-
-		j2cpp::local_ref<MarkerState>	addMarker(j2cpp::local_ref<Marker> const &marker);
-
+		jfloat							getCameraFocalLength();
+		jboolean 						getCameraProjection(j2cpp::local_ref< j2cpp::array<jfloat,1> > const &cameraProjection);
 
 		jboolean						start();
-		jboolean						isStarted();
 		jboolean						isActive();
+		jboolean						isStarting();
+		jboolean						isStarted();
 		jboolean						stop();
-		jboolean						update(j2cpp::local_ref<Frame> const &frame);
+		jboolean						waitToStop();
 
-		void							create(j2cpp::local_ref<Size2> const &fs);
-		void							destroy();
-
+		jboolean						processFrame(j2cpp::local_ref< j2cpp::array<jbyte,1> > const &data, jint pfmt, jint width, jint height);
 
 		j2cpp::field<
 			J2CPP_CLASS_NAME,
@@ -164,9 +138,9 @@ namespace com { namespace baldzarika { namespace ar {
 		> m_cb;
 	};
 
+
 } //namespace ar
 } //namespace baldzarika
 } //namespace com
 
-#endif //COM_BALDZARIKA_AR_FRAME_H
-
+#endif //COM_BALDZARIKA_AR_TRACKER_H

@@ -4,6 +4,12 @@ public class Tracker
 {
 	static { System.loadLibrary("com.baldzarika.ar"); }
 	
+	public static final int RS_STOPPED=0;
+	public static final int RS_STARTING=1;
+	public static final int RS_STARTED=2;
+	public static final int RS_STOPPING=3;
+	
+	
 	public static class MarkerState
 	{
 		public static final int SC_DETECTION=0;
@@ -11,97 +17,60 @@ public class Tracker
 		public static final int SC_DETECT_NOTIFY=2;
 		
 		
-		private native void create(long px);
-		private native void destroy();
+		protected native void initialize(long px);
+		protected native void destroy();
 		
-		protected MarkerState(long px)
-		{
-			create(px);
-		}
+		protected MarkerState(long px){ initialize(px); }
+		public void dispose(){ destroy(); }
+		protected void finalize(){ destroy(); }
 		
-		public void dispose()
-		{
-			destroy();
-		}
-		
-		protected void finalize()
-		{
-			destroy();
-		}
-		
+		public native Tracker getTracker();
 		public native boolean isDetected();
-		public native Marker getMarker();
+		public native Size2 getMarkerSize();
 		public native android.graphics.Matrix getHomography();
-		public native Point2[] getMarkerCorners();
-		public native int getFeatureMatchesSize();
-		
+		public native boolean getCameraPose(float [] cameraPose);
+				
 		private long m_px;
 	}
 	
 	public interface Callback
 	{
+		public void onRunningStateChanged(Tracker t, int rs);
 		public void onMarkerStateChanged(MarkerState ms, int sc);
-		public void onTrackerStart(Tracker t);
-		public void onTrackerStop(Tracker t);
-		public void onTrackerStats(Tracker t, int nff);
 	}
 	
-	private native void create(Size2 fs);
-	private native void destroy();
+	protected native void initialize(long px);
+	protected native void destroy();
 	
-	public Tracker(Size2 fs) {
-		create(fs);
-	}
+	protected Tracker(long px){ initialize(px); }
 	
-	public void dispose()
-	{
-		destroy();
-	}
-	
-	protected void finalize()
-	{
-		destroy();
-	}
+	public void dispose(){ destroy(); }
+	protected void finalize(){ destroy(); }
 	
 	public native Size2 getFrameSize();
 	public native boolean setFrameSize(Size2 fs);
 	
-	public native float getDetectionTreshold();
-	public native boolean setDetectionTreshold(float treshold);
+	public native float getCameraFovy();
+	public native boolean setCameraFovy(float fovy);
 	
-	public native int getDetectionMinFeatures();
-	public native boolean setDetectionMinFeatures(int minFeatures);
+	public native float getCameraZNear();
+	public native boolean setCameraZNear(float zNear);
 	
-	public native int getTrackingMaxFeatures();
-	public native boolean setTrackingMaxFeatures(int maxFeatures);
+	public native float getCameraZFar();
+	public native boolean setCameraZFar(float zFar);
 	
-	public native int getTrackingHalfWinSize();
-	public native boolean setTrackingHalfWinSize(int halfWinSize);
+	public native float getCameraFocalLength();
 	
-	public native int getTrackingNumLevels();
-	public native boolean setTrackingNumLevels(int numLevels);
-	
-	public native int getTrackingMaxIterations();
-	public native boolean setTrackingMaxIterations(int maxIters);
-	
-	public native float getDetectionMaxDiffNorm();
-	public native boolean setDetectionMaxDiffNorm(float maxDiffNorm);
-	
-	public native float getTrackingMaxDiffNorm();
-	public native boolean setTrackingMaxDiffNorm(float maxDiffNorm);
-	
-	
-	
-		
-	
-	public native MarkerState addMarker(Marker m);
+	public native boolean getCameraProjection(float [] cameraProjection);
 	
 	public native boolean start();
-	public native boolean isStarted();
 	public native boolean isActive();
+	public native boolean isStarting();
+	public native boolean isStarted();
 	public native boolean stop();
+	public native boolean waitToStop();
 	
-	public native boolean update(Frame f);
+	public native boolean processFrame(byte[] data, int pfmt, int width, int height);
 	
 	public boolean setCallback(Callback cb)
 	{

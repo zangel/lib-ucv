@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     com_baldzarika_ar_fiducial_BCHMarkerModel
  * Method:    create
- * Signature: ()V
+ * Signature: ()J
  */
-JNIEXPORT void JNICALL Java_com_baldzarika_ar_fiducial_BCHMarkerModel_create
-  (JNIEnv *, jobject);
+JNIEXPORT jlong JNICALL Java_com_baldzarika_ar_fiducial_BCHMarkerModel_create
+  (JNIEnv *, jclass);
 
 #ifdef __cplusplus
 }

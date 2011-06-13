@@ -11,15 +11,18 @@ namespace baldzarika { namespace math {
 		: public vector<T,2>
 	{
 	public:
+		typedef vector<T, 2> base_type;
+		typedef T value_type;
+
 		size2()
 		{
-			m_data[0]=m_data[1]=constant::zero<T>();
+			base_type::m_data[0]=base_type::m_data[1]=constant::zero<T>();
 		}
 
 		size2(T w, T h)
 		{
-			m_data[0]=w;
-			m_data[1]=h;
+			base_type::m_data[0]=w;
+			base_type::m_data[1]=h;
 		}
 
 		inline size2(vector<T,2> const &that)
@@ -29,22 +32,22 @@ namespace baldzarika { namespace math {
 
 		inline bool operator==(size2 const &rhs) const
 		{
-			return m_data[0]==rhs.m_data[0] && m_data[1]==rhs.m_data[1];
+			return base_type::m_data[0]==rhs.m_data[0] && base_type::m_data[1]==rhs.m_data[1];
 		}
 
 		inline bool operator!=(size2 const &rhs) const
 		{
-			return m_data[0]!=rhs.m_data[0] || m_data[1]!=rhs.m_data[1];
+			return base_type::m_data[0]!=rhs.m_data[0] || base_type::m_data[1]!=rhs.m_data[1];
 		}
 		
-		inline T& width() { return m_data[0]; }
-		inline T const& width() const { return m_data[0]; }
+		inline T& width() { return base_type::m_data[0]; }
+		inline T const& width() const { return base_type::m_data[0]; }
 
-		inline T& height() { return m_data[1]; }
-		inline T const& height() const { return m_data[1]; }
+		inline T& height() { return base_type::m_data[1]; }
+		inline T const& height() const { return base_type::m_data[1]; }
 
-		inline T area() const { return m_data[0]*m_data[1]; }
-		inline bool empty() const { return m_data[0]*m_data[1]==constant::zero<T>(); }
+		inline T area() const { return base_type::m_data[0]*base_type::m_data[1]; }
+		inline bool empty() const { return base_type::m_data[0]*base_type::m_data[1]==constant::zero<T>(); }
 	};
 
 	typedef size2<float>			size2f;

@@ -164,11 +164,24 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	{
 		if(!m_frame_is_dirty)
 		{
-			ucv::convert(
-				gv,
-				ucv::gil::view(m_frame),
-				ucv::detail::grayscale_convert()
-			);
+			math::size2ui const &fs=get_frame_size();
+			if(gv.width()==fs.width() && gv.height()==fs.height())
+			{
+				ucv::convert(
+					gv,
+					ucv::gil::view(m_frame),
+					ucv::detail::grayscale_convert()
+				);
+			}
+			else
+			{
+				ucv::resize_and_convert(
+					gv,
+					ucv::gil::view(m_frame),
+					ucv::detail::grayscale_convert()
+				);
+			}
+
 			//m_gaussian_blur(ucv::gil::const_view(m_frame), ucv::gil::view(m_blurred_frame));
 			m_frame_is_dirty=true;
 			return true;

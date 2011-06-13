@@ -102,7 +102,7 @@ namespace baldzarika { namespace math {
 		{
 			for(boost::uint32_t r=0;r<R;++r)
 				for(boost::uint32_t c=0;c<C;++c)
-					lhs.m_data[r][c]*=static_cast<T>(v);
+					lhs.m_data[r][c]*=static_cast<T>(s);
 		}
 
 		template < typename VT >
@@ -132,7 +132,7 @@ namespace baldzarika { namespace math {
 
 			for(boost::uint32_t r=0;r<result_t::ROWS;++r)
 			{
-				for(boost::uint32_t c=0;c<result_t::COLS;++rc)
+				for(boost::uint32_t c=0;c<result_t::COLS;++c)
 				{
 					res.m_data[r][c]=constant::zero<T>();
 					for(boost::uint32_t c2=0;c2<C;++c)

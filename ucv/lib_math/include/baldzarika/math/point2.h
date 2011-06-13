@@ -12,16 +12,17 @@ namespace baldzarika { namespace math {
 		: public vector<T, 2>
 	{
 	public:
+		typedef vector<T, 2> base_type;
 		typedef T value_type;
 		point2()
 		{
-			m_data[0]=m_data[1]=constant::zero<T>();
+			base_type::m_data[0]=base_type::m_data[1]=constant::zero<T>();
 		}
 
 		point2(T px, T py)
 		{
-			m_data[0]=px;
-			m_data[1]=py;
+			base_type::m_data[0]=px;
+			base_type::m_data[1]=py;
 		}
 
 		point2(vector<T,3> const &v3)
@@ -36,11 +37,11 @@ namespace baldzarika { namespace math {
 		}
 
 
-		inline T& x() { return m_data[0]; }
-		inline T const& x() const { return m_data[0]; }
+		inline T& x() { return base_type::m_data[0]; }
+		inline T const& x() const { return base_type::m_data[0]; }
 
-		inline T& y() { return m_data[1]; }
-		inline T const& y() const { return m_data[1]; }
+		inline T& y() { return base_type::m_data[1]; }
+		inline T const& y() const { return base_type::m_data[1]; }
 	};
 
 	typedef point2<float>			point2f;

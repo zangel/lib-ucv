@@ -5,8 +5,8 @@ namespace baldzarika { namespace ar {
 
 
 	float const tracker::DEFAULT_CAMERA_FOVY=65.0f;
-	float const tracker::DEFAULT_Z_NEAR=0.1f;
-	float const tracker::DEFAULT_Z_FAR=500.0f;
+	float const tracker::DEFAULT_CAMERA_Z_NEAR=0.1f;
+	float const tracker::DEFAULT_CAMERA_Z_FAR=500.0f;
 
 	tracker::marker_state::marker_state()
 		: m_is_detected(false)
@@ -72,8 +72,8 @@ namespace baldzarika { namespace ar {
 	tracker::tracker(math::size2ui const &fs)
 		: m_frame_size(fs)
 		, m_camera_fovy(DEFAULT_CAMERA_FOVY)
-		, m_z_near(DEFAULT_Z_NEAR)
-		, m_z_far(DEFAULT_Z_FAR)
+		, m_camera_z_near(DEFAULT_CAMERA_Z_NEAR)
+		, m_camera_z_far(DEFAULT_CAMERA_Z_FAR)
 		, m_ios()
 		, m_ios_work(m_ios)
 		, m_worker()
@@ -120,30 +120,30 @@ namespace baldzarika { namespace ar {
 		return true;
 	}
 
-	float tracker::get_z_near() const
+	float tracker::get_camera_z_near() const
 	{
-		return m_z_near;
+		return m_camera_z_near;
 	}
 
-	bool tracker::set_z_near(float zn)
+	bool tracker::set_camera_z_near(float zn)
 	{
 		if(m_running_state)
 			return false;
-		m_z_near=zn;
+		m_camera_z_near=zn;
 		update_camera_projection();
 		return true;
 	}
 
-	float tracker::get_z_far() const
+	float tracker::get_camera_z_far() const
 	{
-		return m_z_far;
+		return m_camera_z_far;
 	}
 
-	bool tracker::set_z_far(float zf)
+	bool tracker::set_camera_z_far(float zf)
 	{
 		if(m_running_state)
 			return false;
-		m_z_far=zf;
+		m_camera_z_far=zf;
 		update_camera_projection();
 		return true;
 	}
@@ -247,12 +247,11 @@ namespace baldzarika { namespace ar {
 		m_camera_projection(1,1)=-(2.0f*m_camera_focal_length/float(m_frame_size.height()));
 		m_camera_projection(1,2)=-(2.0f*(float(m_frame_size.height())*0.5f)/float(m_frame_size.height())-1.0f);
 
-		m_camera_projection(2,2)=(m_z_far+m_z_near)/(m_z_far-m_z_near);
-		m_camera_projection(2,3)=-2.0f*m_z_far*m_z_near/(m_z_far-m_z_near);
+		m_camera_projection(2,2)=(m_camera_z_far+m_camera_z_near)/(m_camera_z_far-m_camera_z_near);
+		m_camera_projection(2,3)=-2.0f*m_camera_z_far*m_camera_z_near/(m_camera_z_far-m_camera_z_near);
 		m_camera_projection(3,2)=1.0f;
 		m_camera_projection(3,3)=0.0f;
 	}
-
 
 	void tracker::run()
 	{

@@ -38,6 +38,16 @@ namespace baldzarika { namespace math {
 			matrix_ops<T,R,C>::assign(*this,*reinterpret_cast< matrix<RT,R,C> const *>(ma));
 		}
 
+		inline T const* data() const
+		{
+			return &m_data[0][0];
+		}
+
+		inline T* data()
+		{
+			return &m_data[0][0];
+		}
+
 		inline T& operator()(boost::int32_t r, boost::uint32_t c)
 		{
 			return m_data[r][c];
@@ -119,7 +129,7 @@ namespace baldzarika { namespace math {
 		template < typename ST >
 		inline matrix operator *(ST const &s) const
 		{
-			return matrix(*this)*=v;
+			return matrix(*this)*=s;
 		}
 
 		template < typename VT >
@@ -147,7 +157,7 @@ namespace baldzarika { namespace math {
 			return matrix_ops<T,R,C>::assign(*this, matrix_ops<T,R,C>::transpose(*this));
 		}
 
-		inline typename matrix_ops<T,C,R> tansposed() const
+		inline matrix<T,C,R> tansposed() const
 		{
 			return matrix_ops<T,R,C>::transpose(*this);
 		}

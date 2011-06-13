@@ -9,6 +9,14 @@ extern "C" {
 #endif
 /*
  * Class:     com_baldzarika_ar_fiducial_MarkerModel
+ * Method:    initialize
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_baldzarika_ar_fiducial_MarkerModel_initialize
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     com_baldzarika_ar_fiducial_MarkerModel
  * Method:    destroy
  * Signature: ()V
  */

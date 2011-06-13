@@ -120,7 +120,7 @@ namespace baldzarika { namespace math {
 
 		static inline T norm_1(vector<T,D> const &vec)
 		{
-			T res=constant::zero<T>()
+			T res=constant::zero<T>();
 			for(boost::uint32_t d=0;d<D;++d)
 				res+=std::abs(vec.m_data[d]);
 			return res;

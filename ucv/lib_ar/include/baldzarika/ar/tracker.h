@@ -13,15 +13,15 @@ namespace baldzarika { namespace ar {
 	public:
 
 		static float const DEFAULT_CAMERA_FOVY;
-		static float const DEFAULT_Z_NEAR;
-		static float const DEFAULT_Z_FAR;
+		static float const DEFAULT_CAMERA_Z_NEAR;
+		static float const DEFAULT_CAMERA_Z_FAR;
 
 		typedef enum
 		{
 			RS_STOPPED=0,
-			RS_STARTING,
-			RS_STARTED,
-			RS_STOPPING
+			RS_STARTING=1,
+			RS_STARTED=2,
+			RS_STOPPING=3
 		} eRunningState;
 
 		typedef boost::signals2::signal<void (boost::shared_ptr<tracker> const &, eRunningState)> running_state_signal_t;
@@ -36,8 +36,8 @@ namespace baldzarika { namespace ar {
 			typedef enum
 			{
 				SC_DETECTION=0,
-				SC_POSE,
-				SC_DETECT_NOTIFY
+				SC_POSE=1,
+				SC_DETECT_NOTIFY=2
 			} eSC;
 
 			typedef boost::signals2::signal<void (boost::shared_ptr<marker_state> const &, eSC)> changed_signal_t;
@@ -78,12 +78,11 @@ namespace baldzarika { namespace ar {
 		float									get_camera_fovy() const;
 		bool									set_camera_fovy(float fovy);
 
-		float									get_z_near() const;
-		bool									set_z_near(float zn);
+		float									get_camera_z_near() const;
+		bool									set_camera_z_near(float zn);
 
-		float									get_z_far() const;
-		bool									set_z_far(float zf);
-
+		float									get_camera_z_far() const;
+		bool									set_camera_z_far(float zf);
 
 		float									get_camera_focal_length() const;
 		math::matrix44f const&					get_camera_projection() const;
@@ -120,8 +119,8 @@ namespace baldzarika { namespace ar {
 	protected:
 		math::size2ui							m_frame_size;
 		float									m_camera_fovy;
-		float									m_z_near;
-		float									m_z_far;
+		float									m_camera_z_near;
+		float									m_camera_z_far;
 		float									m_camera_focal_length;
 		math::matrix44f							m_camera_projection;
 		

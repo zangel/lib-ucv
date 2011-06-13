@@ -63,11 +63,11 @@ namespace baldzarika { namespace ucv {
 			{
 				math::point2<T> next_pt=pts[(p+1)%count];
 
-				math::point2<T> a=next_pt-curr_pt;
+				math::point2<T> a(next_pt-curr_pt);
 				a.x()*=inv_width;
 				a.y()*=inv_height;
 
-				math::point2<T> b=prev_pt-curr_pt;
+				math::point2<T> b(prev_pt-curr_pt);
 				b.x()*=inv_width;
 				b.y()*=inv_height;
 

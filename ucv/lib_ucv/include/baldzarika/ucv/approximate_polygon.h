@@ -41,7 +41,7 @@ namespace baldzarika { namespace ucv {
 				for(boost::int32_t j=1;j<count;++j)
 				{
 					boost::int32_t pt_idx=(slice.first+j)%count;
-					math::point2<PT> diff=input[pt_idx]-input[slice.first];
+					math::point2<PT> diff(input[pt_idx]-input[slice.first]);
 					diff.x()*=inv_width;
 					diff.y()*=inv_height;
 
@@ -84,7 +84,7 @@ namespace baldzarika { namespace ucv {
 			boost::int32_t num_pts=(slice.second-slice.first+count)%count;
 			if(num_pts>1)
 			{
-				math::point2<PT> diff=input[slice.second]-input[slice.first];
+				math::point2<PT> diff(input[slice.second]-input[slice.first]);
 
 				diff.x()*=inv_width;
 				diff.y()*=inv_height;
@@ -94,7 +94,7 @@ namespace baldzarika { namespace ucv {
 				for(boost::int32_t pt=1;pt<num_pts;++pt)
 				{
 					boost::int32_t pt_idx=(slice.first+pt)%count;
-					math::point2<PT> diff_start=input[pt_idx]-input[slice.first];
+					math::point2<PT> diff_start(input[pt_idx]-input[slice.first]);
 					diff_start.x()*=inv_width;
 					diff_start.y()*=inv_height;
 
@@ -144,12 +144,12 @@ namespace baldzarika { namespace ucv {
 		for(boost::int32_t i=is_closed?0:1;i<count-(is_closed?0:1);++i)
 		{
 			math::point2<PT> next_pt=input[indices[(i+1+count)%count]];
-			math::point2<PT> diff=next_pt-prev_pt;
+			math::point2<PT> diff(next_pt-prev_pt);
 			
 			diff.x()*=inv_width;
 			diff.y()*=inv_height;
 
-			math::point2<PT> diff_start=curr_pt-prev_pt;
+			math::point2<PT> diff_start(curr_pt-prev_pt);
 			diff_start.x()*=inv_width;
 			diff_start.y()*=inv_height;
 

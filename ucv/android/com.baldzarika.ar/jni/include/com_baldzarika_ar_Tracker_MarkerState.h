@@ -15,10 +15,10 @@ extern "C" {
 #define com_baldzarika_ar_Tracker_MarkerState_SC_DETECT_NOTIFY 2L
 /*
  * Class:     com_baldzarika_ar_Tracker_MarkerState
- * Method:    create
+ * Method:    initialize
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_create
+JNIEXPORT void JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_initialize
   (JNIEnv *, jobject, jlong);
 
 /*
@@ -31,6 +31,14 @@ JNIEXPORT void JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_destroy
 
 /*
  * Class:     com_baldzarika_ar_Tracker_MarkerState
+ * Method:    getTracker
+ * Signature: ()Lcom/baldzarika/ar/Tracker;
+ */
+JNIEXPORT jobject JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_getTracker
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_Tracker_MarkerState
  * Method:    isDetected
  * Signature: ()Z
  */
@@ -39,10 +47,10 @@ JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_isDet
 
 /*
  * Class:     com_baldzarika_ar_Tracker_MarkerState
- * Method:    getMarker
- * Signature: ()Lcom/baldzarika/ar/Marker;
+ * Method:    getMarkerSize
+ * Signature: ()Lcom/baldzarika/ar/Size2;
  */
-JNIEXPORT jobject JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_getMarker
+JNIEXPORT jobject JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_getMarkerSize
   (JNIEnv *, jobject);
 
 /*
@@ -55,19 +63,11 @@ JNIEXPORT jobject JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_getHom
 
 /*
  * Class:     com_baldzarika_ar_Tracker_MarkerState
- * Method:    getMarkerCorners
- * Signature: ()[Lcom/baldzarika/ar/Point2;
+ * Method:    getCameraPose
+ * Signature: ([F)Z
  */
-JNIEXPORT jobjectArray JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_getMarkerCorners
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_Tracker_MarkerState
- * Method:    getFeatureMatchesSize
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_getFeatureMatchesSize
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_00024MarkerState_getCameraPose
+  (JNIEnv *, jobject, jfloatArray);
 
 #ifdef __cplusplus
 }
