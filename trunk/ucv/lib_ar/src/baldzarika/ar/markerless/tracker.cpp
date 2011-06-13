@@ -757,8 +757,8 @@ namespace baldzarika { namespace ar { namespace markerless {
 				math::constant::one<feature_point_t::value_type>()/
 				feature_point_t::value_type(averaged_corners[c].size());
 
-			math::point2f avg_mpoint=feature_point_t::point2_t::zero();
-			math::point2f avg_ipoint=feature_point_t::point2_t::zero();
+			math::point2f avg_mpoint(feature_point_t::point2_t::zero());
+			math::point2f avg_ipoint(feature_point_t::point2_t::zero());
 
 
 			for(boost::uint32_t i=0;i<averaged_corners[c].size();++i)

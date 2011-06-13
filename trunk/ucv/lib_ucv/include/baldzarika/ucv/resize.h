@@ -3,8 +3,8 @@
 
 namespace baldzarika { namespace ucv {
 
-	template < typename SVT, typename DVT >
-	bool half_sample_and_scale(SVT src, DVT dst, typename gil::channel_type<typename DVT::value_type>::type s)
+	template < typename SVT, typename DVT, typename CV >
+	bool half_sample_and_convert(SVT src, DVT dst, CV converter)
 	{
 		typedef typename SVT::value_type	src_pixel_t;
 		typedef typename DVT::value_type	dst_pixel_t;
@@ -15,32 +15,33 @@ namespace baldzarika { namespace ucv {
 		if(src.width()/2!=dst.width() && src.height()/2!=dst.height())
 			return false;
 
-		for(boost::int32_t y=0;y<static_cast<std::size_t>(dst.height());++y)
+		dst_channel_t tmp[4];
+		for(boost::int32_t y=0;y<dst.height();++y)
 		{
-			src_channel_t const *src_row=reinterpret_cast<src_channel_t *>(src.row_begin(y<<1));
-			src_channel_t const *nxt_src_row=reinterpret_cast<src_channel_t *>(src.row_begin((y<<1)+1));
+			src_channel_t const *src_row=reinterpret_cast<src_channel_t const *>(src.row_begin(y<<1));
+			src_channel_t const *nxt_src_row=reinterpret_cast<src_channel_t const *>(src.row_begin((y<<1)+1));
 			dst_channel_t *dst_row=reinterpret_cast<dst_channel_t *>(dst.row_begin(y));
 
+			converter.begin_row();
+
 			for(boost::int32_t x=0;x<dst.width();++x)
-				dst_row[x]=
-				s*
-				(
-					(
-						dst_channel_t(src_row[x<<1])+
-						dst_channel_t(src_row[(x<<1)+1])+
-						dst_channel_t(nxt_src_row[x<<1])+
-						dst_channel_t(nxt_src_row[(x<<1)+1])
-					).operator>>(2)
-				);
+			{
+				converter(src_row[x<<1],			tmp[0]);
+				converter(src_row[(x<<1)+1],		tmp[1]);
+				converter(nxt_src_row[x<<1],		tmp[2]);
+				converter(nxt_src_row[(x<<1)+1],	tmp[3]);
+				dst_row[x]=(tmp[0]+tmp[1]+tmp[2]+tmp[3]).operator>>(2);
+			}
+			converter.end_row();
 		}
 		return true;
 	}
 
-	template < typename SVT, typename DVT >
-	bool resize_and_scale(SVT src, DVT dst, typename gil::channel_type<typename DVT::value_type>::type s)
+	template < typename SVT, typename DVT, typename CV >
+	bool resize_and_convert(SVT src, DVT dst, CV converter)
 	{
 		if(src.width()/2==dst.width() && src.height()/2==dst.height())
-			return half_sample_and_scale(src, dst, s);
+			return half_sample_and_convert(src, dst, converter);
 		return false;
 	}
 

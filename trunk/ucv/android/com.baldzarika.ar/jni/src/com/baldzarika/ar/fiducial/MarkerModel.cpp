@@ -2,7 +2,14 @@
 #include <com/baldzarika/ar/fiducial/MarkerModel.h>
 #include <com_baldzarika_ar_fiducial_MarkerModel.h>
 
-void JNICALL Java_com_baldzarika_ar_fiducial_MarkerModel_destroy(JNIEnv */*e*/, jobject mm)
+void Java_com_baldzarika_ar_fiducial_MarkerModel_initialize(JNIEnv */*e*/, jobject mm, jlong px)
+{
+	using namespace com::baldzarika::ar::fiducial;
+	using namespace j2cpp;
+	MarkerModel(mm).initialize(px);
+}
+
+void Java_com_baldzarika_ar_fiducial_MarkerModel_destroy(JNIEnv */*E*/, jobject mm)
 {
 	using namespace com::baldzarika::ar::fiducial;
 	using namespace j2cpp;
@@ -34,6 +41,13 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 	{
 	}
 
+	void MarkerModel::initialize(jlong px)
+	{
+		px_t *ppx=reinterpret_cast<px_t *>(px);
+		(*ppx)->m_any_data=jref_t(get_jobject());
+		m_px=reinterpret_cast<jlong>(ppx);
+	}
+
 	void MarkerModel::destroy()
 	{
 		if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
@@ -43,7 +57,6 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 			m_px=0;
 		}
 	}
-
 } //namespace fiducial
 } //namespace ar
 } //namespace baldzarika

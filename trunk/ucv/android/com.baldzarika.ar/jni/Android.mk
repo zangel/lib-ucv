@@ -10,6 +10,7 @@ LOCAL_C_INCLUDES	:=	$(ANDROID_CPP_SDK)/j2cpp \
 						$(OPENCV_ROOT)/3rdparty/libpng \
 						$(OPENCV_ROOT)/3rdparty/include \
 						$(LOCAL_PATH)/../../../3rd_party/libkdtree \
+						$(LOCAL_PATH)/../../../lib_math/include \
 						$(LOCAL_PATH)/../../../lib_ucv/include \
 						$(LOCAL_PATH)/../../../lib_ar/include \
 						$(LOCAL_PATH)/include
@@ -17,19 +18,19 @@ LOCAL_C_INCLUDES	:=	$(ANDROID_CPP_SDK)/j2cpp \
 LOCAL_SRC_FILES :=	src/support.cpp \
 					src/com/baldzarika/ar/Size2.cpp \
 					src/com/baldzarika/ar/Point2.cpp \
-					src/com/baldzarika/ar/Frame.cpp \
-					src/com/baldzarika/ar/Marker.cpp \
 					src/com/baldzarika/ar/Tracker.cpp \
+					src/com/baldzarika/ar/fiducial/Tracker.cpp \
 					src/com/baldzarika/ar/fiducial/MarkerModel.cpp \
 					src/com/baldzarika/ar/fiducial/BCHMarkerModel.cpp \
-					src/com/baldzarika/ar/fiducial/Detector.cpp \
-					../../../lib_ar/src/baldzarika/ar/marker.cpp \
 					../../../lib_ar/src/baldzarika/ar/tracker.cpp \
+					../../../lib_ar/src/baldzarika/ar/markerless/marker.cpp \
+					../../../lib_ar/src/baldzarika/ar/markerless/tracker.cpp \
 					../../../lib_ar/src/baldzarika/ar/fiducial/marker_model.cpp \
 					../../../lib_ar/src/baldzarika/ar/fiducial/bch_marker_model.cpp \
-					../../../lib_ar/src/baldzarika/ar/fiducial/detector.cpp \
+					../../../lib_ar/src/baldzarika/ar/fiducial/tracker.cpp \
 					../../../lib_ucv/src/baldzarika/ucv/surf.cpp \
 					../../../lib_ucv/src/baldzarika/ucv/homography.cpp
+					
 					
 					
 					

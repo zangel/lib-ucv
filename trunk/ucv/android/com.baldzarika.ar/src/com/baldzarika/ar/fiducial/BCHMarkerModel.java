@@ -4,10 +4,10 @@ public class BCHMarkerModel extends MarkerModel
 {
 	static { System.loadLibrary("com.baldzarika.ar"); }
 	
-	private native void create();
+	private static native long create();
 	
 	public BCHMarkerModel()
 	{
-		create();
+		super(create());
 	}
 }

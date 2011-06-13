@@ -7,13 +7,21 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#undef com_baldzarika_ar_Tracker_RS_STOPPED
+#define com_baldzarika_ar_Tracker_RS_STOPPED 0L
+#undef com_baldzarika_ar_Tracker_RS_STARTING
+#define com_baldzarika_ar_Tracker_RS_STARTING 1L
+#undef com_baldzarika_ar_Tracker_RS_STARTED
+#define com_baldzarika_ar_Tracker_RS_STARTED 2L
+#undef com_baldzarika_ar_Tracker_RS_STOPPING
+#define com_baldzarika_ar_Tracker_RS_STOPPING 3L
 /*
  * Class:     com_baldzarika_ar_Tracker
- * Method:    create
- * Signature: (Lcom/baldzarika/ar/Size2;)V
+ * Method:    initialize
+ * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_com_baldzarika_ar_Tracker_create
-  (JNIEnv *, jobject, jobject);
+JNIEXPORT void JNICALL Java_com_baldzarika_ar_Tracker_initialize
+  (JNIEnv *, jobject, jlong);
 
 /*
  * Class:     com_baldzarika_ar_Tracker
@@ -41,139 +49,67 @@ JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setFrameSize
 
 /*
  * Class:     com_baldzarika_ar_Tracker
- * Method:    getDetectionTreshold
+ * Method:    getCameraFovy
  * Signature: ()F
  */
-JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_Tracker_getDetectionTreshold
+JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_Tracker_getCameraFovy
   (JNIEnv *, jobject);
 
 /*
  * Class:     com_baldzarika_ar_Tracker
- * Method:    setDetectionTreshold
+ * Method:    setCameraFovy
  * Signature: (F)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setDetectionTreshold
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setCameraFovy
   (JNIEnv *, jobject, jfloat);
 
 /*
  * Class:     com_baldzarika_ar_Tracker
- * Method:    getDetectionMinFeatures
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_com_baldzarika_ar_Tracker_getDetectionMinFeatures
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_Tracker
- * Method:    setDetectionMinFeatures
- * Signature: (I)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setDetectionMinFeatures
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_baldzarika_ar_Tracker
- * Method:    getTrackingMaxFeatures
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_com_baldzarika_ar_Tracker_getTrackingMaxFeatures
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_Tracker
- * Method:    setTrackingMaxFeatures
- * Signature: (I)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setTrackingMaxFeatures
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_baldzarika_ar_Tracker
- * Method:    getTrackingHalfWinSize
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_com_baldzarika_ar_Tracker_getTrackingHalfWinSize
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_Tracker
- * Method:    setTrackingHalfWinSize
- * Signature: (I)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setTrackingHalfWinSize
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_baldzarika_ar_Tracker
- * Method:    getTrackingNumLevels
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_com_baldzarika_ar_Tracker_getTrackingNumLevels
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_Tracker
- * Method:    setTrackingNumLevels
- * Signature: (I)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setTrackingNumLevels
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_baldzarika_ar_Tracker
- * Method:    getTrackingMaxIterations
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_com_baldzarika_ar_Tracker_getTrackingMaxIterations
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_Tracker
- * Method:    setTrackingMaxIterations
- * Signature: (I)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setTrackingMaxIterations
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_baldzarika_ar_Tracker
- * Method:    getDetectionMaxDiffNorm
+ * Method:    getCameraZNear
  * Signature: ()F
  */
-JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_Tracker_getDetectionMaxDiffNorm
+JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_Tracker_getCameraZNear
   (JNIEnv *, jobject);
 
 /*
  * Class:     com_baldzarika_ar_Tracker
- * Method:    setDetectionMaxDiffNorm
+ * Method:    setCameraZNear
  * Signature: (F)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setDetectionMaxDiffNorm
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setCameraZNear
   (JNIEnv *, jobject, jfloat);
 
 /*
  * Class:     com_baldzarika_ar_Tracker
- * Method:    getTrackingMaxDiffNorm
+ * Method:    getCameraZFar
  * Signature: ()F
  */
-JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_Tracker_getTrackingMaxDiffNorm
+JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_Tracker_getCameraZFar
   (JNIEnv *, jobject);
 
 /*
  * Class:     com_baldzarika_ar_Tracker
- * Method:    setTrackingMaxDiffNorm
+ * Method:    setCameraZFar
  * Signature: (F)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setTrackingMaxDiffNorm
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_setCameraZFar
   (JNIEnv *, jobject, jfloat);
 
 /*
  * Class:     com_baldzarika_ar_Tracker
- * Method:    addMarker
- * Signature: (Lcom/baldzarika/ar/Marker;)Lcom/baldzarika/ar/Tracker/MarkerState;
+ * Method:    getCameraFocalLength
+ * Signature: ()F
  */
-JNIEXPORT jobject JNICALL Java_com_baldzarika_ar_Tracker_addMarker
-  (JNIEnv *, jobject, jobject);
+JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_Tracker_getCameraFocalLength
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_Tracker
+ * Method:    getCameraProjection
+ * Signature: ([F)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_getCameraProjection
+  (JNIEnv *, jobject, jfloatArray);
 
 /*
  * Class:     com_baldzarika_ar_Tracker
@@ -181,14 +117,6 @@ JNIEXPORT jobject JNICALL Java_com_baldzarika_ar_Tracker_addMarker
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_start
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_Tracker
- * Method:    isStarted
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_isStarted
   (JNIEnv *, jobject);
 
 /*
@@ -201,6 +129,22 @@ JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_isActive
 
 /*
  * Class:     com_baldzarika_ar_Tracker
+ * Method:    isStarting
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_isStarting
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_Tracker
+ * Method:    isStarted
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_isStarted
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_Tracker
  * Method:    stop
  * Signature: ()Z
  */
@@ -209,11 +153,19 @@ JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_stop
 
 /*
  * Class:     com_baldzarika_ar_Tracker
- * Method:    update
- * Signature: (Lcom/baldzarika/ar/Frame;)Z
+ * Method:    waitToStop
+ * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_update
-  (JNIEnv *, jobject, jobject);
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_waitToStop
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_Tracker
+ * Method:    processFrame
+ * Signature: ([BIII)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_processFrame
+  (JNIEnv *, jobject, jbyteArray, jint, jint, jint);
 
 #ifdef __cplusplus
 }

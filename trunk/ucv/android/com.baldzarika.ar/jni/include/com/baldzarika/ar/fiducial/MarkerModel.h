@@ -21,19 +21,10 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 		static jx_t				get(px_t const &px);
 		static px_t				get(jx_t const &jx);
 
-		template < typename DNT, typename DWT >
-		static void tie(boost::shared_ptr<DNT> const &px, j2cpp::local_ref<DWT> const &jx)
-		{
-			px_t *ppx=new px_t(px);
-			jref_t jref(jx);
-			(*ppx)->m_any_data=jref;
-			jref->m_px=reinterpret_cast<jlong>(ppx);
-		}
-
 		explicit MarkerModel(jobject jobj);
 
-
-		void 		destroy();
+		void				initialize(jlong px);
+		void				destroy();
 
 		j2cpp::field<
 			J2CPP_CLASS_NAME,

@@ -4,6 +4,7 @@
 #include <baldzarika/ucv/config.h>
 #include <baldzarika/ucv/gil_channel_traits.h>
 #include <baldzarika/ucv/convert.h>
+#include <baldzarika/ucv/resize.h>
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/norm.h>
 #include <baldzarika/ucv/contour.h>

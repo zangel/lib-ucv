@@ -4,8 +4,9 @@
 namespace baldzarika { namespace math {
 
 	template < typename T, boost::uint32_t R, boost::uint32_t C> class matrix;
-	template < typename T, boost::uint32_t R, boost::uint32_t C> struct matrix_ops;
-
+	template < typename T2, boost::uint32_t D2 > struct vector_ops;
+	template < typename T2, boost::uint32_t R2, boost::uint32_t C2 > struct matrix_ops;
+	
 	template < typename T, boost::uint32_t D >
 	class vector
 	{
@@ -17,7 +18,7 @@ namespace baldzarika { namespace math {
 		static inline vector const& zero() { return vector_ops<T,D>::zero(); }
 
 		template < boost::uint32_t A >
-		static inline vector const& unit() { return vector_ops<T,D>::unit<A>(); }
+		static inline vector const& unit() { return vector_ops<T,D>::template unit<A>(); }
 
 		inline vector()
 		{
@@ -211,5 +212,7 @@ namespace baldzarika { namespace math {
 } //namespace baldzarika
 
 #include <baldzarika/math/vector_ops.h>
+#include <baldzarika/math/matrix_ops.h>
+
 
 #endif //BALDZARIKA_MATH_VECTOR_H
