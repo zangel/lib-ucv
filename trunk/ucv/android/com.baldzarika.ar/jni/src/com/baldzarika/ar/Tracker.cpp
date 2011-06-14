@@ -239,8 +239,8 @@ namespace com { namespace baldzarika { namespace ar {
 			if(px_t *ppx=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
 			{
 				(*ppx)->m_any_data=boost::any();
-				delete ppx;
 				m_px=0;
+				delete ppx;
 			}
 		}
 

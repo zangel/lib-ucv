@@ -58,14 +58,9 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 			::baldzarika::ar::fiducial::tracker
 		> px_t;
 
-		typedef j2cpp::local_ref<Tracker> jx_t;
-
 		typedef _Tracker::MarkerState MarkerState;
 
 		J2CPP_DECLARE_CLASS
-
-		J2CPP_DECLARE_FIELD(0)
-		J2CPP_DECLARE_FIELD(1)
 
 		px_t								get_px() const;
 
