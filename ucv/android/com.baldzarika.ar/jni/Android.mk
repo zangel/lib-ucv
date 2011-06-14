@@ -6,9 +6,9 @@ LOCAL_MODULE    := com.baldzarika.ar
 
 LOCAL_C_INCLUDES	:=	$(ANDROID_CPP_SDK)/j2cpp \
 						$(ANDROID_CPP_SDK)/platforms/android-7 \
-						$(ANDROID_BOOST_DIR) \
-						$(OPENCV_ROOT)/3rdparty/libpng \
-						$(OPENCV_ROOT)/3rdparty/include \
+						$(ANDROID_BOOST_INCLUDE_DIR) \
+						$(ANDROID_OPENCV_ROOT)/3rdparty/libpng \
+						$(ANDROID_OPENCV_ROOT)/3rdparty/include \
 						$(LOCAL_PATH)/../../../3rd_party/libkdtree \
 						$(LOCAL_PATH)/../../../lib_math/include \
 						$(LOCAL_PATH)/../../../lib_ucv/include \
@@ -36,10 +36,10 @@ LOCAL_SRC_FILES :=	src/support.cpp \
 					
 					
 					
-LOCAL_LDLIBS    	:=	-L$(ANDROID_BOOST_DIR)/android/lib \
-						-L$(OPENCV_ROOT)/android/build/obj/local/armeabi \
+LOCAL_LDLIBS    	:=	-L$(ANDROID_BOOST_LIB_DIR) \
+						-L$(ANDROID_OPENCV_ROOT)/android/build/obj/local/armeabi \
 						-lboost_system \
-						-l boost_thread \
+						-lboost_thread \
 						-lpng \
 						-lzlib \
 						-ldl \
