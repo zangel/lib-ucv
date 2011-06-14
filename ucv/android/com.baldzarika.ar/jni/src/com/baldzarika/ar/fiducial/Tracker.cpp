@@ -21,7 +21,7 @@ jobject Java_com_baldzarika_ar_fiducial_Tracker_00024MarkerState_getMarkerModel(
 	return Tracker::MarkerState(ms).getMarkerModel().get_jobject();
 }
 
-jlong Java_com_baldzarika_ar_fiducial_Tracker_create(JNIEnv */*e*/, jclass tc, jobject frameSize)
+jlong Java_com_baldzarika_ar_fiducial_Tracker_create(JNIEnv */*e*/, jclass /*trackerClazz*/, jobject frameSize)
 {
 	using namespace com::baldzarika::ar::fiducial;
 	using namespace j2cpp;
@@ -141,7 +141,7 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 	{
 		j2cpp::local_ref< ::com::baldzarika::ar::Tracker::MarkerState > jms=::com::baldzarika::ar::Tracker::MarkerState::get(ms);
 
-		if(sc==::baldzarika::ar::tracker::marker_state::SC_DETECTION && ms->is_detected())
+		if(sc==::baldzarika::ar::tracker::marker_state::SC_DETECTION && ms->is_detected() && !jms)
 		{
 			jms=j2cpp::local_ref< ::com::baldzarika::ar::Tracker::MarkerState >(
 				MarkerState(
@@ -154,7 +154,7 @@ namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 			if(j2cpp::local_ref< ::com::baldzarika::ar::Tracker::Callback > cb=jx->m_cb)
 				cb->onMarkerStateChanged(jms, sc);
 
-		if(sc==::baldzarika::ar::tracker::marker_state::SC_DETECTION && !ms->is_detected())
+		if(sc==::baldzarika::ar::tracker::marker_state::SC_DETECTION && !ms->is_detected() && jms)
 		{
 			jms->destroy();
 		}

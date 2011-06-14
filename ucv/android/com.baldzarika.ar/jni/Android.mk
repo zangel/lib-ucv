@@ -22,6 +22,8 @@ LOCAL_SRC_FILES :=	src/support.cpp \
 					src/com/baldzarika/ar/fiducial/Tracker.cpp \
 					src/com/baldzarika/ar/fiducial/MarkerModel.cpp \
 					src/com/baldzarika/ar/fiducial/BCHMarkerModel.cpp \
+					src/com/baldzarika/ar/markerless/Marker.cpp \
+					src/com/baldzarika/ar/markerless/Tracker.cpp \
 					../../../lib_ar/src/baldzarika/ar/tracker.cpp \
 					../../../lib_ar/src/baldzarika/ar/markerless/marker.cpp \
 					../../../lib_ar/src/baldzarika/ar/markerless/tracker.cpp \
