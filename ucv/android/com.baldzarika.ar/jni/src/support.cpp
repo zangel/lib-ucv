@@ -102,6 +102,7 @@ namespace {
 
 } //namespace anonymous
 
+#pragma GCC visibility push(default)
 
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
@@ -110,3 +111,6 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
 		return JNI_VERSION_1_4;
 	return JNI_ERR;
 }
+
+#pragma GCC visibility pop
+

@@ -4,6 +4,8 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE    := com.baldzarika.ar
 
+LOCAL_CFLAGS	+= -fvisibility=hidden -fvisibility-inlines-hidden
+
 LOCAL_C_INCLUDES	:=	$(ANDROID_CPP_SDK)/j2cpp \
 						$(ANDROID_CPP_SDK)/platforms/android-7 \
 						$(ANDROID_BOOST_INCLUDE_DIR) \

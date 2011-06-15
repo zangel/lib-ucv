@@ -6,6 +6,7 @@
 #include <com_baldzarika_ar_fiducial_Tracker.h>
 #include <com_baldzarika_ar_fiducial_Tracker_MarkerState.h>
 
+#pragma GCC visibility push(default)
 
 jint Java_com_baldzarika_ar_fiducial_Tracker_00024MarkerState_getMarkerId(JNIEnv */*e*/, jobject ms)
 {
@@ -42,6 +43,7 @@ jboolean Java_com_baldzarika_ar_fiducial_Tracker_removeMarkerModel(JNIEnv */*e*/
 	return Tracker(t).removeMarkerModel(local_ref<MarkerModel>(markerModel));
 }
 
+#pragma GCC visibility pop
 
 namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 

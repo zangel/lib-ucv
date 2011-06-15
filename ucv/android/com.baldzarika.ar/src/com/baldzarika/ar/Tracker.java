@@ -70,7 +70,11 @@ public class Tracker
 	public native boolean stop();
 	public native boolean waitToStop();
 	
-	public native boolean processFrame(byte[] data, int pfmt, int width, int height);
+	public native boolean processFrame(byte[] frame, int pfmt, int width, int height);
+	
+	//for testing purpose only ( it is very inefficient )
+	public native boolean processFrame(android.graphics.Bitmap frame);
+	
 	
 	public boolean setCallback(Callback cb)
 	{

@@ -122,6 +122,7 @@ namespace com { namespace baldzarika { namespace ar {
 		jboolean						waitToStop();
 
 		jboolean						processFrame(j2cpp::local_ref< j2cpp::array<jbyte,1> > const &data, jint pfmt, jint width, jint height);
+		jboolean						processFrame(j2cpp::local_ref< j2cpp::android::graphics::Bitmap > const &frame);
 
 		j2cpp::field<
 			J2CPP_CLASS_NAME,

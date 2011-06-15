@@ -2,6 +2,8 @@
 #include <com/baldzarika/ar/fiducial/MarkerModel.h>
 #include <com_baldzarika_ar_fiducial_MarkerModel.h>
 
+#pragma GCC visibility push(default)
+
 void Java_com_baldzarika_ar_fiducial_MarkerModel_initialize(JNIEnv */*e*/, jobject mm, jlong px)
 {
 	using namespace com::baldzarika::ar::fiducial;
@@ -15,6 +17,8 @@ void Java_com_baldzarika_ar_fiducial_MarkerModel_destroy(JNIEnv */*E*/, jobject 
 	using namespace j2cpp;
 	MarkerModel(mm).destroy();
 }
+
+#pragma GCC visibility pop
 
 namespace com { namespace baldzarika { namespace ar { namespace fiducial {
 

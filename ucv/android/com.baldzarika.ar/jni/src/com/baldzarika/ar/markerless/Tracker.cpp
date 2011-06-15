@@ -3,9 +3,10 @@
 #include <com/baldzarika/ar/markerless/Tracker.h>
 #include <com/baldzarika/ar/Size2.h>
 #include <com/baldzarika/ar/markerless/Marker.h>
-#include <com_baldzarika_ar_fiducial_Tracker.h>
-#include <com_baldzarika_ar_fiducial_Tracker_MarkerState.h>
+#include <com_baldzarika_ar_markerless_Tracker.h>
+#include <com_baldzarika_ar_markerless_Tracker_MarkerState.h>
 
+#pragma GCC visibility push(default)
 
 jobject Java_com_baldzarika_ar_markerless_Tracker_00024MarkerState_getMarker(JNIEnv */*e*/, jobject ms)
 {
@@ -140,6 +141,8 @@ jboolean Java_com_baldzarika_ar_markerless_Tracker_addMarker(JNIEnv */*e*/, jobj
 	using namespace j2cpp;
 	return Tracker(t).addMarker(local_ref<Marker>(marker));
 }
+
+#pragma GCC visibility pop
 
 namespace com { namespace baldzarika { namespace ar { namespace markerless {
 
