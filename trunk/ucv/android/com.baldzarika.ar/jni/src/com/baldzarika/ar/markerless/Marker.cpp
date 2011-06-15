@@ -3,6 +3,7 @@
 #include <com/baldzarika/ar/markerless/Marker.h>
 #include <com/baldzarika/ar/Size2.h>
 
+#pragma GCC visibility push(default)
 
 void Java_com_baldzarika_ar_markerless_Marker_initialize(JNIEnv */*e*/, jobject m, jlong px)
 {
@@ -61,6 +62,7 @@ jboolean Java_com_baldzarika_ar_markerless_Marker_saveImage(JNIEnv */*e*/, jobje
 
 }
 
+#pragma GCC visibility pop
 
 namespace com { namespace baldzarika { namespace ar { namespace markerless {
 

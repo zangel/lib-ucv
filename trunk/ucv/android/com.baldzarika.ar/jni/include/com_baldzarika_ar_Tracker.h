@@ -164,8 +164,16 @@ JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_waitToStop
  * Method:    processFrame
  * Signature: ([BIII)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_processFrame
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_processFrame___3BIII
   (JNIEnv *, jobject, jbyteArray, jint, jint, jint);
+
+/*
+ * Class:     com_baldzarika_ar_Tracker
+ * Method:    processFrame
+ * Signature: (Landroid/graphics/Bitmap;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_Tracker_processFrame__Landroid_graphics_Bitmap_2
+  (JNIEnv *, jobject, jobject);
 
 #ifdef __cplusplus
 }

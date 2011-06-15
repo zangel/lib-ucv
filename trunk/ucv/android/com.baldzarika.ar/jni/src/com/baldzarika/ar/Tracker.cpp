@@ -4,6 +4,7 @@
 #include <com_baldzarika_ar_Tracker.h>
 #include <com_baldzarika_ar_Tracker_MarkerState.h>
 
+#pragma GCC visibility push(default)
 
 void Java_com_baldzarika_ar_Tracker_00024MarkerState_initialize(JNIEnv */*e*/, jobject ms, jlong px)
 {
@@ -188,6 +189,15 @@ jboolean Java_com_baldzarika_ar_Tracker_processFrame(JNIEnv */*e*/, jobject t, j
 	return Tracker(t).processFrame(local_ref< array< jbyte,1> >(data), pfmt, width, height);
 }
 
+jboolean Java_com_baldzarika_ar_Tracker_processFrame__Landroid_graphics_Bitmap_2(JNIEnv */*e*/, jobject t, jobject frame)
+{
+	using namespace com::baldzarika::ar;
+	using namespace j2cpp;
+	return Tracker(t).processFrame(local_ref< j2cpp::android::graphics::Bitmap >(frame));
+}
+
+#pragma GCC visibility pop
+
 namespace com { namespace baldzarika { namespace ar {
 
 	namespace _Tracker {
@@ -299,7 +309,7 @@ namespace com { namespace baldzarika { namespace ar {
 
 
 		J2CPP_DEFINE_CLASS(Callback,"com/baldzarika/ar/Tracker$Callback")
-		J2CPP_DEFINE_METHOD(Callback,0,"onRunningStateChanged","(Lcom/baldzarika/Tracker;I)V")
+		J2CPP_DEFINE_METHOD(Callback,0,"onRunningStateChanged","(Lcom/baldzarika/ar/Tracker;I)V")
 		J2CPP_DEFINE_METHOD(Callback,1,"onMarkerStateChanged","(Lcom/baldzarika/ar/Tracker$MarkerState;I)V")
 
 		Callback::Callback(jobject jobj)
@@ -517,6 +527,47 @@ namespace com { namespace baldzarika { namespace ar {
 						)
 					)?JNI_TRUE:JNI_FALSE;
 				} break;
+			}
+		}
+		return JNI_FALSE;
+	}
+
+	jboolean Tracker::processFrame(j2cpp::local_ref< j2cpp::android::graphics::Bitmap > const &frame)
+	{
+		using namespace j2cpp;
+		using namespace j2cpp::android::graphics;
+		using namespace j2cpp::java::lang;
+
+		if(px_t *p_px=reinterpret_cast<px_t*>(static_cast<jlong>(m_px)))
+		{
+			if(frame)
+			{
+				::baldzarika::math::size2ui frame_size(frame->getWidth(), frame->getHeight());
+				if(frame_size.area())
+				{
+					if(local_ref<Bitmap::Config> frame_cfg=frame->getConfig())
+					{
+						if(0==static_cast< local_ref< Comparable > >(frame_cfg)->compareTo(local_ref<Bitmap::Config>(Bitmap::Config::ARGB_8888)))
+						{
+							local_ref< array<jint,1> > frame_pixels(frame_size.area());
+							if(frame_pixels->length()==frame_size.area())
+							{
+								::baldzarika::ucv::gil::gray8_image_t gray8_frame(frame_size.width(), frame_size.height());
+
+								frame->getPixels(frame_pixels, 0, frame_size.width(), 0, 0, frame_size.width(), frame_size.height());
+								::baldzarika::ucv::gil::copy_and_convert_pixels(
+									::baldzarika::ucv::gil::interleaved_view(
+										frame_size.width(), frame_size.height(),
+										reinterpret_cast< ::baldzarika::ucv::gil::argb8_pixel_t * >( frame_pixels->data() ),
+										frame_size.width()*4
+									),
+									::baldzarika::ucv::gil::view(gray8_frame)
+								);
+								return (*p_px)->process_frame(::baldzarika::ucv::gil::const_view(gray8_frame))?JNI_TRUE:JNI_FALSE;
+							}
+						}
+					}
+				}
 			}
 		}
 		return JNI_FALSE;

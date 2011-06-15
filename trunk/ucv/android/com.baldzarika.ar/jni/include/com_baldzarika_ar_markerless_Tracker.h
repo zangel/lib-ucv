@@ -25,138 +25,18 @@ JNIEXPORT jlong JNICALL Java_com_baldzarika_ar_markerless_Tracker_create
 
 /*
  * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    getDetectionTreshold
- * Signature: ()F
- */
-JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_markerless_Tracker_getDetectionTreshold
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    setDetectionTreshold
- * Signature: (F)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_markerless_Tracker_setDetectionTreshold
-  (JNIEnv *, jobject, jfloat);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    getDetectionMinFeatures
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_com_baldzarika_ar_markerless_Tracker_getDetectionMinFeatures
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    setDetectionMinFeatures
- * Signature: (I)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_markerless_Tracker_setDetectionMinFeatures
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    getTrackingMaxFeatures
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_com_baldzarika_ar_markerless_Tracker_getTrackingMaxFeatures
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    setTrackingMaxFeatures
- * Signature: (I)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_markerless_Tracker_setTrackingMaxFeatures
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    getTrackingHalfWinSize
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_com_baldzarika_ar_markerless_Tracker_getTrackingHalfWinSize
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    setTrackingHalfWinSize
- * Signature: (I)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_markerless_Tracker_setTrackingHalfWinSize
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    getTrackingNumLevels
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_com_baldzarika_ar_markerless_Tracker_getTrackingNumLevels
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    setTrackingNumLevels
- * Signature: (I)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_markerless_Tracker_setTrackingNumLevels
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    getTrackingMaxIterations
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_com_baldzarika_ar_markerless_Tracker_getTrackingMaxIterations
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    setTrackingMaxIterations
- * Signature: (I)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_markerless_Tracker_setTrackingMaxIterations
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    getDetectionMaxDiffNorm
- * Signature: ()F
- */
-JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_markerless_Tracker_getDetectionMaxDiffNorm
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    setDetectionMaxDiffNorm
- * Signature: (F)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_markerless_Tracker_setDetectionMaxDiffNorm
-  (JNIEnv *, jobject, jfloat);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    getTrackingMaxDiffNorm
- * Signature: ()F
- */
-JNIEXPORT jfloat JNICALL Java_com_baldzarika_ar_markerless_Tracker_getTrackingMaxDiffNorm
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
- * Method:    setTrackingMaxDiffNorm
- * Signature: (F)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_markerless_Tracker_setTrackingMaxDiffNorm
-  (JNIEnv *, jobject, jfloat);
-
-/*
- * Class:     com_baldzarika_ar_markerless_Tracker
  * Method:    addMarker
  * Signature: (Lcom/baldzarika/ar/markerless/Marker;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_markerless_Tracker_addMarker
+  (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     com_baldzarika_ar_markerless_Tracker
+ * Method:    removeMarker
+ * Signature: (Lcom/baldzarika/ar/markerless/Marker;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_baldzarika_ar_markerless_Tracker_removeMarker
   (JNIEnv *, jobject, jobject);
 
 #ifdef __cplusplus

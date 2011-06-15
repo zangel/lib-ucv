@@ -19,5 +19,4 @@
 #include <baldzarika/ar/fiducial/bch_marker_model.h>
 #include <baldzarika/ar/fiducial/tracker.h>
 
-
 #endif //CONFIG_H
