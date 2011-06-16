@@ -15,18 +15,18 @@ LOCAL_SRC_FILES :=	ucv_test.cpp \
 
 LOCAL_C_INCLUDES	:=	$(ANDROID_CPP_SDK)/j2cpp \
 						$(ANDROID_CPP_SDK)/platforms/android-7 \
-						$(ANDROID_BOOST_DIR) \
+						$(ANDROID_BOOST_INCLUDE_DIR) \
+						$(LOCAL_PATH)/../../../lib_math/include \
 						$(LOCAL_PATH)/../../../lib_ucv/include \
 						$(LOCAL_PATH)/../../../3rd_party/libkdtree \
-						$(UCV_DIR)/include \
-						$(OPENCV_ROOT)/3rdparty/libpng \
-						$(OPENCV_ROOT)/3rdparty/include
+						$(ANDROID_OPENCV_ROOT)/3rdparty/libpng \
+						$(ANDROID_OPENCV_ROOT)/3rdparty/include
 						
 
 						
 
-LOCAL_LDLIBS    	:=	-L$(ANDROID_BOOST_DIR)/android/lib \
-						-L$(OPENCV_ROOT)/android/build/obj/local/armeabi \
+LOCAL_LDLIBS    	:=	-L$(ANDROID_BOOST_LIB_DIR)/android/lib \
+						-L$(ANDROID_OPENCV_ROOT)/android/build/obj/local/armeabi \
 						-lGLESv2 \
 						-lpng \
 						-lzlib \

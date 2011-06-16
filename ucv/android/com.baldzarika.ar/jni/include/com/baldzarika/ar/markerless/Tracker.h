@@ -96,6 +96,7 @@ namespace com { namespace baldzarika { namespace ar { namespace markerless {
 		jboolean						setTrackingMaxDiffNorm(jfloat maxDiffNorm);
 
 		jboolean						addMarker(j2cpp::local_ref<Marker> const &marker);
+		jboolean						removeMarker(j2cpp::local_ref<Marker> const &marker);
 
 
 	};
