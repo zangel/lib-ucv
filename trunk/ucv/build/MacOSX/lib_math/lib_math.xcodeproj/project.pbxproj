@@ -1,0 +1,317 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		78874CA313AA93AA00E44DD1 /* box2.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874C9513AA93AA00E44DD1 /* box2.h */; };
+		78874CA413AA93AA00E44DD1 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874C9613AA93AA00E44DD1 /* config.h */; };
+		78874CA513AA93AA00E44DD1 /* constant.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874C9713AA93AA00E44DD1 /* constant.h */; };
+		78874CA613AA93AA00E44DD1 /* fixed_point.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874C9813AA93AA00E44DD1 /* fixed_point.h */; };
+		78874CA713AA93AA00E44DD1 /* jacobi.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874C9913AA93AA00E44DD1 /* jacobi.h */; };
+		78874CA813AA93AA00E44DD1 /* matrix_ops.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874C9A13AA93AA00E44DD1 /* matrix_ops.h */; };
+		78874CA913AA93AA00E44DD1 /* matrix.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874C9B13AA93AA00E44DD1 /* matrix.h */; };
+		78874CAA13AA93AA00E44DD1 /* point2.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874C9C13AA93AA00E44DD1 /* point2.h */; };
+		78874CAB13AA93AA00E44DD1 /* size2.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874C9D13AA93AA00E44DD1 /* size2.h */; };
+		78874CAC13AA93AA00E44DD1 /* solve.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874C9E13AA93AA00E44DD1 /* solve.h */; };
+		78874CAD13AA93AA00E44DD1 /* svd.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874C9F13AA93AA00E44DD1 /* svd.h */; };
+		78874CAE13AA93AA00E44DD1 /* utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874CA013AA93AA00E44DD1 /* utils.h */; };
+		78874CAF13AA93AA00E44DD1 /* vector_ops.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874CA113AA93AA00E44DD1 /* vector_ops.h */; };
+		78874CB013AA93AA00E44DD1 /* vector.h in Headers */ = {isa = PBXBuildFile; fileRef = 78874CA213AA93AA00E44DD1 /* vector.h */; };
+		78874CB513AA93D800E44DD1 /* config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 78874CB413AA93D800E44DD1 /* config.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		78874C8113AA934500E44DD1 /* lib_math.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = lib_math.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		78874C9513AA93AA00E44DD1 /* box2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = box2.h; path = ../../../../lib_math/include/baldzarika/math/box2.h; sourceTree = "<group>"; };
+		78874C9613AA93AA00E44DD1 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = ../../../../lib_math/include/baldzarika/math/config.h; sourceTree = "<group>"; };
+		78874C9713AA93AA00E44DD1 /* constant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constant.h; path = ../../../../lib_math/include/baldzarika/math/constant.h; sourceTree = "<group>"; };
+		78874C9813AA93AA00E44DD1 /* fixed_point.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fixed_point.h; path = ../../../../lib_math/include/baldzarika/math/fixed_point.h; sourceTree = "<group>"; };
+		78874C9913AA93AA00E44DD1 /* jacobi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jacobi.h; path = ../../../../lib_math/include/baldzarika/math/jacobi.h; sourceTree = "<group>"; };
+		78874C9A13AA93AA00E44DD1 /* matrix_ops.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = matrix_ops.h; path = ../../../../lib_math/include/baldzarika/math/matrix_ops.h; sourceTree = "<group>"; };
+		78874C9B13AA93AA00E44DD1 /* matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = matrix.h; path = ../../../../lib_math/include/baldzarika/math/matrix.h; sourceTree = "<group>"; };
+		78874C9C13AA93AA00E44DD1 /* point2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = point2.h; path = ../../../../lib_math/include/baldzarika/math/point2.h; sourceTree = "<group>"; };
+		78874C9D13AA93AA00E44DD1 /* size2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = size2.h; path = ../../../../lib_math/include/baldzarika/math/size2.h; sourceTree = "<group>"; };
+		78874C9E13AA93AA00E44DD1 /* solve.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = solve.h; path = ../../../../lib_math/include/baldzarika/math/solve.h; sourceTree = "<group>"; };
+		78874C9F13AA93AA00E44DD1 /* svd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = svd.h; path = ../../../../lib_math/include/baldzarika/math/svd.h; sourceTree = "<group>"; };
+		78874CA013AA93AA00E44DD1 /* utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utils.h; path = ../../../../lib_math/include/baldzarika/math/utils.h; sourceTree = "<group>"; };
+		78874CA113AA93AA00E44DD1 /* vector_ops.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vector_ops.h; path = ../../../../lib_math/include/baldzarika/math/vector_ops.h; sourceTree = "<group>"; };
+		78874CA213AA93AA00E44DD1 /* vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vector.h; path = ../../../../lib_math/include/baldzarika/math/vector.h; sourceTree = "<group>"; };
+		78874CB413AA93D800E44DD1 /* config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = config.cpp; path = ../../../../lib_math/src/baldzarika/math/config.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		78874C7E13AA934500E44DD1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		78874C7613AA934500E44DD1 = {
+			isa = PBXGroup;
+			children = (
+				78874C8313AA934500E44DD1 /* lib_math */,
+				78874C8213AA934500E44DD1 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		78874C8213AA934500E44DD1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				78874C8113AA934500E44DD1 /* lib_math.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		78874C8313AA934500E44DD1 /* lib_math */ = {
+			isa = PBXGroup;
+			children = (
+				78874CB113AA93B200E44DD1 /* src */,
+				78874C9413AA938D00E44DD1 /* include */,
+			);
+			path = lib_math;
+			sourceTree = "<group>";
+		};
+		78874C9213AA937500E44DD1 /* baldzarika */ = {
+			isa = PBXGroup;
+			children = (
+				78874C9313AA938200E44DD1 /* math */,
+			);
+			name = baldzarika;
+			sourceTree = "<group>";
+		};
+		78874C9313AA938200E44DD1 /* math */ = {
+			isa = PBXGroup;
+			children = (
+				78874C9513AA93AA00E44DD1 /* box2.h */,
+				78874C9613AA93AA00E44DD1 /* config.h */,
+				78874C9713AA93AA00E44DD1 /* constant.h */,
+				78874C9813AA93AA00E44DD1 /* fixed_point.h */,
+				78874C9913AA93AA00E44DD1 /* jacobi.h */,
+				78874C9A13AA93AA00E44DD1 /* matrix_ops.h */,
+				78874C9B13AA93AA00E44DD1 /* matrix.h */,
+				78874C9C13AA93AA00E44DD1 /* point2.h */,
+				78874C9D13AA93AA00E44DD1 /* size2.h */,
+				78874C9E13AA93AA00E44DD1 /* solve.h */,
+				78874C9F13AA93AA00E44DD1 /* svd.h */,
+				78874CA013AA93AA00E44DD1 /* utils.h */,
+				78874CA113AA93AA00E44DD1 /* vector_ops.h */,
+				78874CA213AA93AA00E44DD1 /* vector.h */,
+			);
+			name = math;
+			sourceTree = "<group>";
+		};
+		78874C9413AA938D00E44DD1 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				78874C9213AA937500E44DD1 /* baldzarika */,
+			);
+			name = include;
+			sourceTree = "<group>";
+		};
+		78874CB113AA93B200E44DD1 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				78874CB213AA93BC00E44DD1 /* baldzarika */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		78874CB213AA93BC00E44DD1 /* baldzarika */ = {
+			isa = PBXGroup;
+			children = (
+				78874CB313AA93C600E44DD1 /* math */,
+			);
+			name = baldzarika;
+			sourceTree = "<group>";
+		};
+		78874CB313AA93C600E44DD1 /* math */ = {
+			isa = PBXGroup;
+			children = (
+				78874CB413AA93D800E44DD1 /* config.cpp */,
+			);
+			name = math;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		78874C7F13AA934500E44DD1 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				78874CA313AA93AA00E44DD1 /* box2.h in Headers */,
+				78874CA413AA93AA00E44DD1 /* config.h in Headers */,
+				78874CA513AA93AA00E44DD1 /* constant.h in Headers */,
+				78874CA613AA93AA00E44DD1 /* fixed_point.h in Headers */,
+				78874CA713AA93AA00E44DD1 /* jacobi.h in Headers */,
+				78874CA813AA93AA00E44DD1 /* matrix_ops.h in Headers */,
+				78874CA913AA93AA00E44DD1 /* matrix.h in Headers */,
+				78874CAA13AA93AA00E44DD1 /* point2.h in Headers */,
+				78874CAB13AA93AA00E44DD1 /* size2.h in Headers */,
+				78874CAC13AA93AA00E44DD1 /* solve.h in Headers */,
+				78874CAD13AA93AA00E44DD1 /* svd.h in Headers */,
+				78874CAE13AA93AA00E44DD1 /* utils.h in Headers */,
+				78874CAF13AA93AA00E44DD1 /* vector_ops.h in Headers */,
+				78874CB013AA93AA00E44DD1 /* vector.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		78874C8013AA934500E44DD1 /* lib_math */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 78874C8F13AA934500E44DD1 /* Build configuration list for PBXNativeTarget "lib_math" */;
+			buildPhases = (
+				78874C7D13AA934500E44DD1 /* Sources */,
+				78874C7E13AA934500E44DD1 /* Frameworks */,
+				78874C7F13AA934500E44DD1 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = lib_math;
+			productName = lib_math;
+			productReference = 78874C8113AA934500E44DD1 /* lib_math.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		78874C7813AA934500E44DD1 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 78874C7B13AA934500E44DD1 /* Build configuration list for PBXProject "lib_math" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 78874C7613AA934500E44DD1;
+			productRefGroup = 78874C8213AA934500E44DD1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				78874C8013AA934500E44DD1 /* lib_math */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		78874C7D13AA934500E44DD1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				78874CB513AA93D800E44DD1 /* config.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		78874C8D13AA934500E44DD1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		78874C8E13AA934500E44DD1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		78874C9013AA934500E44DD1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_FAST_OBJC_DISPATCH = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					"$(BOOST_INCLUDE_DIR)",
+					../../../lib_math/include,
+				);
+				MACH_O_TYPE = mh_dylib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
+				VERSION_INFO_FILE = "";
+			};
+			name = Debug;
+		};
+		78874C9113AA934500E44DD1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_FAST_OBJC_DISPATCH = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					"$(BOOST_INCLUDE_DIR)",
+					../../../lib_math/include,
+				);
+				MACH_O_TYPE = mh_dylib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
+				VERSION_INFO_FILE = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		78874C7B13AA934500E44DD1 /* Build configuration list for PBXProject "lib_math" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				78874C8D13AA934500E44DD1 /* Debug */,
+				78874C8E13AA934500E44DD1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		78874C8F13AA934500E44DD1 /* Build configuration list for PBXNativeTarget "lib_math" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				78874C9013AA934500E44DD1 /* Debug */,
+				78874C9113AA934500E44DD1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 78874C7813AA934500E44DD1 /* Project object */;
+}
