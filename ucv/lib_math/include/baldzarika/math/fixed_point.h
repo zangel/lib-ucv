@@ -152,7 +152,7 @@ namespace baldzarika { namespace math {
 			static T1 adjust(T2 v)
 			{
 				typedef typename select<
-					bool(std::numeric_limits<T1>::digits > std::numeric_limits<T2>::digits),
+					(std::numeric_limits<T1>::digits > std::numeric_limits<T2>::digits),
 					T1,
 					T2
 				>::type greater_type;
@@ -335,16 +335,22 @@ namespace baldzarika { namespace math {
 
 		inline fixed_point& operator /=(fixed_point const& rhs)
 		{
-			m_value=(typename fixed_point<2*I, 2*F>::value_type(m_value)<<F)/rhs.m_value;
+			m_value=static_cast<value_type>(
+                (typename fixed_point<2*I, 2*F>::value_type(m_value)<<F)/
+                typename fixed_point<2*I, 2*F>::value_type(rhs.m_value)
+            );
 			return *this;
 		}
 
 		inline fixed_point operator /(fixed_point const& rhs) const
 		{
 			return fixed_point(
-				(typename fixed_point<2*I, 2*F>::value_type(m_value)<<F)/rhs.m_value,
-				detail::fp_explicit_tag()
-				);
+                static_cast<value_type>(
+                    (typename fixed_point<2*I, 2*F>::value_type(m_value)<<F)/
+                    typename fixed_point<2*I, 2*F>::value_type(rhs.m_value)
+                ),
+                detail::fp_explicit_tag()
+			);
 		}
 
 		inline fixed_point& operator >>=(boost::uint32_t b)
@@ -476,11 +482,11 @@ namespace std
 		static const bool traps=false;
 		static const float_round_style round_style=round_toward_zero;
 		static const int digits=I;
-		static const int digits10=(int)(digits*301./1000.+.5);
+		//static const  digits10=(int)(I*301./1000.+.5);
 		static const int max_exponent=0;
-		static const int max_exponent10=0;
+		//static const int max_exponent10=0;
 		static const int min_exponent=0;
-		static const int min_exponent10=0;
+		//static const int min_exponent10=0;
 		static const int radix=0;
 		static inline fp_type (min)()
 		{
@@ -493,9 +499,9 @@ namespace std
 			return fp_type((std::numeric_limits<typename fp_type::value_type>::max)(), baldzarika::math::detail::fp_explicit_tag());
 		}
 
-		static inline fp_type epsilon()
+		static inline fp_type (epsilon)()
 		{
-			return fp_type(1, baldzarika::math::detail::fp_explicit_tag());
+			return fp_type(1, baldzarika::math::detail::fp_explicit_tag() );
 		}
 
 		static inline fp_type (lowest)()
