@@ -35,9 +35,6 @@ LOCAL_SRC_FILES :=	src/support.cpp \
 					../../../lib_ucv/src/baldzarika/ucv/surf.cpp \
 					../../../lib_ucv/src/baldzarika/ucv/homography.cpp
 					
-					
-					
-					
 LOCAL_LDLIBS    	:=	-L$(ANDROID_BOOST_LIB_DIR) \
 						-L$(ANDROID_OPENCV_ROOT)/android/build/obj/local/armeabi \
 						-lboost_system \
