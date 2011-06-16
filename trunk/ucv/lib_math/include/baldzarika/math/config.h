@@ -17,8 +17,6 @@
 
 namespace baldzarika { namespace math {
 	
-	namespace ublas=::boost::numeric::ublas;
-
 } //namespace math
 } //namespace math
 

@@ -71,7 +71,7 @@ namespace baldzarika { namespace math {
 		template < typename RT >
 		static inline vector<T,D>& vector_multiply_assign(vector<T,D> &lhs, vector<RT,D> const &rhs)
 		{
-			for(boost::uint32_t d=0;d<d;++d)
+			for(boost::uint32_t d=0;d<D;++d)
 				lhs.m_data[d]*=static_cast<T>(rhs.m_data[d]);
 			return lhs;
 		}
@@ -79,7 +79,7 @@ namespace baldzarika { namespace math {
 		template < typename RT >
 		static inline vector<T,D>& vector_divide_assign(vector<T,D> &lhs, vector<RT,D> const &rhs)
 		{
-			for(boost::uint32_t d=0;d<d;++d)
+			for(boost::uint32_t d=0;d<D;++d)
 				lhs.m_data[d]/=static_cast<T>(rhs.m_data[d]);
 			return lhs;
 		}
@@ -105,7 +105,7 @@ namespace baldzarika { namespace math {
 		static inline T dot_product(vector<T,D> const &lhs, vector<RT,D> const &rhs)
 		{
 			T res=constant::zero<T>();
-			for(boost::uint32_t d=0;d<d;++d)
+			for(boost::uint32_t d=0;d<D;++d)
 				res+=lhs.m_data[d]*static_cast<T>(rhs.m_data[d]);
 			return res;
 		}
