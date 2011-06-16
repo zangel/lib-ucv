@@ -5,8 +5,7 @@ import java.util.List;
 
 import com.baldzarika.ar.Size2;
 import com.baldzarika.ar.fiducial.BCHMarkerModel;
-import com.baldzarika.ar.fiducial.Detector;
-
+import com.baldzarika.ar.fiducial.Tracker;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -75,9 +74,9 @@ public class DemoApp extends Application implements SharedPreferences.OnSharedPr
 		
 		m_PreviewSize=getPreviewSizeSettings(sp, spEdit);
 		
-		m_Detector=new Detector(findOptimalFrameSize(m_PreviewSize));
+		m_Tracker=new Tracker(findOptimalFrameSize(m_PreviewSize));
 		m_BCHMarkerModel = new BCHMarkerModel();
-		m_Detector.addMarkerModel(m_BCHMarkerModel);
+		m_Tracker.addMarkerModel(m_BCHMarkerModel);
 		
 		
 		spEdit.commit();
@@ -117,9 +116,9 @@ public class DemoApp extends Application implements SharedPreferences.OnSharedPr
 		return s_Instance;
 	}
 	
-	public Detector getDetector()
+	public Tracker getTracker()
 	{
-		return m_Detector;
+		return m_Tracker;
 	}
 
 	public List<Size2> getPreviewSizes()
@@ -165,7 +164,7 @@ public class DemoApp extends Application implements SharedPreferences.OnSharedPr
 	private void setPreviewSize(Size2 previewSize)
 	{
 		m_PreviewSize=previewSize;
-		m_Detector.setFrameSize(findOptimalFrameSize(m_PreviewSize));
+		m_Tracker.setFrameSize(findOptimalFrameSize(m_PreviewSize));
 	}
 	
 	private static DemoApp s_Instance=null;
@@ -174,6 +173,6 @@ public class DemoApp extends Application implements SharedPreferences.OnSharedPr
 	private List<Size2> m_PreviewSizes=null;
 	private String m_DefaultPreviewSize=null;
 	private Size2 m_PreviewSize=null;
-	private Detector m_Detector=null;
+	private Tracker m_Tracker=null;
 	private BCHMarkerModel m_BCHMarkerModel=null;
 }

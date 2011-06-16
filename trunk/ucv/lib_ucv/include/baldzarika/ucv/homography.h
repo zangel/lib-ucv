@@ -58,13 +58,13 @@ namespace baldzarika { namespace ucv {
 		for(std::size_t p=0;p<oim.size();++p)
 		{
 			obj_pts[p]=math::point2f(
-				static_cast<float>(ops[oim[p].first].x),
-				static_cast<float>(ops[oim[p].first].y)
+				static_cast<float>(ops[oim[p].first].x()),
+				static_cast<float>(ops[oim[p].first].y())
 			);
 
 			img_pts[p]=math::point2f(
-				static_cast<float>(ips[oim[p].second].x),
-				static_cast<float>(ips[oim[p].second].y)
+				static_cast<float>(ips[oim[p].second].x()),
+				static_cast<float>(ips[oim[p].second].y())
 			);
 		}
 		math::matrix33f hmf;

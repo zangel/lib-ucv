@@ -97,6 +97,7 @@ public class MeshLoader
 	{
 		String [] tokens=line.split("[ ]+");
 		int c=tokens.length;
+		/*
 		if(tokens[1].matches("[0-9]+") && false)
 		{
 			if(c==4)
@@ -119,6 +120,7 @@ public class MeshLoader
 			}
 		}
 		else
+		*/
 		if(tokens[1].matches("[0-9]+/[0-9]+"))
 		{
 			if(c==4)
@@ -152,6 +154,7 @@ public class MeshLoader
 				m_TexCoordPtr.addAll(triangulate(tmpTexCoordPtr));
 			}
 		}
+		/*
 		else
 		if(tokens[1].matches("[0-9]+/[0-9]+/[0-9]+") && false)
 		{
@@ -194,6 +197,7 @@ public class MeshLoader
 				m_NormalPtr.addAll(triangulate(tmpNormalPtr));
 			}
 		}
+		*/
 	}
 
 	private static Vector<Short> triangulate(Vector<Short> polygon)

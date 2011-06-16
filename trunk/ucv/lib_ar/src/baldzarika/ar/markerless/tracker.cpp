@@ -223,7 +223,20 @@ namespace baldzarika { namespace ar { namespace markerless {
 
 	bool tracker::remove_marker(boost::shared_ptr<marker> const &m)
 	{
-		return false;
+		if(!m) return false;
+		if(m_running_state)
+			return false;
+
+		marker_states_t::index<marker_state::marker_identity_tag>::type &marker_states_by_marker=
+			m_marker_states.get<marker_state::marker_identity_tag>();
+
+		marker_states_t::index<marker_state::marker_identity_tag>::type::iterator msi=
+			marker_states_by_marker.find(m);
+				
+		if(msi==marker_states_by_marker.end()) return false;
+
+		marker_states_by_marker.erase(msi);
+		return true;
 	}
 
 	void tracker::on_start()

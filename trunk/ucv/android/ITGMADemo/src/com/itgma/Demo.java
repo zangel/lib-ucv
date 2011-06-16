@@ -7,7 +7,8 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.baldzarika.ar.Size2;
-import com.baldzarika.ar.fiducial.Detector;
+import com.baldzarika.ar.Tracker.Callback;
+import com.baldzarika.ar.fiducial.Tracker;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,7 +18,6 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -26,7 +26,7 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class Demo extends Activity implements SurfaceHolder.Callback, GLSurfaceView.Renderer, Camera.PreviewCallback, Detector.Callback
+public class Demo extends Activity implements SurfaceHolder.Callback, GLSurfaceView.Renderer, Camera.PreviewCallback, Callback
 {
 	protected static final int SETTINGS_CHANGED=1;
 
@@ -89,7 +89,7 @@ public class Demo extends Activity implements SurfaceHolder.Callback, GLSurfaceV
     		{ public void onClick(View v) { onSettings(); } }
         );
         
-        DemoApp.getInstance().getDetector().setCallback(this);
+        DemoApp.getInstance().getTracker().setCallback(this);
         
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
         
@@ -109,7 +109,7 @@ public class Demo extends Activity implements SurfaceHolder.Callback, GLSurfaceV
 	public void onDestroy()
 	{
 		super.onDestroy();
-		DemoApp.getInstance().getDetector().setCallback(null);
+		DemoApp.getInstance().getTracker().setCallback(null);
 	}
 	
 	@Override
@@ -180,13 +180,13 @@ public class Demo extends Activity implements SurfaceHolder.Callback, GLSurfaceV
     	gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		
-    	Detector detector=DemoApp.getInstance().getDetector();
-    	if(detector.isStarted() && m_IsDetected)
+    	Tracker tracker=DemoApp.getInstance().getTracker();
+    	if(tracker.isStarted() && m_IsDetected)
     	{
     		if(m_Model!=null && m_LightTexture.isValid())
     		{
     			float [] projMatrix=new float[16];
-	    		detector.getCameraProjection(projMatrix);
+    			tracker.getCameraProjection(projMatrix);
 		    	gl.glMatrixMode(GL10.GL_PROJECTION);
 		    	gl.glLoadMatrixf(projMatrix, 0);
 		    	
@@ -220,11 +220,13 @@ public class Demo extends Activity implements SurfaceHolder.Callback, GLSurfaceV
 	//android.hardware.Camera.PreviewCallback
     public void onPreviewFrame(byte[] data, Camera camera)
     {
-    	if(DemoApp.getInstance().getDetector().isStarted())
+    	if(DemoApp.getInstance().getTracker().isStarted())
     	//{
-    		DemoApp.getInstance().getDetector().update(
-    			data, camera.getParameters().getPreviewFormat(),
-    			camera.getParameters().getPreviewSize().width, camera.getParameters().getPreviewSize().height
+    		DemoApp.getInstance().getTracker().processFrame(
+    			data,
+    			camera.getParameters().getPreviewFormat(),
+    			camera.getParameters().getPreviewSize().width,
+    			camera.getParameters().getPreviewSize().height
     		);
     		//Log.i("FIDUCIAL_AR", "updateRes="+Boolean.toString(updateRes)+" width="+Integer.toString(camera.getParameters().getPreviewSize().width)+"height="+Integer.toString(camera.getParameters().getPreviewSize().height));
     	//}
@@ -232,19 +234,18 @@ public class Demo extends Activity implements SurfaceHolder.Callback, GLSurfaceV
     
 	//com.baldzarika.ar.Detector.Callback
     @Override
-    public void onRunningStateChanged(Detector detector, int rs)
+    public void onRunningStateChanged(com.baldzarika.ar.Tracker tracker, int rs)
     {
     	m_Handler.removeCallbacks(m_HUDButtonsUpdateTask);
     	m_Handler.post(m_HUDButtonsUpdateTask);    	    	
     }
     
-    public void onMarkerStateChanged(Detector.MarkerState markerState, int sc)
+    public void onMarkerStateChanged(com.baldzarika.ar.Tracker.MarkerState markerState, int sc)
     {
-    	//Log.i("FIDUCIAL_AR","ID=" + Integer.toString(markerState.getMarkerId())+" D=" + Boolean.toString(markerState.isDetected()) + " S="+Integer.toString(sc));
-    	if(markerState.getMarkerId()==477)
+    	Tracker.MarkerState fiducialMarkerState=(Tracker.MarkerState)markerState;
+    	if(fiducialMarkerState.getMarkerId()==477)
     	{
     		markerState.getCameraPose(m_CameraPose);
-    		//Matrix.rotateM(m_CameraPose, 0, -90, 1.0f, 0.0f, 0.0f);
     		m_IsDetected=markerState.isDetected();
     	}
     }
@@ -316,17 +317,16 @@ public class Demo extends Activity implements SurfaceHolder.Callback, GLSurfaceV
 	
 	protected void onStartStopDetecting()
 	{
-    	Detector detector=DemoApp.getInstance().getDetector();
+    	Tracker tracker=DemoApp.getInstance().getTracker();
     	m_IsDetected=false;
     	
-    	if(detector.isStarted())
+    	if(tracker.isStarted())
     	{
-    		detector.stop();
+    		tracker.stop();
     	}
     	else
     	{
-    		detector.start();
-    		
+    		tracker.start();
     	}
     	m_TrackingButton.setEnabled(false);
     	m_SettingsButton.setEnabled(false);
@@ -345,12 +345,12 @@ public class Demo extends Activity implements SurfaceHolder.Callback, GLSurfaceV
 	
 	protected void updateHUDButtons()
     {
-    	Detector detector=DemoApp.getInstance().getDetector();
+    	Tracker tracker=DemoApp.getInstance().getTracker();
     	
-    	m_TrackingButton.setEnabled(m_Camera!=null && (!detector.isActive() || detector.isStarted()));
-    	m_TrackingButton.setBackgroundResource((detector.isStarted() || detector.isStarting())?R.drawable.stop_button:R.drawable.start_button);
+    	m_TrackingButton.setEnabled(m_Camera!=null && (!tracker.isActive() || tracker.isStarted()));
+    	m_TrackingButton.setBackgroundResource((tracker.isStarted() || tracker.isStarting())?R.drawable.stop_button:R.drawable.start_button);
     	    	
-    	m_SettingsButton.setEnabled(m_Camera!=null && !detector.isActive());
+    	m_SettingsButton.setEnabled(m_Camera!=null && !tracker.isActive());
     }
 	
 	private class HUDButtonsUpdateTask implements Runnable

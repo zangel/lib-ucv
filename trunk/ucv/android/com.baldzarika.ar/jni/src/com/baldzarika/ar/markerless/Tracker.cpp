@@ -142,11 +142,18 @@ jboolean Java_com_baldzarika_ar_markerless_Tracker_addMarker(JNIEnv */*e*/, jobj
 	return Tracker(t).addMarker(local_ref<Marker>(marker));
 }
 
+jboolean Java_com_baldzarika_ar_markerless_Tracker_removeMarker(JNIEnv */*e*/, jobject t, jobject marker)
+{
+	using namespace com::baldzarika::ar::markerless;
+	using namespace j2cpp;
+	return Tracker(t).removeMarker(local_ref<Marker>(marker));
+}
+
 #pragma GCC visibility pop
 
 namespace com { namespace baldzarika { namespace ar { namespace markerless {
 
-	namespace _Tracker {
+namespace _Tracker {
 
 		J2CPP_DEFINE_CLASS(MarkerState,"com/baldzarika/ar/markerless/Tracker$MarkerState")
 		J2CPP_DEFINE_METHOD(MarkerState,0,"<init>","(J)V")
@@ -371,7 +378,13 @@ namespace com { namespace baldzarika { namespace ar { namespace markerless {
 		if(px_t px=get_px())
 			return px->add_marker(Marker::get(marker))?JNI_TRUE:JNI_FALSE;
 		return JNI_FALSE;
+	}
 
+	jboolean Tracker::removeMarker(j2cpp::local_ref<Marker> const &marker)
+	{
+		if(px_t px=get_px())
+			return px->remove_marker(Marker::get(marker))?JNI_TRUE:JNI_FALSE;
+		return JNI_FALSE;
 	}
 
 } //namespace markerless

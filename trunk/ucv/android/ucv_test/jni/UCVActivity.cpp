@@ -7,7 +7,7 @@
 #include <baldzarika/ucv/surf.h>
 #include <baldzarika/ucv/homography.h>
 #include <baldzarika/ucv/integral.h>
-#include <baldzarika/ucv/convert_scale.h>
+#include <baldzarika/ucv/convert.h>
 #include <baldzarika/ucv/gles/shaders.h>
 #include <baldzarika/ucv/klt_tracker.h>
 #include <boost/date_time.hpp>
@@ -19,6 +19,7 @@
 
 using namespace j2cpp;
 namespace ucv=baldzarika::ucv;
+namespace math=baldzarika::math;
 
 void Java_baldzarika_ucv_test_UCVActivity_initialize(JNIEnv *, jobject jUCVActivity)
 {
@@ -102,7 +103,7 @@ namespace {
 	public:
 		typedef ucv::surf::feature_point_t::value_type value_t;
 
-		typedef ucv::fixed_point<10, 21> gray_t;
+		typedef math::fixed_point<10, 21> gray_t;
 		typedef ucv::gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
 		typedef ucv::gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
 		typedef gray_image_t::view_t gray_view_t;
@@ -117,24 +118,22 @@ namespace {
 			ucv::gil::png_read_and_convert_image("/sdcard/markers/joker.png", marker_img);
 			if(marker_img.width()*marker_img.height())
 			{
-				m_marker_size=ucv::size2ui(marker_img.width(), marker_img.height());
+				m_marker_size=math::size2ui(marker_img.width(), marker_img.height());
 				__android_log_print(ANDROID_LOG_INFO, J2CPP_NAME, "marker image loaded, size=%dx%d, ...",marker_img.width(), marker_img.height());
 
 				gray_image_t marker_gray_img(marker_img.width(), marker_img.height());
 
-				gray_t marker_median;
-				ucv::convert_scale(
+				ucv::convert(
 					ucv::gil::view(marker_img),
 					ucv::gil::view(marker_gray_img),
-					ucv::surf::integral_t(1.0f/255.0f),
-					marker_median
+					ucv::detail::grayscale_convert()
 				);
 				ucv::surf::integral_image_t marker_integral_img(marker_img.width(), marker_img.height());
 				ucv::integral(
 					ucv::gil::const_view(marker_gray_img),
 					ucv::gil::view(marker_integral_img)
 				);
-				ucv::surf surf_marker(ucv::size2ui(marker_img.width(), marker_img.height()), 3, 4, 2, 1.0e-4f);
+				ucv::surf surf_marker(math::size2ui(marker_img.width(), marker_img.height()), 3, 4, 2, 1.0e-4f);
 				surf_marker.set_integral_view(ucv::gil::const_view(marker_integral_img));
 				surf_marker.build_response_layers();
 				surf_marker.detect(m_marker_features);
@@ -152,7 +151,7 @@ namespace {
 		//marker stuff
 		std::vector<ucv::surf::feature_point_t> m_marker_features;
 		std::vector<ucv::surf::feature_point_t::point2_t> m_next_pts;
-		ucv::size2ui m_marker_size;
+		math::size2ui m_marker_size;
 
 		//detection stuff
 		boost::scoped_ptr<ucv::surf> m_surf;
@@ -162,7 +161,7 @@ namespace {
 		std::vector< std::pair<std::size_t,std::size_t> > m_feature_matches;
 		bool m_homography_ok;
 		boost::uint32_t	m_curr;
-		ucv::matrix33f	m_homography[2];
+		math::matrix33f	m_homography[2];
 		ucv::surf::integral_image_t m_integral_img[2];
 
 		boost::scoped_ptr<ucv::gles::program> m_features_program;
@@ -279,8 +278,8 @@ void UCVActivity::onSurfaceChanged(local_ref<egl::EGL10> const &gl, int width, i
 	glViewport(0, 0, width, height);
 	if(Native *pn=reinterpret_cast<Native*>((jlong)(m_Native)))
 	{
-		pn->m_surf.reset(new ucv::surf(ucv::size2ui(width*2,height*2), 2, 4, 2, 1.0e-3f));
-		pn->m_tracker.reset(new Native::klt_tracker_t(ucv::size2ui(width*2, height*2), ucv::size2ui(7,7), 4, 10));
+		pn->m_surf.reset(new ucv::surf(math::size2ui(width*2,height*2), 2, 4, 2, 1.0e-3f));
+		pn->m_tracker.reset(new Native::klt_tracker_t(math::size2ui(width*2, height*2), math::size2ui(7,7), 4, 10));
 
 		//pn->m_gil_gray_img.recreate(width*2,height*2);
 		pn->m_gray_img.recreate(width*2,height*2);
@@ -315,7 +314,7 @@ void UCVActivity::onDrawFrame(local_ref<egl::EGL10> const &gl)
 #if 1
 			if(pn->m_homography_ok)
 			{
-				ucv::matrix33f hm(pn->m_homography[pn->m_curr]);
+				math::matrix33f hm(pn->m_homography[pn->m_curr]);
 
 				float marker_corners[4][3]=
 				{
@@ -341,12 +340,12 @@ void UCVActivity::onDrawFrame(local_ref<egl::EGL10> const &gl)
 					}
 				};
 
-				ucv::point2f image_corners[4]=
+				math::point2f image_corners[4]=
 				{
-					(hm*ucv::vector3f(marker_corners[0])).homogenized(),
-					(hm*ucv::vector3f(marker_corners[1])).homogenized(),
-					(hm*ucv::vector3f(marker_corners[2])).homogenized(),
-					(hm*ucv::vector3f(marker_corners[3])).homogenized()
+					(hm*math::vector3f(marker_corners[0])).homogenized(),
+					(hm*math::vector3f(marker_corners[1])).homogenized(),
+					(hm*math::vector3f(marker_corners[2])).homogenized(),
+					(hm*math::vector3f(marker_corners[3])).homogenized()
 				};
 
 				boost::scoped_array<float> corner_pts( new float[4*4]);
@@ -485,7 +484,7 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 		if(pn->m_surf)
 		{
 			local_ref<Camera::Parameters> parameters=camera->getParameters();
-			ucv::size2ui fs(parameters->getPreviewSize()->width, parameters->getPreviewSize()->height);
+			math::size2ui fs(parameters->getPreviewSize()->width, parameters->getPreviewSize()->height);
 
 			jint pfmt=parameters->getPreviewFormat();
 
@@ -555,8 +554,8 @@ void UCVActivity::onPreviewFrame(local_ref< j2cpp::array<jbyte,1> > const &data,
 				for(std::size_t ifp=0;ifp<pn->m_features.size();++ifp)
 					prev_pts.push_back(
 						ucv::surf::feature_point_t::point2_t(
-							pn->m_features[ifp].x,
-							pn->m_features[ifp].y
+							pn->m_features[ifp].x(),
+							pn->m_features[ifp].y()
 						)
 					);
 
