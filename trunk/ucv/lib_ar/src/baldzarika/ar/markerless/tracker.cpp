@@ -6,20 +6,20 @@ namespace baldzarika { namespace ar { namespace markerless {
 
 	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=2;
 	boost::uint32_t const tracker::DEFAULT_SURF_INTERVALS=4;
-	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=1;
-	float const tracker::DEFAULT_SURF_TRESHOLD=4.0e-4f;
+	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=2;
+	float const tracker::DEFAULT_SURF_TRESHOLD=1.5e-3f;
 
-	boost::uint32_t const tracker::DEFAULT_KLT_HALF_WIN_SIZE=8;
+	boost::uint32_t const tracker::DEFAULT_KLT_HALF_WIN_SIZE=5;
 	boost::uint32_t const tracker::DEFAULT_KLT_LEVELS=4;
 	boost::uint32_t const tracker::DEFAULT_KLT_MAX_ITERATIONS=2;
 	float const	tracker::DEFAULT_KLT_EPSILON=1.0e-4f;
 
-	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=8;
-	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=16;
-	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=0.0f;
+	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=5;
+	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=10;
+	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=1.0f;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=1.3e-3f;
 	float const	tracker::DEFAULT_DETECTION_MAX_DIFF_NORM=5.0e-3f;
-	float const	tracker::DEFAULT_TRACKING_MAX_DIFF_NORM=1.0e-2f;
+	float const	tracker::DEFAULT_TRACKING_MAX_DIFF_NORM=1.0e-4f;
 
 	namespace {
 

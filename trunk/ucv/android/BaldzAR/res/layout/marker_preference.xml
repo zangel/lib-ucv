@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@+id/pref_marker_frame">
+    <TextView android:layout_width="fill_parent" android:layout_height="fill_parent"
+    	android:gravity="left|center" android:text="Select Marker ..." android:paddingLeft="2mm"
+    	android:textSize="22sp" android:textColor="#FFFF"
+    	android:id="@+id/pref_marker" android:layout_weight="4" />
+        <ImageView android:layout_width="15mm" android:layout_height="13mm" android:paddingRight="2mm"
+                android:id="@+id/pref_marker_image" android:scaleType="centerInside" android:layout_weight="1"/>
+</LinearLayout>

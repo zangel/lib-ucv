@@ -89,9 +89,9 @@ public abstract class ARSystem
 		
 		if(arSystem.compareTo(AR_FIDUCIAL_SYSTEM)==0)
 			return new ARFiducialSystem(getPreviewSizeConfig());
-		//else
-		//if(arSystem.compareTo(AR_MARKERLESS_SYSTEM)==0)
-		//	return new ARMarkerlessSystem(getPreviewSizeConfig());
+		else
+		if(arSystem.compareTo(AR_MARKERLESS_SYSTEM)==0)
+			return new ARMarkerlessSystem(getPreviewSizeConfig());
 		return null;
 	}
 	

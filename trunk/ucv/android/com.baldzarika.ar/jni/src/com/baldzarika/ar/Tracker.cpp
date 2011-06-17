@@ -182,7 +182,7 @@ jboolean Java_com_baldzarika_ar_Tracker_waitToStop(JNIEnv */*e*/, jobject t)
 	return Tracker(t).waitToStop();
 }
 
-jboolean Java_com_baldzarika_ar_Tracker_processFrame(JNIEnv */*e*/, jobject t, jbyteArray data, jint pfmt, jint width, jint height)
+jboolean Java_com_baldzarika_ar_Tracker_processFrame___3BIII(JNIEnv */*e*/, jobject t, jbyteArray data, jint pfmt, jint width, jint height)
 {
 	using namespace com::baldzarika::ar;
 	using namespace j2cpp;

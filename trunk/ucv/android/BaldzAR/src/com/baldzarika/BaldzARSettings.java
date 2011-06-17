@@ -2,12 +2,19 @@ package com.baldzarika;
 
 import java.util.List;
 import com.baldzarika.ar.Size2;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 
 public class BaldzARSettings extends PreferenceActivity
 {
+	private static final int ACTIVITY_SELECT_MARKER_IMAGE=1;
 	@Override
     protected void onCreate(Bundle savedInstanceState)
 	{
@@ -38,5 +45,44 @@ public class BaldzARSettings extends PreferenceActivity
 		arSystemEntries[1]=arSystemValues[1]=ARSystem.AR_MARKERLESS_SYSTEM;
 		arSystemSettings.setEntries(arSystemEntries);
 		arSystemSettings.setEntryValues(arSystemValues);
+		
+		m_MarkerPreference=(MarkerPreference)findPreference(getString(R.string.settings_markerless_marker_key));
+		m_MarkerPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+		{
+			public boolean onPreferenceClick(Preference preference)
+			{
+            	selectMarkerImage();
+                return true;
+            }
+        });
+        
 	}
+	
+	protected void selectMarkerImage()
+	{
+        Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI); 
+        startActivityForResult(i, ACTIVITY_SELECT_MARKER_IMAGE);
+    }
+	
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
+	{ 
+        super.onActivityResult(requestCode, resultCode, intent);
+        switch(requestCode)
+        { 
+            case ACTIVITY_SELECT_MARKER_IMAGE:
+            	if(resultCode==RESULT_OK)
+            	{
+            		Uri imageURI = intent.getData();
+            		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            		SharedPreferences.Editor editor=prefs.edit();
+            		editor.putString(getString(R.string.settings_markerless_marker_key), imageURI.toString());
+            		editor.commit();
+            		m_MarkerPreference.updateMarkerImage();
+                }
+                break;
+        }
+    }
+	
+	private MarkerPreference m_MarkerPreference=null;
 }
