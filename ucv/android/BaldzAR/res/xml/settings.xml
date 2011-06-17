@@ -4,4 +4,15 @@
         <ListPreference android:title="@string/settings_general_preview_size_title" android:key="@string/settings_general_preview_size_key"></ListPreference>
         <ListPreference android:key="@string/settings_general_system_key" android:title="@string/settings_general_system_title"></ListPreference>
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_fiducial_title">
+        <EditTextPreference
+        	android:title="@string/settings_fiducial_marker_id_title"
+        	android:key="@string/settings_fiducial_marker_id_key"
+        	android:maxLength="4" android:hint="Enter marker id (1-1023)" android:numeric="integer">
+    	</EditTextPreference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_markerless_title">
+    	<com.baldzarika.MarkerPreference 
+        	android:key="@string/settings_markerless_marker_key" android:layout="@layout/marker_preference" android:title="@string/settings_markerless_marker_title"/>
+    </PreferenceCategory>
 </PreferenceScreen>

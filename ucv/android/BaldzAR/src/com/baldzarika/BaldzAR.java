@@ -1,6 +1,9 @@
 package com.baldzarika;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -76,7 +79,7 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
     	
     	m_TrackingButton=(Button)findViewById(R.id.start_stop_tracking);
     	m_TrackingButton.setOnClickListener(new OnClickListener()
-    		{ public void onClick(View v) { onStartStopDetecting(); } }
+    		{ public void onClick(View v) { onStartStopTracking(); } }
         );
         
         m_SettingsButton=(Button)findViewById(R.id.settings);
@@ -88,7 +91,7 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
         m_ARSystem.getTracker().setCallback(this);
         
         updateHUDButtons();
-	}
+    }
     
     @Override
 	public void onDestroy()
@@ -163,6 +166,39 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
     {
     	gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+		
+		Tracker tracker=m_ARSystem.getTracker();
+		if(tracker.isStarted() && m_IsDetected)
+		{
+			float [] projMatrix=new float[16];
+			tracker.getCameraProjection(projMatrix);
+	    	gl.glMatrixMode(GL10.GL_PROJECTION);
+	    	gl.glLoadMatrixf(projMatrix, 0);
+	    	
+			gl.glMatrixMode(GL10.GL_MODELVIEW);
+			gl.glLoadMatrixf(m_CameraPose, 0);
+			
+			gl.glEnable(GL10.GL_BLEND);
+			gl.glDisable(GL10.GL_TEXTURE_2D);
+			gl.glDisable(GL10.GL_DEPTH_TEST);
+			gl.glDisable(GL10.GL_NORMALIZE);
+			gl.glEnable(GL10.GL_DEPTH_TEST);
+			gl.glDisable(GL10.GL_CULL_FACE);
+			gl.glDisable(GL10.GL_LIGHTING);
+			gl.glShadeModel(GL10.GL_SMOOTH);
+			gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+			gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+			gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
+			gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			gl.glVertexPointer(3, GL10.GL_FLOAT, 0, m_MarkerVBuffer);
+			gl.glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+			gl.glDrawArrays(GL10.GL_LINE_LOOP, 0, 4);
+			gl.glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+			gl.glDrawArrays(GL10.GL_LINE_LOOP, 4, 4);
+			gl.glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+			for(int l=0;l<4;++l)
+				gl.glDrawArrays(GL10.GL_LINE_STRIP, 8+l*2, 2);
+		}
 	}
 	
 	//android.hardware.Camera.PreviewCallback
@@ -191,6 +227,8 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
     {
     	if(m_ARSystem.isCorrect(markerState))
     	{
+    		if(!m_IsDetected)
+    			buildCube(markerState.getMarkerSize());
     		markerState.getCameraPose(m_CameraPose);
     		m_IsDetected=markerState.isDetected();
     	}
@@ -263,7 +301,7 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
 		return false;
 	}
 	
-	protected void onStartStopDetecting()
+	protected void onStartStopTracking()
 	{
     	Tracker tracker=m_ARSystem.getTracker();
     	m_IsDetected=false;
@@ -292,6 +330,39 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
 		m_ARSystem=ARSystem.create();
 		m_ARSystem.getTracker().setCallback(this);
 	}
+	
+	protected void buildCube(Size2 markerSize)
+	{
+		m_MarkerVBuffer.position(0);
+		float halfW=0.5f*markerSize.m_Width;
+		float halfL=0.5f*markerSize.m_Height;
+		float height=(float)Math.sqrt(markerSize.m_Width*markerSize.m_Height);
+		
+		float [] lowCorners=
+		{
+			-halfW,  halfL, 0.0f,
+			 halfW,  halfL, 0.0f,
+			 halfW, -halfL, 0.0f,
+			-halfW, -halfL, 0.0f
+		};
+		
+		float [] highCorners=
+		{
+			-halfW,  halfL,  -height,
+			 halfW,  halfL,  -height,
+			 halfW, -halfL,  -height,
+			-halfW, -halfL,  -height
+		};
+		
+		m_MarkerVBuffer.put(lowCorners);
+		m_MarkerVBuffer.put(highCorners);
+		for(int h=0;h<4;++h)
+		{
+			m_MarkerVBuffer.put(lowCorners,h*3,3);			
+			m_MarkerVBuffer.put(highCorners,h*3,3);
+		}
+		m_MarkerVBuffer.position(0);
+	}
 
 	protected void updateHUDButtons()
     {
@@ -310,6 +381,8 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
     		updateHUDButtons();
     	}
     };
+    
+    private FloatBuffer						m_MarkerVBuffer=ByteBuffer.allocateDirect((2*4+4*2)*3*4).order(ByteOrder.nativeOrder()).asFloatBuffer();
     
     private SurfaceView                     m_CameraPreview=null;
     private GLSurfaceView           		m_GLView=null;
