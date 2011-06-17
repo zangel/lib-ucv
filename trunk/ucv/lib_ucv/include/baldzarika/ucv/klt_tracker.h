@@ -101,21 +101,23 @@ namespace baldzarika { namespace ucv {
 		bool operator()(math::point2< math::fixed_point<I2,F2> > const &prev_fp, math::point2< math::fixed_point<I2,F2> > &curr_fp)
 		{
 			integral_t const range_corr=math::constant::one<integral_t>()/integral_t((2*m_half_win_size.width()+1)*(2*m_half_win_size.height()+1));
-			integral_t const step_factor=2.0f;
+			//integral_t const step_factor=2.0f;
 			curr_fp=prev_fp;
 			for(boost::uint32_t l=0;l<m_num_levels;++l)
 			{
-				boost::uint32_t ls=1<<(m_num_levels-l-1);
-				integral_t level_scale=ls;
+				
+				boost::uint32_t lshift=m_num_levels-l-1;
+				//boost::uint32_t ls=1<<lshift;
+				//integral_t level_scale=ls;
 
 				for(boost::uint32_t i=0;i<m_max_iters;++i)
 				{
-					compute_gradient_sum_and_img_diff(prev_fp, curr_fp, ls);
+					compute_gradient_sum_and_img_diff(prev_fp, curr_fp, lshift);
 					integral_t gxx, gyy, gxy, ex, ey;
 					compute_gradient_matrix_and_err_vector(gxx,gyy, gxy, ex, ey);
 
-					ex*=step_factor;
-					ey*=step_factor;
+					ex.operator<<=(1);
+					ey.operator<<=(1);
 
 					integral_t det=gxx*gyy-gxy*gxy;
 
@@ -125,8 +127,8 @@ namespace baldzarika { namespace ucv {
 					integral_t dx=(gyy*ex-gxy*ey)/det;
 					integral_t dy=(gxx*ey-gxy*ex)/det;
 
-					curr_fp.x()+=dx*level_scale;
-					curr_fp.y()+=dy*level_scale;
+					curr_fp.x()+=dx.operator<<(lshift);
+					curr_fp.y()+=dy.operator<<(lshift);
 
 					if((dx*dx+dy*dy)<m_epsilon)
 						break;
@@ -186,28 +188,24 @@ namespace baldzarika { namespace ucv {
 		}
 
 		template < boost::uint32_t I2, boost::uint32_t F2 >
-		void compute_gradient_sum_and_img_diff(math::point2< math::fixed_point<I2,F2> > const &prev_pt, math::point2< math::fixed_point<I2,F2> > const &curr_pt, boost::uint32_t s)
+		void compute_gradient_sum_and_img_diff(math::point2< math::fixed_point<I2,F2> > const &prev_pt, math::point2< math::fixed_point<I2,F2> > const &curr_pt, boost::uint32_t lshift)
 		{
 			typedef math::fixed_point<I2,F2> real_t;
 			typedef math::point2<real_t> point2_t;
 
-			static integral_t const sobel_scale=0.5f/4.0f;
-			static integral_t const gauss_scale=1.0f/16.0f;
-			
-			integral_t const inv_s=1.0f/float(s);
-			integral_t const inv_area=1.0f/float(s*s);
+			boost::uint32_t s=1<<lshift;
 
 
-			integral_t prev_ax=integral_t(prev_pt.x()-real_t(static_cast<boost::int32_t>(prev_pt.x())))*inv_s;
-			integral_t prev_ay=integral_t(prev_pt.y()-real_t(static_cast<boost::int32_t>(prev_pt.y())))*inv_s;
+			integral_t prev_ax=integral_t(prev_pt.x()-real_t(static_cast<boost::int32_t>(prev_pt.x()))).operator>>(lshift);
+			integral_t prev_ay=integral_t(prev_pt.y()-real_t(static_cast<boost::int32_t>(prev_pt.y()))).operator>>(lshift);
 			integral_t prev_c00=(math::constant::one<integral_t>()-prev_ax)*(math::constant::one<integral_t>()-prev_ay);
 			integral_t prev_c01=prev_ax*(math::constant::one<integral_t>()-prev_ay);
 			integral_t prev_c10=(math::constant::one<integral_t>()-prev_ax)*prev_ay;
 			integral_t prev_c11=prev_ax*prev_ay;
 			
 
-			integral_t curr_ax=integral_t(curr_pt.x()-real_t(static_cast<boost::int32_t>(curr_pt.x())))*inv_s;
-			integral_t curr_ay=integral_t(curr_pt.y()-real_t(static_cast<boost::int32_t>(curr_pt.y())))*inv_s;
+			integral_t curr_ax=integral_t(curr_pt.x()-real_t(static_cast<boost::int32_t>(curr_pt.x()))).operator>>(lshift);
+			integral_t curr_ay=integral_t(curr_pt.y()-real_t(static_cast<boost::int32_t>(curr_pt.y()))).operator>>(lshift);
 			integral_t curr_c00=(math::constant::one<integral_t>()-curr_ax)*(math::constant::one<integral_t>()-curr_ay);
 			integral_t curr_c01=curr_ax*(math::constant::one<integral_t>()-curr_ay);
 			integral_t curr_c10=(math::constant::one<integral_t>()-curr_ax)*curr_ay;
@@ -259,23 +257,23 @@ namespace baldzarika { namespace ucv {
 				for(boost::uint32_t x=1;x<(2*m_half_win_size.width()+1)+2+1;++x)
 				{
 					math::point2i prev_pos(
-						static_cast<boost::int32_t>(prev_pt.x())+(x-m_half_win_size.width()-2)*s,
-						static_cast<boost::int32_t>(prev_pt.y())+(y-m_half_win_size.height()-2)*s
+						static_cast<boost::int32_t>(prev_pt.x())+((x-m_half_win_size.width()-2)<<lshift),
+						static_cast<boost::int32_t>(prev_pt.y())+((y-m_half_win_size.height()-2)<<lshift)
 					);
 
 					math::point2i curr_pos(
-						static_cast<math::point2i::value_type>(curr_pt.x())+(x-m_half_win_size.width()-2)*s,
-						static_cast<math::point2i::value_type>(curr_pt.y())+(y-m_half_win_size.height()-2)*s
+						static_cast<math::point2i::value_type>(curr_pt.x())+((x-m_half_win_size.width()-2)<<lshift),
+						static_cast<math::point2i::value_type>(curr_pt.y())+((y-m_half_win_size.height()-2)<<lshift)
 					);
 
-					integral_t prev_val=box_integral<const_integral_view_t,integral_t>(m_prev_view, prev_pos, math::size2ui(s,s))*inv_area;
-					integral_t curr_val=box_integral<const_integral_view_t,integral_t>(m_curr_view, curr_pos, math::size2ui(s,s))*inv_area;
+					integral_t prev_val=box_integral<const_integral_view_t,integral_t>(m_prev_view, prev_pos, math::size2ui(s,s)).operator>>(lshift<<1);
+					integral_t curr_val=box_integral<const_integral_view_t,integral_t>(m_curr_view, curr_pos, math::size2ui(s,s)).operator>>(lshift<<1);
 
 					//intensity difference
-					integral_t diff_00=gauss_scale*(prev_val*prev_c11-curr_val*curr_c11);
-					integral_t diff_01=gauss_scale*(prev_val*prev_c10-curr_val*curr_c10);
-					integral_t diff_10=gauss_scale*(prev_val*prev_c01-curr_val*curr_c01);
-					integral_t diff_11=gauss_scale*(prev_val*prev_c00-curr_val*curr_c00);
+					integral_t diff_00=(prev_val*prev_c11-curr_val*curr_c11).operator>>(4);
+					integral_t diff_01=(prev_val*prev_c10-curr_val*curr_c10).operator>>(4);
+					integral_t diff_10=(prev_val*prev_c01-curr_val*curr_c01).operator>>(4);
+					integral_t diff_11=(prev_val*prev_c00-curr_val*curr_c00).operator>>(4);
 
 					integral_t diff_00_2=math::constant::two<integral_t>()*diff_00;
 					integral_t diff_01_2=math::constant::two<integral_t>()*diff_01;
@@ -338,10 +336,10 @@ namespace baldzarika { namespace ucv {
 					img_diff_rows[3][+2]+=diff_11;
 					
 					//gradient x sum
-					integral_t sum_00=sobel_scale*(prev_val*prev_c11+curr_val*curr_c11);
-					integral_t sum_01=sobel_scale*(prev_val*prev_c10+curr_val*curr_c10);
-					integral_t sum_10=sobel_scale*(prev_val*prev_c01+curr_val*curr_c01);
-					integral_t sum_11=sobel_scale*(prev_val*prev_c00+curr_val*curr_c00);
+					integral_t sum_00=(prev_val*prev_c11+curr_val*curr_c11).operator>>(3);
+					integral_t sum_01=(prev_val*prev_c10+curr_val*curr_c10).operator>>(3);
+					integral_t sum_10=(prev_val*prev_c01+curr_val*curr_c01).operator>>(3);
+					integral_t sum_11=(prev_val*prev_c00+curr_val*curr_c00).operator>>(3);
 
 					integral_t sum_00_2=math::constant::two<integral_t>()*sum_00;
 					integral_t sum_01_2=math::constant::two<integral_t>()*sum_01;
