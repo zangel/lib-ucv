@@ -1,0 +1,436 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		783F989F13AAA826006B228F /* adaptive_treshold.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F987E13AAA826006B228F /* adaptive_treshold.h */; };
+		783F98A013AAA826006B228F /* approximate_polygon.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F987F13AAA826006B228F /* approximate_polygon.h */; };
+		783F98A113AAA826006B228F /* camera_pose.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988013AAA826006B228F /* camera_pose.h */; };
+		783F98A213AAA826006B228F /* canny.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988113AAA826006B228F /* canny.h */; };
+		783F98A313AAA826006B228F /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988213AAA826006B228F /* config.h */; };
+		783F98A413AAA826006B228F /* contour.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988313AAA826006B228F /* contour.h */; };
+		783F98A513AAA826006B228F /* convert.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988413AAA826006B228F /* convert.h */; };
+		783F98A613AAA826006B228F /* corners_subpixel.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988513AAA826006B228F /* corners_subpixel.h */; };
+		783F98A713AAA826006B228F /* feature_point.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988613AAA826006B228F /* feature_point.h */; };
+		783F98A813AAA826006B228F /* find_otsu_threshold.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988713AAA826006B228F /* find_otsu_threshold.h */; };
+		783F98A913AAA826006B228F /* gaussian_blur.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988813AAA826006B228F /* gaussian_blur.h */; };
+		783F98AA13AAA826006B228F /* gil_channel_traits.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988913AAA826006B228F /* gil_channel_traits.h */; };
+		783F98AB13AAA826006B228F /* fbo.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988B13AAA826006B228F /* fbo.h */; };
+		783F98AC13AAA826006B228F /* hessian_detector.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988C13AAA826006B228F /* hessian_detector.h */; };
+		783F98AD13AAA826006B228F /* shaders.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988D13AAA826006B228F /* shaders.h */; };
+		783F98AE13AAA826006B228F /* texture.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988E13AAA826006B228F /* texture.h */; };
+		783F98AF13AAA826006B228F /* good_features_detector.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F988F13AAA826006B228F /* good_features_detector.h */; };
+		783F98B013AAA826006B228F /* homography.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989013AAA826006B228F /* homography.h */; };
+		783F98B113AAA826006B228F /* integral.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989113AAA826006B228F /* integral.h */; };
+		783F98B213AAA826006B228F /* klt_tracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989213AAA826006B228F /* klt_tracker.h */; };
+		783F98B313AAA826006B228F /* match_feature_points.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989413AAA826006B228F /* match_feature_points.h */; };
+		783F98B413AAA826006B228F /* norm.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989513AAA826006B228F /* norm.h */; };
+		783F98B513AAA826006B228F /* perspective_transform.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989613AAA826006B228F /* perspective_transform.h */; };
+		783F98B613AAA826006B228F /* pixel_count.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989713AAA826006B228F /* pixel_count.h */; };
+		783F98B713AAA826006B228F /* ranged_histogram.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989813AAA826006B228F /* ranged_histogram.h */; };
+		783F98B813AAA826006B228F /* resize.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989913AAA826006B228F /* resize.h */; };
+		783F98B913AAA826006B228F /* sobel.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989A13AAA826006B228F /* sobel.h */; };
+		783F98BA13AAA826006B228F /* surf.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989B13AAA826006B228F /* surf.h */; };
+		783F98BB13AAA826006B228F /* threshold.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989C13AAA826006B228F /* threshold.h */; };
+		783F98BC13AAA826006B228F /* ublas_fixed_point_type_traits.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989D13AAA826006B228F /* ublas_fixed_point_type_traits.h */; };
+		783F98BD13AAA826006B228F /* warp.h in Headers */ = {isa = PBXBuildFile; fileRef = 783F989E13AAA826006B228F /* warp.h */; };
+		783F98CA13AAA876006B228F /* config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 783F98C213AAA876006B228F /* config.cpp */; };
+		783F98CB13AAA876006B228F /* fbo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 783F98C413AAA876006B228F /* fbo.cpp */; };
+		783F98CC13AAA876006B228F /* hessian_detector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 783F98C513AAA876006B228F /* hessian_detector.cpp */; };
+		783F98CD13AAA876006B228F /* shaders.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 783F98C613AAA876006B228F /* shaders.cpp */; };
+		783F98CE13AAA876006B228F /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 783F98C713AAA876006B228F /* texture.cpp */; };
+		783F98CF13AAA876006B228F /* homography.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 783F98C813AAA876006B228F /* homography.cpp */; };
+		783F98D013AAA876006B228F /* surf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 783F98C913AAA876006B228F /* surf.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		783F986B13AAA7DB006B228F /* lib_ucv.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = lib_ucv.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		783F987E13AAA826006B228F /* adaptive_treshold.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adaptive_treshold.h; path = ../../../../lib_ucv/include/baldzarika/ucv/adaptive_treshold.h; sourceTree = "<group>"; };
+		783F987F13AAA826006B228F /* approximate_polygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = approximate_polygon.h; path = ../../../../lib_ucv/include/baldzarika/ucv/approximate_polygon.h; sourceTree = "<group>"; };
+		783F988013AAA826006B228F /* camera_pose.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = camera_pose.h; path = ../../../../lib_ucv/include/baldzarika/ucv/camera_pose.h; sourceTree = "<group>"; };
+		783F988113AAA826006B228F /* canny.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = canny.h; path = ../../../../lib_ucv/include/baldzarika/ucv/canny.h; sourceTree = "<group>"; };
+		783F988213AAA826006B228F /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = ../../../../lib_ucv/include/baldzarika/ucv/config.h; sourceTree = "<group>"; };
+		783F988313AAA826006B228F /* contour.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = contour.h; path = ../../../../lib_ucv/include/baldzarika/ucv/contour.h; sourceTree = "<group>"; };
+		783F988413AAA826006B228F /* convert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = convert.h; path = ../../../../lib_ucv/include/baldzarika/ucv/convert.h; sourceTree = "<group>"; };
+		783F988513AAA826006B228F /* corners_subpixel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = corners_subpixel.h; path = ../../../../lib_ucv/include/baldzarika/ucv/corners_subpixel.h; sourceTree = "<group>"; };
+		783F988613AAA826006B228F /* feature_point.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = feature_point.h; path = ../../../../lib_ucv/include/baldzarika/ucv/feature_point.h; sourceTree = "<group>"; };
+		783F988713AAA826006B228F /* find_otsu_threshold.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = find_otsu_threshold.h; path = ../../../../lib_ucv/include/baldzarika/ucv/find_otsu_threshold.h; sourceTree = "<group>"; };
+		783F988813AAA826006B228F /* gaussian_blur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gaussian_blur.h; path = ../../../../lib_ucv/include/baldzarika/ucv/gaussian_blur.h; sourceTree = "<group>"; };
+		783F988913AAA826006B228F /* gil_channel_traits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gil_channel_traits.h; path = ../../../../lib_ucv/include/baldzarika/ucv/gil_channel_traits.h; sourceTree = "<group>"; };
+		783F988B13AAA826006B228F /* fbo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fbo.h; sourceTree = "<group>"; };
+		783F988C13AAA826006B228F /* hessian_detector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hessian_detector.h; sourceTree = "<group>"; };
+		783F988D13AAA826006B228F /* shaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shaders.h; sourceTree = "<group>"; };
+		783F988E13AAA826006B228F /* texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = texture.h; sourceTree = "<group>"; };
+		783F988F13AAA826006B228F /* good_features_detector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = good_features_detector.h; path = ../../../../lib_ucv/include/baldzarika/ucv/good_features_detector.h; sourceTree = "<group>"; };
+		783F989013AAA826006B228F /* homography.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = homography.h; path = ../../../../lib_ucv/include/baldzarika/ucv/homography.h; sourceTree = "<group>"; };
+		783F989113AAA826006B228F /* integral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = integral.h; path = ../../../../lib_ucv/include/baldzarika/ucv/integral.h; sourceTree = "<group>"; };
+		783F989213AAA826006B228F /* klt_tracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = klt_tracker.h; path = ../../../../lib_ucv/include/baldzarika/ucv/klt_tracker.h; sourceTree = "<group>"; };
+		783F989413AAA826006B228F /* match_feature_points.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = match_feature_points.h; path = ../../../../lib_ucv/include/baldzarika/ucv/match_feature_points.h; sourceTree = "<group>"; };
+		783F989513AAA826006B228F /* norm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = norm.h; path = ../../../../lib_ucv/include/baldzarika/ucv/norm.h; sourceTree = "<group>"; };
+		783F989613AAA826006B228F /* perspective_transform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = perspective_transform.h; path = ../../../../lib_ucv/include/baldzarika/ucv/perspective_transform.h; sourceTree = "<group>"; };
+		783F989713AAA826006B228F /* pixel_count.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pixel_count.h; path = ../../../../lib_ucv/include/baldzarika/ucv/pixel_count.h; sourceTree = "<group>"; };
+		783F989813AAA826006B228F /* ranged_histogram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ranged_histogram.h; path = ../../../../lib_ucv/include/baldzarika/ucv/ranged_histogram.h; sourceTree = "<group>"; };
+		783F989913AAA826006B228F /* resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resize.h; path = ../../../../lib_ucv/include/baldzarika/ucv/resize.h; sourceTree = "<group>"; };
+		783F989A13AAA826006B228F /* sobel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sobel.h; path = ../../../../lib_ucv/include/baldzarika/ucv/sobel.h; sourceTree = "<group>"; };
+		783F989B13AAA826006B228F /* surf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = surf.h; path = ../../../../lib_ucv/include/baldzarika/ucv/surf.h; sourceTree = "<group>"; };
+		783F989C13AAA826006B228F /* threshold.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = threshold.h; path = ../../../../lib_ucv/include/baldzarika/ucv/threshold.h; sourceTree = "<group>"; };
+		783F989D13AAA826006B228F /* ublas_fixed_point_type_traits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ublas_fixed_point_type_traits.h; path = ../../../../lib_ucv/include/baldzarika/ucv/ublas_fixed_point_type_traits.h; sourceTree = "<group>"; };
+		783F989E13AAA826006B228F /* warp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = warp.h; path = ../../../../lib_ucv/include/baldzarika/ucv/warp.h; sourceTree = "<group>"; };
+		783F98C213AAA876006B228F /* config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = config.cpp; path = ../../../../lib_ucv/src/baldzarika/ucv/config.cpp; sourceTree = "<group>"; };
+		783F98C413AAA876006B228F /* fbo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fbo.cpp; sourceTree = "<group>"; };
+		783F98C513AAA876006B228F /* hessian_detector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hessian_detector.cpp; sourceTree = "<group>"; };
+		783F98C613AAA876006B228F /* shaders.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = shaders.cpp; sourceTree = "<group>"; };
+		783F98C713AAA876006B228F /* texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = texture.cpp; sourceTree = "<group>"; };
+		783F98C813AAA876006B228F /* homography.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = homography.cpp; path = ../../../../lib_ucv/src/baldzarika/ucv/homography.cpp; sourceTree = "<group>"; };
+		783F98C913AAA876006B228F /* surf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = surf.cpp; path = ../../../../lib_ucv/src/baldzarika/ucv/surf.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		783F986813AAA7DB006B228F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		783F986013AAA7DB006B228F = {
+			isa = PBXGroup;
+			children = (
+				783F986D13AAA7DB006B228F /* lib_ucv */,
+				783F986C13AAA7DB006B228F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		783F986C13AAA7DB006B228F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				783F986B13AAA7DB006B228F /* lib_ucv.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		783F986D13AAA7DB006B228F /* lib_ucv */ = {
+			isa = PBXGroup;
+			children = (
+				783F98BF13AAA849006B228F /* src */,
+				783F98BE13AAA83E006B228F /* include */,
+			);
+			path = lib_ucv;
+			sourceTree = "<group>";
+		};
+		783F987C13AAA803006B228F /* bsldzarika */ = {
+			isa = PBXGroup;
+			children = (
+				783F987D13AAA80C006B228F /* ucv */,
+			);
+			name = bsldzarika;
+			sourceTree = "<group>";
+		};
+		783F987D13AAA80C006B228F /* ucv */ = {
+			isa = PBXGroup;
+			children = (
+				783F987E13AAA826006B228F /* adaptive_treshold.h */,
+				783F987F13AAA826006B228F /* approximate_polygon.h */,
+				783F988013AAA826006B228F /* camera_pose.h */,
+				783F988113AAA826006B228F /* canny.h */,
+				783F988213AAA826006B228F /* config.h */,
+				783F988313AAA826006B228F /* contour.h */,
+				783F988413AAA826006B228F /* convert.h */,
+				783F988513AAA826006B228F /* corners_subpixel.h */,
+				783F988613AAA826006B228F /* feature_point.h */,
+				783F988713AAA826006B228F /* find_otsu_threshold.h */,
+				783F988813AAA826006B228F /* gaussian_blur.h */,
+				783F988913AAA826006B228F /* gil_channel_traits.h */,
+				783F988A13AAA826006B228F /* gles */,
+				783F988F13AAA826006B228F /* good_features_detector.h */,
+				783F989013AAA826006B228F /* homography.h */,
+				783F989113AAA826006B228F /* integral.h */,
+				783F989213AAA826006B228F /* klt_tracker.h */,
+				783F989313AAA826006B228F /* lapack */,
+				783F989413AAA826006B228F /* match_feature_points.h */,
+				783F989513AAA826006B228F /* norm.h */,
+				783F989613AAA826006B228F /* perspective_transform.h */,
+				783F989713AAA826006B228F /* pixel_count.h */,
+				783F989813AAA826006B228F /* ranged_histogram.h */,
+				783F989913AAA826006B228F /* resize.h */,
+				783F989A13AAA826006B228F /* sobel.h */,
+				783F989B13AAA826006B228F /* surf.h */,
+				783F989C13AAA826006B228F /* threshold.h */,
+				783F989D13AAA826006B228F /* ublas_fixed_point_type_traits.h */,
+				783F989E13AAA826006B228F /* warp.h */,
+			);
+			name = ucv;
+			sourceTree = "<group>";
+		};
+		783F988A13AAA826006B228F /* gles */ = {
+			isa = PBXGroup;
+			children = (
+				783F988B13AAA826006B228F /* fbo.h */,
+				783F988C13AAA826006B228F /* hessian_detector.h */,
+				783F988D13AAA826006B228F /* shaders.h */,
+				783F988E13AAA826006B228F /* texture.h */,
+			);
+			name = gles;
+			path = ../../../../lib_ucv/include/baldzarika/ucv/gles;
+			sourceTree = "<group>";
+		};
+		783F989313AAA826006B228F /* lapack */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = lapack;
+			path = ../../../../lib_ucv/include/baldzarika/ucv/lapack;
+			sourceTree = "<group>";
+		};
+		783F98BE13AAA83E006B228F /* include */ = {
+			isa = PBXGroup;
+			children = (
+				783F987C13AAA803006B228F /* bsldzarika */,
+			);
+			name = include;
+			sourceTree = "<group>";
+		};
+		783F98BF13AAA849006B228F /* src */ = {
+			isa = PBXGroup;
+			children = (
+				783F98C013AAA853006B228F /* baldzarika */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		783F98C013AAA853006B228F /* baldzarika */ = {
+			isa = PBXGroup;
+			children = (
+				783F98C113AAA856006B228F /* ucv */,
+			);
+			name = baldzarika;
+			sourceTree = "<group>";
+		};
+		783F98C113AAA856006B228F /* ucv */ = {
+			isa = PBXGroup;
+			children = (
+				783F98C213AAA876006B228F /* config.cpp */,
+				783F98C313AAA876006B228F /* gles */,
+				783F98C813AAA876006B228F /* homography.cpp */,
+				783F98C913AAA876006B228F /* surf.cpp */,
+			);
+			name = ucv;
+			sourceTree = "<group>";
+		};
+		783F98C313AAA876006B228F /* gles */ = {
+			isa = PBXGroup;
+			children = (
+				783F98C413AAA876006B228F /* fbo.cpp */,
+				783F98C513AAA876006B228F /* hessian_detector.cpp */,
+				783F98C613AAA876006B228F /* shaders.cpp */,
+				783F98C713AAA876006B228F /* texture.cpp */,
+			);
+			name = gles;
+			path = ../../../../lib_ucv/src/baldzarika/ucv/gles;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		783F986913AAA7DB006B228F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				783F989F13AAA826006B228F /* adaptive_treshold.h in Headers */,
+				783F98A013AAA826006B228F /* approximate_polygon.h in Headers */,
+				783F98A113AAA826006B228F /* camera_pose.h in Headers */,
+				783F98A213AAA826006B228F /* canny.h in Headers */,
+				783F98A313AAA826006B228F /* config.h in Headers */,
+				783F98A413AAA826006B228F /* contour.h in Headers */,
+				783F98A513AAA826006B228F /* convert.h in Headers */,
+				783F98A613AAA826006B228F /* corners_subpixel.h in Headers */,
+				783F98A713AAA826006B228F /* feature_point.h in Headers */,
+				783F98A813AAA826006B228F /* find_otsu_threshold.h in Headers */,
+				783F98A913AAA826006B228F /* gaussian_blur.h in Headers */,
+				783F98AA13AAA826006B228F /* gil_channel_traits.h in Headers */,
+				783F98AB13AAA826006B228F /* fbo.h in Headers */,
+				783F98AC13AAA826006B228F /* hessian_detector.h in Headers */,
+				783F98AD13AAA826006B228F /* shaders.h in Headers */,
+				783F98AE13AAA826006B228F /* texture.h in Headers */,
+				783F98AF13AAA826006B228F /* good_features_detector.h in Headers */,
+				783F98B013AAA826006B228F /* homography.h in Headers */,
+				783F98B113AAA826006B228F /* integral.h in Headers */,
+				783F98B213AAA826006B228F /* klt_tracker.h in Headers */,
+				783F98B313AAA826006B228F /* match_feature_points.h in Headers */,
+				783F98B413AAA826006B228F /* norm.h in Headers */,
+				783F98B513AAA826006B228F /* perspective_transform.h in Headers */,
+				783F98B613AAA826006B228F /* pixel_count.h in Headers */,
+				783F98B713AAA826006B228F /* ranged_histogram.h in Headers */,
+				783F98B813AAA826006B228F /* resize.h in Headers */,
+				783F98B913AAA826006B228F /* sobel.h in Headers */,
+				783F98BA13AAA826006B228F /* surf.h in Headers */,
+				783F98BB13AAA826006B228F /* threshold.h in Headers */,
+				783F98BC13AAA826006B228F /* ublas_fixed_point_type_traits.h in Headers */,
+				783F98BD13AAA826006B228F /* warp.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		783F986A13AAA7DB006B228F /* lib_ucv */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 783F987913AAA7DB006B228F /* Build configuration list for PBXNativeTarget "lib_ucv" */;
+			buildPhases = (
+				783F986713AAA7DB006B228F /* Sources */,
+				783F986813AAA7DB006B228F /* Frameworks */,
+				783F986913AAA7DB006B228F /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = lib_ucv;
+			productName = lib_ucv;
+			productReference = 783F986B13AAA7DB006B228F /* lib_ucv.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		783F986213AAA7DB006B228F /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 783F986513AAA7DB006B228F /* Build configuration list for PBXProject "lib_ucv" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 783F986013AAA7DB006B228F;
+			productRefGroup = 783F986C13AAA7DB006B228F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				783F986A13AAA7DB006B228F /* lib_ucv */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		783F986713AAA7DB006B228F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				783F98CA13AAA876006B228F /* config.cpp in Sources */,
+				783F98CB13AAA876006B228F /* fbo.cpp in Sources */,
+				783F98CC13AAA876006B228F /* hessian_detector.cpp in Sources */,
+				783F98CD13AAA876006B228F /* shaders.cpp in Sources */,
+				783F98CE13AAA876006B228F /* texture.cpp in Sources */,
+				783F98CF13AAA876006B228F /* homography.cpp in Sources */,
+				783F98D013AAA876006B228F /* surf.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		783F987713AAA7DB006B228F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		783F987813AAA7DB006B228F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		783F987A13AAA7DB006B228F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(BOOST_INCLUDE_DIR)",
+					../../../lib_math/include,
+					../../../lib_ucv/include,
+					"$(MAC_PORTS_ROOT)/include",
+					../../../3rd_party/libkdtree,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		783F987B13AAA7DB006B228F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(BOOST_INCLUDE_DIR)",
+					../../../lib_math/include,
+					../../../lib_ucv/include,
+					"$(MAC_PORTS_ROOT)/include",
+					../../../3rd_party/libkdtree,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		783F986513AAA7DB006B228F /* Build configuration list for PBXProject "lib_ucv" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				783F987713AAA7DB006B228F /* Debug */,
+				783F987813AAA7DB006B228F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		783F987913AAA7DB006B228F /* Build configuration list for PBXNativeTarget "lib_ucv" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				783F987A13AAA7DB006B228F /* Debug */,
+				783F987B13AAA7DB006B228F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 783F986213AAA7DB006B228F /* Project object */;
+}

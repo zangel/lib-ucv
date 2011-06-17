@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    <string name="app_name">ITGMADemo</string>
+    <string name="app_desc">ITGMADemo</string>
+    <string name="settings_general_title">General</string>
+    <string name="settings_name">Settings</string>
+    <string name="settings_preview_size_title">Preview size</string>
+    <string name="settings_preview_size_key">settings_preview_size</string>
+</resources>

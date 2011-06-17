@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\baldzarika">
+      <UniqueIdentifier>{014c692e-4792-44a2-82fd-6d488ad3337e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\baldzarika\ar">
+      <UniqueIdentifier>{894ef6bc-27ab-4fbd-a903-563f6cf3ebb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\baldzarika">
+      <UniqueIdentifier>{30d6416d-8ad5-414b-a3c6-5dfa13681555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\baldzarika\ar">
+      <UniqueIdentifier>{65a2eaaf-5703-4d9a-9905-33ad909577f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\baldzarika\ar\fiducial">
+      <UniqueIdentifier>{5ffe7819-42d5-45e9-9147-1ec1538942dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\baldzarika\ar\fiducial">
+      <UniqueIdentifier>{e6d3b1ce-2b16-4e22-a3ee-ccc808c195bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\baldzarika\ar\markerless">
+      <UniqueIdentifier>{e24c5fee-8347-439e-affa-8512e6a96278}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\baldzarika\ar\markerless">
+      <UniqueIdentifier>{02843918-de93-4a2a-bef5-203498e5a922}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\baldzarika\ar\config.h">
+      <Filter>Header Files\baldzarika\ar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\fiducial\typedefs.h">
+      <Filter>Header Files\baldzarika\ar\fiducial</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\fiducial\marker_model.h">
+      <Filter>Header Files\baldzarika\ar\fiducial</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\fiducial\bch_marker_model.h">
+      <Filter>Header Files\baldzarika\ar\fiducial</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\markerless\tracker.h">
+      <Filter>Header Files\baldzarika\ar\markerless</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\markerless\marker.h">
+      <Filter>Header Files\baldzarika\ar\markerless</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\common_typedefs.h">
+      <Filter>Header Files\baldzarika\ar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\markerless\typedefs.h">
+      <Filter>Header Files\baldzarika\ar\markerless</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\tracker.h">
+      <Filter>Header Files\baldzarika\ar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ar\fiducial\tracker.h">
+      <Filter>Header Files\baldzarika\ar\fiducial</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\baldzarika\ar\config.cpp">
+      <Filter>Source Files\baldzarika\ar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ar\fiducial\marker_model.cpp">
+      <Filter>Source Files\baldzarika\ar\fiducial</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ar\fiducial\bch_marker_model.cpp">
+      <Filter>Source Files\baldzarika\ar\fiducial</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ar\markerless\marker.cpp">
+      <Filter>Source Files\baldzarika\ar\markerless</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ar\markerless\tracker.cpp">
+      <Filter>Source Files\baldzarika\ar\markerless</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ar\tracker.cpp">
+      <Filter>Source Files\baldzarika\ar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baldzarika\ar\fiducial\tracker.cpp">
+      <Filter>Source Files\baldzarika\ar\fiducial</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
