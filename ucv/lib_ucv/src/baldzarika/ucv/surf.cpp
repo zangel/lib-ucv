@@ -189,13 +189,13 @@ namespace baldzarika { namespace ucv  {
 				boost::int32_t ix4=ix-b;
 				boost::int32_t ix5=ix+1;
 
-				response_t d_xx=
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix4, iy2), math::size2ui(w, l1))-
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix3, iy2), math::size2ui(l, l1))*three;
+				response_t d_xx3=box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix3, iy2), math::size2ui(l, l1));
+				response_t d_xx=box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix4, iy2), math::size2ui(w, l1))-
+					(d_xx3.operator<<(1)+d_xx3);
 				
-				response_t d_yy=
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix2, iy4), math::size2ui(l1, w))-
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix2, iy3), math::size2ui(l1, l))*three;
+				response_t d_yy3=box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix2, iy3), math::size2ui(l1, l));
+				response_t d_yy=box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix2, iy4), math::size2ui(l1, w))-
+					(d_yy3.operator<<(1)+d_yy3);
 				
 				response_t d_xy=
 					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix5, iy1), math::size2ui(l, l))+
@@ -215,12 +215,12 @@ namespace baldzarika { namespace ucv  {
 
 	void surf::response_layer::detect(response_layer &bl, response_layer &ml, ranged_detect_params_t const &rdp)
 	{
-		static const response_t inv_2=math::constant::one<response_t>()/response_t(2);
-		static const response_t inv_4=math::constant::one<response_t>()/response_t(4);
-		static const response_t r_2=2;
+		//static const response_t inv_2=math::constant::one<response_t>()/response_t(2);
+		//static const response_t inv_4=math::constant::one<response_t>()/response_t(4);
+		//static const response_t r_2=2;
 		static const response_t coeff_1=0.1333f;
 		static response_t const det_eps=1.0e-3f;
-		static response_t const prec_s=500;
+		//static response_t const prec_s=512;
 
 		response_t const response_treshold(m_surf.m_treshold);
 		boost::int32_t border=(m_filter_size+1)/(2*m_sample_step);
@@ -256,41 +256,41 @@ namespace baldzarika { namespace ucv  {
 					response_t b=bl.get_response(x, y, *this);
 
 					response_t v=ml.get_response(x, y, *this);
-					response_t v_r_2=v*r_2;
-					response_t d_x=prec_s*(ml.get_response(x+1, y, *this)-ml.get_response(x-1, y, *this))*inv_2;
-					response_t d_y=prec_s*(ml.get_response(x, y+1, *this)-ml.get_response(x, y-1, *this))*inv_2;
-					response_t d_s=prec_s*(t-b)*inv_2;
+					response_t v_r_2=v.operator<<(1);
+					response_t d_x=(ml.get_response(x+1, y, *this)-ml.get_response(x-1, y, *this)).operator<<(8);
+					response_t d_y=(ml.get_response(x, y+1, *this)-ml.get_response(x, y-1, *this)).operator<<(8);
+					response_t d_s=(t-b).operator<<(8);
 					
 					//H[0][0]
-					response_t d_xx=prec_s*(ml.get_response(x+1, y, *this)+ml.get_response(x-1, y, *this)-v_r_2);
+					response_t d_xx=(ml.get_response(x+1, y, *this)+ml.get_response(x-1, y, *this)-v_r_2).operator<<(9);
 
 					//H[1][1]
-					response_t d_yy=prec_s*(ml.get_response(x, y+1, *this)+ml.get_response(x, y-1, *this)-v_r_2);
+					response_t d_yy=(ml.get_response(x, y+1, *this)+ml.get_response(x, y-1, *this)-v_r_2).operator<<(9);
 
-					//H[2][2]			
-					response_t d_ss=prec_s*(t+b-v_r_2);
+					//H[2][2]
+					response_t d_ss=(t+b-v_r_2).operator<<(9);
 					
 					//H[0][1] H[1][0]
-					response_t d_xy=prec_s*
+					response_t d_xy=
 					(
 						ml.get_response(x+1, y+1, *this)-ml.get_response(x-1, y+1, *this)-
 						ml.get_response(x+1, y-1, *this)+ml.get_response(x-1, y-1, *this)
-					)*inv_4;
+					).operator<<(7);
 					
 					//H[0][2] H[2][0]
-					response_t d_xs=prec_s*
+					response_t d_xs=
 					(
 						m_response_view(x+1, y).operator response_t()-m_response_view(x-1, y).operator response_t()-
 						bl.get_response(x+1, y, *this)+bl.get_response(x-1, y, *this)
-					)*inv_4;
+					).operator<<(7);
 
 					
 					//H[1][2] H[2][1]
-					response_t d_ys=prec_s*
+					response_t d_ys=
 					(
 						m_response_view(x, y+1).operator response_t()-m_response_view(x, y-1).operator response_t()-
 						bl.get_response(x, y+1, *this)+bl.get_response(x, y-1, *this)
-					)*inv_4;
+					).operator<<(7);
 					
 
 					response_t det=
@@ -765,7 +765,7 @@ namespace baldzarika { namespace ucv  {
 	{
 		typedef feature_point_t::desc_value_type dec_t;
 		static dec_t const r_3i20=0.15f;
-		static dec_t const r_2=2.0f;
+		//static dec_t const r_2=2.0f;
 
 		static dec_t const r_3i2_sq=2.25f;
 

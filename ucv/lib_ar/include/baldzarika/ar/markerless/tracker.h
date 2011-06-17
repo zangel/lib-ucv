@@ -67,8 +67,10 @@ namespace baldzarika { namespace ar { namespace markerless {
 			boost::weak_ptr<tracker>				m_tracker;
 			boost::shared_ptr<marker>				m_marker;
 			feature_points_t						m_features;
+			ucv::surf::fps_by_pos_tree_t			m_features_kdtree;
 			points2_t								m_marker_points;
 			points2_t								m_frame_points;
+			
 		};
 
 		typedef boost::multi_index_container
