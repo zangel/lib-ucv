@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D60FD689-2C93-486B-9705-C6BA83BB29FE}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>lib_ucv</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)lib\</OutDir>
+    <TargetName>$(ProjectName)_d32</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)lib\</OutDir>
+    <TargetName>$(ProjectName)_32</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(BOOST_DIR)/;$(LIBPNG_DIR);../3rd_party/libkdtree;../lib_math/include;./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(BOOST_DIR)/;$(LIBPNG_DIR);../3rd_party/libkdtree;../lib_math/include;./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib />
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\baldzarika\ucv\adaptive_treshold.h" />
+    <ClInclude Include="include\baldzarika\ucv\approximate_polygon.h" />
+    <ClInclude Include="include\baldzarika\ucv\camera_pose.h" />
+    <ClInclude Include="include\baldzarika\ucv\canny.h" />
+    <ClInclude Include="include\baldzarika\ucv\config.h" />
+    <ClInclude Include="include\baldzarika\ucv\contour.h" />
+    <ClInclude Include="include\baldzarika\ucv\convert.h" />
+    <ClInclude Include="include\baldzarika\ucv\corners_subpixel.h" />
+    <ClInclude Include="include\baldzarika\ucv\feature_point.h" />
+    <ClInclude Include="include\baldzarika\ucv\gaussian_blur.h" />
+    <ClInclude Include="include\baldzarika\ucv\good_features_detector.h" />
+    <ClInclude Include="include\baldzarika\ucv\klt_tracker.h" />
+    <ClInclude Include="include\baldzarika\ucv\match_feature_points.h" />
+    <ClInclude Include="include\baldzarika\ucv\gil_channel_traits.h" />
+    <ClInclude Include="include\baldzarika\ucv\gles\fbo.h" />
+    <ClInclude Include="include\baldzarika\ucv\gles\hessian_detector.h" />
+    <ClInclude Include="include\baldzarika\ucv\gles\shaders.h" />
+    <ClInclude Include="include\baldzarika\ucv\gles\texture.h" />
+    <ClInclude Include="include\baldzarika\ucv\homography.h" />
+    <ClInclude Include="include\baldzarika\ucv\integral.h" />
+    <ClInclude Include="include\baldzarika\ucv\norm.h" />
+    <ClInclude Include="include\baldzarika\ucv\find_otsu_threshold.h" />
+    <ClInclude Include="include\baldzarika\ucv\perspective_transform.h" />
+    <ClInclude Include="include\baldzarika\ucv\pixel_count.h" />
+    <ClInclude Include="include\baldzarika\ucv\ranged_histogram.h" />
+    <ClInclude Include="include\baldzarika\ucv\resize.h" />
+    <ClInclude Include="include\baldzarika\ucv\sobel.h" />
+    <ClInclude Include="include\baldzarika\ucv\surf.h" />
+    <ClInclude Include="include\baldzarika\ucv\threshold.h" />
+    <ClInclude Include="include\baldzarika\ucv\ublas_fixed_point_type_traits.h" />
+    <ClInclude Include="include\baldzarika\ucv\warp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\baldzarika\ucv\config.cpp" />
+    <ClCompile Include="src\baldzarika\ucv\gles\fbo.cpp" />
+    <ClCompile Include="src\baldzarika\ucv\gles\hessian_detector.cpp" />
+    <ClCompile Include="src\baldzarika\ucv\gles\shaders.cpp" />
+    <ClCompile Include="src\baldzarika\ucv\gles\texture.cpp" />
+    <ClCompile Include="src\baldzarika\ucv\homography.cpp" />
+    <ClCompile Include="src\baldzarika\ucv\surf.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
