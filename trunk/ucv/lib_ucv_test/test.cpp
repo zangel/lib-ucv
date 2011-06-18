@@ -42,7 +42,6 @@
 
 using namespace boost;
 
-#if 0
 BOOST_AUTO_TEST_CASE( create_open_cv_window )
 {
 	cv::namedWindow(OPENCV_WND_NAME);
@@ -630,7 +629,7 @@ BOOST_AUTO_TEST_CASE( warp_test )
 
 
 	ucv::gil::gray8_image_t src8_img;
-	ucv::gil::png_read_and_convert_image("image-test.png", src8_img);
+	ucv::gil::png_read_and_convert_image("fiducial_test.png", src8_img);
 
 	gray_image_t src_img(src8_img.width(), src8_img.height());
 
@@ -673,7 +672,7 @@ BOOST_AUTO_TEST_CASE( warp_test )
 		ucv::detail::grayscale_convert()
 	));
 
-	ucv::gil::png_write_view("warped-image-test.png", ucv::gil::const_view(dst8_img));
+	ucv::gil::png_write_view("warped-fiducial_test.png", ucv::gil::const_view(dst8_img));
 }
 
 
@@ -739,7 +738,6 @@ BOOST_AUTO_TEST_CASE( camera_pose_test )
 	bottom_right=cam_intr*bottom_right; bottom_right/=bottom_right[2];
 	bottom_left=cam_intr*bottom_left; bottom_left/=bottom_left[2];
 }
-#endif
 
 BOOST_AUTO_TEST_CASE( canny_test )
 {
@@ -761,10 +759,7 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	
 
 	ucv::gil::gray8_image_t gray8_img;
-	ucv::gil::png_read_and_convert_image("image-test.png", gray8_img);
-	//ucv::gil::png_read_and_convert_image("frame.png", gray8_img);
-	//ucv::gil::png_read_and_convert_image("rectangle.png", gray8_img);
-	//ucv::gil::png_read_and_convert_image("sudoku.png", gray8_img);
+	ucv::gil::png_read_and_convert_image("fiducial_test.png", gray8_img);
 
 
 	gaussian_blur_t::gray_image_t raw_img(gray8_img.width(), gray8_img.height());
@@ -780,13 +775,6 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 	gaussian_blur_t gaussian_blur(math::size2ui(gray8_img.width(), gray8_img.height()));
 	gaussian_blur(ucv::gil::const_view(raw_img), ucv::gil::view(gray_img));
-	//gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
-	//gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
-	//gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
-	//gaussian_blur(ucv::gil::const_view(gray_img), ucv::gil::view(gray_img));
-
-	
-
 
 	sobel_t sobel(math::size2ui(gray8_img.width(), gray8_img.height()));
 
@@ -827,10 +815,8 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	cv::imshow(OPENCV_WND_NAME, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &gil::view(gray32f_img)[0][0]));
 	cv::waitKey();
 
-	cv::Mat image=cv::imread("image-test.png", CV_LOAD_IMAGE_GRAYSCALE);
-	//cv::Mat image=cv::imread("rectangle.png", CV_LOAD_IMAGE_GRAYSCALE);
-	//cv::Mat image=cv::imread("sudoku.png", CV_LOAD_IMAGE_GRAYSCALE);
-	//cv::Mat image=cv::imread("frame.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat image=cv::imread("fiducial_test.png", CV_LOAD_IMAGE_GRAYSCALE);
+
 
 	cv::blur(image,image,cv::Size(3,3));
 

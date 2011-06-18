@@ -1,11 +1,12 @@
-#define BOOST_TEST_MODULE lib_ucv_test
+#define BOOST_TEST_MODULE lib_ar_test
 
 #include <boost/test/unit_test.hpp>
 #include <baldzarika/ar/config.h>
 #include <baldzarika/ar/tracker.h>
-#include <baldzarika/ar/marker.h>
-#include <baldzarika/ar/fiducial/detector.h>
+#include <baldzarika/ar/fiducial/tracker.h>
 #include <baldzarika/ar/fiducial/bch_marker_model.h>
+#include <baldzarika/ar/markerless/tracker.h>
+#include <baldzarika/ar/markerless/marker.h>
 
 #if 0
 
@@ -54,17 +55,19 @@ BOOST_AUTO_TEST_CASE( tracker_detect_marker )
 {
 	using namespace baldzarika;
 
-	boost::shared_ptr<ar::marker> pmarker=ar::marker::create_from_file("../lib_ucv_test/test_img2.png");
+	boost::shared_ptr<ar::markerless::marker> pmarker=ar::markerless::marker::create_from_file("../lib_ucv_test/test_img2.png");
+	ucv::gil::gray8_image_t frame;
+	ucv::gil::png_read_and_convert_image("../lib_ucv_test/test_img2.png", frame);
 
-	boost::shared_ptr<ar::tracker> ar_tracker( new ar::tracker(
-		ucv::size2ui(
+	boost::shared_ptr<ar::markerless::tracker> ar_tracker( new ar::markerless::tracker(
+		math::size2ui(
 			pmarker->get_size().width(),
 			pmarker->get_size().height()
 		)
 	));
 
 
-	boost::shared_ptr<ar::tracker::marker_state> pms=ar_tracker->add_marker(pmarker);
+	BOOST_CHECK(ar_tracker->add_marker(pmarker));
 
 	struct _anonymous
 	{
@@ -79,10 +82,17 @@ BOOST_AUTO_TEST_CASE( tracker_detect_marker )
 	
 	ar_tracker->marker_state_changed().connect(boost::bind(&_anonymous::on_marker_state_changed_signal, &anonymous, _1, _2));
 	ar_tracker->start();
-	ar_tracker->update(ucv::gil::const_view(pmarker->get_image()), pmarker->get_median());
+	while(!ar_tracker->is_started()) boost::this_thread::yield();
+	ar_tracker->process_frame(ucv::gil::const_view(frame));
+	ar_tracker->process_frame(ucv::gil::const_view(frame));
 	ar_tracker->stop();
-
-	BOOST_CHECK_EQUAL(anonymous.pdms, pms);
+	ar_tracker->wait_to_stop();
+	boost::shared_ptr<ar::markerless::tracker::marker_state> pdmms(
+		anonymous.pdms,
+		boost::detail::dynamic_cast_tag()
+	);
+	BOOST_CHECK(pdmms);
+	BOOST_CHECK_EQUAL(pdmms->get_marker(), pmarker);
 }
 
 
@@ -91,25 +101,23 @@ BOOST_AUTO_TEST_CASE( tracker_detect_marker )
 BOOST_AUTO_TEST_CASE( fiducial_bch_marker_model )
 {
 	using namespace baldzarika;
-	typedef ucv::gaussian_blur<ar::fiducial::gray_t, 5> gaussian_blur_t;
-	typedef ucv::canny<ar::fiducial::gray_t, 3> canny_t;
+	typedef ucv::gaussian_blur<ar::gray_t, 5> gaussian_blur_t;
+	typedef ucv::canny<ar::gray_t, 3> canny_t;
 
 	ucv::gil::gray8_image_t gray8_img;
-	ucv::gil::png_read_and_convert_image("../lib_ucv_test/image-test.png", gray8_img);
+	ucv::gil::png_read_and_convert_image("../lib_ucv_test/fiducial_test.png", gray8_img);
 
-	ar::fiducial::gray_image_t gray_img(gray8_img.width(), gray8_img.height());
+	ar::gray_image_t gray_img(gray8_img.width(), gray8_img.height());
 	
-	ucv::convert_scale(
+	ucv::convert(
 		ucv::gil::const_view(gray8_img),
 		ucv::gil::view(gray_img),
-		ar::fiducial::gray_t(1.0f/255.0f)
+		ucv::detail::grayscale_convert()
 	);
 
-	
-
-	ar::fiducial::gray_image_t gray_blurred_img(gray8_img.width(), gray8_img.height());
-	gaussian_blur_t gaussian_blur(ucv::size2ui(gray8_img.width(), gray8_img.height()));
-	canny_t canny(ucv::size2ui(gray8_img.width(), gray8_img.height()), 0.4, 1.2);
+	ar::gray_image_t gray_blurred_img(gray8_img.width(), gray8_img.height());
+	gaussian_blur_t gaussian_blur(math::size2ui(gray8_img.width(), gray8_img.height()));
+	canny_t canny(math::size2ui(gray8_img.width(), gray8_img.height()), 0.4, 1.2);
 
 	boost::posix_time::ptime start_time=boost::posix_time::microsec_clock::local_time();
 	for(boost::uint32_t i=0;i<100;++i)
@@ -141,14 +149,15 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_start_stop_test )
 {
 	using namespace baldzarika;
 
-	boost::shared_ptr<ar::fiducial::detector> detector(new ar::fiducial::detector(ucv::size2ui(100,100)));
+	boost::shared_ptr<ar::fiducial::tracker> tracker(new ar::fiducial::tracker(math::size2ui(100,100)));
 
-	BOOST_CHECK(!detector->is_started());
-	BOOST_CHECK(detector->start());
-	BOOST_CHECK(detector->is_starting() || detector->is_started());
-	BOOST_CHECK(detector->stop());
-	BOOST_CHECK(!detector->is_started());
-	detector->wait_to_stop();
+	BOOST_CHECK(!tracker->is_started());
+	BOOST_CHECK(tracker->start());
+	BOOST_CHECK(tracker->is_starting() || tracker->is_started());
+	BOOST_CHECK(tracker->stop());
+	BOOST_CHECK(!tracker->is_started());
+	tracker->wait_to_stop();
+	BOOST_CHECK(!tracker->is_active());
 }
 
 
@@ -158,19 +167,19 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 	using namespace baldzarika;
 
 	ucv::gil::gray8_image_t gray8_frame;
-	ucv::gil::png_read_and_convert_image("../lib_ucv_test/image-test.png", gray8_frame);
+	ucv::gil::png_read_and_convert_image("../lib_ucv_test/fiducial_test.png", gray8_frame);
 
-	ar::fiducial::gray_image_t gray_frame(gray8_frame.width(), gray8_frame.height());
+	ar::gray_image_t gray_frame(gray8_frame.width(), gray8_frame.height());
 
-	ucv::convert_scale(
+	ucv::convert(
 		ucv::gil::const_view(gray8_frame),
 		ucv::gil::view(gray_frame),
-		ar::fiducial::gray_t(1.0f/255.0f)
+		ucv::detail::grayscale_convert()
 	);
 
-	boost::shared_ptr<ar::fiducial::detector> detector(new ar::fiducial::detector(ucv::size2ui(gray8_frame.width(), gray8_frame.height())));
+	boost::shared_ptr<ar::fiducial::tracker> tracker(new ar::fiducial::tracker(math::size2ui(gray8_frame.width(), gray8_frame.height())));
 
-	BOOST_CHECK(detector->add_marker_model( boost::shared_ptr<ar::fiducial::marker_model>(
+	BOOST_CHECK(tracker->add_marker_model( boost::shared_ptr<ar::fiducial::marker_model>(
 		new ar::fiducial::bch_marker_model()
 	)));
 
@@ -178,16 +187,16 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 
 	struct _signal_listener
 	{
-		_signal_listener(boost::shared_ptr<ar::fiducial::detector> const &d): m_detector(d), m_detected(0){ }
+		_signal_listener(boost::shared_ptr<ar::fiducial::tracker> const &t): m_tracker(t), m_detected(0){ }
 
-		void on_marker_state_changed_signal(boost::shared_ptr<ar::fiducial::detector::marker_state> const &ms, ar::fiducial::detector::marker_state::eSC sc)
+		void on_marker_state_changed_signal(boost::shared_ptr<ar::tracker::marker_state> const &ms, ar::tracker::marker_state::eSC sc)
 		{
-			if(sc==ar::fiducial::detector::marker_state::SC_DETECTION && ms->is_detected())
+			if(sc==ar::tracker::marker_state::SC_DETECTION && ms->is_detected())
 			{
 				
-				ucv::matrix44f cam_pose=ms->get_camera_pose();
-				ucv::matrix44f cam_proj=m_detector->get_camera_projection();
-				ucv::matrix44f transform=cam_proj*cam_pose;
+				math::matrix44f cam_pose=ms->get_camera_pose();
+				math::matrix44f cam_proj=m_tracker->get_camera_projection();
+				math::matrix44f transform=cam_proj*cam_pose;
 #if 0
 				ucv::size2ui mark_size=ms->get_marker_size();
 				float corners[4][4]=
@@ -207,13 +216,13 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 				};
 #endif
 
-				ucv::vector4f top_left=transform*ucv::vector4f(corners[0]);
+				math::vector4f top_left=transform*math::vector4f(corners[0]);
 				top_left*=1.0f/top_left[2];
-				ucv::vector4f top_right=transform*ucv::vector4f(corners[1]);
+				math::vector4f top_right=transform*math::vector4f(corners[1]);
 				top_right*=1.0f/top_right[2];
-				ucv::vector4f bottom_right=transform*ucv::vector4f(corners[2]);
+				math::vector4f bottom_right=transform*math::vector4f(corners[2]);
 				bottom_right*=1.0f/bottom_right[2]; 
-				ucv::vector4f bottom_left=transform*ucv::vector4f(corners[3]);
+				math::vector4f bottom_left=transform*math::vector4f(corners[3]);
 				bottom_left*=1.0f/bottom_left[2];
 
 				std::cout << std::endl;
@@ -225,14 +234,14 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 				m_detected++;
 			}
 		}
-		boost::shared_ptr<ar::fiducial::detector> m_detector;
+		boost::shared_ptr<ar::fiducial::tracker> m_tracker;
 		boost::uint32_t m_detected;
 
-	} signal_listener(detector);
+	} signal_listener(tracker);
 
 
 
-	detector->marker_state_changed().connect(boost::bind(&_signal_listener::on_marker_state_changed_signal, &signal_listener, _1, _2));
+	tracker->marker_state_changed().connect(boost::bind(&_signal_listener::on_marker_state_changed_signal, &signal_listener, _1, _2));
 	//detector->start();
 	//detector->update(ucv::gil::const_view(gray_frame));
 	
@@ -243,18 +252,10 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 	//BOOST_CHECK_EQUAL(signal_listener.m_detected, 6);
 
 	signal_listener.m_detected=0;
-	detector->start();
-	boost::uint32_t n=2;
-	while(n)
-	{
-		if(ar::fiducial::detector::locked_frame frame_lock=detector->lock_frame())
-		{
-			BOOST_CHECK(static_cast<bool>(frame_lock));	
-			BOOST_CHECK(ucv::convert(ucv::gil::const_view(gray_frame),frame_lock.get_view(), ucv::detail::convert));
-			n--;
-		}
-	}
-	detector->stop();
-	detector->wait_to_stop();
+	tracker->start();
+	while(!tracker->is_started()) boost::this_thread::yield();
+	tracker->process_frame(ucv::gil::const_view(gray8_frame));
+	tracker->stop();
+	tracker->wait_to_stop();
 	BOOST_CHECK_EQUAL(signal_listener.m_detected, 6);
 }

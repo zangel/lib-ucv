@@ -54,12 +54,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(BOOST_DIR);$(LIBPNG_DIR);../3rd_party/libkdtree;../lib_ucv/include;../lib_ar/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_INC_DIR);$(LIBPNG_DIR);../3rd_party/libkdtree;../lib_ucv/include;../lib_ar/include;../lib_math/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_STAGE_DIR)/vc100/32/lib;$(LIBPNG_DIR)/projects/vstudio/Debug Library;../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_LIB_DIR)/vc100/32/lib;$(LIBPNG_DIR)/projects/vstudio/Debug Library;../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>lib_ucv_d32.lib;lib_ar_d32.lib;libpng15.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -72,14 +72,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(BOOST_DIR);$(LIBPNG_DIR);../3rd_party/libkdtree;../lib_ucv/include;../lib_ar/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_INC_DIR);$(LIBPNG_DIR);../3rd_party/libkdtree;../lib_ucv/include;../lib_ar/include;../lib_math/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(BOOST_STAGE_DIR)/vc100/32/lib;$(LIBPNG_DIR)/projects/vstudio/Release Library;../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_LIB_DIR)/vc100/32/lib;$(LIBPNG_DIR)/projects/vstudio/Release Library;../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>lib_ucv_32.lib;lib_ar_32.lib;libpng15.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
