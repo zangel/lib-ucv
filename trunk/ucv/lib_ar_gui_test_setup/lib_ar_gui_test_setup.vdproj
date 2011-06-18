@@ -331,7 +331,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:lib_ar_gui_test"
         "ProductCode" = "8:{4F4568A0-39DD-4AB6-B90C-A9758BA2D423}"
-        "PackageCode" = "8:{DCC205CE-5D99-4787-99CF-E7B2D1BB1353}"
+        "PackageCode" = "8:{2AA290C4-89E3-46CA-8F7D-5B3FBEDE4EFF}"
         "UpgradeCode" = "8:{C6D55D65-64A5-44B7-ACE9-8C7749245E02}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
