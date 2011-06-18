@@ -94,7 +94,7 @@ void ArTestDlg::start()
 				new ar::markerless::tracker(PREVIEW_SIZES[size_idx])
 			);
 
-			new_tracker->set_z_far(2000.0f);
+			new_tracker->set_camera_z_far(2000.0f);
 
 			new_tracker->marker_state_changed().connect(
 				boost::bind(
@@ -151,7 +151,7 @@ void ArTestDlg::stop()
 	BOOST_ASSERT(m_tracker);
 	m_fg_ios.stop();
 	m_fg_worker.join();
-	BOOST_ASSERT(m_fg_ios.stopped());
+	//BOOST_ASSERT(m_fg_ios.stopped());
 	m_fg_ios.reset();
 	m_tracker->stop();
 	m_tracker->wait_to_stop();

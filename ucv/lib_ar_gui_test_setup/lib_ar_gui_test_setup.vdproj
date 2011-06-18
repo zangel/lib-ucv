@@ -15,20 +15,8 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_1FD083311FE34DB093EA4EB6A630F7D8"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_25F8E4B5FE93E7D4E8A2FBF458667CC3"
         "OwnerKey" = "8:_38EF13AE128A40DBB3F185A5679FC70C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_2A64D93614AC456D85147DBA4D71EDF7"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -39,26 +27,26 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_4298BB7C766BFAE0672B3B5D233BE4EC"
+        "MsmKey" = "8:_57231FBA769A472B93540DBE45E874D6"
         "OwnerKey" = "8:_38EF13AE128A40DBB3F185A5679FC70C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_51E647D3F34835186D07BAE0204D1728"
-        "OwnerKey" = "8:_38EF13AE128A40DBB3F185A5679FC70C"
+        "MsmKey" = "8:_A411C30605D34D69A6F3BE1BBFC35690"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_7BFF05FEBE1DFA7DE1893CCDD72C113D"
-        "OwnerKey" = "8:_38EF13AE128A40DBB3F185A5679FC70C"
+        "MsmKey" = "8:_A668EA160CEC48909416E3153A46C5E2"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_DC3C7019CDE3499AB9BF8E1B6C02F332"
-        "OwnerKey" = "8:_38EF13AE128A40DBB3F185A5679FC70C"
+        "MsmKey" = "8:_E3B856C3E73A48759A03FFAE34FC8ADD"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -92,6 +80,19 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.0,Profile=Client"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4 Client Profile (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.0,Profile=Client"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
             }
         }
         "Release"
@@ -151,26 +152,6 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1FD083311FE34DB093EA4EB6A630F7D8"
-            {
-            "SourcePath" = "8:..\\..\\..\\..\\SDK\\QT_4_7_2\\plugins\\imageformats\\qico4.dll"
-            "TargetName" = "8:qico4.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_F51A5964C56D4E8487DE318A54D4DB13"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_25F8E4B5FE93E7D4E8A2FBF458667CC3"
             {
             "SourcePath" = "8:OPENGL32.dll"
@@ -191,9 +172,9 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2A64D93614AC456D85147DBA4D71EDF7"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A411C30605D34D69A6F3BE1BBFC35690"
             {
-            "SourcePath" = "8:..\\..\\..\\..\\SDK\\QT_4_7_2\\plugins\\imageformats\\qjpeg4.dll"
+            "SourcePath" = "8:..\\..\\..\\SDK\\QT\\4_7_3\\plugins\\imageformats\\qjpeg4.dll"
             "TargetName" = "8:qjpeg4.dll"
             "Tag" = "8:"
             "Folder" = "8:_F51A5964C56D4E8487DE318A54D4DB13"
@@ -211,12 +192,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4298BB7C766BFAE0672B3B5D233BE4EC"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A668EA160CEC48909416E3153A46C5E2"
             {
-            "SourcePath" = "8:QtCore4.dll"
-            "TargetName" = "8:QtCore4.dll"
+            "SourcePath" = "8:..\\..\\..\\SDK\\QT\\4_7_3\\plugins\\imageformats\\qico4.dll"
+            "TargetName" = "8:qico4.dll"
             "Tag" = "8:"
-            "Folder" = "8:_9F524938FC054469B59F5A991C9DDCF2"
+            "Folder" = "8:_F51A5964C56D4E8487DE318A54D4DB13"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -228,15 +209,15 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_51E647D3F34835186D07BAE0204D1728"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E3B856C3E73A48759A03FFAE34FC8ADD"
             {
-            "SourcePath" = "8:QtOpenGL4.dll"
-            "TargetName" = "8:QtOpenGL4.dll"
+            "SourcePath" = "8:..\\..\\..\\SDK\\QT\\4_7_3\\plugins\\imageformats\\qgif4.dll"
+            "TargetName" = "8:qgif4.dll"
             "Tag" = "8:"
-            "Folder" = "8:_9F524938FC054469B59F5A991C9DDCF2"
+            "Folder" = "8:_F51A5964C56D4E8487DE318A54D4DB13"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -248,27 +229,7 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7BFF05FEBE1DFA7DE1893CCDD72C113D"
-            {
-            "SourcePath" = "8:QtGui4.dll"
-            "TargetName" = "8:QtGui4.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_9F524938FC054469B59F5A991C9DDCF2"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F4607148522742DF82B9D274663D49C7"
@@ -370,7 +331,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:lib_ar_gui_test"
         "ProductCode" = "8:{4F4568A0-39DD-4AB6-B90C-A9758BA2D423}"
-        "PackageCode" = "8:{034142D3-A115-4EBB-A5A1-8C85B3287E44}"
+        "PackageCode" = "8:{DCC205CE-5D99-4787-99CF-E7B2D1BB1353}"
         "UpgradeCode" = "8:{C6D55D65-64A5-44B7-ACE9-8C7749245E02}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -914,7 +875,7 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_DC3C7019CDE3499AB9BF8E1B6C02F332"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_57231FBA769A472B93540DBE45E874D6"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
