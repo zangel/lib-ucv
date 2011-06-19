@@ -80,12 +80,10 @@ public class FiducialTrackerTest extends android.test.AndroidTestCase
 		final List<Integer> detectedMarkerIds=new ArrayList<Integer>();
 		tracker.setCallback( new com.baldzarika.ar.Tracker.Callback()
 			{
-				@Override
 				public void onRunningStateChanged(com.baldzarika.ar.Tracker t, int rs)
 				{
 				}
 				
-				@Override
 				public void onMarkerStateChanged(MarkerState ms, int sc)
 				{
 					if(sc==com.baldzarika.ar.Tracker.MarkerState.SC_DETECTION && ms!=null && ms.isDetected())

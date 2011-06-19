@@ -1,5 +1,4 @@
 LOCAL_PATH := $(call my-dir)
-
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := com.baldzarika.ar
@@ -8,9 +7,9 @@ LOCAL_CFLAGS	+= -fvisibility=hidden -fvisibility-inlines-hidden
 
 LOCAL_C_INCLUDES	:=	$(ANDROID_CPP_SDK)/j2cpp \
 						$(ANDROID_CPP_SDK)/platforms/android-7 \
-						$(ANDROID_BOOST_INCLUDE_DIR) \
-						$(ANDROID_OPENCV_ROOT)/3rdparty/libpng \
-						$(ANDROID_OPENCV_ROOT)/3rdparty/include \
+						$(LOCAL_PATH)/../../../3rd_party/android/boost/build/include \
+						$(LOCAL_PATH)/../../../3rd_party/android/libpng/include \
+						$(LOCAL_PATH)/../../../3rd_party/android/zlib/include \
 						$(LOCAL_PATH)/../../../3rd_party/libkdtree \
 						$(LOCAL_PATH)/../../../lib_math/include \
 						$(LOCAL_PATH)/../../../lib_ucv/include \
@@ -35,8 +34,9 @@ LOCAL_SRC_FILES :=	src/support.cpp \
 					../../../lib_ucv/src/baldzarika/ucv/surf.cpp \
 					../../../lib_ucv/src/baldzarika/ucv/homography.cpp
 					
-LOCAL_LDLIBS    	:=	-L$(ANDROID_BOOST_LIB_DIR) \
-						-L$(ANDROID_OPENCV_ROOT)/android/build/obj/local/armeabi \
+LOCAL_LDLIBS    	:=	-L$(LOCAL_PATH)/../../../3rd_party/android/boost/build/lib \
+						-L$(LOCAL_PATH)/../../../3rd_party/android/libpng/obj/local/armeabi \
+						-L$(LOCAL_PATH)/../../../3rd_party/android/zlib/obj/local/armeabi \
 						-lboost_system \
 						-lboost_thread \
 						-lpng \

@@ -83,14 +83,13 @@ public class MarkerlessTrackerTest extends android.test.AndroidTestCase
 		assertTrue(tracker.addMarker(bentenMarker));
 		
 		final List<Marker> detectedMarkers=new ArrayList<Marker>();
+		
 		tracker.setCallback( new com.baldzarika.ar.Tracker.Callback()
 			{
-				@Override
 				public void onRunningStateChanged(com.baldzarika.ar.Tracker t, int rs)
 				{
 				}
 				
-				@Override
 				public void onMarkerStateChanged(MarkerState ms, int sc)
 				{
 					if(sc==com.baldzarika.ar.Tracker.MarkerState.SC_DETECTION && ms!=null && ms.isDetected())
