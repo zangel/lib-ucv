@@ -117,10 +117,6 @@ namespace baldzarika { namespace ucv {
 		void						compute_descriptor(feature_point_t &fp);
 		
 
-
-		template < typename T > T		haar_x(math::point2i const &p, boost::uint32_t s);
-		template < typename T > T		haar_y(math::point2i const &p, boost::uint32_t s);
-
 		template < boost::uint32_t I, boost::uint32_t F >
 		math::fixed_point<I,F>			get_angle(math::fixed_point<I,F> const &x, math::fixed_point<I,F> const &y);
 

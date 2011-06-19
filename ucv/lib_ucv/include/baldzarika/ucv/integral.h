@@ -6,31 +6,28 @@
 namespace baldzarika { namespace ucv {
 		
 	template <typename IVT, typename RT>
-	RT box_integral(IVT const &iv, math::point2i const &p, math::size2ui const &s)
+	static inline RT box_integral(IVT const &iv, boost::int32_t x, boost::int32_t y, boost::uint32_t w, boost::uint32_t h)
 	{
 		typedef typename IVT::value_type iv_pixel_t;
 		typedef typename gil::channel_type<iv_pixel_t>::type iv_channel_t;
 
-		static RT const _zero_rt=0;
-		static iv_channel_t const _zero_iv=0;
+		boost::int32_t x1=std::min<boost::int32_t>(x,iv.width())-1;
+		boost::int32_t y1=std::min<boost::int32_t>(y,iv.height())-1;
+		boost::int32_t x2=std::min<boost::int32_t>(x+w,iv.width())-1;
+		boost::int32_t y2=std::min<boost::int32_t>(y+h,iv.height())-1;
 
-		boost::int32_t x1=std::min<boost::int32_t>(p.x(),iv.width())-1;
-		boost::int32_t y1=std::min<boost::int32_t>(p.y(),iv.height())-1;
-		boost::int32_t x2=std::min<boost::int32_t>(p.x()+s.width(),iv.width())-1;
-		boost::int32_t y2=std::min<boost::int32_t>(p.y()+s.height(),iv.height())-1;
-
-		iv_channel_t A=((y1>=0 && x1>=0)?iv(x1,y1).operator iv_channel_t():_zero_iv);
-		iv_channel_t B=((y1>=0 && x2>=0)?iv(x2,y1).operator iv_channel_t():_zero_iv);
-		iv_channel_t C=((y2>=0 && x1>=0)?iv(x1,y2).operator iv_channel_t():_zero_iv);
-		iv_channel_t D=((y2>=0 && x2>=0)?iv(x2,y2).operator iv_channel_t():_zero_iv);
-
-		//float A_=static_cast<float>(A);
-		//float B_=static_cast<float>(B);
-		//float C_=static_cast<float>(C);
-		//float D_=static_cast<float>(D);
+		iv_channel_t A=((y1>=0 && x1>=0)?iv(x1,y1).operator iv_channel_t():math::constant::zero<iv_channel_t>());
+		iv_channel_t B=((y1>=0 && x2>=0)?iv(x2,y1).operator iv_channel_t():math::constant::zero<iv_channel_t>());
+		iv_channel_t C=((y2>=0 && x1>=0)?iv(x1,y2).operator iv_channel_t():math::constant::zero<iv_channel_t>());
+		iv_channel_t D=((y2>=0 && x2>=0)?iv(x2,y2).operator iv_channel_t():math::constant::zero<iv_channel_t>());
 
 		return RT((A-B)-(C-D));
-		//return std::max( _zero_rt, RT(A-B-C+D) );
+	}
+
+	template <typename IVT, typename RT>
+	RT box_integral(IVT const &iv, math::point2i const &p, math::size2ui const &s)
+	{
+		return box_integral<IVT,RT>(iv,p.x(), p.y(), s.width(), s.height());
 	}
 
 
