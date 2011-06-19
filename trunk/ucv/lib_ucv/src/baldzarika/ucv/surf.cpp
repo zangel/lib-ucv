@@ -1,6 +1,7 @@
 #include <baldzarika/ucv/config.h>
 #include <baldzarika/ucv/surf.h>
 #include <baldzarika/ucv/integral.h>
+#include <baldzarika/ucv/haar_wavelets.h>
 
 namespace baldzarika { namespace ucv  {
 
@@ -189,19 +190,19 @@ namespace baldzarika { namespace ucv  {
 				boost::int32_t ix4=ix-b;
 				boost::int32_t ix5=ix+1;
 
-				response_t d_xx3=box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix3, iy2), math::size2ui(l, l1));
-				response_t d_xx=box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix4, iy2), math::size2ui(w, l1))-
+				response_t d_xx3=box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, ix3, iy2, l, l1);
+				response_t d_xx=box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, ix4, iy2, w, l1)-
 					(d_xx3.operator<<(1)+d_xx3);
 				
-				response_t d_yy3=box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix2, iy3), math::size2ui(l1, l));
-				response_t d_yy=box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix2, iy4), math::size2ui(l1, w))-
+				response_t d_yy3=box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, ix2, iy3, l1, l);
+				response_t d_yy=box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, ix2, iy4, l1, w)-
 					(d_yy3.operator<<(1)+d_yy3);
 				
 				response_t d_xy=
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix5, iy1), math::size2ui(l, l))+
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix1, iy5), math::size2ui(l, l))-
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix1, iy1), math::size2ui(l, l))-
-					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, math::point2i(ix5, iy5), math::size2ui(l, l));
+					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, ix5, iy1, l, l)+
+					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, ix1, iy5, l, l)-
+					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, ix1, iy1, l, l)-
+					box_integral<const_integral_view_t,response_t>(m_surf.m_integral_view, ix5, iy5, l, l);
 	
 				d_xx*=s_coeff;
 				d_yy*=s_coeff;
@@ -782,19 +783,17 @@ namespace baldzarika { namespace ucv  {
 		{
 			dec_t gauss=dec_t(gauss_25[std::abs(orientation_indices::get().m_values[k][0])][std::abs(orientation_indices::get().m_values[k][1])]);
 				
-			res_x[k]=gauss*haar_x<dec_t>(
-				math::point2i(
-					pt.x()+orientation_indices::get().m_values[k][0]*s,
-					pt.y()+orientation_indices::get().m_values[k][1]*s
-				),
-				4*s
+			res_x[k]=gauss*haar2d_x<const_integral_view_t,dec_t>(
+				m_integral_view,
+				pt.x()+orientation_indices::get().m_values[k][0]*s,
+				pt.y()+orientation_indices::get().m_values[k][1]*s,
+				s<<2
 			);
-			res_y[k]=gauss*haar_y<dec_t>(
-				math::point2i(
-					pt.x()+orientation_indices::get().m_values[k][0]*s,
-					pt.y()+orientation_indices::get().m_values[k][1]*s
-				),
-				4*s
+			res_y[k]=gauss*haar2d_y<const_integral_view_t,dec_t>(
+				m_integral_view,
+				pt.x()+orientation_indices::get().m_values[k][0]*s,
+				pt.y()+orientation_indices::get().m_values[k][1]*s,
+				s<<2
 			);
 			angle[k]=get_angle(res_x[k],res_y[k]);
 		}
@@ -922,14 +921,18 @@ namespace baldzarika { namespace ucv  {
 						dec_t gauss_s1=gaussian(xs-sample_x, ys-sample_y, c_5i2*fp.m_scale);
 						//dec_t gauss_s1=gauss_25_lut<dec_t::IS,dec_t::FS, 16, 2>::get()(dec_t(xs-sample_x)*inv_scale,dec_t(ys-sample_y)*inv_scale);
 
-						dec_t rx=haar_x<dec_t>(
-							math::point2i(sample_x, sample_y),
-							2*ui_scale
+						dec_t rx=haar2d_x<const_integral_view_t,dec_t>(
+							m_integral_view,
+							sample_x,
+							sample_y,
+							ui_scale<<1
 						);
 							
-						dec_t ry=haar_y<dec_t>(
-							math::point2i(sample_x, sample_y),
-							2*ui_scale
+						dec_t ry=haar2d_y<const_integral_view_t,dec_t>(
+							m_integral_view,
+							sample_x,
+							sample_y,
+							ui_scale<<1
 						);
 
 						dec_t rrx=gauss_s1*(ry*co-rx*si);
@@ -976,20 +979,6 @@ namespace baldzarika { namespace ucv  {
 		for(boost::uint32_t i=0;i<64;++i)
 			fp.m_desc[i]*=len;
 
-	}
-
-	template < typename T >
-	T surf::haar_x(math::point2i const &p, boost::uint32_t s)
-	{
-		return	box_integral<const_integral_view_t, T>(m_integral_view, math::point2i(p.x(),p.y()-s/2), math::size2ui(s/2, s))-
-				box_integral<const_integral_view_t, T>(m_integral_view, math::point2i(p.x()-s/2,p.y()-s/2), math::size2ui(s/2, s));
-	}
-	
-	template < typename T >
-	T surf::haar_y(math::point2i const &p, boost::uint32_t s)
-	{
-		return	box_integral<const_integral_view_t, T>(m_integral_view, math::point2i(p.x()-s/2,p.y()), math::size2ui(s, s/2))-
-				box_integral<const_integral_view_t, T>(m_integral_view, math::point2i(p.x()-s/2,p.y()-s/2), math::size2ui(s, s/2));
 	}
 
 	template < boost::uint32_t I, boost::uint32_t F >
