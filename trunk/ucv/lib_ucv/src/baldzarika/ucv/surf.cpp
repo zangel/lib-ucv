@@ -3,6 +3,7 @@
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/haar_wavelets.h>
 #include <baldzarika/ucv/estimate_rotation.h>
+#include <baldzarika/ucv/extract_surf_descriptor.h>
 
 namespace baldzarika { namespace ucv  {
 
@@ -744,6 +745,15 @@ namespace baldzarika { namespace ucv  {
 	
 	void surf::compute_descriptor(feature_point_t &fp)
 	{
+#if 1
+		extract_surf_descriptor<
+			const_integral_view_t,
+			feature_point_t::value_type,
+			feature_point_t::desc_value_type,
+			feature_point_t::BLOCK_SIZE,
+			7
+		>(m_integral_view,fp);
+#else
 		typedef feature_point_t::desc_value_type dec_t;
 
 		static dec_t const c_5i2=2.5f;
@@ -883,7 +893,7 @@ namespace baldzarika { namespace ucv  {
 		
 		for(boost::uint32_t i=0;i<64;++i)
 			fp.m_desc[i]*=len;
-
+#endif
 	}
 
 	template < boost::uint32_t I, boost::uint32_t F >

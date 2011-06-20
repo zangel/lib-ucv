@@ -12,7 +12,7 @@ namespace baldzarika { namespace ucv {
 	public:
 
 		static boost::uint32_t const SAMPLES_PER_BLOCK;
-		typedef feature_point< math::real_t, math::fixed_point<10, 21>, 4 > feature_point_t;
+		typedef feature_point< math::real_t, math::fixed_point<10, 21>, 3 > feature_point_t;
 
 		typedef std::vector< feature_point_t > fps_array_t;
 		typedef KDTree::KDTree<2, feature_point_t, feature_point_t::position_accessor> fps_by_pos_tree_t;

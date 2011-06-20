@@ -22,13 +22,13 @@ namespace baldzarika { namespace ucv {
 	template <typename IVT, typename RT>
 	static inline RT haar2d_x(IVT const &iv, math::point2i const &p, boost::uint32_t s)
 	{
-		return haar2d_x<IVT,RT>(iv, p.x()(), p.y(), s);
+		return haar2d_x<IVT,RT>(iv, p.x(), p.y(), s);
 	}
 
 	template <typename IVT, typename RT>
 	static inline RT haar2d_y(IVT const &iv, math::point2i const &p, boost::uint32_t s)
 	{
-		return haar2d_y<IVT,RT>(iv, p.x()(), p.y(), s);
+		return haar2d_y<IVT,RT>(iv, p.x(), p.y(), s);
 	}
 
 } //namespace ucv

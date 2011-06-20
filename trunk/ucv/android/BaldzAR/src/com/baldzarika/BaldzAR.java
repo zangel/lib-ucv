@@ -127,22 +127,19 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
     }
 	
 	//android.view.SurfaceHolder.Callback
-    @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
     {
     	startCameraPreview();
     	updateHUDButtons();
     }
     
-    @Override
-	public void surfaceCreated(SurfaceHolder holder)
+    public void surfaceCreated(SurfaceHolder holder)
 	{
     	openCamera();
     	updateHUDButtons();
     }
     
-    @Override
-	public void surfaceDestroyed(SurfaceHolder holder)
+    public void surfaceDestroyed(SurfaceHolder holder)
 	{
     	stopCameraPreview();
     	closeCamera();
@@ -150,18 +147,15 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
     }
     
 	//android.opengl.GLSurfaceView.Renderer
-	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config)
 	{
 	}
 
-	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height)
 	{
 		gl.glViewport(0, 0, width, height);
 	}
     
-    @Override
     public void onDrawFrame(GL10 gl)
     {
     	gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -216,7 +210,6 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
     }
     
 	//com.baldzarika.ar.Tracker.Callback
-    @Override
     public void onRunningStateChanged(com.baldzarika.ar.Tracker tracker, int rs)
     {
     	m_Handler.removeCallbacks(m_HUDButtonsUpdateTask);
@@ -375,7 +368,6 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
     
     private class HUDButtonsUpdateTask implements Runnable
     {
-    	@Override
     	public void run()
     	{
     		updateHUDButtons();

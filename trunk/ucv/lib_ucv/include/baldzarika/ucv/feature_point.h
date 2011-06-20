@@ -8,6 +8,7 @@ namespace baldzarika { namespace ucv {
 		: public math::point2<T>
 	{
 	public:
+		static boost::uint32_t const BLOCK_SIZE=BS;
 		static boost::uint32_t const DESCRIPTOR_SIZE=4*BS*BS;
 		typedef T value_type;
 		typedef math::point2<value_type> point2_t;

@@ -209,7 +209,7 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 
 	//img 1
-	cv::Mat cv_img1=cv::imread("box.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img1=cv::imread("test_img2.png", CV_LOAD_IMAGE_GRAYSCALE);
 	
 	ucv::gil::gray8_image_t gil_gray_img1(cv_img1.cols, cv_img1.rows);
 	ucv::gil::resize_view(
@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	ucv::integral(ucv::gil::view(gray_img1), ucv::gil::view(int_img1));
 	
 	//img2
-	cv::Mat cv_img2=cv::imread("box_in_scene.png", CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img2=cv::imread("test_img2_match.png", CV_LOAD_IMAGE_GRAYSCALE);
 	
 	ucv::gil::gray8_image_t gil_gray_img2(cv_img2.cols, cv_img2.rows);
 	ucv::gil::resize_view(
@@ -298,7 +298,7 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 	the_surf1.describe(fps1);
 
-	ucv::surf the_surf2(math::size2ui(gray_img2.width(), gray_img2.height()), 3, 4, 2, 1.0e-4f);
+	ucv::surf the_surf2(math::size2ui(gray_img2.width(), gray_img2.height()), 3, 4, 2, 4.0e-4f);
 
 	the_surf2.set_integral_view(ucv::gil::const_view(int_img2));
 	the_surf2.build_response_layers();
@@ -334,8 +334,8 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	
 	std::cout << "found " << matches.size() << " matches!" << std::endl;
 
-	cv::Mat cv_img1_rgb=cv::imread("box.png");
-	cv::Mat cv_img2_rgb=cv::imread("box_in_scene.png");
+	cv::Mat cv_img1_rgb=cv::imread("test_img2.png");
+	cv::Mat cv_img2_rgb=cv::imread("test_img2_match.png");
 	
 	std::vector<cv::Point2f> pts1,pts2;
 
