@@ -2,52 +2,12 @@
 #include <baldzarika/ucv/surf.h>
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/haar_wavelets.h>
+#include <baldzarika/ucv/estimate_rotation.h>
 
 namespace baldzarika { namespace ucv  {
 
 	namespace {
 		
-		static surf::feature_point_t::desc_value_type const gauss_25[7][7]=
-		{
-			{	0.02350693969273,	0.01849121369071,	0.01239503121241,	0.00708015417522,	0.00344628101733,	0.00142945847484,	0.00050524879060	},
-			{	0.02169964028389,	0.01706954162243,	0.01144205592615,	0.00653580605408,	0.00318131834134,	0.00131955648461,	0.00046640341759	},
-			{	0.01706954162243,	0.01342737701584,	0.00900063997939,	0.00514124713667,	0.00250251364222,	0.00103799989504,	0.00036688592278	},
-			{	0.01144205592615,	0.00900063997939,	0.00603330940534,	0.00344628101733,	0.00167748505986,	0.00069579213743,	0.00024593098864	},
-			{	0.00653580605408,	0.00514124713667,	0.00344628101733,	0.00196854695367,	0.00095819467066,	0.00039744277546,	0.00014047800980	},
-			{	0.00318131834134,	0.00250251364222,	0.00167748505986,	0.00095819467066,	0.00046640341759,	0.00019345616757,	0.00006837798818	},
-			{	0.00131955648461,	0.00103799989504,	0.00069579213743,	0.00039744277546,	0.00019345616757,	0.00008024231247,	0.00002836202103	}
-		};
-
-		class orientation_indices
-		{
-		private:
-			orientation_indices()
-			{
-				boost::int32_t idx=0;
-				for(boost::int32_t i=-6;i<=6;++i)
-				{
-					for(boost::int32_t j=-6;j<=6;++j)
-					{
-						if(i*i+j*j<36)
-						{
-							m_values[idx][0]=i;
-							m_values[idx][1]=j;
-							idx++;
-						}
-					}
-				}
-			}
-
-		public:
-			static orientation_indices const& get()
-			{
-				static orientation_indices _orientation_indices;
-				return _orientation_indices;
-			}
-		public:
-			boost::int32_t	m_values[109][2];
-		};
-
 		template < boost::uint32_t I, boost::uint32_t F, boost::uint32_t S, boost::uint32_t SS >
 		class gauss_25_lut
 		{
@@ -765,76 +725,21 @@ namespace baldzarika { namespace ucv  {
 	void surf::compute_orientation(feature_point_t &fp)
 	{
 		typedef feature_point_t::desc_value_type dec_t;
-		static dec_t const r_3i20=0.15f;
-		//static dec_t const r_2=2.0f;
-
-		static dec_t const r_3i2_sq=2.25f;
-
-		
-		math::point2ui pt(
-			static_cast<boost::uint32_t>(std::floor(fp.x()+math::constant::half<feature_point_t::value_type>())),
-			static_cast<boost::uint32_t>(std::floor(fp.y()+math::constant::half<feature_point_t::value_type>()))
+#if 1
+		fp.m_orientation=estimate_rotation<const_integral_view_t,dec_t,3>(
+			m_integral_view,
+			static_cast<boost::int32_t>(std::floor(fp.x()+math::constant::half<feature_point_t::value_type>())),
+			static_cast<boost::int32_t>(std::floor(fp.y()+math::constant::half<feature_point_t::value_type>())),
+			fp.m_scale
 		);
-		boost::uint32_t s=static_cast<boost::uint32_t>(std::floor(fp.m_scale+math::constant::half<dec_t>()));
-
-		dec_t res_x[109], res_y[109], angle[109];
-
-		for(boost::uint32_t k=0;k<109;++k)
-		{
-			dec_t gauss=dec_t(gauss_25[std::abs(orientation_indices::get().m_values[k][0])][std::abs(orientation_indices::get().m_values[k][1])]);
-				
-			res_x[k]=gauss*haar2d_x<const_integral_view_t,dec_t>(
-				m_integral_view,
-				pt.x()+orientation_indices::get().m_values[k][0]*s,
-				pt.y()+orientation_indices::get().m_values[k][1]*s,
-				s<<2
-			);
-			res_y[k]=gauss*haar2d_y<const_integral_view_t,dec_t>(
-				m_integral_view,
-				pt.x()+orientation_indices::get().m_values[k][0]*s,
-				pt.y()+orientation_indices::get().m_values[k][1]*s,
-				s<<2
-			);
-			angle[k]=get_angle(res_x[k],res_y[k]);
-		}
-
-		dec_t max_sum=math::constant::zero<dec_t>();
-		dec_t orientation=math::constant::zero<dec_t>();
-
-
-		for(boost::uint32_t a=0;a<42;++a)
-		{
-			dec_t ang1=dec_t(a)*r_3i20;
-			dec_t ang2=((ang1+math::constant::pi_i3<dec_t>())>math::constant::pi_2<dec_t>()?
-				ang1-math::constant::pi_5i3<dec_t>():
-				ang1+math::constant::pi_i3<dec_t>());
-
-			dec_t sum_x=math::constant::zero<dec_t>();
-			dec_t sum_y=math::constant::zero<dec_t>();
-
-			for(boost::uint32_t k=0;k<109;++k)
-			{
-				dec_t const &ang=angle[k];
-				if(ang1<ang2 && ang1<ang && ang<ang2)
-				{
-					sum_x+=res_x[k];  
-					sum_y+=res_y[k];
-				} 
-				else
-				if(ang2<ang1 && ((ang>math::constant::zero<dec_t>() && ang<ang2) || (ang>ang1 && ang<math::constant::pi_2<dec_t>())))
-				{
-					sum_x+=res_x[k];
-					sum_y+=res_y[k];
-				}
-			}
-			dec_t this_sum=sum_x*sum_x+sum_y*sum_y;
-			if(this_sum>max_sum) 
-			{
-				max_sum=this_sum;
-				orientation=get_angle(sum_x, sum_y);
-			}
-		}
-		fp.m_orientation=orientation;
+#else
+		fp.m_orientation=estimate_rotation_fast<const_integral_view_t,dec_t>(
+			m_integral_view,
+			static_cast<boost::int32_t>(std::floor(fp.x()+math::constant::half<feature_point_t::value_type>())),
+			static_cast<boost::int32_t>(std::floor(fp.y()+math::constant::half<feature_point_t::value_type>())),
+			static_cast<boost::uint32_t>(std::floor(fp.m_scale+math::constant::half<dec_t>()))
+		);
+#endif
 	}
 	
 	void surf::compute_descriptor(feature_point_t &fp)
@@ -980,39 +885,6 @@ namespace baldzarika { namespace ucv  {
 			fp.m_desc[i]*=len;
 
 	}
-
-	template < boost::uint32_t I, boost::uint32_t F >
-	math::fixed_point<I,F> surf::get_angle(math::fixed_point<I,F> const &x, math::fixed_point<I,F> const &y)
-	{
-		if(y<math::constant::zero< math::fixed_point<I,F> >())
-		{
-			if(x<math::constant::zero< math::fixed_point<I,F> >()) return math::constant::pi< math::fixed_point<I,F> >()+std::atan2(y,x);
-			if(x>math::constant::zero< math::fixed_point<I,F> >()) return math::constant::pi_2< math::fixed_point<I,F> >()-std::atan2(-y,x);
-		}
-		else
-		{
-			if(x<math::constant::zero< math::fixed_point<I,F> >()) return math::constant::pi< math::fixed_point<I,F> >()-std::atan2(-y,x);
-			if(x>math::constant::zero< math::fixed_point<I,F> >()) return std::atan2(y,x);
-		}
-		return math::constant::zero< math::fixed_point<I,F> >();
-	}
-
-	
-	float surf::get_angle(float x, float y)
-	{
-		if(y<0.0f)
-		{
-			if(x<0.0f) return math::constant::pi<float>()+std::atan2(y,x);
-			if(x>0.0f) return math::constant::pi_2<float>()-std::atan2(-y,x);
-		}
-		else
-		{
-			if(x<0.0f) return math::constant::pi<float>()-std::atan2(-y,x);
-			if(x>0.0f) return std::atan2(y,x);
-		}
-		return 0.0f;
-	}
-
 
 	template < boost::uint32_t I, boost::uint32_t F >
 	math::fixed_point<I,F> surf::gaussian(boost::int32_t x, boost::int32_t y, math::fixed_point<I,F> const &sig)

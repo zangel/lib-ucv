@@ -95,6 +95,7 @@
     <ClInclude Include="include\baldzarika\ucv\contour.h" />
     <ClInclude Include="include\baldzarika\ucv\convert.h" />
     <ClInclude Include="include\baldzarika\ucv\corners_subpixel.h" />
+    <ClInclude Include="include\baldzarika\ucv\estimate_rotation.h" />
     <ClInclude Include="include\baldzarika\ucv\feature_point.h" />
     <ClInclude Include="include\baldzarika\ucv\gaussian_blur.h" />
     <ClInclude Include="include\baldzarika\ucv\good_features_detector.h" />
@@ -116,6 +117,7 @@
     <ClInclude Include="include\baldzarika\ucv\resize.h" />
     <ClInclude Include="include\baldzarika\ucv\sobel.h" />
     <ClInclude Include="include\baldzarika\ucv\surf.h" />
+    <ClInclude Include="include\baldzarika\ucv\extract_surf_descriptor.h" />
     <ClInclude Include="include\baldzarika\ucv\threshold.h" />
     <ClInclude Include="include\baldzarika\ucv\ublas_fixed_point_type_traits.h" />
     <ClInclude Include="include\baldzarika\ucv\warp.h" />

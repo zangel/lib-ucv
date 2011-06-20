@@ -116,12 +116,6 @@ namespace baldzarika { namespace ucv {
 		void						compute_orientation(feature_point_t &fp);
 		void						compute_descriptor(feature_point_t &fp);
 		
-
-		template < boost::uint32_t I, boost::uint32_t F >
-		math::fixed_point<I,F>			get_angle(math::fixed_point<I,F> const &x, math::fixed_point<I,F> const &y);
-
-		float							get_angle(float x, float y);
-
 		template < boost::uint32_t I, boost::uint32_t F >
 		static math::fixed_point<I,F>	gaussian(boost::int32_t x, boost::int32_t y, math::fixed_point<I,F> const &sig);
 
