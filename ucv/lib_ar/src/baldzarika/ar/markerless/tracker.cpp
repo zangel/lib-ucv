@@ -4,18 +4,18 @@
 
 namespace baldzarika { namespace ar { namespace markerless {
 
-	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=2;
+	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=3;
 	boost::uint32_t const tracker::DEFAULT_SURF_INTERVALS=4;
 	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=2;
-	float const tracker::DEFAULT_SURF_TRESHOLD=1.5e-3f;
+	float const tracker::DEFAULT_SURF_TRESHOLD=4.0e-4f;
 
 	boost::uint32_t const tracker::DEFAULT_KLT_HALF_WIN_SIZE=5;
 	boost::uint32_t const tracker::DEFAULT_KLT_LEVELS=4;
 	boost::uint32_t const tracker::DEFAULT_KLT_MAX_ITERATIONS=2;
 	float const	tracker::DEFAULT_KLT_EPSILON=1.0e-4f;
 
-	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=5;
-	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=10;
+	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=8;
+	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=16;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=1.0f;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=1.3e-3f;
 	float const	tracker::DEFAULT_DETECTION_MAX_DIFF_NORM=5.0e-3f;
@@ -359,9 +359,9 @@ namespace baldzarika { namespace ar { namespace markerless {
 		{
 			ucv::surf marker_surf(
 				ms.m_marker->get_size(),
-				2, //m_surf.octaves(),
+				3, //m_surf.octaves(),
 				4, //m_surf.intervals(),
-				1, //m_surf.sample_step(),
+				2, //m_surf.sample_step(),
 				4.0e-4f//m_surf.treshold()
 			);
 
