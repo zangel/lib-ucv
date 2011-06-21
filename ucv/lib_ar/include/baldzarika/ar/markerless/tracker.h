@@ -23,6 +23,7 @@ namespace baldzarika { namespace ar { namespace markerless {
 		static boost::uint32_t const	DEFAULT_SURF_INTERVALS;
 		static boost::uint32_t const	DEFAULT_SURF_SAMPLE_STEPS;
 		static float const				DEFAULT_SURF_TRESHOLD;
+		static float const				DEFAULT_SURF_MATCH_DIST;
 
 		static boost::uint32_t const	DEFAULT_KLT_HALF_WIN_SIZE;
 		static boost::uint32_t const	DEFAULT_KLT_LEVELS;
