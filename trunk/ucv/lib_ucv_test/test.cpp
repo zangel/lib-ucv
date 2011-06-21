@@ -48,6 +48,7 @@ BOOST_AUTO_TEST_CASE( create_open_cv_window )
 	//cv::namedWindow(OPENCV_WND_NAME2);
 }
 
+#if 0
 BOOST_AUTO_TEST_CASE( test_convert )
 {
 	namespace ucv=baldzarika::ucv;
@@ -194,7 +195,7 @@ BOOST_AUTO_TEST_CASE( test_surf )
 	cv::waitKey();
 }
 
-
+#endif
 
 BOOST_AUTO_TEST_CASE( test_surf_match )
 {
@@ -264,31 +265,31 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	the_surf1.build_response_layers();
 	std::vector<ucv::surf::feature_point_t> fps1;
 	boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
-	for(int i=0;i<100;++i)
+	for(int i=0;i<1;++i)
 		the_surf1.detect(fps1);
 	boost::posix_time::ptime finish=boost::posix_time::microsec_clock::local_time();
-	std::cout << "detect<vec>: " << float((finish-start).total_microseconds())/100.0f << std::endl;
+	std::cout << "detect<vec>: " << float((finish-start).total_microseconds())/1.0f << std::endl;
 
 
 	ucv::surf::fps_by_pos_tree_t ffps1;
 	boost::posix_time::ptime start2=boost::posix_time::microsec_clock::local_time();
-	for(int i=0;i<100;++i)
+	for(int i=0;i<1;++i)
 		the_surf1.detect(ffps1);
 	boost::posix_time::ptime finish2=boost::posix_time::microsec_clock::local_time();
-	std::cout << "detect<pos>: " << float((finish2-start2).total_microseconds())/100.0f << std::endl;
+	std::cout << "detect<pos>: " << float((finish2-start2).total_microseconds())/1.0f << std::endl;
 
 	ucv::surf::fps_by_desc_tree_t ffps2;
 	boost::posix_time::ptime start3=boost::posix_time::microsec_clock::local_time();
-	for(int i=0;i<100;++i)
-	the_surf1.detect(ffps2);
+	for(int i=0;i<1;++i)
+		the_surf1.detect(ffps2);
 	boost::posix_time::ptime finish3=boost::posix_time::microsec_clock::local_time();
-	std::cout << "detect<desc>: " << float((finish3-start3).total_microseconds())/100.0f << std::endl;
+	std::cout << "detect<desc>: " << float((finish3-start3).total_microseconds())/1.0f << std::endl;
 
 	boost::posix_time::ptime start4=boost::posix_time::microsec_clock::local_time();
-	for(int i=0;i<100;++i)
+	for(int i=0;i<1;++i)
 		the_surf1.describe(ffps2);
 	boost::posix_time::ptime finish4=boost::posix_time::microsec_clock::local_time();
-	std::cout << "describe<desc>: " << float((finish4-start4).total_microseconds())/100.0f << std::endl;
+	std::cout << "describe<desc>: " << float((finish4-start4).total_microseconds())/1.0f << std::endl;
 
 	std::cout << "detect<vec>.size()=" << fps1.size() << " detect<pos>.size()=" << ffps1.size() << " detect<desc>.size()=" << ffps2.size() <<std::endl;
 	
@@ -318,18 +319,18 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 
 	ffps2.optimise();
 	boost::posix_time::ptime match_kdtree_start=boost::posix_time::microsec_clock::local_time();
-	for(std::size_t i=0;i<10;++i)
+	for(std::size_t i=0;i<1;++i)
 	{
 		std::vector< std::pair< std::vector< ucv::surf::feature_point_t >::const_iterator, ucv::surf::fps_by_desc_tree_t::const_iterator > > matches_vec_tree;
 		ucv::match_feature_points(fps2, ffps2, matches_vec_tree);
 	}
 	boost::posix_time::ptime match_kdtree_finish=boost::posix_time::microsec_clock::local_time();
-	std::cout << "matches_vec_tree: " << float((match_kdtree_finish-match_kdtree_start).total_microseconds())/10.0f << std::endl;
+	std::cout << "matches_vec_tree: " << float((match_kdtree_finish-match_kdtree_start).total_microseconds())/1.0f << std::endl;
 
 
 
 	std::vector< std::pair< std::vector< ucv::surf::feature_point_t >::const_iterator, ucv::surf::fps_by_desc_tree_t::const_iterator > > matches;
-	ucv::match_feature_points(fps2, ffps2, matches);
+	ucv::match_feature_points(fps2, ffps2, matches, 0.65f);
 
 	
 	std::cout << "found " << matches.size() << " matches!" << std::endl;

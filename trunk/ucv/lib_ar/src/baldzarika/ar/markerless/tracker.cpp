@@ -8,6 +8,7 @@ namespace baldzarika { namespace ar { namespace markerless {
 	boost::uint32_t const tracker::DEFAULT_SURF_INTERVALS=4;
 	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=2;
 	float const tracker::DEFAULT_SURF_TRESHOLD=4.0e-4f;
+	float const tracker::DEFAULT_SURF_MATCH_DIST=0.65f;
 
 	boost::uint32_t const tracker::DEFAULT_KLT_HALF_WIN_SIZE=5;
 	boost::uint32_t const tracker::DEFAULT_KLT_LEVELS=4;
@@ -18,7 +19,7 @@ namespace baldzarika { namespace ar { namespace markerless {
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=16;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=1.0f;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=1.3e-3f;
-	float const	tracker::DEFAULT_DETECTION_MAX_DIFF_NORM=5.0e-3f;
+	float const	tracker::DEFAULT_DETECTION_MAX_DIFF_NORM=4.0e-3f;
 	float const	tracker::DEFAULT_TRACKING_MAX_DIFF_NORM=1.0e-4f;
 
 	namespace {
@@ -399,12 +400,12 @@ namespace baldzarika { namespace ar { namespace markerless {
 			ucv::surf::feature_point_t,
 			std::vector<ucv::surf::feature_point_t>,
 			std::vector<ucv::surf::feature_point_t>
-		>(ms.m_features, ffs, marker_matches);
+		>(ms.m_features, ffs, marker_matches, DEFAULT_SURF_MATCH_DIST);
 
 		if(marker_matches.size()>=m_min_marker_features)
 		{
 			math::matrix33f hm;
-#if 1
+#if 0
 			find_marker_homography(marker_matches, ms.get_marker_size(), hm);
 
 #else

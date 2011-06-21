@@ -37,6 +37,7 @@ namespace baldzarika { namespace ucv {
 		static boost::int32_t samples_center=SPB/2+1;
 
 		boost::uint32_t ui_scale=static_cast<boost::uint32_t>(std::floor(fp.m_scale+math::constant::half<desc_value_t>()));
+		boost::uint32_t ui_scale2=2*ui_scale;
 
 		desc_value_t co=std::cos(fp.m_orientation);
 		desc_value_t si=std::sin(fp.m_orientation);
@@ -52,12 +53,12 @@ namespace baldzarika { namespace ucv {
 		boost::uint32_t count=0;
 
 		desc_value_t cy=math::constant::half<desc_value_t>();
-		for(boost::int32_t regy=-half_region;regy<half_region-FPBS;regy+=SPB-FPBS)//i
+		for(boost::int32_t regy=-half_region;regy<half_region-FPBS;regy+=SPB-FPBS)
 		{
 			desc_value_t cx=math::constant::half<desc_value_t>();
 			boost::int32_t scy=regy+samples_center;
 
-			for(boost::int32_t regx=-half_region;regx<half_region-FPBS;regx+=SPB-FPBS)//j
+			for(boost::int32_t regx=-half_region;regx<half_region-FPBS;regx+=SPB-FPBS)
 			{
 				boost::int32_t scx=regx+samples_center;
 
@@ -98,14 +99,14 @@ namespace baldzarika { namespace ucv {
 							iv,
 							sample_x,
 							sample_y,
-							ui_scale<<1
+							ui_scale2
 						);
 
 						desc_value_t ry=haar2d_y<IVT,desc_value_t>(
 							iv,
 							sample_x,
 							sample_y,
-							ui_scale<<1
+							ui_scale2
 						);
 
 						desc_value_t rrx=gauss_s1*(ry*co-rx*si);

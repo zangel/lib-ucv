@@ -181,7 +181,8 @@ namespace baldzarika { namespace ucv  {
 		//static const response_t inv_4=math::constant::one<response_t>()/response_t(4);
 		//static const response_t r_2=2;
 		static const response_t coeff_1=0.1333f;
-		static response_t const det_eps=1.0e-3f;
+		static const response_t coeff_2=1.0f;
+		static response_t const det_eps=std::numeric_limits<response_t>::epsilon();
 		//static response_t const prec_s=512;
 
 		response_t const response_treshold(m_surf.m_treshold);
@@ -198,6 +199,8 @@ namespace baldzarika { namespace ucv  {
 			for(boost::int32_t x=min_x;x<max_x;++x)
 			{
 				response_t candidate=ml.get_response(x,y, *this);
+				response_t candidate_s=candidate*coeff_2;
+
 				if(candidate<response_treshold) continue;
 				bool fp_detected(true);
 				for(boost::int32_t ry=-1;ry<=1 && fp_detected;++ry)
@@ -205,9 +208,9 @@ namespace baldzarika { namespace ucv  {
 					for(boost::int32_t rx=-1;rx<=1 && fp_detected;++rx)
 					{
 						fp_detected=!
-						(	m_response_view(x+rx,y+ry).operator response_t()>=candidate ||
-							( (ry!=0||rx!=0) && ml.get_response(x+rx, y+ry, *this)>=candidate ) ||
-							bl.get_response(x+rx, y+ry, *this)>=candidate
+						(	m_response_view(x+rx,y+ry).operator response_t()>=candidate_s ||
+							( (ry!=0||rx!=0) && ml.get_response(x+rx, y+ry, *this)>=candidate_s ) ||
+							bl.get_response(x+rx, y+ry, *this)>=candidate_s
 						);
 					}
 				}
@@ -727,7 +730,7 @@ namespace baldzarika { namespace ucv  {
 	{
 		typedef feature_point_t::desc_value_type dec_t;
 #if 1
-		fp.m_orientation=estimate_rotation<const_integral_view_t,dec_t,3>(
+		fp.m_orientation=estimate_rotation<const_integral_view_t,dec_t,6>(
 			m_integral_view,
 			static_cast<boost::int32_t>(std::floor(fp.x()+math::constant::half<feature_point_t::value_type>())),
 			static_cast<boost::int32_t>(std::floor(fp.y()+math::constant::half<feature_point_t::value_type>())),

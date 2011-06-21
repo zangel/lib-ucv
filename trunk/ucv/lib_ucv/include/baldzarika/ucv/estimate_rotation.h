@@ -208,14 +208,14 @@ namespace baldzarika { namespace ucv {
 		typedef detail::rotation_helper<AT,R> rotation_helper_t;
 
 		static rotation_helper_t const &rot_h=rotation_helper_t::get();
-		static AT const ss4s=AT(12)/AT(R);
+		static AT const sss=AT(6)/AT(R);
 		
 		static AT const r_3i20=0.15f;
 		static AT const r_3i2_sq=2.25f;
 
-		boost::uint32_t ss=static_cast<boost::uint32_t>(std::floor(s+math::constant::half<AT>()));
+		boost::uint32_t ss=static_cast<boost::uint32_t>(std::floor(s*sss+math::constant::half<AT>()));
 
-		boost::uint32_t ss4=static_cast<boost::uint32_t>(std::floor(s*ss4s+math::constant::half<AT>()));
+		boost::uint32_t ss4=ss*4;//static_cast<boost::uint32_t>(std::floor(s*AT(4)+math::constant::half<AT>()));
 
 		AT res_x[rotation_helper_t::N], res_y[rotation_helper_t::N], angle[rotation_helper_t::N];
 		
