@@ -27,7 +27,7 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfaceView.Renderer, Camera.PreviewCallback, Callback
+public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfaceView.Renderer, Camera.PreviewCallback, Camera.AutoFocusCallback, Callback 
 {
 	protected static final int SETTINGS_CHANGED=1;
 	
@@ -209,6 +209,11 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
     	}
     }
     
+  //android.hardware.Camera.AutoFocusCallback
+	public void onAutoFocus(boolean success, Camera camera)
+	{
+	}
+    
 	//com.baldzarika.ar.Tracker.Callback
     public void onRunningStateChanged(com.baldzarika.ar.Tracker tracker, int rs)
     {
@@ -236,8 +241,11 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
     		Camera.Parameters cameraParams=m_Camera.getParameters();
     		Size2 previewSize=m_ARSystem.getTracker().getFrameSize();
     		cameraParams.setPreviewSize(previewSize.m_Width,previewSize.m_Height);
+    		cameraParams.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
     		m_Camera.setParameters(cameraParams);
+    		m_Camera.autoFocus(this);
     		m_Camera.startPreview();
+    		
     		return true;
     	}
 		return false;
@@ -269,6 +277,7 @@ public class BaldzAR extends Activity implements SurfaceHolder.Callback, GLSurfa
 		if(m_Camera!=null)
 		{
 			m_Camera.stopPreview();
+			m_Camera.cancelAutoFocus();
 			try
     		{
     			m_Camera.setPreviewDisplay(null);
