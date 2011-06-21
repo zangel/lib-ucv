@@ -1,6 +1,7 @@
 #include "Prec.h"
 #include "ArTestDlg.h"
 #include "FiducialTestDlg.h"
+#include "SURFTestDlg.h"
 
 int main(int argc, char *argv[])
 {
@@ -16,6 +17,12 @@ int main(int argc, char *argv[])
 
 	qApp->addLibraryPath(QFileInfo(QString::fromWCharArray(moduleFileName)).absoluteDir().path()+"/plugins");
 
+#if 1
+	SURFTestDlg TheSURFTestDlg;
+	TheSURFTestDlg.show();
+	return TheSURFTestDlg.exec();
+
+#else
 	QDialog *pDialog(0);
 
 	switch(QMessageBox::question(0,
@@ -30,4 +37,5 @@ int main(int argc, char *argv[])
 	}
 	pDialog->show();
 	return pDialog->exec();
+#endif
 }
