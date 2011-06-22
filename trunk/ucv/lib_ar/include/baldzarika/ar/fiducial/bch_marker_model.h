@@ -24,6 +24,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 		bch_marker_model();
 		virtual ~bch_marker_model();
+		bool					begin(math::size2ui const &fs) const;
+		bool					end() const;
 		math::size2ui 			get_marker_size(marker_id_t mid) const;
 		bool					detect_markers(gray_const_view_t img, std::list<contour_t> const &contours, std::list<detect_info> &dis) const;
 

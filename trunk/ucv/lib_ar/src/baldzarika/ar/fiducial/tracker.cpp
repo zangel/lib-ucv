@@ -132,6 +132,15 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	void tracker::on_start()
 	{
+		for(marker_model_holders_t::iterator mmhi=m_marker_model_holders.begin();mmhi!=m_marker_model_holders.end();++mmhi)
+		{
+			boost::shared_ptr<marker_model_holder> const &mmh=*mmhi;
+			BOOST_ASSERT(mmh);
+			boost::shared_ptr<marker_model> const &mm=mmh->m_marker_model;
+			BOOST_ASSERT(mm);
+
+			mm->begin(get_frame_size());
+		}
 	}
 
 	void tracker::on_update()
@@ -195,6 +204,9 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		{
 			boost::shared_ptr<marker_model_holder> const &mmh=*mmhi;
 			BOOST_ASSERT(mmh);
+			boost::shared_ptr<marker_model> const &mm=mmh->m_marker_model;
+			BOOST_ASSERT(mm);
+
 			marker_model_holder::marker_states_t::index<marker_state::detected_tag>::type &ms_by_detected=mmh->m_marker_states.get<marker_state::detected_tag>();
 			for(marker_model_holder::marker_states_t::iterator msi=mmh->m_marker_states.begin();msi!=mmh->m_marker_states.end();++msi)
 			{
@@ -214,6 +226,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				m_marker_state_changed_signal(ms, marker_state::SC_DETECTION);
 			}
 			mmh->m_marker_states.clear();
+			mm->end();
 		}
 	}
 

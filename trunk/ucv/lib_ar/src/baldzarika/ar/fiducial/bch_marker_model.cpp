@@ -161,7 +161,16 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	bch_marker_model::~bch_marker_model()
 	{
+	}
 
+	bool bch_marker_model::begin(math::size2ui const &fs) const
+	{
+		return true;
+	}
+
+	bool bch_marker_model::end() const
+	{
+		return true;
 	}
 
 	math::size2ui bch_marker_model::get_marker_size(marker_id_t mid) const

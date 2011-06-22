@@ -5,6 +5,7 @@
 #include <baldzarika/ar/tracker.h>
 #include <baldzarika/ar/fiducial/tracker.h>
 #include <baldzarika/ar/fiducial/bch_marker_model.h>
+#include <baldzarika/ar/fiducial/qr_marker_model.h>
 #include <baldzarika/ar/markerless/tracker.h>
 #include <baldzarika/ar/markerless/marker.h>
 
@@ -49,7 +50,6 @@ BOOST_AUTO_TEST_CASE( tracker_frame_size )
 	BOOST_CHECK(ar_tracker->get_frame_size()==ucv::size2ui(100,100));
 }
 
-#endif
 
 BOOST_AUTO_TEST_CASE( tracker_detect_marker )
 {
@@ -143,8 +143,6 @@ BOOST_AUTO_TEST_CASE( fiducial_bch_marker_model )
 	std::cout << "fiducial_bch_marker_model performance=" << 100.0f/(1.0e-3f*float((finish_time-start_time).total_milliseconds())) << "fps" << std::endl;
 }
 
-
-
 BOOST_AUTO_TEST_CASE( fiducial_detector_start_stop_test )
 {
 	using namespace baldzarika;
@@ -160,14 +158,15 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_start_stop_test )
 	BOOST_CHECK(!tracker->is_active());
 }
 
+#endif
 
-
-BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
+template < typename MarkerModel >
+void test_fiducial_marker_model_detection(char const *test_image, boost::uint32_t expected_markers_count)
 {
 	using namespace baldzarika;
 
 	ucv::gil::gray8_image_t gray8_frame;
-	ucv::gil::png_read_and_convert_image("../lib_ucv_test/fiducial_test.png", gray8_frame);
+	ucv::gil::png_read_and_convert_image(test_image, gray8_frame);
 
 	ar::gray_image_t gray_frame(gray8_frame.width(), gray8_frame.height());
 
@@ -180,7 +179,7 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 	boost::shared_ptr<ar::fiducial::tracker> tracker(new ar::fiducial::tracker(math::size2ui(gray8_frame.width(), gray8_frame.height())));
 
 	BOOST_CHECK(tracker->add_marker_model( boost::shared_ptr<ar::fiducial::marker_model>(
-		new ar::fiducial::bch_marker_model()
+		new MarkerModel()
 	)));
 
 
@@ -197,40 +196,6 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 				math::matrix44f cam_pose=ms->get_camera_pose();
 				math::matrix44f cam_proj=m_tracker->get_camera_projection();
 				math::matrix44f transform=cam_proj*cam_pose;
-#if 0
-				ucv::size2ui mark_size=ms->get_marker_size();
-				float corners[4][4]=
-				{
-					{ 0.0f,					0.0f,				0.0f, 1.0f },
-					{ mark_size.width(),	0.0f,				0.0f, 1.0f },
-					{ mark_size.width(),	mark_size.height(),	0.0f, 1.0f },
-					{ 0.0f,					mark_size.height(),	0.0f, 1.0f }
-				};
-#else
-				float corners[4][4]=
-				{
-					{ -1.0f,  1.0f, 0.0f, 1.0f },
-					{  1.0f,  1.0f,	0.0f, 1.0f },
-					{  1.0f, -1.0f,	0.0f, 1.0f },
-					{ -1.0f, -1.0f,	0.0f, 1.0f }
-				};
-#endif
-
-				math::vector4f top_left=transform*math::vector4f(corners[0]);
-				top_left*=1.0f/top_left[2];
-				math::vector4f top_right=transform*math::vector4f(corners[1]);
-				top_right*=1.0f/top_right[2];
-				math::vector4f bottom_right=transform*math::vector4f(corners[2]);
-				bottom_right*=1.0f/bottom_right[2]; 
-				math::vector4f bottom_left=transform*math::vector4f(corners[3]);
-				bottom_left*=1.0f/bottom_left[2];
-
-				std::cout << std::endl;
-				std::cout << "tl=(" << top_left[0] << "," << top_left[1] << ")" << std::endl;
-				std::cout << "tr=(" << top_right[0] << "," << top_right[1] << ")" << std::endl;
-				std::cout << "br=(" << bottom_right[0] << "," << bottom_right[1] << ")" << std::endl;
-				std::cout << "bl=(" << bottom_left[0] << "," << bottom_left[1] << ")" << std::endl;
-
 				m_detected++;
 			}
 		}
@@ -242,20 +207,24 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_detection )
 
 
 	tracker->marker_state_changed().connect(boost::bind(&_signal_listener::on_marker_state_changed_signal, &signal_listener, _1, _2));
-	//detector->start();
-	//detector->update(ucv::gil::const_view(gray_frame));
 	
-	
-	//detector->stop();
-	//detector->wait_to_stop();
-
-	//BOOST_CHECK_EQUAL(signal_listener.m_detected, 6);
-
 	signal_listener.m_detected=0;
 	tracker->start();
 	while(!tracker->is_started()) boost::this_thread::yield();
 	tracker->process_frame(ucv::gil::const_view(gray8_frame));
 	tracker->stop();
 	tracker->wait_to_stop();
-	BOOST_CHECK_EQUAL(signal_listener.m_detected, 6);
+	BOOST_CHECK_EQUAL(signal_listener.m_detected, expected_markers_count);
+
+}
+
+
+BOOST_AUTO_TEST_CASE( fiducial_tracker_bch_detection )
+{
+	test_fiducial_marker_model_detection<baldzarika::ar::fiducial::bch_marker_model>("../lib_ucv_test/fiducial_test.png",6);
+}
+
+BOOST_AUTO_TEST_CASE( fiducial_tracker_qr_detection )
+{
+	test_fiducial_marker_model_detection<baldzarika::ar::fiducial::qr_marker_model>("../lib_ucv_test/qr_code_test.png", 1);
 }
