@@ -69,9 +69,17 @@ namespace baldzarika { namespace math {
 			return tlx<=brx && tly<=bry;
 		}
 
+		bool contains(point2_t const &p) const
+		{
+			return p.x()>=m_top_left.x() && p.x()<m_top_left.x()+m_size.width() &&
+				p.y()>=m_top_left.y() && p.y()<m_top_left.y()+m_size.height();
+		}
+
 		point2_t	m_top_left;
 		size2_t		m_size;
 	};
+
+	typedef box2<float> box2f;
 
 } //namespace math
 } //namespace baldzarika
