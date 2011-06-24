@@ -138,6 +138,9 @@
     <ClInclude Include="include\baldzarika\ucv\extract_surf_descriptor.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\binarize.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ucv\config.cpp">
