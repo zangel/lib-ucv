@@ -2,8 +2,107 @@
 #include <baldzarika/ar/fiducial/qr_marker_model.h>
 
 namespace baldzarika { namespace ar { namespace fiducial {
+
+	namespace {
+		
+		template < typename T, boost::int32_t D >
+		struct helper1_neighbours
+		{
+			static math::point2<T> const HELPER1[4];
+			static math::point2<T> const HELPER2_TL[4];
+			static math::point2<T> const HELPER2_TR[4];
+			static math::point2<T> const HELPER2_BL[4];
+		};
+
+		template < typename T, boost::int32_t D >
+		math::point2<T> const helper1_neighbours< T, D >::HELPER1[4]=
+		{
+			math::point2<T>(
+				T((7+D+3)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T(3*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			),
+			math::point2<T>(
+				T(3*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T(-(D+4)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			),
+			math::point2<T>(
+				T(-(D+4)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T(3*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			),
+			math::point2<T>(
+				T(3*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T((7+D+3)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			)
+		};
+
+		template < typename T, boost::int32_t D >
+		math::point2<T> const helper1_neighbours< T, D >::HELPER2_TL[4]=
+		{
+			math::point2<T>(
+				T((qr_marker_model::HELPER1_CELLS+D)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T((qr_marker_model::HELPER1_CELLS+D)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			),
+			math::point2<T>(
+				T((qr_marker_model::HELPER1_CELLS+D)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T(-(D+1)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			),
+			math::point2<T>(
+				T(-(D+1)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T(-(D+1)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+				
+			),
+			math::point2<T>(
+				T(-(D+1)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T((qr_marker_model::HELPER1_CELLS+D)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			)
+		};
+
+		template < typename T, boost::int32_t D >
+		math::point2<T> const helper1_neighbours< T, D >::HELPER2_TR[4]=
+		{
+			math::point2<T>(
+				T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T((qr_marker_model::HELPER1_CELLS+D)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			),
+			math::point2<T>(
+				T((qr_marker_model::HELPER1_CELLS+D)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T((qr_marker_model::HELPER1_CELLS-1)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			),
+			math::point2<T>(
+				T((qr_marker_model::HELPER1_CELLS-1)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T(-(D+1)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			),
+			math::point2<T>(
+				T(-(D+1)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			)
+		};
+
+		template < typename T, boost::int32_t D >
+		math::point2<T> const helper1_neighbours< T, D >::HELPER2_BL[4]=
+		{
+			math::point2<T>(
+				T((qr_marker_model::HELPER1_CELLS+D)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			),
+			math::point2<T>(
+				T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T(-(D+1)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			),
+			math::point2<T>(
+				T(-(D+1)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T((qr_marker_model::HELPER1_CELLS-1)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			),
+			math::point2<T>(
+				T((qr_marker_model::HELPER1_CELLS-1)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>(),
+				T((qr_marker_model::HELPER1_CELLS+D)*qr_marker_model::HELPER1_CELL_SIZE)+T(qr_marker_model::HELPER1_CELL_SIZE)*math::constant::half<T>()
+			)
+		};
+
+	} //namespace anonymous
 	
-	qr_marker_model::helper_detect_info::helper_detect_info(std::list<contour_t>::const_iterator cn, math::point2f const &cr, math::matrix33f const &h, math::matrix33f const &ih)
+	template < typename T >
+	qr_marker_model::helper_detect_info<T>::helper_detect_info(std::list<contour_t>::const_iterator cn, math::point2<T> const &cr, math::matrix<T,3,3> const &h, math::matrix<T,3,3> const &ih)
 		: m_contour(cn)
 		, m_center(cr)
 		, m_homography(h)
@@ -11,17 +110,20 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	{
 	}
 
-	qr_marker_model::paired_helper_detect_infos::paired_helper_detect_infos(std::list<helper_detect_info>::iterator f, std::list<helper_detect_info>::iterator s, boost::uint32_t frot, boost::uint32_t srot)
-		: m_first(f)
-		, m_second(s)
-		, m_first_rot(frot)
-		, m_second_rot(srot)
+	template < typename T >
+	qr_marker_model::helper_detect_info_triplet<T>::helper_detect_info_triplet(typename std::list< helper_detect_info<T> >::iterator tl, boost::int32_t tlr, typename std::list< helper_detect_info<T> >::iterator tr, boost::int32_t trr, typename std::list< helper_detect_info<T> >::iterator bl, boost::int32_t blr)
+		: m_top_left(tl)
+		, m_top_left_rot(tlr)
+		, m_top_right(tr)
+		, m_top_right_rot(trr)
+		, m_bottom_left(bl)
+		, m_bottom_left_rot(blr)
 	{
 	}
 
 	boost::int32_t const qr_marker_model::CELL_SIZE=3;
-	boost::int32_t const qr_marker_model::MARKER_CELLS=25;
-	boost::int32_t const qr_marker_model::MARKER_SIZE=MARKER_CELLS*CELL_SIZE;
+	boost::int32_t const qr_marker_model::MAX_MARKER_CELLS=33;
+	boost::int32_t const qr_marker_model::MAX_MARKER_SIZE=MAX_MARKER_CELLS*CELL_SIZE;
 	boost::int32_t const qr_marker_model::HELPER1_CELLS=7;
 	boost::int32_t const qr_marker_model::HELPER2_CELLS=3;
 	boost::int32_t const qr_marker_model::HELPER_CELLS=HELPER1_CELLS*HELPER2_CELLS;
@@ -29,12 +131,12 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	boost::int32_t const qr_marker_model::HELPER2_CELL_SIZE=HELPER_CELLS/HELPER2_CELLS*CELL_SIZE;
 	boost::int32_t const qr_marker_model::HELPER_SIZE=HELPER_CELLS*CELL_SIZE;
 		
-	math::real_t const qr_marker_model::DEFAULT_HELPER_ECCENTRICITY=0.70710678118654752440084436210485;;
+	math::real_t const qr_marker_model::DEFAULT_HELPER_ECCENTRICITY=0.70710678118654752440084436210485;
 	math::real_t const qr_marker_model::DEFAULT_HELPER_MIN_AREA=0.05;
 
 	qr_marker_model::qr_marker_model()
 		: m_helper_warped_img(HELPER_SIZE, HELPER_SIZE)
-		, m_marker_warped_img(MARKER_SIZE, MARKER_SIZE)
+		, m_marker_warped_img(MAX_MARKER_SIZE, MAX_MARKER_SIZE)
 		, m_helper_eccentricity(DEFAULT_HELPER_ECCENTRICITY)
 		, m_helper_min_area(DEFAULT_HELPER_MIN_AREA)
 	{
@@ -56,7 +158,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	math::size2ui qr_marker_model::get_marker_size(marker_id_t mid) const
 	{
-		return math::size2ui(MARKER_SIZE,MARKER_SIZE);
+		return math::size2ui(MAX_MARKER_SIZE,MAX_MARKER_SIZE);
 	}
 
 	bool qr_marker_model::detect_markers(gray_const_view_t img, std::list<contour_t> const &contours, std::list<detect_info> &dis) const
@@ -65,7 +167,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		find_helper_candidates(img, contours, helper_candidates);
 		filter_helper_candidates(helper_candidates);
 
-		std::list< helper_detect_info > helpers1, helpers2;
+		std::list< helper_detect_info<float> > helpers1, helpers2;
 		if(!detect_helpers(img, helper_candidates, helpers1, helpers2))
 			return false;
 		return detect_markers(img,helpers1,helpers2,dis);
@@ -149,7 +251,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		}
 	}
 
-	bool qr_marker_model::detect_helpers(gray_const_view_t img, std::list<std::list<contour_t>::const_iterator> const &helper_candidates, std::list< helper_detect_info > &helpers1, std::list< helper_detect_info > &helpers2) const
+	template < typename T >
+	bool qr_marker_model::detect_helpers(gray_const_view_t img, std::list< std::list<contour_t>::const_iterator > const &helper_candidates, std::list< helper_detect_info<T> > &helpers1, std::list< helper_detect_info<T> > &helpers2) const
 	{
 		std::vector<math::point2f> src_pts(4), dst_pts(4);
 
@@ -179,7 +282,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			if(!ucv::warp(img, ucv::gil::view(m_helper_warped_img), fp_homography, true))
 				continue;
 
-#if 1
+#if 0
 			{
 				ucv::gil::gray8_image_t save_img(m_helper_warped_img.width(),m_helper_warped_img.height());
 				ucv::convert(
@@ -212,7 +315,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			if(helper_type==HELPER_INVALID) continue;
 
 			math::matrix33f inv_homography=homography.inverted();
-			//inv_homography*=1.0f/inv_homography(2,2);
+			
 			
 			math::point2f helper_center(
 				(dst_pts[0].x()+dst_pts[1].x()+dst_pts[2].x()+dst_pts[3].x())*0.25f,
@@ -220,10 +323,10 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			);
 
 			if(helper_type==HELPER_1)
-				helpers1.push_back( helper_detect_info(*helper_candidate, helper_center, homography, inv_homography) );
+				helpers1.push_back( helper_detect_info<T>(*helper_candidate, helper_center, homography, inv_homography) );
 			else
 			if(helper_type==HELPER_2)
-				helpers2.push_back( helper_detect_info(*helper_candidate, helper_center, homography, inv_homography) );
+				helpers2.push_back( helper_detect_info<T>(*helper_candidate, helper_center, homography, inv_homography) );
 		}
 		return true;
 	}
@@ -265,15 +368,50 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		
 		if(border_zero_count>((24*HELPER1_CELL_SIZE*HELPER1_CELL_SIZE)*2)/3) //helper1
 		{
-			boost::uint32_t center_zero_count=ucv::pixel_count(
+			boost::uint32_t middle_zero_count=ucv::pixel_count(
 				ucv::gil::subimage_view(wimg,
-					2*HELPER1_CELL_SIZE, 2*HELPER1_CELL_SIZE,
-					3*HELPER1_CELL_SIZE, 3*HELPER1_CELL_SIZE
+					HELPER1_CELL_SIZE, HELPER1_CELL_SIZE,
+					(HELPER1_CELLS-2)*HELPER1_CELL_SIZE,HELPER1_CELL_SIZE
 				),
 				ucv::detail::is_zero()
 			);
-			if(center_zero_count>((9*HELPER1_CELL_SIZE*HELPER1_CELL_SIZE)*2)/3)
-				return HELPER_1;
+
+			middle_zero_count+=ucv::pixel_count(
+				ucv::gil::subimage_view(wimg,
+					HELPER1_CELL_SIZE, 2*HELPER1_CELL_SIZE,
+					HELPER1_CELL_SIZE,(HELPER1_CELLS-4)*HELPER1_CELL_SIZE
+				),
+				ucv::detail::is_zero()
+			);
+
+			middle_zero_count+=ucv::pixel_count(
+				ucv::gil::subimage_view(wimg,
+					(HELPER1_CELLS-2)*HELPER1_CELL_SIZE, 2*HELPER1_CELL_SIZE,
+					HELPER1_CELL_SIZE,(HELPER1_CELLS-4)*HELPER1_CELL_SIZE
+				),
+				ucv::detail::is_zero()
+			);
+
+			middle_zero_count+=ucv::pixel_count(
+				ucv::gil::subimage_view(wimg,
+					HELPER1_CELL_SIZE, (HELPER1_CELLS-2)*HELPER1_CELL_SIZE,
+					(HELPER1_CELLS-2)*HELPER1_CELL_SIZE,HELPER1_CELL_SIZE
+				),
+				ucv::detail::is_zero()
+			);
+
+			if(middle_zero_count<((16*HELPER1_CELL_SIZE*HELPER1_CELL_SIZE)*1)/3)
+			{
+				boost::uint32_t center_zero_count=ucv::pixel_count(
+					ucv::gil::subimage_view(wimg,
+						2*HELPER1_CELL_SIZE, 2*HELPER1_CELL_SIZE,
+						3*HELPER1_CELL_SIZE, 3*HELPER1_CELL_SIZE
+					),
+					ucv::detail::is_zero()
+				);
+				if(center_zero_count>((9*HELPER1_CELL_SIZE*HELPER1_CELL_SIZE)*2)/3)
+					return HELPER_1;
+			}
 		}
 		else
 		if(border_zero_count<(24*HELPER1_CELL_SIZE*HELPER1_CELL_SIZE)/3)//helper2
@@ -326,218 +464,227 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		return HELPER_INVALID;
 	}
 
-
-	bool qr_marker_model::detect_markers(gray_const_view_t img, std::list< helper_detect_info > &helpers1, std::list< helper_detect_info > &helpers2, std::list<detect_info> &dis) const
+	template < typename T >
+	bool qr_marker_model::detect_markers(gray_const_view_t img, std::list< helper_detect_info<T> > &helpers1, std::list< helper_detect_info<T> > &helpers2, std::list<detect_info> &dis) const
 	{
+		return (
+			detect_v1_markers<T,7>(img, helpers1, dis) &&
+			detect_v2_4_markers<T,9>(img, helpers1, helpers2, dis) &&
+			detect_v2_4_markers<T,15>(img, helpers1, helpers2, dis) &&
+			detect_v2_4_markers<T,19>(img, helpers1, helpers2, dis)
+		);
+	}
 
-		std::list< paired_helper_detect_infos > v4_pairs;
-		find_paired_helper_detect_infos(helpers1, 15, v4_pairs);
+	template < typename T, boost::int32_t D >
+	void qr_marker_model::find_helper_detect_info_triplets(std::list< helper_detect_info<T> > &helpers1, std::list< helper_detect_info_triplet<T> > &triplets) const
+	{
+		static math::box2<T> const helper_bbox2=math::box2<T>(
+			math::point2<T>(math::constant::zero<T>(), math::constant::zero<T>()),
+			math::size2<T>(T(HELPER_SIZE),T(HELPER_SIZE))
+		);
 
-
-#if 0
-		static math::point2f const helper21_1[4]=
+		typename std::list< helper_detect_info<T> >::iterator i_top_left=helpers1.begin();
+		while(i_top_left!=helpers1.end())
 		{
-			math::point2f(4*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f, -14*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f),
-			math::point2f(-14*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f, -2*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f),
-			math::point2f(-2*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f, 16*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f),
-			math::point2f(16*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f, 4*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f)
-		};
-
-		static math::point2f const helper21_2[4]=
-		{
-			math::point2f(-14*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f, 4*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f),
-			math::point2f(4*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f, 16*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f),
-			math::point2f(16*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f, -2*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f),
-			math::point2f(-2*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f, -14*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f)
-		};
-
-		static math::point2f const helper21_3[4]=
-		{
-			math::point2f(-14*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f, -14*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f),
-			math::point2f(-14*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f, 16*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f),
-			math::point2f(16*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f, 16*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f),
-			math::point2f(16*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f, -14*HELPER2_CELL_SIZE+HELPER2_CELL_SIZE*0.5f)
-		};
-		
-		static math::point2f const marker_corners[4]=
-		{
-			math::point2f(18.0f*CELL_SIZE+CELL_SIZE*0.5f, 18.0f*CELL_SIZE+CELL_SIZE*0.5f),
-			math::point2f(21.0f*CELL_SIZE+CELL_SIZE*0.5f, 3.0f*CELL_SIZE+CELL_SIZE*0.5f),
-			math::point2f(3.0f*CELL_SIZE+CELL_SIZE*0.5f, 21.0f*CELL_SIZE+CELL_SIZE*0.5f),
-			math::point2f(3.0f*CELL_SIZE+CELL_SIZE*0.5f, 3.0f*CELL_SIZE+CELL_SIZE*0.5f)
-		};
-
-
-		static std::vector< math::point2f > src_pts(marker_corners, marker_corners+4);
-		
-		std::list< helper_detect_info >::const_iterator ihelper2=helpers2.begin();
-		
-		while(ihelper2!=helpers2.end())
-		{
-			contour_t const &contour_helper2=*(ihelper2->m_contour);
-
-			std::list< helper_detect_info >::iterator helpers21[3];
-
-			bool helpers1_found=false;
-			boost::uint32_t r=0;
-			for(;r<4;++r)
+			math::point2<T> const rotated_neighbours[4]=
 			{
-				math::point2f helper1_centers[3]=
-				{
-					ihelper2->m_homography*math::vector3f(helper21_1[r]),
-					ihelper2->m_homography*math::vector3f(helper21_2[r]),
-					ihelper2->m_homography*math::vector3f(helper21_3[r])
-				};
-
-				for(std::list< helper_detect_info >::iterator ihelper11=helpers1.begin();!helpers1_found && ihelper11!=helpers1.end();++ihelper11)
-				{
-					helpers21[0]=helpers1.end();
-					math::point2f _center1=helper1_centers[0].transformed(ihelper11->m_inv_homography);
-
-					if(helper_bbox2.contains(_center1))
-					{
-						helpers21[0]=ihelper11;
-						for(std::list< helper_detect_info >::iterator ihelper12=helpers1.begin();!helpers1_found && ihelper12!=helpers1.end();++ihelper12)
-						{
-							helpers21[1]=helpers1.end();
-							if(ihelper12==ihelper11) continue;
-							math::point2f _center2=helper1_centers[1].transformed(ihelper12->m_inv_homography);
-
-							if(helper_bbox2.contains(_center2))
-							{
-								helpers21[1]=ihelper12;
-								for(std::list< helper_detect_info >::iterator ihelper13=helpers1.begin();!helpers1_found && ihelper13!=helpers1.end();++ihelper13)
-								{
-									helpers21[2]=helpers1.end();
-									if(ihelper13==ihelper12 || ihelper13==ihelper11) continue;
-
-									math::point2f _center3=helper1_centers[2].transformed(ihelper13->m_inv_homography);
-									
-									if(helper_bbox2.contains(_center3))
-									{
-										helpers21[2]=ihelper13;
-										helpers1_found=true;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+				helper1_neighbours<T,D>::HELPER1[0].transformed(i_top_left->m_homography),
+				helper1_neighbours<T,D>::HELPER1[1].transformed(i_top_left->m_homography),
+				helper1_neighbours<T,D>::HELPER1[2].transformed(i_top_left->m_homography),
+				helper1_neighbours<T,D>::HELPER1[3].transformed(i_top_left->m_homography)
+			};
 			
-			if(helpers1_found)
+			typename std::list< helper_detect_info<T> >::iterator i_top_right=helpers1.end();
+			boost::uint32_t top_right_rot;
+
+			typename std::list< helper_detect_info<T> >::iterator i_bottom_left=helpers1.end();
+			boost::uint32_t bottom_left_rot;
+
+			boost::uint32_t rot=0;
+			while(rot<4 && (i_top_right==helpers1.end() || i_bottom_left==helpers1.end()))
 			{
-				BOOST_ASSERT(helpers21[0]!=helpers1.end());
-				BOOST_ASSERT(helpers21[1]!=helpers1.end());
-				BOOST_ASSERT(helpers21[2]!=helpers1.end());
-
-				std::vector< math::point2f > dst_pts(4);
-
-				dst_pts[0]=ihelper2->m_center;
-				dst_pts[1]=helpers21[0]->m_center;
-				dst_pts[2]=helpers21[1]->m_center;
-				dst_pts[3]=helpers21[2]->m_center;
-
-				math::matrix33f homography;
-				if(ucv::perspective_transform(src_pts,dst_pts,homography))
+				math::point2<T> const &top_right_center=rotated_neighbours[rot];
+				math::point2<T> const &bottom_left_center=rotated_neighbours[(rot+3)%4];
+				
+				typename std::list< helper_detect_info<T> >::iterator i_neighbours=helpers1.begin();
+				while(i_neighbours!=helpers1.end() && (i_top_right==helpers1.end() || i_bottom_left==helpers1.end()))
 				{
-					math::matrix<math::real_t, 3, 3> fp_homography=homography;
-					if(ucv::warp(img, ucv::gil::view(m_marker_warped_img), fp_homography, true))
+					if(i_neighbours==i_top_left)
 					{
-						{
-							ucv::gil::gray8_image_t save_img(m_marker_warped_img.width(),m_marker_warped_img.height());
-							ucv::convert(
-								ucv::gil::const_view(m_marker_warped_img),
-								ucv::gil::view(save_img),
-								ucv::detail::grayscale_convert()
-							);
-				
-							ucv::gil::png_write_view("warped_image.png", ucv::gil::const_view(save_img));
-						}
+						i_neighbours++;
+						continue;
 					}
-					
-				}
-				
-				helpers1.erase(helpers21[0]);
-				helpers1.erase(helpers21[1]);
-				helpers1.erase(helpers21[2]);
 
-				ihelper2=helpers2.erase(ihelper2);
-				continue;
+					if(i_top_right==helpers1.end() && helper_bbox2.contains(top_right_center.transformed(i_neighbours->m_inv_homography)))
+					{
+						top_right_rot=0;
+						bool paired(false);
+						while(top_right_rot<4)
+						{
+							if(paired=helper_bbox2.contains(helper1_neighbours<T,D>::HELPER1[top_right_rot].
+								transformed(i_neighbours->m_homography).
+								transformed(i_top_left->m_inv_homography))) break;
+							top_right_rot++;
+						}
+
+						if(paired) i_top_right=i_neighbours;
+					}
+
+					if(i_bottom_left==helpers1.end() && helper_bbox2.contains(bottom_left_center.transformed(i_neighbours->m_inv_homography)))
+					{
+						bottom_left_rot=0;
+						bool paired(false);
+						while(bottom_left_rot<4)
+						{
+							if(paired=helper_bbox2.contains(helper1_neighbours<T,D>::HELPER1[bottom_left_rot].
+								transformed(i_neighbours->m_homography).
+								transformed(i_top_left->m_inv_homography))) break;
+							bottom_left_rot++;
+						}
+
+						if(paired) i_bottom_left=i_neighbours;
+					}
+					i_neighbours++;
+				}
+
+				if(i_top_right!=helpers1.end() && i_bottom_left!=helpers1.end())
+				{
+					triplets.push_back(
+						helper_detect_info_triplet<T>(
+							i_top_left, rot,
+							i_top_right, top_right_rot,
+							i_bottom_left, bottom_left_rot
+						)
+					);
+					break;
+				}
+				else
+					i_top_right=i_bottom_left=helpers1.end();
+
+				rot++;
 			}
-			ihelper2++;
+			i_top_left++;
 		}
-#endif
+	}
+	
+	template < typename T, boost::int32_t D >
+	bool qr_marker_model::detect_v1_markers(gray_const_view_t img, std::list< helper_detect_info<T> > &helpers1, std::list<detect_info> &dis) const
+	{
 		return true;
 	}
 
-	void qr_marker_model::find_paired_helper_detect_infos(std::list< helper_detect_info > &helpers1, boost::uint32_t dist, std::list<paired_helper_detect_infos> &paired_infos) const
+	template < typename T, boost::int32_t D >
+	bool qr_marker_model::detect_v2_4_markers(gray_const_view_t img, std::list< helper_detect_info<T> > &helpers1, std::list< helper_detect_info<T> > &helpers2, std::list<detect_info> &dis) const
 	{
-		static math::box2f const helper_bbox2=math::box2f(
-			math::point2f(0.0f, 0.0f),
-			math::size2f(HELPER_SIZE,HELPER_SIZE)
+		static math::box2<T> const helper_bbox2=math::box2<T>(
+			math::point2<T>(math::constant::zero<T>(), math::constant::zero<T>()),
+			math::size2<T>(T(HELPER_SIZE),T(HELPER_SIZE))
 		);
 
-		math::point2f const neigbours[4]=
+		static math::point2f const src_pts_data[4]=
 		{
-			math::point2f((7+dist+3)*HELPER1_CELL_SIZE+HELPER1_CELL_SIZE*0.5f, 3*HELPER1_CELL_SIZE+HELPER1_CELL_SIZE*0.5f),
-			math::point2f(3*HELPER1_CELL_SIZE+HELPER1_CELL_SIZE*0.5f, -(dist+4)*HELPER1_CELL_SIZE+HELPER1_CELL_SIZE*0.5f),
-			math::point2f(-(dist+4)*HELPER1_CELL_SIZE+HELPER1_CELL_SIZE*0.5f, 3*HELPER1_CELL_SIZE+HELPER1_CELL_SIZE*0.5f),
-			math::point2f(3*HELPER1_CELL_SIZE+HELPER1_CELL_SIZE*0.5f, (7+dist+3)*HELPER1_CELL_SIZE+HELPER1_CELL_SIZE*0.5f)
+			math::point2f(
+				float(HELPER1_CELLS*CELL_SIZE)*math::constant::half<float>(),
+				float(HELPER1_CELLS*CELL_SIZE)*math::constant::half<float>()
+			),
+			math::point2f(
+				float((HELPER1_CELLS+D)*CELL_SIZE)+float(HELPER1_CELLS*CELL_SIZE)*math::constant::half<float>(),
+				float(HELPER1_CELLS*CELL_SIZE)*math::constant::half<float>()
+			),
+			math::point2f(
+				float((D+HELPER1_CELLS)*CELL_SIZE)+float(CELL_SIZE)*math::constant::half<float>(),
+				float((D+HELPER1_CELLS)*CELL_SIZE)+float(CELL_SIZE)*math::constant::half<float>()
+			),
+			math::point2f(
+				float(HELPER1_CELLS*CELL_SIZE)*math::constant::half<float>(),
+				float((HELPER1_CELLS+D)*CELL_SIZE)+float(HELPER1_CELLS*CELL_SIZE)*math::constant::half<float>()
+			)
 		};
 
-		std::list< helper_detect_info >::iterator ihelper1_first=helpers1.begin();
-		while(ihelper1_first!=helpers1.end())
+		static std::vector<math::point2f> src_pts(src_pts_data, src_pts_data+4);
+
+		std::vector<math::point2f> dst_pts(4);
+
+
+		std::list< helper_detect_info_triplet<T> > triplets;
+		find_helper_detect_info_triplets<T,D>(helpers1, triplets);
+		for(typename std::list< helper_detect_info_triplet<T> >::const_iterator itriplet=triplets.begin();itriplet!=triplets.end();++itriplet)
 		{
-			math::point2f const rotated_centers[4]=
+			typename std::list< helper_detect_info<T> >::iterator ihelper2=helpers2.begin();
+			while(ihelper2!=helpers2.end())
 			{
-				neigbours[0].transformed(ihelper1_first->m_homography),
-				neigbours[1].transformed(ihelper1_first->m_homography),
-				neigbours[2].transformed(ihelper1_first->m_homography),
-				neigbours[3].transformed(ihelper1_first->m_homography)
-			};
+				bool tl_contains=helper_bbox2.contains(
+					helper1_neighbours<T,D>::HELPER2_TL[itriplet->m_top_left_rot].
+						transformed(itriplet->m_top_left->m_homography).
+						transformed(ihelper2->m_inv_homography)
+				);
 
+				bool tr_contains=helper_bbox2.contains(
+					helper1_neighbours<T,D>::HELPER2_TR[(itriplet->m_top_right_rot+2)%4].
+						transformed(itriplet->m_top_right->m_homography).
+						transformed(ihelper2->m_inv_homography)
+				);
 
-			bool paired=false;
-			std::list< helper_detect_info >::iterator ihelper1_second=ihelper1_first;
-			ihelper1_second++;
-			while(ihelper1_second!=helpers1.end())
-			{
-				bool paired_fs(false);
-				boost::uint32_t fr=0;
-				while(!paired_fs && fr<4)
+				bool bl_contains=helper_bbox2.contains(
+					helper1_neighbours<T,D>::HELPER2_BL[(itriplet->m_bottom_left_rot+3)%4].
+						transformed(itriplet->m_bottom_left->m_homography).
+						transformed(ihelper2->m_inv_homography)
+				);
+
+				if(tl_contains && tr_contains && bl_contains)
 				{
-					math::point2f p=rotated_centers[fr].transformed(ihelper1_second->m_inv_homography);
-					if(paired_fs=helper_bbox2.contains(p)) break;
+					dst_pts[0]=itriplet->m_top_left->m_center;
+					dst_pts[1]=itriplet->m_top_right->m_center;
+					dst_pts[2]=ihelper2->m_center;
+					dst_pts[3]=itriplet->m_bottom_left->m_center;
 
-					fr++;
-				}
-
-				if(paired_fs)
-				{
-					bool paired_sf(false);
-					boost::uint32_t sr=0;
-
-					while(!paired_sf && sr<4)
+					math::matrix33f homography;
+					if(ucv::perspective_transform(src_pts,dst_pts,homography))
 					{
-						math::point2f p=neigbours[sr].transformed(ihelper1_second->m_homography).
-							transformed(ihelper1_first->m_inv_homography);
+						math::matrix<math::real_t, 3, 3> fp_homography=homography;
+						if(ucv::warp(
+							img,
+							ucv::gil::subimage_view(
+								ucv::gil::view(m_marker_warped_img),
+								0, 0,
+								(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+							),
+							fp_homography,
+							true))
+						{
+				
+						
 
-						if(paired_sf=helper_bbox2.contains(p)) break;
-						sr++;
+#if 0
+							{
+								ucv::gil::gray8_image_t save_img((2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE);
+								ucv::convert(
+									ucv::gil::subimage_view(
+										ucv::gil::const_view(m_marker_warped_img),
+										0, 0,
+										(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+									),
+									ucv::gil::view(save_img),
+									ucv::detail::grayscale_convert()
+								);
+				
+								ucv::gil::png_write_view("warped_marker_image.png", ucv::gil::const_view(save_img));
+							}
+#endif
+						}
+						
 					}
-					if(paired_sf)
-						paired_infos.push_back(
-							paired_helper_detect_infos(
-								ihelper1_first, ihelper1_second,
-								fr, sr
-							)
-						);
+
+					helpers2.erase(ihelper2);
+					helpers1.erase(itriplet->m_top_left);
+					helpers1.erase(itriplet->m_top_right);
+					helpers1.erase(itriplet->m_bottom_left);
+					break;
 				}
-				ihelper1_second++;
+				ihelper2++;
 			}
-			ihelper1_first++;
 		}
+		return true;
 	}
 
 } //namespace fiducial 

@@ -10,32 +10,38 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	{
 	public:
 
+		template <typename T>
 		struct helper_detect_info
 		{
-			helper_detect_info(std::list<contour_t>::const_iterator cn, math::point2f const &cr, math::matrix33f const &h, math::matrix33f const &ih);
+			helper_detect_info(std::list<contour_t>::const_iterator cn, math::point2<T> const &cr, math::matrix<T,3,3> const &h, math::matrix<T,3,3> const &ih);
 
 			std::list<contour_t>::const_iterator	m_contour;
-			math::point2f							m_center;
-			math::matrix33f							m_homography;
-			math::matrix33f							m_inv_homography;
+			math::point2<T>							m_center;
+			math::matrix<T,3,3>						m_homography;
+			math::matrix<T,3,3>						m_inv_homography;
 		};
 
-		struct paired_helper_detect_infos
+		template < typename T >
+		struct helper_detect_info_triplet
 		{
-			paired_helper_detect_infos(std::list<helper_detect_info>::iterator f, std::list<helper_detect_info>::iterator s, boost::uint32_t frot, boost::uint32_t srot);
+			helper_detect_info_triplet(typename std::list< helper_detect_info<T> >::iterator tl, boost::int32_t tlr, typename std::list< helper_detect_info<T> >::iterator tr, boost::int32_t trr, typename std::list< helper_detect_info<T> >::iterator bl, boost::int32_t blr);
 			
-			std::list<helper_detect_info>::iterator	m_first;
-			std::list<helper_detect_info>::iterator	m_second;
+			typename std::list< helper_detect_info <T> >::iterator	m_top_left;
+			boost::int32_t											m_top_left_rot;
 
-			boost::uint32_t							m_first_rot;
-			boost::uint32_t							m_second_rot;
+			typename std::list< helper_detect_info <T> >::iterator	m_top_right;
+			boost::int32_t											m_top_right_rot;
+
+			typename std::list< helper_detect_info<T> >::iterator	m_bottom_left;
+			boost::int32_t											m_bottom_left_rot;
 		};
 
 
-		
+
+
 		static boost::int32_t const CELL_SIZE;
-		static boost::int32_t const MARKER_CELLS;
-		static boost::int32_t const MARKER_SIZE;
+		static boost::int32_t const MAX_MARKER_CELLS;
+		static boost::int32_t const MAX_MARKER_SIZE;
 		static boost::int32_t const HELPER1_CELLS;
 		static boost::int32_t const HELPER2_CELLS;
 		static boost::int32_t const HELPER_CELLS;
@@ -71,12 +77,19 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		void					find_helper_candidates(gray_const_view_t img, std::list<contour_t> const &contours, std::list<std::list<contour_t>::const_iterator> &helper_candidates) const;
 		void					filter_helper_candidates(std::list<std::list<contour_t>::const_iterator> &helper_candidates) const;
 
-		bool					detect_helpers(gray_const_view_t img, std::list<std::list<contour_t>::const_iterator> const &helper_candidates, std::list< helper_detect_info > &helpers1, std::list< helper_detect_info > &helpers2) const;
+		
+		template < typename T >
+		bool					detect_helpers(gray_const_view_t img, std::list< std::list<contour_t>::const_iterator > const &helper_candidates, std::list< helper_detect_info<T> > &helpers1, std::list< helper_detect_info<T> > &helpers2) const;
 		eHelperType				detect_helper(gray_const_view_t wimg) const;
-		bool					detect_markers(gray_const_view_t img, std::list< helper_detect_info > &helpers1, std::list< helper_detect_info > &helpers2, std::list<detect_info> &dis) const;
-		void					find_paired_helper_detect_infos(std::list< helper_detect_info > &helpers1, boost::uint32_t dist, std::list<paired_helper_detect_infos> &paired_infos) const;
-
-
+		template < typename T >
+		bool					detect_markers(gray_const_view_t img, std::list< helper_detect_info<T> > &helpers1, std::list< helper_detect_info<T> > &helpers2, std::list<detect_info> &dis) const;
+		template < typename T, boost::int32_t D >
+		void					find_helper_detect_info_triplets(std::list< helper_detect_info<T> > &helpers1, std::list< helper_detect_info_triplet<T> > &triplets) const;
+		template < typename T, boost::int32_t D >
+		bool					detect_v1_markers(gray_const_view_t img, std::list< helper_detect_info<T> > &helpers1, std::list<detect_info> &dis) const;
+		template < typename T, boost::int32_t D >
+		bool					detect_v2_4_markers(gray_const_view_t img, std::list< helper_detect_info<T> > &helpers1, std::list< helper_detect_info<T> > &helpers2, std::list<detect_info> &dis) const;
+	
 	private:
 		mutable gray_image_t	m_helper_warped_img;
 		mutable gray_image_t	m_marker_warped_img;
