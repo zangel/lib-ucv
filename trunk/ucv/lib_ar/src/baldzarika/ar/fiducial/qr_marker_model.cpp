@@ -167,7 +167,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		find_helper_candidates(img, contours, helper_candidates);
 		filter_helper_candidates(helper_candidates);
 
-		std::list< helper_detect_info<float> > helpers1, helpers2;
+		std::list< helper_detect_info<math::real_t> > helpers1, helpers2;
 		if(!detect_helpers(img, helper_candidates, helpers1, helpers2))
 			return false;
 		return detect_markers(img,helpers1,helpers2,dis);
@@ -323,10 +323,10 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			);
 
 			if(helper_type==HELPER_1)
-				helpers1.push_back( helper_detect_info<T>(*helper_candidate, helper_center, homography, inv_homography) );
+				helpers1.push_back( helper_detect_info<T>(*helper_candidate, math::point2<T>(helper_center), math::matrix<T,3,3>(homography), math::matrix<T,3,3>(inv_homography)) );
 			else
 			if(helper_type==HELPER_2)
-				helpers2.push_back( helper_detect_info<T>(*helper_candidate, helper_center, homography, inv_homography) );
+				helpers2.push_back( helper_detect_info<T>(*helper_candidate, math::point2<T>(helper_center), math::matrix<T,3,3>(homography), math::matrix<T,3,3>(inv_homography)) );
 		}
 		return true;
 	}
@@ -633,10 +633,10 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 				if(tl_contains && tr_contains && bl_contains)
 				{
-					dst_pts[0]=itriplet->m_top_left->m_center;
-					dst_pts[1]=itriplet->m_top_right->m_center;
-					dst_pts[2]=ihelper2->m_center;
-					dst_pts[3]=itriplet->m_bottom_left->m_center;
+					dst_pts[0]=math::point2f(itriplet->m_top_left->m_center);
+					dst_pts[1]=math::point2f(itriplet->m_top_right->m_center);
+					dst_pts[2]=math::point2f(ihelper2->m_center);
+					dst_pts[3]=math::point2f(itriplet->m_bottom_left->m_center);
 
 					math::matrix33f homography;
 					if(ucv::perspective_transform(src_pts,dst_pts,homography))
@@ -653,8 +653,6 @@ namespace baldzarika { namespace ar { namespace fiducial {
 							true))
 						{
 				
-						
-
 #if 0
 							{
 								ucv::gil::gray8_image_t save_img((2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE);
@@ -671,8 +669,50 @@ namespace baldzarika { namespace ar { namespace fiducial {
 								ucv::gil::png_write_view("warped_marker_image.png", ucv::gil::const_view(save_img));
 							}
 #endif
+
+
+							if(ucv::threshold(
+								ucv::gil::subimage_view(
+									ucv::gil::const_view(m_marker_warped_img),
+									0, 0,
+									(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+								),
+								ucv::gil::subimage_view(
+									ucv::gil::view(m_marker_warped_img),
+									0, 0,
+									(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+								),
+								ucv::detail::normal_binary_threshold<gray_t,gray_t>(
+									ucv::find_otsu_threshold<gray_const_view_t,20>(
+										ucv::gil::subimage_view(
+											ucv::gil::const_view(m_marker_warped_img),
+											0, 0,
+											(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+										),
+										0,
+										1
+									)*gray_t(1.2),
+									1.0
+								)
+							))
+							{
+								ucv::gil::gray8_image_t binary((2*HELPER1_CELLS+D),(2*HELPER1_CELLS+D));
+								if(ucv::binarize(
+									ucv::gil::subimage_view(
+										ucv::gil::const_view(m_marker_warped_img),
+										0, 0,
+										(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+									),
+									ucv::gil::view(binary),
+									CELL_SIZE,CELL_SIZE,
+									ucv::detail::is_non_zero()
+								))
+								{
+
+								}
+
+							}
 						}
-						
 					}
 
 					helpers2.erase(ihelper2);

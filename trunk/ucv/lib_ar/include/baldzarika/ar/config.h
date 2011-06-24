@@ -21,6 +21,8 @@
 #include <baldzarika/ucv/gaussian_blur.h>
 #include <baldzarika/ucv/canny.h>
 #include <baldzarika/ucv/pixel_count.h>
+#include <baldzarika/ucv/binarize.h>
+
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/thread.hpp>
