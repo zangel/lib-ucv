@@ -708,7 +708,9 @@ namespace baldzarika { namespace ar { namespace fiducial {
 									ucv::detail::is_non_zero()
 								))
 								{
-
+									boost::shared_ptr< ucv::qr::data< ucv::qr::get_version<D+2*7>::value > > qr_data=
+										ucv::qr_decode<ucv::qr::get_version<D+2*7>::value>(ucv::gil::view(binary));
+									
 								}
 
 							}
