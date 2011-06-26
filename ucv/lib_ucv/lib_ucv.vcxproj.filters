@@ -141,6 +141,12 @@
     <ClInclude Include="include\baldzarika\ucv\binarize.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\masked_region.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\qr_code.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ucv\config.cpp">
