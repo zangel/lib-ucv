@@ -274,7 +274,7 @@ namespace baldzarika { namespace ucv {
 				ucv::detail::rectangle_mask< 0, 0, 9, 9,
 				ucv::detail::rectangle_mask< get_dimension<3>::value-8, 0, 8, 9,
 				ucv::detail::rectangle_mask< 0, get_dimension<3>::value-8, 9, 8,
-				ucv::detail::rectangle_mask< 20, 20, 5, 5,
+				ucv::detail::rectangle_mask< get_dimension<3>::value-9, get_dimension<3>::value-9, 5, 5,
 				ucv::detail::rectangle_mask< 6, 9, 1, get_dimension<3>::value-17,
 				ucv::detail::rectangle_mask< 9, 6, get_dimension<3>::value-17, 1 > > > > > >
 			> data_mask_t;
