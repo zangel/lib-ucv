@@ -13,7 +13,7 @@ namespace baldzarika { namespace ucv {
 			}
 		};
 
-		template < boost::int32_t T, boost::int32_t L, boost::int32_t W, boost::int32_t H, typename NEXT=no_mask >
+		template < boost::int32_t L, boost::int32_t T, boost::int32_t W, boost::int32_t H, typename NEXT=no_mask >
 		struct rectangle_mask
 			: NEXT
 		{
