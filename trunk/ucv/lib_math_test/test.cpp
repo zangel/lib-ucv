@@ -7,6 +7,7 @@
 #include <baldzarika/math/matrix.h>
 #include <baldzarika/math/vector.h>
 #include <baldzarika/math/point2.h>
+#include <baldzarika/math/ec/galois/field.h>
 #include <boost/date_time.hpp>
 
 #if 0
@@ -98,8 +99,6 @@ BOOST_AUTO_TEST_CASE( test_fixed_point_atan2_speed )
 	std::cout << "fixed_point speed=" << float((cp_3-cp_2).total_microseconds())/float((cp_2-cp_1).total_microseconds()) << " " << f_res << " " << static_cast<float>(fp_res) << std::endl;
 }
 
-#endif
-
 BOOST_AUTO_TEST_CASE( test_vector )
 {
 	namespace bmath=baldzarika::math;
@@ -151,4 +150,12 @@ BOOST_AUTO_TEST_CASE( test_matrix )
 	//test_square_matrix<bmath::real_t,5>();
 	//test_square_matrix<float,5>();
 	//test_square_matrix<double,5>();
+}
+
+#endif
+
+BOOST_AUTO_TEST_CASE( test_ec_galois_field )
+{
+	namespace bmath=baldzarika::math;
+	bmath::ec::galois::field<8,6> const &f=bmath::ec::galois::field<8,6>::get();
 }

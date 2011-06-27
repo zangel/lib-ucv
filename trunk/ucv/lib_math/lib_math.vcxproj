@@ -86,6 +86,7 @@
     <ClInclude Include="include\baldzarika\math\box2.h" />
     <ClInclude Include="include\baldzarika\math\config.h" />
     <ClInclude Include="include\baldzarika\math\constant.h" />
+    <ClInclude Include="include\baldzarika\math\ec\galois\field.h" />
     <ClInclude Include="include\baldzarika\math\fixed_point.h" />
     <ClInclude Include="include\baldzarika\math\jacobi.h" />
     <ClInclude Include="include\baldzarika\math\matrix.h" />

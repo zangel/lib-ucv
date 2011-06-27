@@ -25,6 +25,15 @@
     <Filter Include="Source Files\baldzarika\math">
       <UniqueIdentifier>{334c35ff-d870-410d-95ed-dbb605fcbded}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\baldzarika\math\ec">
+      <UniqueIdentifier>{fa199e40-200c-4e63-8e2d-767d3618e386}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\baldzarika\math\ec\galois">
+      <UniqueIdentifier>{e6f8a677-12f2-4bd8-8d7d-c5c79f302593}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\baldzarika\math\ec\reed_solomon">
+      <UniqueIdentifier>{94d0e832-dc53-4ba8-8d46-c0811b9eeb9c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -71,6 +80,9 @@
     </ClInclude>
     <ClInclude Include="include\baldzarika\math\utils.h">
       <Filter>Header Files\baldzarika\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\math\ec\galois\field.h">
+      <Filter>Header Files\baldzarika\math\ec\galois</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

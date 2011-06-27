@@ -35,6 +35,7 @@
 
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <boost/dynamic_bitset.hpp>
 
 
 #if defined(HAVE_GLES2)

@@ -311,10 +311,8 @@ namespace baldzarika { namespace ucv {
 		if(!(ret_val->m_format_info.m_flip_mask.flip<V>(bv))) return boost::shared_ptr< qr::data<V> >();
 
 		bool read_up=true;
-		boost::uint8_t current_byte=0;
-		boost::int32_t bits_read=0;
-		boost::int32_t total_bits_read=0;
-		boost::int32_t result_offset=0;
+		boost::dynamic_bitset<> code_words;
+
 
 		for(boost::int32_t x=qr::get_dimension<V>::value-1;x>0;x-=2)
 		{
@@ -326,23 +324,13 @@ namespace baldzarika { namespace ucv {
 				for(boost::int32_t dx=0;dx<2;dx++)
 				{
 					if(!qr::version<V>::data_mask_t::is_masked(x-dx,y))
-					{
-						bits_read++;
-						total_bits_read++;
-						current_byte<<=1;
-						current_byte|=bv(x-dx,y)?1:0;
-						
-						if(bits_read==8)
-						{
-							bits_read=0;
-							current_byte=0;
-							result_offset++;
-						}
-					}
+						code_words.push_back(bv(x-dx,y)?true:false);
 				}
 			}
 			read_up=!read_up;
 		}
+
+		boost::int32_t nbits=code_words.size();
 		
 		return ret_val;
 	}
