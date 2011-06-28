@@ -87,6 +87,11 @@
     <ClInclude Include="include\baldzarika\math\config.h" />
     <ClInclude Include="include\baldzarika\math\constant.h" />
     <ClInclude Include="include\baldzarika\math\ec\galois\field.h" />
+    <ClInclude Include="include\baldzarika\math\ec\galois\field_element.h" />
+    <ClInclude Include="include\baldzarika\math\ec\galois\field_polynomial.h" />
+    <ClInclude Include="include\baldzarika\math\ec\galois\field_symbol.h" />
+    <ClInclude Include="include\baldzarika\math\ec\reed_solomon\block.h" />
+    <ClInclude Include="include\baldzarika\math\ec\reed_solomon\decoder.h" />
     <ClInclude Include="include\baldzarika\math\fixed_point.h" />
     <ClInclude Include="include\baldzarika\math\jacobi.h" />
     <ClInclude Include="include\baldzarika\math\matrix.h" />
