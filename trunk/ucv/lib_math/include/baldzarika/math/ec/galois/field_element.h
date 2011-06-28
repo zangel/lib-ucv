@@ -158,6 +158,49 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 		field_symbol_t	m_poly_value;
 	};
 
+
+	template < boost::uint32_t PWR, boost::uint32_t PP >
+	inline field_element<PWR,PP> operator +(field_element<PWR,PP> const &a, field_element<PWR,PP> const &b)
+	{
+		return field_element<PWR,PP>(a)+=b;
+	}
+
+	template < boost::uint32_t PWR, boost::uint32_t PP >
+	inline field_element<PWR,PP> operator -(field_element<PWR,PP> const &a, field_element<PWR,PP> const &b)
+	{
+		return field_element<PWR,PP>(a)-=b;
+	}
+
+	template < boost::uint32_t PWR, boost::uint32_t PP >
+	inline field_element<PWR,PP> operator *(field_element<PWR,PP> const &a, field_element<PWR,PP> const &b)
+	{
+		return field_element<PWR,PP>(a)*=b;
+	}
+
+	template < boost::uint32_t PWR, boost::uint32_t PP >
+	inline field_element<PWR,PP> operator *(field_element<PWR,PP> const &a, typename field_element<PWR,PP>::field_symbol_t const &b)
+	{
+		return field_element<PWR,PP>(a)*=b;
+	}
+
+	template < boost::uint32_t PWR, boost::uint32_t PP >
+	inline field_element<PWR,PP> operator *(typename field_element<PWR,PP>::field_symbol_t const &a, field_element<PWR,PP> const &b)
+	{
+		return field_element<PWR,PP>(b)*=a;
+	}
+
+	template < boost::uint32_t PWR, boost::uint32_t PP >
+	inline field_element<PWR,PP> operator /(field_element<PWR,PP> const &a, field_element<PWR,PP> const &b)
+	{
+		return field_element<PWR,PP>(a)/=b;
+	}
+
+	template < boost::uint32_t PWR, boost::uint32_t PP >
+	inline field_element<PWR,PP> operator ^(field_element<PWR,PP> const &a, boost::int32_t b)
+	{
+		return field_element<PWR,PP>(a)^=b;
+	}
+
 } //namespace galois
 } //namespace ec
 } //namespace math

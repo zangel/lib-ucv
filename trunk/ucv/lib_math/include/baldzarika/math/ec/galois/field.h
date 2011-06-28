@@ -12,18 +12,26 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 	struct primitive_polynomial<5>
 	{
 		static boost::int32_t const DEGREE=9;
-		static boost::uint32_t const POLYNOMIAL[DEGREE];
+		static inline boost::uint32_t polynomial(boost::uint32_t n)
+		{
+			static boost::uint32_t const _polynomial[DEGREE]={1, 0, 1, 1, 1, 0, 0, 0, 1};
+			BOOST_ASSERT(n<DEGREE);
+			return _polynomial[n];
+		}
 	};
-	boost::uint32_t const primitive_polynomial<5>::POLYNOMIAL[primitive_polynomial<5>::DEGREE]={1, 0, 1, 1, 1, 0, 0, 0, 1};
+	
 
 	template <>
 	struct primitive_polynomial<6>
 	{
 		static boost::int32_t const DEGREE=9;
-		static boost::uint32_t const POLYNOMIAL[DEGREE];
+		static inline boost::uint32_t polynomial(boost::uint32_t n)
+		{
+			static boost::uint32_t const _polynomial[DEGREE]={1, 1, 1, 0, 0, 0, 0, 1, 1};
+			BOOST_ASSERT(n<DEGREE);
+			return _polynomial[n];
+		}
 	};
-	boost::uint32_t const primitive_polynomial<6>::POLYNOMIAL[primitive_polynomial<6>::DEGREE]={1, 1, 1, 0, 0, 0, 0, 1, 1};
-
 	
 
 	template < boost::uint32_t PWR, boost::uint32_t PP >
@@ -53,7 +61,7 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 			: m_prim_poly_hash(INIT_PRIM_POLY_HASH)
 		{
 			for(boost::int32_t i=0;i<DEGREE;++i)
-				m_prim_poly[i]=primitive_polynomial_t::POLYNOMIAL[i];
+				m_prim_poly[i]=primitive_polynomial_t::polynomial(i);
 			m_prim_poly[DEGREE]=0;
 
 			for(boost::int32_t i=0;i<DEGREE+1;++i)
@@ -70,7 +78,7 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 			{
 				m_alpha_to[i]=mask;
 				m_index_of[m_alpha_to[i]]=i;
-				if(primitive_polynomial_t::POLYNOMIAL[i]!=0)
+				if(primitive_polynomial_t::polynomial(i)!=0)
 					m_alpha_to[POWER]^=mask;
 				mask<<=1;
             }
@@ -138,11 +146,16 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
             return x;
          }
 
-	protected:
-
+	public:
+		
 		inline field_symbol_t index(field_symbol_t const &v) const
 		{
 			return m_index_of[v];
+		}
+
+		inline field_symbol_t alpha(field_symbol_t const &v) const
+		{
+			return m_alpha_to[v];
 		}
 
 		inline field_symbol_t inverse(field_symbol_t const &v) const

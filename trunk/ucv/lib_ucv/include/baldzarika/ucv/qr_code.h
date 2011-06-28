@@ -3,6 +3,7 @@
 
 #include <baldzarika/ucv/masked_region.h>
 
+
 namespace baldzarika { namespace ucv {
 
 	namespace qr {
@@ -236,6 +237,17 @@ namespace baldzarika { namespace ucv {
 			flip_mask	m_flip_mask;
 		};
 
+		template < boost::uint32_t NB, boost::uint32_t CL, boost::uint32_t FECL >
+		struct ec_config
+		{
+			static boost::uint32_t const POWER=8;
+			static boost::uint32_t const PRIMITIVE_POLY=5;
+
+			static boost::uint32_t const N_BLOCKS=NB;
+			typedef math::ec::reed_solomon::block<POWER,CL,FECL> block_t;
+			typedef math::ec::reed_solomon::decoder<POWER, PRIMITIVE_POLY, CL, FECL > decoder_t;
+		};
+
 		template < boost::int32_t V >
 		struct version;
 
@@ -250,6 +262,11 @@ namespace baldzarika { namespace ucv {
 				ucv::detail::rectangle_mask< 6, 9, 1, get_dimension<1>::value-17,
 				ucv::detail::rectangle_mask< 9, 6, get_dimension<1>::value-17, 1 > > > > >
 			> data_mask_t;
+
+			typedef ec_config<1,26, 7> ec_l_config_t;
+			typedef ec_config<1,26,10> ec_m_config_t;
+			typedef ec_config<1,26,13> ec_q_config_t;
+			typedef ec_config<1,26,17> ec_h_config_t;
 		};
 
 		template <>
@@ -264,6 +281,11 @@ namespace baldzarika { namespace ucv {
 				ucv::detail::rectangle_mask< 6, 9, 1, get_dimension<2>::value-17,
 				ucv::detail::rectangle_mask< 9, 6, get_dimension<2>::value-17, 1 > > > > > >
 			> data_mask_t;
+
+			typedef ec_config<1,44,10> ec_l_config_t;
+			typedef ec_config<1,44,16> ec_m_config_t;
+			typedef ec_config<1,44,22> ec_q_config_t;
+			typedef ec_config<1,44,28> ec_h_config_t;
 		};
 		
 		template <>
@@ -278,6 +300,11 @@ namespace baldzarika { namespace ucv {
 				ucv::detail::rectangle_mask< 6, 9, 1, get_dimension<3>::value-17,
 				ucv::detail::rectangle_mask< 9, 6, get_dimension<3>::value-17, 1 > > > > > >
 			> data_mask_t;
+
+			typedef ec_config<1,70,15> ec_l_config_t;
+			typedef ec_config<1,70,26> ec_m_config_t;
+			typedef ec_config<2,35,18> ec_q_config_t;
+			typedef ec_config<2,35,22> ec_h_config_t;
 		};
 		
 		template <>
@@ -292,6 +319,13 @@ namespace baldzarika { namespace ucv {
 				ucv::detail::rectangle_mask< 6, 9, 1, get_dimension<4>::value-17,
 				ucv::detail::rectangle_mask< 9, 6, get_dimension<4>::value-17, 1 > > > > > >
 			> data_mask_t;
+
+			typedef ec_config<1,100,20> ec_l_config_t;
+			typedef ec_config<2, 50,18> ec_m_config_t;
+			typedef ec_config<2, 50,26> ec_q_config_t;
+			typedef ec_config<4, 25,16> ec_h_config_t;
+
+
 		};
 		
 		template < boost::int32_t V >
@@ -330,8 +364,63 @@ namespace baldzarika { namespace ucv {
 			read_up=!read_up;
 		}
 
-		boost::int32_t nbits=code_words.size();
-		
+		boost::dynamic_bitset<> error_corrected_words;
+		switch(ret_val->m_format_info.m_ecl)
+		{
+		case qr::ECL_L:
+			{
+				typedef qr::version<V>::ec_l_config_t ec_config_t;
+				typedef typename ec_config_t::block_t block_t;
+				typedef ec_config_t::decoder_t decoder_t;
+				
+				for(boost::uint32_t i=0;i<256;++i)
+				{
+					decoder_t decoder(i);
+					decoder.decode(code_words,error_corrected_words);
+				}
+			}
+			break;
+		case qr::ECL_M:
+			{
+				typedef qr::version<V>::ec_m_config_t ec_config_t;
+				typedef typename ec_config_t::block_t block_t;
+				typedef ec_config_t::decoder_t decoder_t;
+
+				for(boost::uint32_t i=0;i<256;++i)
+				{
+					decoder_t decoder(i);
+					decoder.decode(code_words,error_corrected_words);
+				}
+			}
+			break;
+		case qr::ECL_Q:
+			{
+				typedef qr::version<V>::ec_q_config_t ec_config_t;
+				typedef typename ec_config_t::block_t block_t;
+				typedef ec_config_t::decoder_t decoder_t;
+				
+				for(boost::uint32_t i=0;i<256;++i)
+				{
+					decoder_t decoder(i);
+					decoder.decode(code_words,error_corrected_words);
+				}
+			}
+			break;
+		case qr::ECL_H:
+			{
+				typedef qr::version<V>::ec_h_config_t ec_config_t;
+				typedef typename ec_config_t::block_t block_t;
+				typedef ec_config_t::decoder_t decoder_t;
+
+				for(boost::uint32_t i=0;i<256;++i)
+				{
+					decoder_t decoder(i);
+					decoder.decode(code_words,error_corrected_words);
+				}
+			}
+			break;
+		}
+
 		return ret_val;
 	}
 	

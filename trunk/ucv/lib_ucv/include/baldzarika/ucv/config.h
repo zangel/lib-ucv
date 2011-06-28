@@ -8,6 +8,12 @@
 #include <baldzarika/math/box2.h>
 #include <baldzarika/math/matrix.h>
 #include <baldzarika/math/vector.h>
+#include <baldzarika/math/ec/galois/field_symbol.h>
+#include <baldzarika/math/ec/galois/field.h>
+#include <baldzarika/math/ec/galois/field_element.h>
+#include <baldzarika/math/ec/galois/field_polynomial.h>
+#include <baldzarika/math/ec/reed_solomon/block.h>
+#include <baldzarika/math/ec/reed_solomon/decoder.h>
 
 #include <boost/config.hpp>
 #include <boost/math/special_functions.hpp>
