@@ -84,6 +84,21 @@
     <ClInclude Include="include\baldzarika\math\ec\galois\field.h">
       <Filter>Header Files\baldzarika\math\ec\galois</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\math\ec\reed_solomon\block.h">
+      <Filter>Header Files\baldzarika\math\ec\reed_solomon</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\math\ec\reed_solomon\decoder.h">
+      <Filter>Header Files\baldzarika\math\ec\reed_solomon</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\math\ec\galois\field_element.h">
+      <Filter>Header Files\baldzarika\math\ec\galois</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\math\ec\galois\field_symbol.h">
+      <Filter>Header Files\baldzarika\math\ec\galois</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\math\ec\galois\field_polynomial.h">
+      <Filter>Header Files\baldzarika\math\ec\galois</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\math\config.cpp">
