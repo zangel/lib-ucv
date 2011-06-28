@@ -10,10 +10,7 @@
 //#define BALDZARIKA_MATH_FIXED_POINT_TRIGONO_USE_FPU_SIN
 #define BALDZARIKA_MATH_FIXED_POINT_TRIGONO_USE_FPU_SQRT
 
-
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/vector.hpp>
-
+#include <boost/dynamic_bitset.hpp>
 
 namespace baldzarika { namespace math {
 	

@@ -7,7 +7,13 @@
 #include <baldzarika/math/matrix.h>
 #include <baldzarika/math/vector.h>
 #include <baldzarika/math/point2.h>
+#include <baldzarika/math/ec/galois/field_symbol.h>
 #include <baldzarika/math/ec/galois/field.h>
+#include <baldzarika/math/ec/galois/field_element.h>
+#include <baldzarika/math/ec/galois/field_polynomial.h>
+#include <baldzarika/math/ec/reed_solomon/block.h>
+#include <baldzarika/math/ec/reed_solomon/decoder.h>
+
 #include <boost/date_time.hpp>
 
 #if 0
@@ -158,4 +164,9 @@ BOOST_AUTO_TEST_CASE( test_ec_galois_field )
 {
 	namespace bmath=baldzarika::math;
 	bmath::ec::galois::field<8,6> const &f=bmath::ec::galois::field<8,6>::get();
+
+	typedef bmath::ec::reed_solomon::decoder<8,6,255,32> decoder_t;
+	decoder_t decoder(120);
+	decoder_t::block_t block;
+	decoder.decode(block);
 }
