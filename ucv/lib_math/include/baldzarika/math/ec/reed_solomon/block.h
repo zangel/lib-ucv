@@ -36,8 +36,8 @@ namespace baldzarika { namespace math { namespace ec { namespace reed_solomon {
 				field_symbol_t v=0;
 				for(boost::uint32_t b=0;b<PWR;++b)
 				{
-					v|=bs.test((n+s)*PWR+b)?1:0;
 					v<<=1;
+					v|=bs.test((n+s)*PWR+b)?1:0;
 				}
 				m_data[s]=v;
 			}

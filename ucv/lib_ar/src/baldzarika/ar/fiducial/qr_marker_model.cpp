@@ -653,7 +653,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 							true))
 						{
 				
-#if 0
+#if 1
 							{
 								ucv::gil::gray8_image_t save_img((2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE);
 								ucv::convert(
@@ -708,11 +708,12 @@ namespace baldzarika { namespace ar { namespace fiducial {
 									ucv::detail::is_non_zero()
 								))
 								{
+									ucv::gil::png_write_view("warped_marker_image_bin.png", ucv::gil::const_view(binary));
+
 									boost::shared_ptr< ucv::qr::data< ucv::qr::get_version<D+2*7>::value > > qr_data=
 										ucv::qr_decode<ucv::qr::get_version<D+2*7>::value>(ucv::gil::view(binary));
 									
 								}
-
 							}
 						}
 					}
