@@ -23,10 +23,10 @@ namespace baldzarika { namespace ucv {
 		typedef enum
 		{
 			ECL_INVALID=-1,
-			ECL_L=0,
-			ECL_M=1,
-			ECL_Q=2,
-			ECL_H=3
+			ECL_M=0,
+			ECL_L=1,
+			ECL_H=2,
+			ECL_Q=3
 		} eECL;
 
 		typedef enum
@@ -111,11 +111,11 @@ namespace baldzarika { namespace ucv {
 
 				mask_fn_t mask_fn=get_mask_fn();
 				if(!mask_fn) return false;
-				for(boost::int32_t y=0;y<get_dimension<V>::value;++y)
+				for(boost::int32_t x=0;x<get_dimension<V>::value;++x)
 				{
-					for(boost::int32_t x=0;x<get_dimension<V>::value;++x)
+					for(boost::int32_t y=0;y<get_dimension<V>::value;++y)
 					{
-						if(mask_fn(y,x)) bv(x,y)=bv(x,y)?0:1;
+						if(mask_fn(x,y)) bv(y,x)=(bv(y,x)?0:1);
 					}
 				}
 				return true;
@@ -373,11 +373,8 @@ namespace baldzarika { namespace ucv {
 				typedef typename ec_config_t::block_t block_t;
 				typedef ec_config_t::decoder_t decoder_t;
 				
-				for(boost::uint32_t i=0;i<256;++i)
-				{
-					decoder_t decoder(i);
-					decoder.decode(code_words,error_corrected_words);
-				}
+				decoder_t decoder;
+				decoder.decode(code_words,error_corrected_words);
 			}
 			break;
 		case qr::ECL_M:
@@ -386,11 +383,8 @@ namespace baldzarika { namespace ucv {
 				typedef typename ec_config_t::block_t block_t;
 				typedef ec_config_t::decoder_t decoder_t;
 
-				for(boost::uint32_t i=0;i<256;++i)
-				{
-					decoder_t decoder(i);
-					decoder.decode(code_words,error_corrected_words);
-				}
+				decoder_t decoder;
+				decoder.decode(code_words,error_corrected_words);
 			}
 			break;
 		case qr::ECL_Q:
@@ -399,11 +393,8 @@ namespace baldzarika { namespace ucv {
 				typedef typename ec_config_t::block_t block_t;
 				typedef ec_config_t::decoder_t decoder_t;
 				
-				for(boost::uint32_t i=0;i<256;++i)
-				{
-					decoder_t decoder(i);
-					decoder.decode(code_words,error_corrected_words);
-				}
+				decoder_t decoder;
+				decoder.decode(code_words,error_corrected_words);
 			}
 			break;
 		case qr::ECL_H:
@@ -412,11 +403,8 @@ namespace baldzarika { namespace ucv {
 				typedef typename ec_config_t::block_t block_t;
 				typedef ec_config_t::decoder_t decoder_t;
 
-				for(boost::uint32_t i=0;i<256;++i)
-				{
-					decoder_t decoder(i);
-					decoder.decode(code_words,error_corrected_words);
-				}
+				decoder_t decoder;
+				decoder.decode(code_words,error_corrected_words);
 			}
 			break;
 		}

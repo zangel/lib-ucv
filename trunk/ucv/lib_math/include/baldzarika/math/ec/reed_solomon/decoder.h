@@ -20,9 +20,8 @@ namespace baldzarika { namespace math { namespace ec { namespace reed_solomon {
 		typedef galois::field_polynomial<PWR,PP> field_polynomial_t;
 		typedef block<PWR,CL,FECL> block_t;
 
-		decoder(boost::uint32_t gii)
+		decoder()
 			: m_x(field_polynomial_t::get_x())
-			, m_gii(gii)
 		{
 			create_lookup_tables();
 		}
@@ -105,27 +104,22 @@ namespace baldzarika { namespace math { namespace ec { namespace reed_solomon {
 
 		void create_lookup_tables()
 		{
-			m_root_exponent_table.reserve(block_t::CODE_LENGTH+1);
 			for(boost::int32_t i=0;i<=static_cast<boost::int32_t>(block_t::CODE_LENGTH);++i)
-				m_root_exponent_table.push_back(field_t::get().exp(field_t::get().alpha(block_t::CODE_LENGTH-i),(1-m_gii)));
+				m_root_exponent_table[i]=field_t::get().exp(field_t::get().alpha(block_t::CODE_LENGTH-i),1);
 
-			m_syndrome_exponent_table.reserve(block_t::FEC_LENGTH);
 			for(boost::int32_t i=0;i<static_cast<boost::int32_t>(block_t::FEC_LENGTH);++i)
-				m_syndrome_exponent_table.push_back(field_t::get().alpha(m_gii+i));
+				m_syndrome_exponent_table[i]=field_t::get().alpha(i);
 			
-			m_gamma_table.reserve(field_t::FIELD_SIZE+1);
 			for(boost::int32_t i=0;i<static_cast<boost::int32_t>(field_t::FIELD_SIZE+1);++i)
-				m_gamma_table.push_back((1 + (m_x*field_element_t(field_t::get().alpha(i)))));
+				m_gamma_table[i]=(1 + (m_x*field_element_t(field_t::get().alpha(i))));
 		}
 
 		void load_message(field_polynomial_t& received, block_t const &rsblock) const
 		{
 			for(boost::uint32_t i=0;i<block_t::CODE_LENGTH;++i)
-			{
-               received[block_t::CODE_LENGTH-1-i]=rsblock[i];
-            }
-         }
-
+				received[block_t::CODE_LENGTH-1-i]=rsblock[i];
+		}
+		
 		boost::int32_t compute_syndrome(field_polynomial_t const &received, field_polynomial_t &syndrome) const
 		{
 			boost::int32_t error_flag=0;
@@ -234,11 +228,10 @@ namespace baldzarika { namespace math { namespace ec { namespace reed_solomon {
          }
 
 	private:
-		std::vector<field_symbol_t>			m_root_exponent_table;
-		std::vector<field_symbol_t>			m_syndrome_exponent_table;
-		std::vector<field_polynomial_t>		m_gamma_table;
+		field_symbol_t						m_root_exponent_table[block_t::CODE_LENGTH+1];
+		field_symbol_t						m_syndrome_exponent_table[block_t::FEC_LENGTH];
+		field_polynomial_t					m_gamma_table[field_t::FIELD_SIZE+1];
 		field_polynomial_t					m_x;
-		boost::uint32_t						m_gii;
 	};
 
 } //namespace reed_solomon

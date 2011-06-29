@@ -12,7 +12,7 @@ namespace baldzarika { namespace ucv {
 		typedef typename DVT::value_type	dst_pixel_t;
 		typedef typename gil::channel_type<dst_pixel_t>::type dst_channel_t;
 
-		boost::uint32_t const threshold=(bw*bh/2)+1;
+		boost::uint32_t const threshold=(bw*bh)/2;
 		if(dst.width()*bw!=src.width() || dst.height()*bh!=src.height())
 			return false;
 
@@ -31,8 +31,8 @@ namespace baldzarika { namespace ucv {
 					}
 				}
 				dst_row[x]=pcount<threshold?
-					math::constant::zero<dst_channel_t>():
-					math::constant::one<dst_channel_t>();
+					std::numeric_limits<dst_channel_t>::max():
+					math::constant::zero<dst_channel_t>();
 			}
 		}
 
