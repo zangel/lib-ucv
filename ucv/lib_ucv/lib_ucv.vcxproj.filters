@@ -31,6 +31,9 @@
     <Filter Include="Source Files\baldzarika\ucv\gles">
       <UniqueIdentifier>{dac3081f-64d2-4e70-9a33-e9643a2ebe26}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\baldzarika\ucv\qr">
+      <UniqueIdentifier>{bc5c36b4-1e96-4db0-8333-a3e7c4066cb8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -144,8 +147,8 @@
     <ClInclude Include="include\baldzarika\ucv\masked_region.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\qr_code.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
+    <ClInclude Include="include\baldzarika\ucv\qr\code.h">
+      <Filter>Header Files\baldzarika\ucv\qr</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -26,9 +26,9 @@ namespace baldzarika { namespace math { namespace ec { namespace reed_solomon {
 			return bs.size()/PWR/CODE_LENGTH;
 		}
 
-		bool get(boost::dynamic_bitset<> const &bs, boost::uint32_t n)
+		bool get(boost::dynamic_bitset<> const &bs, boost::uint32_t n, boost::uint32_t N)
 		{
-			if(bs.size()<(n+CODE_LENGTH)*PWR)
+			if(n>=N || bs.size()<N*CODE_LENGTH*PWR)
 				return false;
 
 			for(boost::uint32_t s=0;s<CODE_LENGTH;++s)
@@ -37,7 +37,7 @@ namespace baldzarika { namespace math { namespace ec { namespace reed_solomon {
 				for(boost::uint32_t b=0;b<PWR;++b)
 				{
 					v<<=1;
-					v|=bs.test((n+s)*PWR+b)?1:0;
+					v|=bs.test((n+s*N)*PWR+b)?1:0;
 				}
 				m_data[s]=v;
 			}
@@ -46,13 +46,10 @@ namespace baldzarika { namespace math { namespace ec { namespace reed_solomon {
 
 		bool put(boost::dynamic_bitset<> &bs, boost::uint32_t n)
 		{
-			if(bs.size()<(n+CODE_LENGTH)*PWR)
-				return false;
-
-			for(boost::uint32_t s=0;s<CODE_LENGTH;++s)
+			for(boost::uint32_t s=0;s<DATA_LENGTH;++s)
 			{
 				for(boost::uint32_t b=0;b<PWR;++b)
-					bs.set((n+s)*PWR+b, (m_data[s]&(1<<b))?true:false);
+					bs.push_back((m_data[s]&(1<<b))?true:false);
 			}
 			return true;
 		}

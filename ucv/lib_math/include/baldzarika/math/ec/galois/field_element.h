@@ -14,6 +14,13 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 		typedef field_symbol_traits<PWR> field_symbol_traits_t;
 		typedef typename field_symbol_traits_t::field_symbol_t field_symbol_t;
 
+
+		static inline field_element const& one()
+		{
+			static field_element _one(1);
+			return _one;
+		}
+
 		field_element()
 			: m_poly_value(field_symbol_traits_t::invalid_symbol())
 		{
@@ -33,6 +40,11 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 		{
 			m_poly_value=rhs.m_poly_value;
 			return *this;
+		}
+
+		inline operator field_symbol_t() const
+		{
+			return m_poly_value;
 		}
 
 		inline field_element& operator=(field_symbol_t const &v)
@@ -87,7 +99,7 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 			return *this;
 		}
 
-		inline field_element& operator^=(boost::int32_t n)
+		inline field_element& operator^=(field_symbol_t n)
 		{
 			m_poly_value=field_t::get().exp(m_poly_value, n);
 			return *this;
@@ -143,9 +155,9 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 			return m_poly_value;
 		}
 
-		inline field_symbol_t inverse() const
+		inline field_element inverse() const
 		{
-			return field_t::get().inverse(m_poly_value);
+			return field_element(field_t::get().inverse(m_poly_value));
 		}
 
 		inline field_element& normalize()
@@ -161,6 +173,12 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 
 	template < boost::uint32_t PWR, boost::uint32_t PP >
 	inline field_element<PWR,PP> operator +(field_element<PWR,PP> const &a, field_element<PWR,PP> const &b)
+	{
+		return field_element<PWR,PP>(a)+=b;
+	}
+
+	template < boost::uint32_t PWR, boost::uint32_t PP >
+	inline field_element<PWR,PP> operator +(field_element<PWR,PP> const &a, typename field_element<PWR,PP>::field_symbol_t const &b)
 	{
 		return field_element<PWR,PP>(a)+=b;
 	}
@@ -196,7 +214,7 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 	}
 
 	template < boost::uint32_t PWR, boost::uint32_t PP >
-	inline field_element<PWR,PP> operator ^(field_element<PWR,PP> const &a, boost::int32_t b)
+	inline field_element<PWR,PP> operator ^(field_element<PWR,PP> const &a, typename field_element<PWR,PP>::field_symbol_t b)
 	{
 		return field_element<PWR,PP>(a)^=b;
 	}
