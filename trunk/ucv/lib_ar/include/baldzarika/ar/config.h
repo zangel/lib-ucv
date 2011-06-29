@@ -22,7 +22,7 @@
 #include <baldzarika/ucv/canny.h>
 #include <baldzarika/ucv/pixel_count.h>
 #include <baldzarika/ucv/binarize.h>
-#include <baldzarika/ucv/qr_code.h>
+#include <baldzarika/ucv/qr/code.h>
 
 
 #include <boost/enable_shared_from_this.hpp>

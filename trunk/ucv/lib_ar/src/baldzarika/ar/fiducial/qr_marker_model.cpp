@@ -708,11 +708,14 @@ namespace baldzarika { namespace ar { namespace fiducial {
 									ucv::detail::is_non_zero()
 								))
 								{
-									ucv::gil::png_write_view("warped_marker_image_bin.png", ucv::gil::const_view(binary));
+									//ucv::gil::png_write_view("warped_marker_image_bin.png", ucv::gil::const_view(binary));
 
-									boost::shared_ptr< ucv::qr::data< ucv::qr::get_version<D+2*7>::value > > qr_data=
-										ucv::qr_decode<ucv::qr::get_version<D+2*7>::value>(ucv::gil::view(binary));
-									
+									ucv::qr::decoder< ucv::qr::get_version<D+2*7>::value > qr_decoder;
+
+									if(qr_decoder.decode(ucv::gil::view(binary)))
+									{
+
+									}
 								}
 							}
 						}

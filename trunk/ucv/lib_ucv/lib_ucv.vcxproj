@@ -115,7 +115,7 @@
     <ClInclude Include="include\baldzarika\ucv\find_otsu_threshold.h" />
     <ClInclude Include="include\baldzarika\ucv\perspective_transform.h" />
     <ClInclude Include="include\baldzarika\ucv\pixel_count.h" />
-    <ClInclude Include="include\baldzarika\ucv\qr_code.h" />
+    <ClInclude Include="include\baldzarika\ucv\qr\code.h" />
     <ClInclude Include="include\baldzarika\ucv\ranged_histogram.h" />
     <ClInclude Include="include\baldzarika\ucv\resize.h" />
     <ClInclude Include="include\baldzarika\ucv\sobel.h" />

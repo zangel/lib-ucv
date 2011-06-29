@@ -36,9 +36,6 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			boost::int32_t											m_bottom_left_rot;
 		};
 
-
-
-
 		static boost::int32_t const CELL_SIZE;
 		static boost::int32_t const MAX_MARKER_CELLS;
 		static boost::int32_t const MAX_MARKER_SIZE;
@@ -59,6 +56,16 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			HELPER_1,
 			HELPER_2
 		} eHelperType;
+
+
+
+		class qr_code_info
+		{
+		public:
+		private:
+		};
+
+
 
 				
 		qr_marker_model();
