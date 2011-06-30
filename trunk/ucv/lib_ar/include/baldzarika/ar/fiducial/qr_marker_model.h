@@ -57,7 +57,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		
 		typedef boost::multi_index_container
 		<
-			qr_detect_info,
+			boost::shared_ptr<qr_detect_info>,
 			boost::multi_index::indexed_by
 			<
 				boost::multi_index::random_access

@@ -56,22 +56,22 @@
     <ClCompile Include="FiducialTestPreviewWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_ArTestDlg.cpp">
+    <ClCompile Include="SURFTestWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SURFTestDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_SURFTestWidget.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ArTestDlg.cpp">
+    <ClCompile Include="GeneratedFiles\Release\moc_SURFTestWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_FiducialTestDlg.cpp">
+    <ClCompile Include="GeneratedFiles\Debug\moc_SURFTestDlg.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_FiducialTestDlg.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_FiducialTestPreviewWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_FiducialTestPreviewWidget.cpp">
+    <ClCompile Include="GeneratedFiles\Release\moc_SURFTestDlg.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_PreviewWidget.cpp">
@@ -80,23 +80,23 @@
     <ClCompile Include="GeneratedFiles\Release\moc_PreviewWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_SURFTestWidget.cpp">
+    <ClCompile Include="GeneratedFiles\Debug\moc_FiducialTestPreviewWidget.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_SURFTestWidget.cpp">
+    <ClCompile Include="GeneratedFiles\Release\moc_FiducialTestPreviewWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="SURFTestWidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_SURFTestDlg.cpp">
+    <ClCompile Include="GeneratedFiles\Debug\moc_FiducialTestDlg.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_SURFTestDlg.cpp">
+    <ClCompile Include="GeneratedFiles\Release\moc_FiducialTestDlg.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="SURFTestDlg.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ArTestDlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ArTestDlg.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -109,25 +109,25 @@
     <CustomBuild Include="FiducialTestDlg.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="ArTestDlg.h">
+    <CustomBuild Include="SURFTestDlg.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SURFTestWidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="FiducialTestDlg.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="FiducialTestPreviewWidget.h">
+    <CustomBuild Include="SURFTestDlg.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="PreviewWidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="SURFTestWidget.h">
+    <CustomBuild Include="FiducialTestPreviewWidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="SURFTestDlg.ui">
-      <Filter>Form Files</Filter>
+    <CustomBuild Include="FiducialTestDlg.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="SURFTestDlg.h">
+    <CustomBuild Include="ArTestDlg.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -138,11 +138,11 @@
     <ClInclude Include="GeneratedFiles\ui_FiducialTestDlg.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="Prec.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_SURFTestDlg.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Prec.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -154,7 +154,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		return std::make_pair(m_version,m_data_hash);
 	}
 	
-	boost::int32_t const qr_marker_model::CELL_SIZE=3;
+	boost::int32_t const qr_marker_model::CELL_SIZE=5;
 	boost::int32_t const qr_marker_model::MAX_MARKER_CELLS=33;
 	boost::int32_t const qr_marker_model::MAX_MARKER_SIZE=MAX_MARKER_CELLS*CELL_SIZE;
 	boost::int32_t const qr_marker_model::HELPER1_CELLS=7;
@@ -209,9 +209,9 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 		for(qr_detect_infos_t::iterator qri=m_qr_detect_infos.begin();qri!=m_qr_detect_infos.end();++qri)
 		{
-			qr_detect_info &qrdi=const_cast<qr_detect_info &>(*qri);
-			if(!qrdi.m_detect_counter) continue;
-			qrdi.m_detect_counter--;
+			boost::shared_ptr<qr_detect_info> qrdi=*qri;
+			if(!qrdi->m_detect_counter) continue;
+			qrdi->m_detect_counter--;
 		}
 		
 		return true;
@@ -730,9 +730,10 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 						typename qr_detect_infos_t::iterator qri=m_qr_detect_infos.end();
 
-						for(typename qr_detect_infos_by_version_t::iterator qrii=this_version_qr_codes.first; qrii!=this_version_qr_codes.second && qri==m_qr_detect_infos.end(); ++qrii)
+						for(typename qr_detect_infos_by_version_t::iterator qrii=this_version_qr_codes.first; qrii!=this_version_qr_codes.second && qri==m_qr_detect_infos.end() && false; ++qrii)
 						{
-							if(!qrii->m_detect_counter) continue;
+							boost::shared_ptr<qr_detect_info> qrdi=*qrii;
+							if(!qrdi->m_detect_counter) continue;
 							if(	helper_bboxes[0].contains(itriplet->m_top_left->m_center.transformed(fp_inv_homography)) &&
 								helper_bboxes[1].contains(itriplet->m_top_right->m_center.transformed(fp_inv_homography)) &&
 								helper_bboxes[2].contains(ihelper2->m_center.transformed(fp_inv_homography)) &&
@@ -776,7 +777,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 											),
 											0,
 											1
-										)*gray_t(1.2),
+										),
 										1.0
 									)
 								))
@@ -807,11 +808,16 @@ namespace baldzarika { namespace ar { namespace fiducial {
 												marker_id_t qri_id=existing_qri-m_qr_detect_infos.begin();
 												typename std::list<detect_info>::iterator dii=dis.begin();
 												while(dii!=dis.end() && dii->m_marker_id!=qri_id) dii++;
-												if(dii!=dis.end())
+												if(dii==dis.end())
 													qri=existing_qri;
 											}
 											else
-												qri=m_qr_detect_infos.insert(m_qr_detect_infos.end(), qr_detect_info(MARKER_VERSION,data_hash)).first;
+											{
+												qri=m_qr_detect_infos.insert(
+													m_qr_detect_infos.end(),
+													boost::shared_ptr<qr_detect_info>(new qr_detect_info(MARKER_VERSION,data_hash))
+												).first;
+											}
 										}
 									}
 								}
@@ -820,10 +826,10 @@ namespace baldzarika { namespace ar { namespace fiducial {
 						
 						if(qri!=m_qr_detect_infos.end())
 						{
-							qr_detect_info &qrdi=const_cast<qr_detect_info &>(*qri);
+							boost::shared_ptr<qr_detect_info> qrdi=*qri;
 							
-							qrdi.m_detect_counter=2;
-							qrdi.m_last_homography_inverse=fp_inv_homography;
+							qrdi->m_detect_counter=2;
+							qrdi->m_last_homography_inverse=fp_inv_homography;
 							dis.push_back(
 								detect_info(
 									qri-m_qr_detect_infos.begin(),
