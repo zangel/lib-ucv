@@ -163,10 +163,13 @@ BOOST_AUTO_TEST_CASE( test_matrix )
 BOOST_AUTO_TEST_CASE( test_ec_galois_field )
 {
 	namespace bmath=baldzarika::math;
+
 	bmath::ec::galois::field<8,6> const &f=bmath::ec::galois::field<8,6>::get();
 
 	typedef bmath::ec::reed_solomon::decoder<8,6,255,32> decoder_t;
-	decoder_t decoder(120);
+	decoder_t decoder;
 	decoder_t::block_t block;
 	decoder.decode(block);
+
+	
 }

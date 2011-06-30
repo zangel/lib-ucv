@@ -9,6 +9,7 @@
 #include <baldzarika/ar/fiducial/tracker.h>
 #include <baldzarika/ar/fiducial/marker_model.h>
 #include <baldzarika/ar/fiducial/bch_marker_model.h>
+#include <baldzarika/ar/fiducial/qr_marker_model.h>
 
 
 #include <QDialog>

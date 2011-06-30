@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_start_stop_test )
 #endif
 
 template < typename MarkerModel >
-void test_fiducial_marker_model_detection(char const *test_image, boost::uint32_t expected_markers_count)
+void test_fiducial_marker_model_detection(char const *test_image, boost::uint32_t expected_markers_count, boost::uint32_t n_frames=1)
 {
 	using namespace baldzarika;
 
@@ -211,7 +211,14 @@ void test_fiducial_marker_model_detection(char const *test_image, boost::uint32_
 	signal_listener.m_detected=0;
 	tracker->start();
 	while(!tracker->is_started()) boost::this_thread::yield();
-	tracker->process_frame(ucv::gil::const_view(gray8_frame));
+	
+	while(n_frames)
+	{
+		if(tracker->process_frame(ucv::gil::const_view(gray8_frame)))
+			n_frames--;
+		else
+			boost::this_thread::yield();
+	}
 	tracker->stop();
 	tracker->wait_to_stop();
 	BOOST_CHECK_EQUAL(signal_listener.m_detected, expected_markers_count);
@@ -226,5 +233,5 @@ BOOST_AUTO_TEST_CASE( fiducial_tracker_bch_detection )
 
 BOOST_AUTO_TEST_CASE( fiducial_tracker_qr_detection )
 {
-	test_fiducial_marker_model_detection<baldzarika::ar::fiducial::qr_marker_model>("../lib_ucv_test/qr_code_test.png", 1);
+	test_fiducial_marker_model_detection<baldzarika::ar::fiducial::qr_marker_model>("../lib_ucv_test/qr_code_test.png", 1, 2);
 }
