@@ -10,13 +10,13 @@ int main(int argc, char *argv[])
 	QGLFormat::setDefaultFormat(defaultGLFormat);
 	
 	QApplication a(argc, argv);
-
+#if 0
 	wchar_t moduleFileName[MAX_PATH];
 
 	GetModuleFileName(GetModuleHandle(0), moduleFileName, MAX_PATH);
 
 	qApp->addLibraryPath(QFileInfo(QString::fromWCharArray(moduleFileName)).absoluteDir().path()+"/plugins");
-
+#endif
 #if 0
 	SURFTestDlg TheSURFTestDlg;
 	TheSURFTestDlg.show();
