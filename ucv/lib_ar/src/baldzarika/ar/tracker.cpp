@@ -229,9 +229,10 @@ namespace baldzarika { namespace ar {
 				if(!on_process_frame(gv))
 					return false;
 				m_ios.post(boost::bind(&tracker::update, this));
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	void tracker::update_camera_projection()

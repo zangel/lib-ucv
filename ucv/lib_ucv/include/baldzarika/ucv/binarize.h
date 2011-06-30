@@ -31,7 +31,7 @@ namespace baldzarika { namespace ucv {
 					}
 				}
 				dst_row[x]=pcount<threshold?
-					std::numeric_limits<dst_channel_t>::max():
+					math::constant::one<dst_channel_t>():
 					math::constant::zero<dst_channel_t>();
 			}
 		}

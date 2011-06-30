@@ -36,6 +36,47 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			boost::int32_t											m_bottom_left_rot;
 		};
 
+		struct qr_detect_info
+		{
+			typedef std::pair<boost::uint32_t, std::size_t> version_data_hash_t;
+			
+			struct order_tag {};
+			struct version_tag {};
+			struct version_data_hash_tag {};
+			
+
+			qr_detect_info(boost::uint32_t version, std::size_t data_hash);
+
+			version_data_hash_t					version_data_hash() const;
+			
+			boost::uint32_t						m_version;
+			std::size_t							m_data_hash;
+			boost::uint32_t						m_detect_counter;
+			math::matrix<math::real_t, 3, 3>	m_last_homography_inverse;
+		};
+		
+		typedef boost::multi_index_container
+		<
+			qr_detect_info,
+			boost::multi_index::indexed_by
+			<
+				boost::multi_index::random_access
+				<
+					boost::multi_index::tag<qr_detect_info::order_tag>
+				>,
+				boost::multi_index::ordered_non_unique
+				<
+					boost::multi_index::tag<qr_detect_info::version_tag>,
+					BOOST_MULTI_INDEX_MEMBER(qr_detect_info, boost::uint32_t, m_version)
+				>,
+				boost::multi_index::hashed_unique
+				<
+					boost::multi_index::tag<qr_detect_info::version_data_hash_tag>,
+					BOOST_MULTI_INDEX_CONST_MEM_FUN(qr_detect_info, qr_detect_info::version_data_hash_t, version_data_hash)
+				>
+			>
+		> qr_detect_infos_t;
+
 		static boost::int32_t const CELL_SIZE;
 		static boost::int32_t const MAX_MARKER_CELLS;
 		static boost::int32_t const MAX_MARKER_SIZE;
@@ -59,13 +100,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 
 
-		class qr_code_info
-		{
-		public:
-		private:
-		};
-
-
+		
 
 				
 		qr_marker_model();
@@ -98,10 +133,11 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		bool					detect_v2_4_markers(gray_const_view_t img, std::list< helper_detect_info<T> > &helpers1, std::list< helper_detect_info<T> > &helpers2, std::list<detect_info> &dis) const;
 	
 	private:
-		mutable gray_image_t	m_helper_warped_img;
-		mutable gray_image_t	m_marker_warped_img;
-		math::real_t			m_helper_eccentricity;
-		math::real_t			m_helper_min_area;
+		mutable qr_detect_infos_t	m_qr_detect_infos;
+		mutable gray_image_t		m_helper_warped_img;
+		mutable gray_image_t		m_marker_warped_img;
+		math::real_t				m_helper_eccentricity;
+		math::real_t				m_helper_min_area;
 	};
 
 } //namespace fiducial

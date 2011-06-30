@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 
 	qApp->addLibraryPath(QFileInfo(QString::fromWCharArray(moduleFileName)).absoluteDir().path()+"/plugins");
 
-#if 1
+#if 0
 	SURFTestDlg TheSURFTestDlg;
 	TheSURFTestDlg.show();
 	return TheSURFTestDlg.exec();

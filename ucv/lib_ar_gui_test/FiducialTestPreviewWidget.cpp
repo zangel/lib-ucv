@@ -18,11 +18,20 @@ FiducialTestPreviewWidget::FiducialTestPreviewWidget(QWidget *parent/* =0 */)
 	m_vi.setupDevice(0, FIDUCIAL_PREVIEW_WIDTH, FIDUCIAL_PREVIEW_HEIGHT);
 
 	m_tracker.reset(new ar::fiducial::tracker(math::size2ui(FIDUCIAL_PREVIEW_WIDTH,FIDUCIAL_PREVIEW_HEIGHT)));
+
+#if 0
 	m_tracker->add_marker_model(
 		boost::shared_ptr<ar::fiducial::marker_model>(
 			new ar::fiducial::bch_marker_model()
 		)
 	);
+#else
+	m_tracker->add_marker_model(
+		boost::shared_ptr<ar::fiducial::marker_model>(
+			new ar::fiducial::qr_marker_model()
+		)
+	);
+#endif
 
 	m_tracker->marker_state_changed().connect(
 		boost::bind(&FiducialTestPreviewWidget::onMarkerStateChanged, this, _1, _2)

@@ -99,6 +99,27 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			)
 		};
 
+		static inline std::size_t compute_data_hash(boost::dynamic_bitset<> const &data)
+		{
+			std::size_t data_hash(0);
+
+			boost::uint32_t bits_read(0);
+			boost::uint32_t value(0);
+			for(boost::uint32_t b=0;b<data.size();++b)
+			{
+				value|=(data.test(b)?1:0)<<(bits_read++);
+				if(bits_read==32)
+				{
+					boost::hash_combine(data_hash, value);
+					value=0;
+					bits_read=0;
+				}
+			}
+			if(bits_read)
+				boost::hash_combine(data_hash, value);
+			return data_hash;
+		}
+
 	} //namespace anonymous
 	
 	template < typename T >
@@ -121,6 +142,18 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	{
 	}
 
+	qr_marker_model::qr_detect_info::qr_detect_info(boost::uint32_t version, boost::uint32_t data_hash)
+		: m_version(version)
+		, m_data_hash(data_hash)
+		, m_detect_counter(0)
+	{
+	}
+
+	qr_marker_model::qr_detect_info::version_data_hash_t qr_marker_model::qr_detect_info::version_data_hash() const
+	{
+		return std::make_pair(m_version,m_data_hash);
+	}
+	
 	boost::int32_t const qr_marker_model::CELL_SIZE=3;
 	boost::int32_t const qr_marker_model::MAX_MARKER_CELLS=33;
 	boost::int32_t const qr_marker_model::MAX_MARKER_SIZE=MAX_MARKER_CELLS*CELL_SIZE;
@@ -148,6 +181,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	bool qr_marker_model::begin(math::size2ui const &fs) const
 	{
+		m_qr_detect_infos.clear();
 		return true;
 	}
 
@@ -170,7 +204,17 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		std::list< helper_detect_info<math::real_t> > helpers1, helpers2;
 		if(!detect_helpers(img, helper_candidates, helpers1, helpers2))
 			return false;
-		return detect_markers(img,helpers1,helpers2,dis);
+		if(!detect_markers(img,helpers1,helpers2,dis))
+			return false;
+
+		for(qr_detect_infos_t::iterator qri=m_qr_detect_infos.begin();qri!=m_qr_detect_infos.end();++qri)
+		{
+			qr_detect_info &qrdi=const_cast<qr_detect_info &>(*qri);
+			if(!qrdi.m_detect_counter) continue;
+			qrdi.m_detect_counter--;
+		}
+		
+		return true;
 	}
 
 	bool qr_marker_model::is_helper_candidate(gray_const_view_t img, contour_t const &contour) const
@@ -576,10 +620,35 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	template < typename T, boost::int32_t D >
 	bool qr_marker_model::detect_v2_4_markers(gray_const_view_t img, std::list< helper_detect_info<T> > &helpers1, std::list< helper_detect_info<T> > &helpers2, std::list<detect_info> &dis) const
 	{
+		boost::uint32_t const MARKER_VERSION=ucv::qr::get_version<D+2*7>::value;
+		boost::uint32_t const MARKER_DIMENSION=ucv::qr::get_dimension<MARKER_VERSION>::value;
+		
 		static math::box2<T> const helper_bbox2=math::box2<T>(
 			math::point2<T>(math::constant::zero<T>(), math::constant::zero<T>()),
 			math::size2<T>(T(HELPER_SIZE),T(HELPER_SIZE))
 		);
+
+
+		static math::box2<T> const helper_bboxes[4]=
+		{
+			math::box2<T>( //tl
+				math::point2<T>(0,0),
+				math::size2<T>(HELPER1_CELLS*CELL_SIZE,HELPER1_CELLS*CELL_SIZE)
+			),
+			math::box2<T>( //tr
+				math::point2<T>((MARKER_DIMENSION-HELPER1_CELLS)*CELL_SIZE, 0),
+				math::size2<T>(HELPER1_CELLS*CELL_SIZE,HELPER1_CELLS*CELL_SIZE)
+			),
+			math::box2<T>( //alignment pattern
+				math::point2<T>((MARKER_DIMENSION-HELPER1_CELLS-2)*CELL_SIZE,(MARKER_DIMENSION-HELPER1_CELLS-2)*CELL_SIZE),
+				math::size2<T>((HELPER2_CELLS+2)*CELL_SIZE,(HELPER2_CELLS+2)*CELL_SIZE)
+			),
+			math::box2<T>( //bl
+				math::point2<T>(0,(MARKER_DIMENSION-HELPER1_CELLS)*CELL_SIZE),
+				math::size2<T>(HELPER1_CELLS*CELL_SIZE,HELPER1_CELLS*CELL_SIZE)
+			)
+		};
+
 
 		static math::point2f const src_pts_data[4]=
 		{
@@ -641,83 +710,127 @@ namespace baldzarika { namespace ar { namespace fiducial {
 					math::matrix33f homography;
 					if(ucv::perspective_transform(src_pts,dst_pts,homography))
 					{
+						typedef typename qr_detect_infos_t::index<qr_detect_info::version_tag>::type qr_detect_infos_by_version_t;
+						typedef typename qr_detect_infos_t::index<qr_detect_info::version_data_hash_tag>::type qr_detect_infos_by_version_data_hash_t;
+
 						math::matrix<math::real_t, 3, 3> fp_homography=homography;
-						if(ucv::warp(
-							img,
-							ucv::gil::subimage_view(
-								ucv::gil::view(m_marker_warped_img),
-								0, 0,
-								(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
-							),
-							fp_homography,
-							true))
+						math::matrix33f inv_homography=homography.inverted();
+						math::matrix<math::real_t, 3, 3> fp_inv_homography=inv_homography;
+
+						qr_detect_infos_by_version_t &qr_detect_infos_by_version=m_qr_detect_infos.get<qr_detect_info::version_tag>();
+						qr_detect_infos_by_version_data_hash_t &qr_detect_infos_by_version_data_hash=m_qr_detect_infos.get<qr_detect_info::version_data_hash_tag>();
+												
+						std::pair<
+							typename qr_detect_infos_by_version_t::iterator,
+							typename qr_detect_infos_by_version_t::iterator
+						> this_version_qr_codes (
+							qr_detect_infos_by_version.lower_bound(ucv::qr::get_version<D+2*7>::value),
+							qr_detect_infos_by_version.upper_bound(ucv::qr::get_version<D+2*7>::value)
+						);
+
+						typename qr_detect_infos_t::iterator qri=m_qr_detect_infos.end();
+
+						for(typename qr_detect_infos_by_version_t::iterator qrii=this_version_qr_codes.first; qrii!=this_version_qr_codes.second && qri==m_qr_detect_infos.end(); ++qrii)
 						{
-				
-#if 1
+							if(!qrii->m_detect_counter) continue;
+							if(	helper_bboxes[0].contains(itriplet->m_top_left->m_center.transformed(fp_inv_homography)) &&
+								helper_bboxes[1].contains(itriplet->m_top_right->m_center.transformed(fp_inv_homography)) &&
+								helper_bboxes[2].contains(ihelper2->m_center.transformed(fp_inv_homography)) &&
+								helper_bboxes[3].contains(itriplet->m_bottom_left->m_center.transformed(fp_inv_homography))
+							)
 							{
-								ucv::gil::gray8_image_t save_img((2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE);
-								ucv::convert(
-									ucv::gil::subimage_view(
-										ucv::gil::const_view(m_marker_warped_img),
-										0, 0,
-										(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
-									),
-									ucv::gil::view(save_img),
-									ucv::detail::grayscale_convert()
-								);
-				
-								ucv::gil::png_write_view("warped_marker_image.png", ucv::gil::const_view(save_img));
+								qri=m_qr_detect_infos.project<qr_detect_info::order_tag>(qrii);
 							}
-#endif
+						}
 
-
-							if(ucv::threshold(
-								ucv::gil::subimage_view(
-									ucv::gil::const_view(m_marker_warped_img),
-									0, 0,
-									(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
-								),
+						if(qri==m_qr_detect_infos.end())
+						{
+							if(ucv::warp(
+								img,
 								ucv::gil::subimage_view(
 									ucv::gil::view(m_marker_warped_img),
 									0, 0,
 									(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
 								),
-								ucv::detail::normal_binary_threshold<gray_t,gray_t>(
-									ucv::find_otsu_threshold<gray_const_view_t,20>(
-										ucv::gil::subimage_view(
-											ucv::gil::const_view(m_marker_warped_img),
-											0, 0,
-											(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
-										),
-										0,
-										1
-									)*gray_t(1.2),
-									1.0
-								)
+								fp_homography,
+								true
 							))
 							{
-								ucv::gil::gray8_image_t binary((2*HELPER1_CELLS+D),(2*HELPER1_CELLS+D));
-								if(ucv::binarize(
+								if(ucv::threshold(
 									ucv::gil::subimage_view(
 										ucv::gil::const_view(m_marker_warped_img),
 										0, 0,
 										(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
 									),
-									ucv::gil::view(binary),
-									CELL_SIZE,CELL_SIZE,
-									ucv::detail::is_non_zero()
+									ucv::gil::subimage_view(
+										ucv::gil::view(m_marker_warped_img),
+										0, 0,
+										(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+									),
+									ucv::detail::normal_binary_threshold<gray_t,gray_t>(
+										ucv::find_otsu_threshold<gray_const_view_t,20>(
+											ucv::gil::subimage_view(
+												ucv::gil::const_view(m_marker_warped_img),
+												0, 0,
+												(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+											),
+											0,
+											1
+										)*gray_t(1.2),
+										1.0
+									)
 								))
 								{
-									//ucv::gil::png_write_view("warped_marker_image_bin.png", ucv::gil::const_view(binary));
-
-									ucv::qr::decoder< ucv::qr::get_version<D+2*7>::value > qr_decoder;
-
-									if(qr_decoder.decode(ucv::gil::view(binary)))
+									ucv::gil::gray8_image_t binary((2*HELPER1_CELLS+D),(2*HELPER1_CELLS+D));
+									if(ucv::binarize(
+										ucv::gil::subimage_view(
+											ucv::gil::const_view(m_marker_warped_img),
+											0, 0,
+											(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+										),
+										ucv::gil::view(binary),
+										CELL_SIZE,CELL_SIZE,
+										ucv::detail::is_non_zero()
+									))
 									{
+										ucv::qr::decoder< ucv::qr::get_version<D+2*7>::value > qr_decoder;
+									
+										if(qr_decoder.decode(ucv::gil::view(binary)))
+										{
+											std::size_t data_hash=compute_data_hash(qr_decoder.decoded_bits());
 
+											typename qr_detect_infos_by_version_data_hash_t::iterator qrii=
+												qr_detect_infos_by_version_data_hash.find(std::make_pair(MARKER_VERSION,data_hash));
+											if(qrii!=qr_detect_infos_by_version_data_hash.end())
+											{
+												typename qr_detect_infos_t::iterator existing_qri=m_qr_detect_infos.project<qr_detect_info::order_tag>(qrii);
+												marker_id_t qri_id=existing_qri-m_qr_detect_infos.begin();
+												typename std::list<detect_info>::iterator dii=dis.begin();
+												while(dii!=dis.end() && dii->m_marker_id!=qri_id) dii++;
+												if(dii!=dis.end())
+													qri=existing_qri;
+											}
+											else
+												qri=m_qr_detect_infos.insert(m_qr_detect_infos.end(), qr_detect_info(MARKER_VERSION,data_hash)).first;
+										}
 									}
 								}
 							}
+						}
+						
+						if(qri!=m_qr_detect_infos.end())
+						{
+							qr_detect_info &qrdi=const_cast<qr_detect_info &>(*qri);
+							
+							qrdi.m_detect_counter=2;
+							qrdi.m_last_homography_inverse=fp_inv_homography;
+							dis.push_back(
+								detect_info(
+									qri-m_qr_detect_infos.begin(),
+									math::size2ui(MARKER_DIMENSION*CELL_SIZE,MARKER_DIMENSION*CELL_SIZE),
+									homography
+								)
+							);
 						}
 					}
 
