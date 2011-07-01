@@ -155,17 +155,17 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	}
 	
 	boost::int32_t const qr_marker_model::CELL_SIZE=5;
-	boost::int32_t const qr_marker_model::MAX_MARKER_CELLS=33;
+	boost::int32_t const qr_marker_model::MAX_MARKER_CELLS=ucv::qr::get_dimension<4>::value;
 	boost::int32_t const qr_marker_model::MAX_MARKER_SIZE=MAX_MARKER_CELLS*CELL_SIZE;
 	boost::int32_t const qr_marker_model::HELPER1_CELLS=7;
 	boost::int32_t const qr_marker_model::HELPER2_CELLS=3;
-	boost::int32_t const qr_marker_model::HELPER_CELLS=HELPER1_CELLS*HELPER2_CELLS;
-	boost::int32_t const qr_marker_model::HELPER1_CELL_SIZE=HELPER_CELLS/HELPER1_CELLS*CELL_SIZE;
-	boost::int32_t const qr_marker_model::HELPER2_CELL_SIZE=HELPER_CELLS/HELPER2_CELLS*CELL_SIZE;
-	boost::int32_t const qr_marker_model::HELPER_SIZE=HELPER_CELLS*CELL_SIZE;
+	//boost::int32_t const qr_marker_model::HELPER_CELLS=HELPER1_CELLS*HELPER2_CELLS;
+	boost::int32_t const qr_marker_model::HELPER1_CELL_SIZE=6;//HELPER_CELLS/HELPER1_CELLS*CELL_SIZE;
+	boost::int32_t const qr_marker_model::HELPER2_CELL_SIZE=14;//HELPER_CELLS/HELPER2_CELLS*CELL_SIZE;
+	boost::int32_t const qr_marker_model::HELPER_SIZE=42;
 		
 	math::real_t const qr_marker_model::DEFAULT_HELPER_ECCENTRICITY=0.70710678118654752440084436210485;
-	math::real_t const qr_marker_model::DEFAULT_HELPER_MIN_AREA=0.05;
+	math::real_t const qr_marker_model::DEFAULT_HELPER_MIN_AREA=0.001;
 
 	qr_marker_model::qr_marker_model()
 		: m_helper_warped_img(HELPER_SIZE, HELPER_SIZE)
@@ -192,6 +192,16 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	math::size2ui qr_marker_model::get_marker_size(marker_id_t mid) const
 	{
+		if(mid<m_qr_detect_infos.size())
+		{
+			switch(m_qr_detect_infos[mid]->m_version)
+			{
+			case 1: return math::size2ui(ucv::qr::get_dimension<1>::value*CELL_SIZE,ucv::qr::get_dimension<1>::value*CELL_SIZE); break;
+			case 2: return math::size2ui(ucv::qr::get_dimension<2>::value*CELL_SIZE,ucv::qr::get_dimension<2>::value*CELL_SIZE); break;
+			case 3: return math::size2ui(ucv::qr::get_dimension<3>::value*CELL_SIZE,ucv::qr::get_dimension<3>::value*CELL_SIZE); break;
+			case 4: return math::size2ui(ucv::qr::get_dimension<4>::value*CELL_SIZE,ucv::qr::get_dimension<4>::value*CELL_SIZE); break;
+			}
+		}
 		return math::size2ui(MAX_MARKER_SIZE,MAX_MARKER_SIZE);
 	}
 
@@ -201,7 +211,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		find_helper_candidates(img, contours, helper_candidates);
 		filter_helper_candidates(helper_candidates);
 
-		std::list< helper_detect_info<math::real_t> > helpers1, helpers2;
+		//std::list< helper_detect_info<math::real_t> > helpers1, helpers2;
+		std::list< helper_detect_info<float> > helpers1, helpers2;
 		if(!detect_helpers(img, helper_candidates, helpers1, helpers2))
 			return false;
 		if(!detect_markers(img,helpers1,helpers2,dis))
@@ -227,8 +238,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			(math::real_t(contour.m_bbox.height())/math::real_t(img.height()))
 		);
 
-		float fr=bbox_frame_ratio;
-		float min_fr=m_helper_min_area;
+		//float fr=bbox_frame_ratio;
+		//float min_fr=m_helper_min_area;
 
 
 		if(bbox_frame_ratio<m_helper_min_area)
@@ -349,7 +360,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 							ucv::gil::const_view(m_helper_warped_img),
 							0,
 							1
-						),
+						)*gray_t(1.2f),
 						1.0
 					)
 				)
@@ -359,7 +370,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			if(helper_type==HELPER_INVALID) continue;
 
 			math::matrix33f inv_homography=homography.inverted();
-			
+			inv_homography*=1.0f/inv_homography(2,2);
+					
 			
 			math::point2f helper_center(
 				(dst_pts[0].x()+dst_pts[1].x()+dst_pts[2].x()+dst_pts[3].x())*0.25f,
@@ -657,16 +669,16 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				float(HELPER1_CELLS*CELL_SIZE)*math::constant::half<float>()
 			),
 			math::point2f(
-				float((HELPER1_CELLS+D)*CELL_SIZE)+float(HELPER1_CELLS*CELL_SIZE)*math::constant::half<float>(),
+				float((MARKER_DIMENSION-HELPER1_CELLS)*CELL_SIZE)+float(HELPER1_CELLS*CELL_SIZE)*math::constant::half<float>(),
 				float(HELPER1_CELLS*CELL_SIZE)*math::constant::half<float>()
 			),
 			math::point2f(
-				float((D+HELPER1_CELLS)*CELL_SIZE)+float(CELL_SIZE)*math::constant::half<float>(),
-				float((D+HELPER1_CELLS)*CELL_SIZE)+float(CELL_SIZE)*math::constant::half<float>()
+				float((MARKER_DIMENSION-HELPER1_CELLS)*CELL_SIZE)+float(CELL_SIZE)*math::constant::half<float>(),
+				float((MARKER_DIMENSION-HELPER1_CELLS)*CELL_SIZE)+float(CELL_SIZE)*math::constant::half<float>()
 			),
 			math::point2f(
 				float(HELPER1_CELLS*CELL_SIZE)*math::constant::half<float>(),
-				float((HELPER1_CELLS+D)*CELL_SIZE)+float(HELPER1_CELLS*CELL_SIZE)*math::constant::half<float>()
+				float((MARKER_DIMENSION-HELPER1_CELLS)*CELL_SIZE)+float(HELPER1_CELLS*CELL_SIZE)*math::constant::half<float>()
 			)
 		};
 
@@ -682,6 +694,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			typename std::list< helper_detect_info<T> >::iterator ihelper2=helpers2.begin();
 			while(ihelper2!=helpers2.end())
 			{
+				//boost::uint32_t contained_by=0;
 				bool tl_contains=helper_bbox2.contains(
 					helper1_neighbours<T,D>::HELPER2_TL[itriplet->m_top_left_rot].
 						transformed(itriplet->m_top_left->m_homography).
@@ -700,7 +713,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 						transformed(ihelper2->m_inv_homography)
 				);
 
-				if(tl_contains && tr_contains && bl_contains)
+				if(tl_contains || tr_contains || bl_contains)
 				{
 					dst_pts[0]=math::point2f(itriplet->m_top_left->m_center);
 					dst_pts[1]=math::point2f(itriplet->m_top_right->m_center);
@@ -715,35 +728,37 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 						math::matrix<math::real_t, 3, 3> fp_homography=homography;
 						math::matrix33f inv_homography=homography.inverted();
+						inv_homography*=1.0f/inv_homography(2,2);
 						math::matrix<math::real_t, 3, 3> fp_inv_homography=inv_homography;
 
 						qr_detect_infos_by_version_t &qr_detect_infos_by_version=m_qr_detect_infos.get<qr_detect_info::version_tag>();
 						qr_detect_infos_by_version_data_hash_t &qr_detect_infos_by_version_data_hash=m_qr_detect_infos.get<qr_detect_info::version_data_hash_tag>();
-												
+						
+						typename qr_detect_infos_t::iterator qri=m_qr_detect_infos.end();
+
+#if 0
 						std::pair<
 							typename qr_detect_infos_by_version_t::iterator,
 							typename qr_detect_infos_by_version_t::iterator
 						> this_version_qr_codes (
-							qr_detect_infos_by_version.lower_bound(ucv::qr::get_version<D+2*7>::value),
-							qr_detect_infos_by_version.upper_bound(ucv::qr::get_version<D+2*7>::value)
+							qr_detect_infos_by_version.lower_bound(MARKER_VERSION),
+							qr_detect_infos_by_version.upper_bound(MARKER_VERSION)
 						);
 
-						typename qr_detect_infos_t::iterator qri=m_qr_detect_infos.end();
-
-						for(typename qr_detect_infos_by_version_t::iterator qrii=this_version_qr_codes.first; qrii!=this_version_qr_codes.second && qri==m_qr_detect_infos.end() && false; ++qrii)
+						for(typename qr_detect_infos_by_version_t::iterator qrii=this_version_qr_codes.first; qrii!=this_version_qr_codes.second && qri==m_qr_detect_infos.end(); ++qrii)
 						{
 							boost::shared_ptr<qr_detect_info> qrdi=*qrii;
 							if(!qrdi->m_detect_counter) continue;
-							if(	helper_bboxes[0].contains(itriplet->m_top_left->m_center.transformed(fp_inv_homography)) &&
-								helper_bboxes[1].contains(itriplet->m_top_right->m_center.transformed(fp_inv_homography)) &&
-								helper_bboxes[2].contains(ihelper2->m_center.transformed(fp_inv_homography)) &&
-								helper_bboxes[3].contains(itriplet->m_bottom_left->m_center.transformed(fp_inv_homography))
+							if(	helper_bboxes[0].contains(itriplet->m_top_left->m_center.transformed(qrdi->m_last_homography_inverse)) &&
+								helper_bboxes[1].contains(itriplet->m_top_right->m_center.transformed(qrdi->m_last_homography_inverse)) &&
+								helper_bboxes[2].contains(ihelper2->m_center.transformed(qrdi->m_last_homography_inverse)) &&
+								helper_bboxes[3].contains(itriplet->m_bottom_left->m_center.transformed(qrdi->m_last_homography_inverse))
 							)
 							{
 								qri=m_qr_detect_infos.project<qr_detect_info::order_tag>(qrii);
 							}
 						}
-
+#endif
 						if(qri==m_qr_detect_infos.end())
 						{
 							if(ucv::warp(
@@ -751,49 +766,71 @@ namespace baldzarika { namespace ar { namespace fiducial {
 								ucv::gil::subimage_view(
 									ucv::gil::view(m_marker_warped_img),
 									0, 0,
-									(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+									MARKER_DIMENSION*CELL_SIZE,MARKER_DIMENSION*CELL_SIZE
 								),
 								fp_homography,
 								true
 							))
 							{
+
+
+#if 0
+								{
+									ucv::gil::gray8_image_t save_img(MARKER_DIMENSION*CELL_SIZE,MARKER_DIMENSION*CELL_SIZE);
+									ucv::convert(
+										ucv::gil::subimage_view(
+											ucv::gil::const_view(m_marker_warped_img),
+											0, 0,
+											MARKER_DIMENSION*CELL_SIZE,MARKER_DIMENSION*CELL_SIZE
+										),
+										ucv::gil::view(save_img),
+										ucv::detail::grayscale_convert()
+									);
+				
+									ucv::gil::png_write_view("warped_marker_image.png", ucv::gil::const_view(save_img));
+								}
+#endif
 								if(ucv::threshold(
 									ucv::gil::subimage_view(
 										ucv::gil::const_view(m_marker_warped_img),
 										0, 0,
-										(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+										MARKER_DIMENSION*CELL_SIZE,MARKER_DIMENSION*CELL_SIZE
 									),
 									ucv::gil::subimage_view(
 										ucv::gil::view(m_marker_warped_img),
 										0, 0,
-										(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+										MARKER_DIMENSION*CELL_SIZE,MARKER_DIMENSION*CELL_SIZE
 									),
 									ucv::detail::normal_binary_threshold<gray_t,gray_t>(
 										ucv::find_otsu_threshold<gray_const_view_t,20>(
 											ucv::gil::subimage_view(
 												ucv::gil::const_view(m_marker_warped_img),
 												0, 0,
-												(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+												MARKER_DIMENSION*CELL_SIZE,MARKER_DIMENSION*CELL_SIZE
 											),
 											0,
 											1
-										),
+										)*gray_t(1.2f),
 										1.0
 									)
 								))
 								{
-									ucv::gil::gray8_image_t binary((2*HELPER1_CELLS+D),(2*HELPER1_CELLS+D));
+									ucv::gil::gray8_image_t binary(MARKER_DIMENSION,MARKER_DIMENSION);
 									if(ucv::binarize(
 										ucv::gil::subimage_view(
 											ucv::gil::const_view(m_marker_warped_img),
 											0, 0,
-											(2*HELPER1_CELLS+D)*CELL_SIZE,(2*HELPER1_CELLS+D)*CELL_SIZE
+											MARKER_DIMENSION*CELL_SIZE, MARKER_DIMENSION*CELL_SIZE
 										),
 										ucv::gil::view(binary),
 										CELL_SIZE,CELL_SIZE,
 										ucv::detail::is_non_zero()
 									))
 									{
+#if 0
+										ucv::gil::png_write_view("warped_marker_image_bin.png", ucv::gil::const_view(binary));
+										
+#endif
 										ucv::qr::decoder< ucv::qr::get_version<D+2*7>::value > qr_decoder;
 									
 										if(qr_decoder.decode(ucv::gil::view(binary)))
@@ -828,7 +865,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 						{
 							boost::shared_ptr<qr_detect_info> qrdi=*qri;
 							
-							qrdi->m_detect_counter=2;
+							qrdi->m_detect_counter=10;
 							qrdi->m_last_homography_inverse=fp_inv_homography;
 							dis.push_back(
 								detect_info(

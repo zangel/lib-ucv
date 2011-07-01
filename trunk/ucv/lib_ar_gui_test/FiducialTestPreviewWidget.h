@@ -32,6 +32,7 @@ private:
 
 	bool										m_is_detected;
 	boost::int32_t								m_marker_id;
+	math::size2ui								m_marker_size;
 	math::matrix44f								m_model_view;
 
 };

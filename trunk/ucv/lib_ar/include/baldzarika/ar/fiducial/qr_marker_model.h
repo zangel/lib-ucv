@@ -82,7 +82,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		static boost::int32_t const MAX_MARKER_SIZE;
 		static boost::int32_t const HELPER1_CELLS;
 		static boost::int32_t const HELPER2_CELLS;
-		static boost::int32_t const HELPER_CELLS;
+		//static boost::int32_t const HELPER_CELLS;
 		static boost::int32_t const HELPER1_CELL_SIZE;
 		static boost::int32_t const HELPER2_CELL_SIZE;
 		static boost::int32_t const HELPER_SIZE;
