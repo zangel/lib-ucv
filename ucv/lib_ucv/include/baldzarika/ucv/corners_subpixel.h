@@ -30,22 +30,22 @@ namespace baldzarika { namespace ucv {
 
 			do
 			{
-				if( !(cI.x()>math::constant::two<PT>() && cI.x()<PT(src.width()-2) && cI.y()>math::constant::two<PT>() && cI.x()<PT(src.height()-2)))
+				if( !(cI.x()>=math::constant::three<PT>() && cI.x()<PT(src.width()-4) && cI.y()>=math::constant::three<PT>() && cI.y()<PT(src.height()-4)))
 					break;
 				
-				boost::uint32_t ix=static_cast<boost::uint32_t>(cI.x());
-				boost::uint32_t iy=static_cast<boost::uint32_t>(cI.y());
+				boost::int32_t ix=static_cast<boost::int32_t>(cI.x());
+				boost::int32_t iy=static_cast<boost::int32_t>(cI.y());
 
 				src_channel_t frac_x=static_cast<src_channel_t>(cI.x()-PT(ix));
 				src_channel_t frac_y=static_cast<src_channel_t>(cI.y()-PT(iy));
 
 				//subpixel window sampling
-				for(boost::uint32_t y=0;y<7;++y)
+				for(boost::int32_t y=0;y<7;++y)
 				{
 					src_channel_t const *src_row=reinterpret_cast<src_channel_t const *>(src.row_begin(iy+y-3))+ix-3;
 					src_channel_t const *nxt_src_row=reinterpret_cast<src_channel_t const *>(src.row_begin(iy+y+1-3))+ix-3;
 					
-					for(boost::uint32_t x=0;x<7;++x)
+					for(boost::int32_t x=0;x<7;++x)
 					{
 						win[y][x]=static_cast<src_channel_t>(
 							(

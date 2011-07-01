@@ -4,7 +4,6 @@
 #define FIDUCIAL_PREVIEW_WIDTH 640
 #define FIDUCIAL_PREVIEW_HEIGHT 480
 
-
 FiducialTestPreviewWidget::FiducialTestPreviewWidget(QWidget *parent/* =0 */)
 	: QGLWidget(parent)
 	, m_is_detected(false)
@@ -13,11 +12,13 @@ FiducialTestPreviewWidget::FiducialTestPreviewWidget(QWidget *parent/* =0 */)
 	
 	m_frame.recreate(FIDUCIAL_PREVIEW_WIDTH,FIDUCIAL_PREVIEW_HEIGHT);
 	m_gray_frame.recreate(FIDUCIAL_PREVIEW_WIDTH,FIDUCIAL_PREVIEW_HEIGHT);
-	
+		
 	m_vi.setIdealFramerate(0, 30);
 	m_vi.setupDevice(0, FIDUCIAL_PREVIEW_WIDTH, FIDUCIAL_PREVIEW_HEIGHT);
 
 	m_tracker.reset(new ar::fiducial::tracker(math::size2ui(FIDUCIAL_PREVIEW_WIDTH,FIDUCIAL_PREVIEW_HEIGHT)));
+	m_tracker->set_camera_z_far(1300.0f);
+	
 
 #if 0
 	m_tracker->add_marker_model(
@@ -63,6 +64,7 @@ void FiducialTestPreviewWidget::onMarkerStateChanged(boost::shared_ptr<ar::track
 		{
 			m_marker_id=fms->get_marker_id();
 			m_is_detected=true;
+			m_marker_size=fms->get_marker_size();
 		}
 
 		if(m_is_detected && fms->get_marker_id()==m_marker_id)
@@ -188,20 +190,25 @@ void FiducialTestPreviewWidget::paintGL()
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrixf(projection);
 
+		float half_width=float(m_marker_size.width())*0.5f;
+		float half_length=float(m_marker_size.height())*0.5f;
+		
+		float half_height=std::sqrt(float(m_marker_size.area()))*0.5f;
+
 		float low_corners[]=
 		{
-			-24.5f,  24.5f, -24.5f,
-			 24.5f,  24.5f, -24.5f,
-			 24.5f, -24.5f, -24.5f,
-			-24.5f, -24.5f, -24.5f
+			-half_width,  half_length, -half_height,
+			 half_width,  half_length, -half_height,
+			 half_width, -half_length, -half_height,
+			-half_width, -half_length, -half_height
 		};
 
 		float high_corners[]=
 		{
-			-24.5f,  24.5f,  24.5f,
-			 24.5f,  24.5f,  24.5f,
-			 24.5f, -24.5f,  24.5f,
-			-24.5f, -24.5f,  24.5f
+			-half_width,  half_length,  half_height,
+			 half_width,  half_length,  half_height,
+			 half_width, -half_length,  half_height,
+			-half_width, -half_length,  half_height
 		};
 
 		float colors[]=
