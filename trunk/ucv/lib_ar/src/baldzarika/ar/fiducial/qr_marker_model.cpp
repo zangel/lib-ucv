@@ -360,7 +360,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 							ucv::gil::const_view(m_helper_warped_img),
 							0,
 							1
-						)*gray_t(1.2f),
+						)/**gray_t(1.2f)*/,
 						1.0
 					)
 				)
@@ -456,7 +456,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				ucv::detail::is_zero()
 			);
 
-			if(middle_zero_count<((16*HELPER1_CELL_SIZE*HELPER1_CELL_SIZE)*1)/3)
+			if(middle_zero_count<(16*HELPER1_CELL_SIZE*HELPER1_CELL_SIZE)/3)
 			{
 				boost::uint32_t center_zero_count=ucv::pixel_count(
 					ucv::gil::subimage_view(wimg,
@@ -632,12 +632,12 @@ namespace baldzarika { namespace ar { namespace fiducial {
 	template < typename T, boost::int32_t D >
 	bool qr_marker_model::detect_v2_4_markers(gray_const_view_t img, std::list< helper_detect_info<T> > &helpers1, std::list< helper_detect_info<T> > &helpers2, std::list<detect_info> &dis) const
 	{
-		boost::uint32_t const MARKER_VERSION=ucv::qr::get_version<D+2*7>::value;
-		boost::uint32_t const MARKER_DIMENSION=ucv::qr::get_dimension<MARKER_VERSION>::value;
+		static boost::uint32_t const MARKER_VERSION=ucv::qr::get_version<D+2*7>::value;
+		static boost::uint32_t const MARKER_DIMENSION=ucv::qr::get_dimension<MARKER_VERSION>::value;
 		
 		static math::box2<T> const helper_bbox2=math::box2<T>(
-			math::point2<T>(math::constant::zero<T>(), math::constant::zero<T>()),
-			math::size2<T>(T(HELPER_SIZE),T(HELPER_SIZE))
+			math::point2<T>(T(-HELPER2_CELL_SIZE), T(-HELPER2_CELL_SIZE)),
+			math::size2<T>(T(HELPER_SIZE+2*HELPER2_CELL_SIZE),T(HELPER_SIZE+2*HELPER2_CELL_SIZE))
 		);
 
 
@@ -713,7 +713,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 						transformed(ihelper2->m_inv_homography)
 				);
 
-				if(tl_contains || tr_contains || bl_contains)
+				if(tl_contains && tr_contains && bl_contains)
 				{
 					dst_pts[0]=math::point2f(itriplet->m_top_left->m_center);
 					dst_pts[1]=math::point2f(itriplet->m_top_right->m_center);
@@ -810,7 +810,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 											),
 											0,
 											1
-										)*gray_t(1.2f),
+										)/**gray_t(1.2f)*/,
 										1.0
 									)
 								))
@@ -829,9 +829,9 @@ namespace baldzarika { namespace ar { namespace fiducial {
 									{
 #if 0
 										ucv::gil::png_write_view("warped_marker_image_bin.png", ucv::gil::const_view(binary));
-										
+
 #endif
-										ucv::qr::decoder< ucv::qr::get_version<D+2*7>::value > qr_decoder;
+										ucv::qr::decoder< MARKER_VERSION > qr_decoder;
 									
 										if(qr_decoder.decode(ucv::gil::view(binary)))
 										{
@@ -856,6 +856,12 @@ namespace baldzarika { namespace ar { namespace fiducial {
 												).first;
 											}
 										}
+#if 0
+										else
+										{
+											ucv::gil::png_write_view("warped_marker_image_bin.png", ucv::gil::const_view(binary));
+										}
+#endif
 									}
 								}
 							}
@@ -865,7 +871,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 						{
 							boost::shared_ptr<qr_detect_info> qrdi=*qri;
 							
-							qrdi->m_detect_counter=10;
+							qrdi->m_detect_counter=1;
 							qrdi->m_last_homography_inverse=fp_inv_homography;
 							dis.push_back(
 								detect_info(
