@@ -299,6 +299,11 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 		{
 			return operator()(v.poly());
 		}
+
+		inline bool is_zero() const
+		{
+			return m_poly.empty() || m_poly.front()==0;
+		}
 		
 		inline bool operator==(field_polynomial const &rhs) const
 		{
