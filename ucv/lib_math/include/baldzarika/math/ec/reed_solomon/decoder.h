@@ -138,6 +138,7 @@ namespace baldzarika { namespace math { namespace ec { namespace reed_solomon {
 				{
 					boost::int32_t degree_diff=r.degree()-r_last.degree();
 					field_element_t scale=r[r.degree()]*dlt_inverse;
+					if(!scale) break;
 					field_polynomial_t degree_diff_scale(degree_diff, scale);
 					q+=degree_diff_scale;
 					r+=r_last*degree_diff_scale;

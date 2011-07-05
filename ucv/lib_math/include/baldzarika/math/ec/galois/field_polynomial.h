@@ -47,17 +47,33 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 		template < boost::int32_t N >
 		field_polynomial(field_element_t(&elements)[N], bool reverse=false)
 		{
-			m_poly.resize(N);
-			for(boost::uint32_t i=0;i<N;++i)
-				m_poly[i]=reverse?elements[N-1-i]:elements[i];
+			boost::uint32_t poly_size=N;
+
+			while(poly_size>0 && !elements[(reverse?(N-poly_size):(poly_size-1))]) poly_size--;
+			if(poly_size)
+			{
+				m_poly.resize(poly_size);
+				for(boost::uint32_t i=0;i<poly_size;++i)
+					m_poly[i]=reverse?elements[N-1-i]:elements[i];
+			}
+			else
+				m_poly.resize(1,field_element_t::zero());
 		}
 
 		template < boost::int32_t N >
 		field_polynomial(field_symbol_t(&symbols)[N], bool reverse=false)
 		{
-			m_poly.resize(N);
-			for(boost::uint32_t i=0;i<N;++i)
-				m_poly[i]=field_element_t(reverse?symbols[N-1-i]:symbols[i]);
+			boost::uint32_t poly_size=N;
+
+			while(poly_size>0 && !symbols[(reverse?(N-poly_size):(poly_size-1))]) poly_size--;
+			if(poly_size)
+			{
+				m_poly.resize(poly_size);
+				for(boost::uint32_t i=0;i<poly_size;++i)
+					m_poly[i]=reverse?symbols[N-1-i]:symbols[i];
+			}
+			else
+				m_poly.resize(1,field_element_t::zero());
 		}
 
 		field_polynomial(field_polynomial const &that)

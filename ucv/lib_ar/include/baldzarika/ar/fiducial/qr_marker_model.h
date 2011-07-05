@@ -98,11 +98,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			HELPER_2
 		} eHelperType;
 
-
-
 		
-
-				
 		qr_marker_model();
 		virtual ~qr_marker_model();
 

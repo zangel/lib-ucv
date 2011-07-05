@@ -211,8 +211,8 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		find_helper_candidates(img, contours, helper_candidates);
 		filter_helper_candidates(helper_candidates);
 
-		//std::list< helper_detect_info<math::real_t> > helpers1, helpers2;
-		std::list< helper_detect_info<float> > helpers1, helpers2;
+		std::list< helper_detect_info<math::real_t> > helpers1, helpers2;
+		//std::list< helper_detect_info<float> > helpers1, helpers2;
 		if(!detect_helpers(img, helper_candidates, helpers1, helpers2))
 			return false;
 		if(!detect_markers(img,helpers1,helpers2,dis))
@@ -337,6 +337,21 @@ namespace baldzarika { namespace ar { namespace fiducial {
 			if(!ucv::warp(img, ucv::gil::view(m_helper_warped_img), fp_homography, true))
 				continue;
 
+			
+			if(	!ucv::threshold(
+					ucv::gil::const_view(m_helper_warped_img),
+					ucv::gil::view(m_helper_warped_img),
+					ucv::detail::normal_binary_threshold<gray_t,gray_t>(
+						ucv::find_otsu_threshold<gray_const_view_t,20>(
+							ucv::gil::const_view(m_helper_warped_img),
+							0,
+							1
+						)*gray_t(1.3f),
+						1.0
+					)
+				)
+			) continue;
+
 #if 0
 			{
 				ucv::gil::gray8_image_t save_img(m_helper_warped_img.width(),m_helper_warped_img.height());
@@ -349,22 +364,6 @@ namespace baldzarika { namespace ar { namespace fiducial {
 				ucv::gil::png_write_view("warped_image.png", ucv::gil::const_view(save_img));
 			}
 #endif
-
-			
-			
-			if(	!ucv::threshold(
-					ucv::gil::const_view(m_helper_warped_img),
-					ucv::gil::view(m_helper_warped_img),
-					ucv::detail::normal_binary_threshold<gray_t,gray_t>(
-						ucv::find_otsu_threshold<gray_const_view_t,20>(
-							ucv::gil::const_view(m_helper_warped_img),
-							0,
-							1
-						)/**gray_t(1.2f)*/,
-						1.0
-					)
-				)
-			) continue;
 
 			eHelperType helper_type=detect_helper(ucv::gil::const_view(m_helper_warped_img));
 			if(helper_type==HELPER_INVALID) continue;
@@ -810,7 +809,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 											),
 											0,
 											1
-										)/**gray_t(1.2f)*/,
+										)*gray_t(1.3f),
 										1.0
 									)
 								))
@@ -824,7 +823,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 										),
 										ucv::gil::view(binary),
 										CELL_SIZE,CELL_SIZE,
-										ucv::detail::is_non_zero()
+										ucv::detail::is_zero()
 									))
 									{
 #if 0
@@ -871,7 +870,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 						{
 							boost::shared_ptr<qr_detect_info> qrdi=*qri;
 							
-							qrdi->m_detect_counter=1;
+							qrdi->m_detect_counter=5;
 							qrdi->m_last_homography_inverse=fp_inv_homography;
 							dis.push_back(
 								detect_info(

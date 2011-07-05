@@ -3,8 +3,8 @@
 
 namespace baldzarika { namespace ar { namespace fiducial {
 
-	float const tracker::DEFAULT_EDGE_DETECTION_THRESHOLD=0.4f;
-	float const tracker::DEFAULT_POLYGON_APPROXIMATION_EPS=3.0f;
+	float const tracker::DEFAULT_EDGE_DETECTION_THRESHOLD=0.1f;
+	float const tracker::DEFAULT_POLYGON_APPROXIMATION_EPS=0.007f;
 	float const tracker::DEFAULT_SAME_MARKER_MAX_AREA=1.0e-2f;
 	boost::uint32_t const tracker::DEFAULT_KEEP_DETECTED_FRAME_COUNT=10;
 
@@ -50,7 +50,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 
 	void tracker::marker_state::set_detected(bool d)
 	{
-		ar::tracker::marker_state::set_detected(d);		
+		ar::tracker::marker_state::set_detected(d);
 	}
 
 	void tracker::marker_state::set_homography(math::matrix33f const &hm)
@@ -149,9 +149,11 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		{
 			std::list< ar::fiducial::contour_t > contours;
 			m_canny(ucv::gil::const_view(m_frame), contours);
+
+			float poly_approx_pixels=std::sqrt(float(m_frame.width()*m_frame.height()))*m_polygon_approximation_eps;
 			
 			for(std::list<contour_t>::iterator conti=contours.begin();conti!=contours.end();++conti)
-				if(conti->m_is_closed) conti->aproximate(m_polygon_approximation_eps);
+				if(conti->m_is_closed) conti->aproximate(poly_approx_pixels);
 			
 			for(marker_model_holders_t::iterator mmhi=m_marker_model_holders.begin();mmhi!=m_marker_model_holders.end();++mmhi)
 				detect_markers(*mmhi,contours);
