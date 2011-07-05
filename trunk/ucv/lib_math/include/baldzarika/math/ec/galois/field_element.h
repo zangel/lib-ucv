@@ -15,6 +15,12 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 		typedef typename field_symbol_traits_t::field_symbol_t field_symbol_t;
 
 
+		static inline field_element const& zero()
+		{
+			static field_element _zero(0);
+			return _zero;
+		}
+
 		static inline field_element const& one()
 		{
 			static field_element _one(1);
@@ -45,6 +51,16 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 		inline operator field_symbol_t() const
 		{
 			return m_poly_value;
+		}
+
+		inline operator bool() const
+		{
+			return m_poly_value!=0;
+		}
+
+		inline bool operator !() const
+		{
+			return m_poly_value==0;
 		}
 
 		inline field_element& operator=(field_symbol_t const &v)
