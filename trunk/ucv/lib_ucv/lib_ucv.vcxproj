@@ -101,6 +101,7 @@
     <ClInclude Include="include\baldzarika\ucv\gaussian_blur.h" />
     <ClInclude Include="include\baldzarika\ucv\good_features_detector.h" />
     <ClInclude Include="include\baldzarika\ucv\haar_wavelets.h" />
+    <ClInclude Include="include\baldzarika\ucv\kalman_filter.h" />
     <ClInclude Include="include\baldzarika\ucv\klt_tracker.h" />
     <ClInclude Include="include\baldzarika\ucv\masked_region.h" />
     <ClInclude Include="include\baldzarika\ucv\match_feature_points.h" />
