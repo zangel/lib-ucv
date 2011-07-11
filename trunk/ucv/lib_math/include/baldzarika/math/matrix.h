@@ -152,12 +152,12 @@ namespace baldzarika { namespace math {
 			return matrix_ops<T,R,C>::product(*this, rhs);
 		}
 		
-		inline matrix& tanspose()
+		inline matrix& transpose()
 		{
 			return matrix_ops<T,R,C>::assign(*this, matrix_ops<T,R,C>::transpose(*this));
 		}
 
-		inline matrix<T,C,R> tansposed() const
+		inline matrix<T,C,R> transposed() const
 		{
 			return matrix_ops<T,R,C>::transpose(*this);
 		}
