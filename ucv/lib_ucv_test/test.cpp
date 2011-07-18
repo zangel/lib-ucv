@@ -2,12 +2,12 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <baldzarika/math/config.h>
-#include <baldzarika/math/fixed_point.h>
-#include <baldzarika/math/matrix.h>
-#include <baldzarika/math/svd.h>
-#include <baldzarika/math/solve.h>
-#include <baldzarika/math/vector.h>
+//#include <baldzarika/math/config.h>
+//#include <baldzarika/math/fixed_point.h>
+//#include <baldzarika/math/matrix.h>
+//#include <baldzarika/math/svd.h>
+//#include <baldzarika/math/solve.h>
+//#include <baldzarika/math/vector.h>
 
 #include <baldzarika/ucv/config.h>
 #include <baldzarika/ucv/convert.h>
@@ -741,7 +741,6 @@ BOOST_AUTO_TEST_CASE( camera_pose_test )
 	bottom_left=cam_intr*bottom_left; bottom_left/=bottom_left[2];
 }
 
-
 BOOST_AUTO_TEST_CASE( canny_test )
 {
 	namespace ucv=baldzarika::ucv;
@@ -897,8 +896,8 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 			math::matrix33f pmf;
 
-			if(!ucv::perspective_transform(src,dst,pmf))
-				continue;
+			if(!ucv::perspective_transform(src,dst,pmf)) continue;
+
 			
 			matrix_t pm=pmf;
 
@@ -981,7 +980,7 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	cv::waitKey();
 	
 }
-#endif
+
 
 
 BOOST_AUTO_TEST_CASE( kalman_filter_test )
@@ -1027,3 +1026,5 @@ BOOST_AUTO_TEST_CASE( kalman_filter_test )
 			velocity=0.0f;
 	}
 }
+
+

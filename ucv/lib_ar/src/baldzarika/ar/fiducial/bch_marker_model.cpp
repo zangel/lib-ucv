@@ -134,7 +134,7 @@ namespace baldzarika { namespace ar { namespace fiducial {
 		dist=marker_hamming_distance(ucv::gil::rotated90cw_view(bcv));
 		if(dist<min_dist) { min_dist=dist; rot=3; }
 
-		if(min_dist==0)
+		if(min_dist<=2)
 		{
 			switch(rot)
 			{

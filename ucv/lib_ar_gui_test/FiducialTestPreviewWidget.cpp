@@ -20,7 +20,7 @@ FiducialTestPreviewWidget::FiducialTestPreviewWidget(QWidget *parent/* =0 */)
 	m_tracker->set_camera_z_far(1300.0f);
 	
 
-#if 0
+#if 1
 	m_tracker->add_marker_model(
 		boost::shared_ptr<ar::fiducial::marker_model>(
 			new ar::fiducial::bch_marker_model()

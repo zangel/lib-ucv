@@ -2,6 +2,7 @@
 #include "ArTestDlg.h"
 #include "FiducialTestDlg.h"
 #include "SURFTestDlg.h"
+#include "CannyTestDlg.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,10 +18,16 @@ int main(int argc, char *argv[])
 
 	qApp->addLibraryPath(QFileInfo(QString::fromWCharArray(moduleFileName)).absoluteDir().path()+"/plugins");
 #endif
+#if 1
 #if 0
 	SURFTestDlg TheSURFTestDlg;
 	TheSURFTestDlg.show();
 	return TheSURFTestDlg.exec();
+#else
+	CannyTestDlg TheCannyTestDlg;
+	TheCannyTestDlg.show();
+	return TheCannyTestDlg.exec();
+#endif
 
 #else
 	QDialog *pDialog(0);
