@@ -12,17 +12,28 @@ namespace baldzarika { namespace ucv {
 		template < typename T >
 		static inline T get_angle(T const &x, T const &y)
 		{
+#if 0
+			T angle=std::atan2(y,x);
+			while(angle>math::constant::pi_2<T>())
+				angle-=math::constant::pi_2<T>();
+			while(angle<math::constant::zero<T>())
+				angle+=math::constant::pi_2<T>();
+			return angle;
+
+
+#else
 			if(y<math::constant::zero<T>())
 			{
-				if(x<math::constant::zero<T>()) return math::constant::pi<T>()+std::atan2(y,x);
+				if(x<math::constant::zero<T>()) return math::constant::pi<T>()+std::atan2(-y,-x);
 				if(x>math::constant::zero<T>()) return math::constant::pi_2<T>()-std::atan2(-y,x);
 			}
 			else
 			{
-				if(x<math::constant::zero<T>()) return math::constant::pi<T>()-std::atan2(-y,x);
+				if(x<math::constant::zero<T>()) return math::constant::pi<T>()-std::atan2(y,-x);
 				if(x>math::constant::zero<T>()) return std::atan2(y,x);
 			}
 			return math::constant::zero<T>();
+#endif
 		}
 
 		/*
