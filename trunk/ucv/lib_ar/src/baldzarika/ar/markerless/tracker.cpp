@@ -16,10 +16,10 @@ namespace baldzarika { namespace ar { namespace markerless {
 	float const	tracker::DEFAULT_KLT_EPSILON=1.0e-4f;
 
 	boost::uint32_t const tracker::DEFAULT_TRACKER_MIN_MARKER_FEATURES=8;
-	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=16;
+	boost::uint32_t const tracker::DEFAULT_TRACKER_MAX_MARKER_FEATURES=24;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_SCALE=1.0f;
 	float const	tracker::DEFAULT_TRACKER_SELECT_FP_MIN_AREA=1.3e-3f;
-	float const	tracker::DEFAULT_DETECTION_MAX_DIFF_NORM=4.0e-3f;
+	float const	tracker::DEFAULT_DETECTION_MAX_DIFF_NORM=6.0e-3f;
 	float const	tracker::DEFAULT_TRACKING_MAX_DIFF_NORM=1.0e-4f;
 
 	namespace {
