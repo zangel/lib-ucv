@@ -9,6 +9,12 @@ class SURFTestWidget
 public:
 	friend class SURFTestDlg;
 
+	typedef ucv::surf::feature_point_t feature_point_t;
+	typedef feature_point_t::point2_t point2_t;
+
+	typedef KDTree::KDTree<2, feature_point_t, feature_point_t::position_accessor> matched_points_t;
+
+
 	SURFTestWidget(QWidget *parent=0);
 	~SURFTestWidget();
 
@@ -29,9 +35,14 @@ private:
 	videoInput									m_vi;
 
 	QTimer										*m_render_timer;
-	ucv::surf									m_surf;
-	std::vector<ucv::surf::feature_point_t>		m_features;
 
+	ucv::surf::fps_by_desc_tree_t				m_obj_features;
+
+	ucv::surf									m_scene_surf;
+	ucv::surf::fps_by_pos_tree_t				m_scene_features;
+
+	matched_points_t							m_matched_points;
+	
 	float										m_MinScale;
 	float										m_MaxScale;
 
