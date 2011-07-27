@@ -405,7 +405,7 @@ namespace baldzarika { namespace ar { namespace markerless {
 		if(marker_matches.size()>=m_min_marker_features)
 		{
 			math::matrix33f hm;
-#if 0
+#if 1
 			find_marker_homography(marker_matches, ms.get_marker_size(), hm);
 
 #else

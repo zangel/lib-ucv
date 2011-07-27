@@ -34,6 +34,9 @@
     <Filter Include="Header Files\baldzarika\ucv\qr">
       <UniqueIdentifier>{bc5c36b4-1e96-4db0-8333-a3e7c4066cb8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\baldzarika\ucv\surf">
+      <UniqueIdentifier>{8b3d8aaf-a1f0-4e4b-8387-1b1834ef8329}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -46,9 +49,6 @@
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\gil_channel_traits.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\surf.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\feature_point.h">
@@ -153,12 +153,12 @@
     <ClInclude Include="include\baldzarika\ucv\kalman_filter.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\surf\hessian_response.h">
+      <Filter>Header Files\baldzarika\ucv\surf</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ucv\config.cpp">
-      <Filter>Source Files\baldzarika\ucv</Filter>
-    </ClCompile>
-    <ClCompile Include="src\baldzarika\ucv\surf.cpp">
       <Filter>Source Files\baldzarika\ucv</Filter>
     </ClCompile>
     <ClCompile Include="src\baldzarika\ucv\gles\fbo.cpp">

@@ -7,10 +7,39 @@
 
 SURFTestWidget::SURFTestWidget(QWidget *parent/* =0 */)
 	: QGLWidget(parent)
-	, m_surf(math::size2ui(SURF_TEST_WIDTH,SURF_TEST_HEIGHT),3,4,2,4.0e-4f)
+	, m_scene_surf(math::size2ui(SURF_TEST_WIDTH,SURF_TEST_HEIGHT),3,4,2,4.0e-4f)
 	, m_MinScale(0.0f)
 	, m_MaxScale(20.0f)
 {
+	ucv::gil::gray8_image_t gray8_obj_img;
+	ucv::gil::png_read_and_convert_image("../lib_ucv_test/test_img.png", gray8_obj_img);
+
+	ucv::surf::integral_image_t gray_obj_img(gray8_obj_img.width(), gray8_obj_img.height());
+	
+	ucv::surf::integral_t median;
+	ucv::convert(
+		ucv::gil::view(gray8_obj_img),
+		ucv::gil::view(gray_obj_img),
+		ucv::detail::grayscale_convert_and_median<ucv::surf::integral_t>(
+			median,
+			gray8_obj_img.width(),
+			gray8_obj_img.height()
+		)
+	);
+
+	ucv::surf::integral_image_t gray_obj_int_img(gray8_obj_img.width(), gray8_obj_img.height());
+
+	ucv::integral(ucv::gil::const_view(gray_obj_img), ucv::gil::view(gray_obj_int_img), median);
+
+	ucv::surf obj_surf(math::size2ui(gray8_obj_img.width(), gray8_obj_img.height()), 3, 4, 2, 1.0e-4f);
+	obj_surf.set_integral_view(ucv::gil::const_view(gray_obj_int_img));
+	obj_surf.build_response_layers();
+	obj_surf.detect(m_obj_features);
+	obj_surf.describe(m_obj_features);
+	m_obj_features.optimise();
+
+
+
 	setFixedSize(SURF_TEST_WIDTH,SURF_TEST_HEIGHT);
 	
 	m_frame.recreate(SURF_TEST_WIDTH,SURF_TEST_HEIGHT);
@@ -80,10 +109,32 @@ void SURFTestWidget::paintGL()
 			)
 		);
 		ucv::integral(ucv::gil::const_view(m_gray_frame), ucv::gil::view(m_integral_frame), median);
-		m_surf.set_integral_view(ucv::gil::const_view(m_integral_frame));
-		m_surf.build_response_layers();
-		m_surf.detect(m_features);
-		m_surf.describe(m_features);
+		m_scene_surf.set_integral_view(ucv::gil::const_view(m_integral_frame));
+		m_scene_surf.build_response_layers();
+		m_scene_surf.detect(m_scene_features);
+		m_scene_surf.describe(m_scene_features);
+
+		typedef  std::vector<
+			std::pair<
+				ucv::surf::fps_by_desc_tree_t::const_iterator,
+				ucv::surf::fps_by_pos_tree_t::const_iterator
+			>
+		> marker_matches_t;
+
+		marker_matches_t marker_matches;
+
+		ucv::match_feature_points<
+			ucv::surf::feature_point_t,
+			ucv::surf::fps_by_desc_tree_t,
+			ucv::surf::fps_by_pos_tree_t
+		>(m_obj_features, m_scene_features, marker_matches, 0.6f);
+
+		m_matched_points.clear();
+
+
+		for(marker_matches_t::const_iterator imm=marker_matches.begin();imm!=marker_matches.end();++imm)
+			m_matched_points.insert(*imm->second);
+
 
 
 
@@ -136,15 +187,16 @@ void SURFTestWidget::paintGL()
 	glEnd();
 
 
-	if(!m_features.empty())
+	if(!m_scene_features.empty())
 	{
 		glEnable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
 		glLineWidth(1.0f);
 
-		for(boost::uint32_t fp=0;fp<m_features.size();++fp)
+#if 1
+		for(matched_points_t::const_iterator imp=m_matched_points.begin();imp!=m_matched_points.end();++imp)
 		{
-			ucv::surf::feature_point_t const &feature=m_features[fp];
+			ucv::surf::feature_point_t const &feature=*imp;
 			float scale=2.0f*static_cast<float>(feature.m_scale);
 
 			if(scale<m_MinScale || scale>m_MaxScale) continue;
@@ -197,7 +249,7 @@ void SURFTestWidget::paintGL()
 			}
 			glEnd();
 		}
-
+#endif
 
 #if 0
 		for(int i=0;i<4;++i)
