@@ -13,7 +13,7 @@
 #include <baldzarika/ucv/convert.h>
 #include <baldzarika/ucv/warp.h>
 #include <baldzarika/ucv/integral.h>
-#include <baldzarika/ucv/surf.h>
+#include <baldzarika/ucv/surf/hessian_detector.h>
 #include <baldzarika/ucv/homography.h>
 #include <baldzarika/ucv/match_feature_points.h>
 #include <baldzarika/ucv/klt_tracker.h>
@@ -1028,3 +1028,42 @@ BOOST_AUTO_TEST_CASE( kalman_filter_test )
 }
 
 
+#endif
+
+BOOST_AUTO_TEST_CASE( surf_hessian_response_test )
+{
+	namespace ucv=baldzarika::ucv;
+	namespace math=baldzarika::math;
+
+	typedef float gray_t;
+	typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
+	typedef gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
+	typedef gray_image_t::view_t gray_view_t;
+	typedef ucv::surf::hessian_detector<float> hessian_detector_t;
+
+
+	ucv::gil::gray8_image_t gray8_img;
+	ucv::gil::png_read_and_convert_image("test_img2.png", gray8_img);
+
+	gray_image_t gray_img(gray8_img.width(), gray8_img.height());
+
+	gray_t median;
+	ucv::convert(
+		ucv::gil::view(gray8_img),
+		ucv::gil::view(gray_img),
+		ucv::detail::grayscale_convert_and_median<gray_t>(
+			median,
+			gray8_img.width(),
+			gray8_img.height()
+		)
+	);
+
+	gray_image_t integral_img(gray8_img.width(), gray8_img.height());
+	ucv::integral(ucv::gil::const_view(gray_img), ucv::gil::view(integral_img), median);
+
+
+
+	hessian_detector_t hd(math::size2ui(gray8_img.width(),gray8_img.height()));
+
+	hd.update(ucv::gil::view(integral_img));
+}

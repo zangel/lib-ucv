@@ -34,6 +34,16 @@ namespace baldzarika { namespace ucv {
 			inline void begin_row() {}
 			inline void end_row() {}
 			inline void end() {}
+
+			inline void operator()(float const &src, boost::uint8_t &dst)
+			{
+				dst=static_cast<boost::uint8_t>(src*std::numeric_limits<boost::uint8_t>::max());
+			}
+
+			inline void operator()(boost::uint8_t const &src,float &dst)
+			{
+				dst=float(src)*math::constant::i_255<float>();
+			}
 						
 			template < boost::uint32_t I, boost::uint32_t F >
 			inline void operator()(math::fixed_point<I,F> const &src, boost::uint8_t &dst)
