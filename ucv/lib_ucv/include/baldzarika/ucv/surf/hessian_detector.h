@@ -55,6 +55,167 @@ namespace baldzarika { namespace ucv { namespace surf {
 				);
 			}
 
+			template < typename IVT >
+			inline bool update(IVT iv)
+			{
+				typedef typename IVT::value_type	iv_pixel_t;
+				typedef typename gil::channel_type<iv_pixel_t>::type iv_channel_t;
+
+
+				boost::int32_t const width_step=iv.row_begin(1)-iv.row_begin(0);
+				float const layer_scale=float(m_haar_size)/float(HAAR_SIZE0);
+
+				integral_box<iv_channel_t> dx_pattern[]=
+				{
+					integral_box<iv_channel_t>(math::point2i(0,2), math::size2i(3,5), width_step,  math::constant::one<iv_channel_t>()).scaled(layer_scale,width_step),
+					integral_box<iv_channel_t>(math::point2i(3,2), math::size2i(3,5), width_step, -math::constant::two<iv_channel_t>()).scaled(layer_scale,width_step),
+					integral_box<iv_channel_t>(math::point2i(6,2), math::size2i(3,5), width_step,  math::constant::one<iv_channel_t>()).scaled(layer_scale,width_step)
+				};
+
+				integral_box<iv_channel_t> dy_pattern[]=
+				{
+					integral_box<iv_channel_t>(math::point2i(2,0), math::size2i(5,3), width_step,  math::constant::one<iv_channel_t>()).scaled(layer_scale,width_step),
+					integral_box<iv_channel_t>(math::point2i(2,3), math::size2i(5,3), width_step, -math::constant::two<iv_channel_t>()).scaled(layer_scale,width_step),
+					integral_box<iv_channel_t>(math::point2i(2,6), math::size2i(5,3), width_step,  math::constant::one<iv_channel_t>()).scaled(layer_scale,width_step)
+				};
+
+				integral_box<iv_channel_t> dxy_pattern[]=
+				{
+					integral_box<iv_channel_t>(math::point2i(1,1), math::size2i(3,3), width_step,  math::constant::one<iv_channel_t>()).scaled(layer_scale,width_step),
+					integral_box<iv_channel_t>(math::point2i(5,1), math::size2i(3,3), width_step, -math::constant::one<iv_channel_t>()).scaled(layer_scale,width_step),
+					integral_box<iv_channel_t>(math::point2i(1,5), math::size2i(3,3), width_step, -math::constant::one<iv_channel_t>()).scaled(layer_scale,width_step),
+					integral_box<iv_channel_t>(math::point2i(5,5), math::size2i(3,3), width_step,  math::constant::one<iv_channel_t>()).scaled(layer_scale,width_step)
+				};
+
+				boost::int32_t samples_y=1+(iv.height()-1-m_haar_size)/m_sample_step;
+				boost::int32_t samples_x=1+(iv.width()-1-m_haar_size)/m_sample_step;
+				boost::int32_t margin=(m_haar_size/2)/m_sample_step;
+
+				for(boost::int32_t y=0;y<samples_y;++y)
+				{
+					iv_channel_t const *piv=reinterpret_cast<iv_channel_t const *>(iv.row_begin(y*m_sample_step));
+					T *pres=reinterpret_cast<T *>(m_response.row_begin(y+margin))+margin;
+					T *plap=reinterpret_cast<T *>(m_laplacian.row_begin(y+margin))+margin;
+					for(boost::int32_t x=0;x<samples_x;++x)
+					{
+						T dx=integral_sample<T,iv_channel_t>(piv,dx_pattern);
+						T dy=integral_sample<T,iv_channel_t>(piv,dy_pattern);
+						T dxy=integral_sample<T,iv_channel_t>(piv,dxy_pattern);
+						piv+=m_sample_step;
+						*pres++=(dx*dy-0.81f*dxy*dxy);
+						*plap++=(dx+dy);
+					}
+				}
+				return true;
+			}
+
+			template < typename PT, typename PS >
+			inline bool detect(T tsh, boost::function<void (math::point2<PT> const&, PS)> const &dcb, layer const &bl, layer const &tl) const
+			{
+				static T const i4=math::constant::one<T>()/math::constant::four<T>();
+
+				boost::int32_t margin=(tl.m_haar_size/2)/m_sample_step+1;
+
+				boost::int32_t const ws1=bl.m_response.row_begin(1)-bl.m_response.row_begin(0);
+				boost::int32_t const ws2=m_response.row_begin(1)-m_response.row_begin(0);
+				boost::int32_t const ws3=tl.m_response.row_begin(1)-tl.m_response.row_begin(0);
+				
+
+				for(boost::int32_t y=margin;y<m_response.height()-margin;++y)
+				{
+					T const *pres=reinterpret_cast<T *>(m_response.row_begin(y));
+					T const *plap=reinterpret_cast<T *>(m_laplacian.row_begin(y));
+
+					for(boost::int32_t x=margin;x<m_response.width()-margin;++x)
+					{
+						T val111=pres[x];
+						if(val111>tsh)
+						{
+
+							T const *pres1=reinterpret_cast<T *>(bl.m_response.row_begin(y))+x;
+							T const *pres2=pres+x;
+							T const *pres3=reinterpret_cast<T *>(tl.m_response.row_begin(y))+x;
+
+							T N333[3][9]=
+							{
+								{
+									pres1[-ws1-1],	pres1[-ws1],	pres1[-ws1+1],
+									pres1[-1],		pres1[0],		pres1[1],
+									pres1[ws1-1],	pres1[ws1],		pres1[ws1+1]
+								},
+								{
+									pres2[-ws2-1],	pres2[-ws2],	pres2[-ws2+1],
+									pres2[-1],		pres2[0],		pres2[1],
+									pres2[ws2-1],	pres2[ws2],		pres2[ws2+1]
+								},
+								{
+									pres3[-ws3-1],	pres3[-ws3],	pres3[-ws3+1],
+									pres3[-1],		pres3[0],		pres3[1],
+									pres3[ws3-1],	pres3[ws3],		pres3[ws3+1]
+								}
+							};
+							
+							if(
+								val111>N333[0][0] && val111>N333[0][1] && val111>N333[0][2] &&
+								val111>N333[0][3] && val111>N333[0][4] && val111>N333[0][5] &&
+								val111>N333[0][6] && val111>N333[0][7] && val111>N333[0][8] &&
+								val111>N333[1][0] && val111>N333[1][1] && val111>N333[1][2] &&
+								val111>N333[1][3]					   && val111>N333[1][5] &&
+								val111>N333[1][6] && val111>N333[1][7] && val111>N333[1][8] &&
+								val111>N333[2][0] && val111>N333[2][1] && val111>N333[2][2] &&
+								val111>N333[2][3] && val111>N333[2][4] && val111>N333[2][5] &&
+								val111>N333[2][6] && val111>N333[2][7] && val111>N333[2][8]
+							)
+							{
+								boost::int32_t int_y=m_sample_step*(y-(m_haar_size/2)/m_sample_step);
+								boost::int32_t int_x=m_sample_step*(x-(m_haar_size/2)/m_sample_step);
+
+								PT center_y=PT(int_y)+PT(m_haar_size-1)*math::constant::half<PT>();
+								PT center_x=PT(int_x)+PT(m_haar_size-1)*math::constant::half<PT>();
+								
+								
+								
+								T A[9];
+
+								A[0]=N333[1][3]-math::constant::two<T>()*N333[1][4]+N333[1][5];
+								A[1]=(N333[1][8]-N333[1][6]-N333[1][2]+N333[1][0])*i4;
+								A[2]=(N333[2][5]-N333[2][3]-N333[0][5]+N333[0][3])*i4;
+								A[3]=A[1];
+								A[4]=N333[1][1]-math::constant::two<T>()*N333[1][4]+N333[1][7];
+								A[5]=(N333[2][7]-N333[2][1]-N333[0][7]+N333[0][1])*i4;
+								A[6]=A[2];
+								A[7]=A[5];
+								A[8]=N333[0][4]-math::constant::two<T>()*N333[1][4]+N333[2][4];
+
+								math::matrix<T, 3, 3> invA=reinterpret_cast< math::matrix<T, 3, 3> const *>(A)->inverted();
+
+								T b[3]=
+								{
+									-(N333[1][5]-N333[1][3])*math::constant::half<T>(),
+									-(N333[1][7]-N333[1][1])*math::constant::half<T>(),
+									-(N333[2][4]-N333[0][4])*math::constant::half<T>()
+								};
+
+								math::vector<T, 3> xi=invA*(*reinterpret_cast< math::vector<T, 3> const *>(b));
+								if(	std::abs(xi(0))<math::constant::half<T>() &&
+									std::abs(xi(1))<math::constant::half<T>() && 
+									std::abs(xi(2))<math::constant::half<T>()
+								)
+								{
+									math::point2<T> pt(
+										center_x+PT(xi(0))*PT(m_sample_step),
+										center_y+PT(xi(1))*PT(m_sample_step)
+									);
+									PS pts=PS(m_haar_size)+PS(xi(2))*PS(m_haar_size-bl.m_haar_size);
+									dcb(pt,pts);
+								}
+							}
+                		}
+					}
+				}
+				return true;
+			}
+
 			gray_view_t			m_response;
 			gray_view_t			m_laplacian;
 			boost::uint32_t		m_sample_step;
@@ -164,8 +325,22 @@ namespace baldzarika { namespace ucv { namespace surf {
 		template < typename IVT >
 		bool update(IVT iv)
 		{
-			if(!(operator bool() || math::size2ui(iv.width(),iv.height())==m_size))
+			if(!(operator bool() && math::size2ui(iv.width()-1,iv.height()-1)==m_size))
 				return false;
+			for(boost::uint32_t l=0;l<m_layers.size();++l)
+				m_layers[l].update(iv);
+			return true;
+		}
+
+
+		template < typename PT, typename PS >
+		bool detect(T tsh, boost::function<void (math::point2<PT> const&, PS)> const &dcb) const
+		{
+			for(boost::uint32_t ml=0;ml<m_octave_layers*m_octaves;++ml)
+			{
+				boost::int32_t mlid=(ml/m_octave_layers)*(m_octave_layers+2)+(ml%m_octave_layers)+1;
+				m_layers[mlid].detect(tsh, dcb, m_layers[mlid-1], m_layers[mlid+1]);
+			}
 			return true;
 		}
 	

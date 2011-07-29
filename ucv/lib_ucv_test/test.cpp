@@ -1039,6 +1039,7 @@ BOOST_AUTO_TEST_CASE( surf_hessian_response_test )
 	typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
 	typedef gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
 	typedef gray_image_t::view_t gray_view_t;
+	typedef gray_image_t::const_view_t gray_const_view_t;
 	typedef ucv::surf::hessian_detector<float> hessian_detector_t;
 
 
@@ -1058,12 +1059,32 @@ BOOST_AUTO_TEST_CASE( surf_hessian_response_test )
 		)
 	);
 
-	gray_image_t integral_img(gray8_img.width(), gray8_img.height());
+	gray_image_t integral_img(gray8_img.width()+1, gray8_img.height()+1);
 	ucv::integral(ucv::gil::const_view(gray_img), ucv::gil::view(integral_img), median);
 
+	boost::int32_t integral_img_step=ucv::gil::const_view(integral_img).row_begin(1)-ucv::gil::const_view(integral_img).row_begin(0);
 
-
+	
 	hessian_detector_t hd(math::size2ui(gray8_img.width(),gray8_img.height()));
+	hd.update(ucv::gil::const_view(integral_img));
 
-	hd.update(ucv::gil::view(integral_img));
+	
+	struct points_collector
+	{
+		void add_pts(math::point2f const &p, float s)
+		{
+			_points.push_back(p);
+		}
+
+		std::vector<math::point2f> _points;
+	} pc;
+
+
+	
+
+	boost::function<void (math::point2f const &, float)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2));
+
+
+	hd.detect(5.0e-2f, dcb);
+
 }
