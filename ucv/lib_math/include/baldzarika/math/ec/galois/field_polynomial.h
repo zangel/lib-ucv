@@ -437,7 +437,7 @@ namespace baldzarika { namespace math { namespace ec { namespace galois {
 	template < boost::uint32_t PWR, boost::uint32_t PP >
 	inline field_polynomial<PWR,PP> operator +(field_polynomial<PWR,PP> const &a, typename field_polynomial<PWR,PP>::field_symbol_t const &b)
 	{
-		return a+field_element(b);
+		return a+typename field_polynomial<PWR,PP>::field_element_t(a);
 	}
 
 	template < boost::uint32_t PWR, boost::uint32_t PP >

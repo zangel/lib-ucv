@@ -1030,17 +1030,18 @@ BOOST_AUTO_TEST_CASE( kalman_filter_test )
 
 #endif
 
-BOOST_AUTO_TEST_CASE( surf_hessian_response_test )
+template < typename T, boost::uint32_t I >
+void do_surf_hessian_response_test()
 {
 	namespace ucv=baldzarika::ucv;
 	namespace math=baldzarika::math;
 
-	typedef float gray_t;
+	typedef T gray_t;
 	typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
 	typedef gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
 	typedef gray_image_t::view_t gray_view_t;
 	typedef gray_image_t::const_view_t gray_const_view_t;
-	typedef ucv::surf::hessian_detector<float> hessian_detector_t;
+	typedef ucv::surf::hessian_detector<T> hessian_detector_t;
 
 
 	ucv::gil::gray8_image_t gray8_img;
@@ -1062,29 +1063,37 @@ BOOST_AUTO_TEST_CASE( surf_hessian_response_test )
 	gray_image_t integral_img(gray8_img.width()+1, gray8_img.height()+1);
 	ucv::integral(ucv::gil::const_view(gray_img), ucv::gil::view(integral_img), median);
 
-	boost::int32_t integral_img_step=ucv::gil::const_view(integral_img).row_begin(1)-ucv::gil::const_view(integral_img).row_begin(0);
+	hessian_detector_t hd(math::size2ui(gray8_img.width(),gray8_img.height()),3,2);
 
-	
-	hessian_detector_t hd(math::size2ui(gray8_img.width(),gray8_img.height()));
-	hd.update(ucv::gil::const_view(integral_img));
 
-	
 	struct points_collector
 	{
-		void add_pts(math::point2f const &p, float s)
+		void add_pts(math::point2<T> const &p, T s)
 		{
 			_points.push_back(p);
 		}
 
-		std::vector<math::point2f> _points;
-	} pc;
+		std::vector< math::point2<T> > _points;
+	};
 
 
-	
+	boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
+	for(boost::uint32_t i=0;i<I;++i)
+	{
+		points_collector pc;
+		hd.update(ucv::gil::const_view(integral_img));
+		boost::function<void (math::point2<T> const &, T)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2));
+		hd.detect(1.0e-1f, dcb);
+	}
+	boost::posix_time::ptime finish=boost::posix_time::microsec_clock::local_time();
+	std::cout << "hessian_response<" << typeid(T).name() << "> update+detect time=" <<
+		float((finish-start).total_milliseconds())/float(I) << " ms" << std::endl;
+}
 
-	boost::function<void (math::point2f const &, float)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2));
+BOOST_AUTO_TEST_CASE( surf_hessian_response_test )
+{
+	namespace math=baldzarika::math;
 
-
-	hd.detect(5.0e-2f, dcb);
-
+	do_surf_hessian_response_test<float, 1000>();
+	do_surf_hessian_response_test< math::fixed_point<10,21>, 1000 >();
 }

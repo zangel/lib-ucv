@@ -226,6 +226,44 @@ namespace baldzarika { namespace ucv {
 		return true;
 	}
 
+
+#if defined(ANDROID)
+#if defined(FPU_ARM_VFP2)
+
+namespace detail {
+
+	template <>
+	struct grayscale_convert_and_median<float>
+	{
+		grayscale_convert_and_median(float &mv, boost::uint32_t width, boost::uint32_t height)
+		: m_median_value(mv)
+		{
+		}
+
+		float		&m_median_value;
+	};
+} //namespace detail
+
+	bool convert
+	(	boost::gil::gray8c_view_t src,
+		gil::image< gil::pixel<float, gil::gray_layout_t> , false, std::allocator<unsigned char> >::view_t dst,
+		detail::grayscale_convert_and_median<float> converter
+	)
+	{
+		if(src.width()!=dst.width() || src.height()!=dst.height() || !src.width()*dst.width())
+			return false;
+
+		boost::int32_t const width=src.width();
+		boost::int32_t const height=src.height();
+
+
+		return false;
+	}
+
+#endif //FPU_ARM_VFP2
+#endif //ANDROID
+
+
 } //namespace ucv
 } //namespace baldzarika
 

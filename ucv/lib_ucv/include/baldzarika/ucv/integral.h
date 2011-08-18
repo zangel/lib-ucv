@@ -30,7 +30,6 @@ namespace baldzarika { namespace ucv {
 		integral_box()
 		{
 			m_p[0]=m_p[1]=m_p[2]=m_p[3]=0;
-			m_step=0;
 			m_coeff=math::constant::zero<T>();
 		}
 
