@@ -264,7 +264,7 @@ namespace baldzarika { namespace math {
 		template < typename RT, boost::uint32_t RC >
 		static inline typename product_result<RT,1,RC>::type product(matrix<T,1,1> const &lhs, matrix<RT,1,RC> const &rhs)
 		{
-			typedef product_result<RT,1,RC>::type result_t;
+			typedef typename product_result<RT,1,RC>::type result_t;
 			result_t res;
 			for(boost::uint32_t c=0;c<result_t::COLS;++c)
 				res.m_data[0][c]=lhs.m_data[0][0]*rhs.m_data[0][c];
@@ -423,7 +423,7 @@ namespace baldzarika { namespace math {
 		template < typename RT, boost::uint32_t RC >
 		static inline typename product_result<RT,2,RC>::type product(matrix<T,2,2> const &lhs, matrix<RT,2,RC> const &rhs)
 		{
-			typedef product_result<RT,2,RC>::type result_t;
+			typedef typename product_result<RT,2,RC>::type result_t;
 			result_t res;
 			for(boost::uint32_t c=0;c<result_t::COLS;++c)
 				res.m_data[0][c]=lhs.m_data[0][0]*rhs.m_data[0][c]+lhs.m_data[0][1]*rhs.m_data[1][c];

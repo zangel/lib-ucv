@@ -1,6 +1,8 @@
 #ifndef BALDZARIKA_UCV_SURF_HESSIAN_DETECTOR_H
 #define BALDZARIKA_UCV_SURF_HESSIAN_DETECTOR_H
 
+#include <baldzarika/ucv/integral.h>
+
 namespace baldzarika { namespace ucv { namespace surf {
 
 	template < typename T >
@@ -61,6 +63,7 @@ namespace baldzarika { namespace ucv { namespace surf {
 				typedef typename IVT::value_type	iv_pixel_t;
 				typedef typename gil::channel_type<iv_pixel_t>::type iv_channel_t;
 
+				static T const c_081=0.81f;
 
 				boost::int32_t const width_step=iv.row_begin(1)-iv.row_begin(0);
 				float const layer_scale=float(m_haar_size)/float(HAAR_SIZE0);
@@ -102,7 +105,7 @@ namespace baldzarika { namespace ucv { namespace surf {
 						T dy=integral_sample<T,iv_channel_t>(piv,dy_pattern);
 						T dxy=integral_sample<T,iv_channel_t>(piv,dxy_pattern);
 						piv+=m_sample_step;
-						*pres++=(dx*dy-0.81f*dxy*dxy);
+						*pres++=(dx*dy-c_081*dxy*dxy);
 						*plap++=(dx+dy);
 					}
 				}
