@@ -189,7 +189,7 @@ namespace baldzarika { namespace ucv {
 		denom=std::log(denom);
 		return denom>=0.0f || -num>=mi*(-denom)?
 			mi:
-			static_cast<std::size_t>(boost::math::round(num/denom));
+			static_cast<std::size_t>(math::round(num/denom));
 	}
 
 	bool ransac_homography::operator()(math::matrix33f &h, float t, float c, std::size_t mi)

@@ -112,8 +112,8 @@ namespace baldzarika { namespace ucv { namespace surf {
 				return true;
 			}
 
-			template < typename PT, typename PS >
-			inline bool detect(T tsh, boost::function<void (math::point2<PT> const&, PS)> const &dcb, layer const &bl, layer const &tl) const
+			template < typename PT >
+			inline bool detect(T tsh, boost::function<void (math::point2<PT> const&, boost::int32_t, bool)> const &dcb, layer const &bl, layer const &tl) const
 			{
 				static T const i4=math::constant::one<T>()/math::constant::four<T>();
 
@@ -205,12 +205,11 @@ namespace baldzarika { namespace ucv { namespace surf {
 									std::abs(xi(2))<math::constant::half<T>()
 								)
 								{
-									math::point2<T> pt(
-										center_x+PT(xi(0))*PT(m_sample_step),
-										center_y+PT(xi(1))*PT(m_sample_step)
+									dcb(
+										math::point2<T>(center_x+PT(xi(0))*PT(m_sample_step),center_y+PT(xi(1))*PT(m_sample_step)),
+										math::iround(T(m_haar_size)+xi(2)*T(m_haar_size-bl.m_haar_size)),
+										plap[x]>math::constant::zero<T>()
 									);
-									PS pts=PS(m_haar_size)+PS(xi(2))*PS(m_haar_size-bl.m_haar_size);
-									dcb(pt,pts);
 								}
 							}
                 		}
@@ -336,8 +335,8 @@ namespace baldzarika { namespace ucv { namespace surf {
 		}
 
 
-		template < typename PT, typename PS >
-		bool detect(T tsh, boost::function<void (math::point2<PT> const&, PS)> const &dcb) const
+		template < typename PT >
+		bool detect(T tsh, boost::function<void (math::point2<PT> const&, boost::int32_t, bool)> const &dcb) const
 		{
 			for(boost::uint32_t ml=0;ml<m_octave_layers*m_octaves;++ml)
 			{

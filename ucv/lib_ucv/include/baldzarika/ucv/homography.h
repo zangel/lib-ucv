@@ -1,7 +1,7 @@
 #ifndef BALDZARIKA_UCV_HOMOGRAPHY_H
 #define BALDZARIKA_UCV_HOMOGRAPHY_H
 
-#include <baldzarika/ucv/feature_point.h>
+//#include <baldzarika/ucv/surf/feature_point.h>
 
 namespace baldzarika { namespace ucv {
 
@@ -43,6 +43,7 @@ namespace baldzarika { namespace ucv {
 		std::size_t		update_num_iters(float p, float ep, std::size_t mi, std::size_t nmp=4);
 	};
 
+#if 0
 	template < typename T, typename DT, boost::uint32_t BS, typename MT >
 	bool find_homography_ransac(
 		std::vector< feature_point<T,DT,BS> > const &ops,
@@ -75,6 +76,8 @@ namespace baldzarika { namespace ucv {
 		}
 		return false;
 	}
+
+#endif
 
 	template < typename I1, typename I2 , typename MT>
 	bool find_homography_ransac(

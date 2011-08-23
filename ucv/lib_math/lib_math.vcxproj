@@ -97,6 +97,7 @@
     <ClInclude Include="include\baldzarika\math\matrix.h" />
     <ClInclude Include="include\baldzarika\math\matrix_ops.h" />
     <ClInclude Include="include\baldzarika\math\point2.h" />
+    <ClInclude Include="include\baldzarika\math\round.h" />
     <ClInclude Include="include\baldzarika\math\size2.h" />
     <ClInclude Include="include\baldzarika\math\solve.h" />
     <ClInclude Include="include\baldzarika\math\svd.h" />

@@ -15,7 +15,8 @@
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/surf/hessian_detector.h>
 #include <baldzarika/ucv/homography.h>
-#include <baldzarika/ucv/match_feature_points.h>
+#include <baldzarika/ucv/surf/feature_point.h>
+#include <baldzarika/ucv/surf/match_feature_points.h>
 #include <baldzarika/ucv/klt_tracker.h>
 #include <baldzarika/ucv/good_features_detector.h>
 #include <baldzarika/ucv/sobel.h>
@@ -29,6 +30,7 @@
 #include <baldzarika/ucv/camera_pose.h>
 #include <baldzarika/ucv/pixel_count.h>
 #include <baldzarika/ucv/kalman_filter.h>
+#include <baldzarika/ucv/surf/orientation_estimator.h>
 
 #include <boost/date_time.hpp>
 
@@ -403,13 +405,13 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 		math::vector3f const &p1=image_corners[(p+1)%4];
 
 		cv::Point cvp0(
-			boost::math::round<int>(p0(0)),
-			boost::math::round<int>(p0(1))
+			math::round<int>(p0(0)),
+			math::round<int>(p0(1))
 		);
 
 		cv::Point cvp1(
-			boost::math::round<int>(p1(0)),
-			boost::math::round<int>(p1(1))
+			math::round<int>(p1(0)),
+			math::round<int>(p1(1))
 		);
 
 		cv::line(cv_img2_rgb, cvp0, cvp1, cv::Scalar(0.0, 255.0, 0.0));
@@ -1042,6 +1044,7 @@ void do_surf_hessian_response_test()
 	typedef gray_image_t::view_t gray_view_t;
 	typedef gray_image_t::const_view_t gray_const_view_t;
 	typedef ucv::surf::hessian_detector<T> hessian_detector_t;
+	typedef ucv::surf::orientation_estimator<T, 6, 5, 60 > orientation_estimator_t;
 
 
 	ucv::gil::gray8_image_t gray8_img;
@@ -1064,36 +1067,52 @@ void do_surf_hessian_response_test()
 	ucv::integral(ucv::gil::const_view(gray_img), ucv::gil::view(integral_img), median);
 
 	hessian_detector_t hd(math::size2ui(gray8_img.width(),gray8_img.height()),3,2);
-
-
+	orientation_estimator_t oe;
+	
 	struct points_collector
 	{
-		void add_pts(math::point2<T> const &p, T s)
+		void add_pts(math::point2<T> const &p, boost::int32_t s, bool lap)
 		{
-			_points.push_back(p);
+			_points.push_back( ucv::surf::feature_point<T, T, 4>(p,s,lap) );
 		}
 
-		std::vector< math::point2<T> > _points;
+		std::vector< ucv::surf::feature_point<T, T, 4> > _points;
 	};
 
 
-	boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
+	boost::posix_time::ptime start_ud=boost::posix_time::microsec_clock::local_time();
 	for(boost::uint32_t i=0;i<I;++i)
 	{
 		points_collector pc;
 		hd.update(ucv::gil::const_view(integral_img));
-		boost::function<void (math::point2<T> const &, T)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2));
+		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
 		hd.detect(1.0e-1f, dcb);
 	}
-	boost::posix_time::ptime finish=boost::posix_time::microsec_clock::local_time();
+	boost::posix_time::ptime finish_ud=boost::posix_time::microsec_clock::local_time();
 	std::cout << "hessian_response<" << typeid(T).name() << "> update+detect time=" <<
-		float((finish-start).total_milliseconds())/float(I) << " ms" << std::endl;
+		float((finish_ud-start_ud).total_milliseconds())/float(I) << " ms" << std::endl;
+
+	{
+		points_collector pc;
+		hd.update(ucv::gil::const_view(integral_img));
+		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
+		hd.detect(1.0e-1f, dcb);
+		
+		boost::posix_time::ptime start_oe=boost::posix_time::microsec_clock::local_time();
+		for(boost::uint32_t i=0;i<I;++i)
+		{
+			oe.estimate(ucv::gil::const_view(integral_img), pc._points.begin(), pc._points.end());
+		}
+		boost::posix_time::ptime finish_oe=boost::posix_time::microsec_clock::local_time();
+		std::cout << "orientation_estimator<" << typeid(T).name() << ">::estimate time=" <<
+			float((finish_oe-start_oe).total_milliseconds())/float(I) << " ms" << std::endl;
+	}
 }
 
 BOOST_AUTO_TEST_CASE( surf_hessian_response_test )
 {
 	namespace math=baldzarika::math;
 
-	do_surf_hessian_response_test<float, 1000>();
-	do_surf_hessian_response_test< math::fixed_point<10,21>, 1000 >();
+	do_surf_hessian_response_test<float, 500 >();
+	do_surf_hessian_response_test< math::fixed_point<10,21>, 500 >();
 }
