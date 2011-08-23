@@ -10,7 +10,7 @@ namespace baldzarika { namespace ucv {
 		T sum=math::constant::zero<T>();
 		for(boost::int32_t n=0;n<N;++n)
 		{
-			T x=n-T(N-1)*math::constant::half<T>();
+			T x=T(n)-T(N-1)*math::constant::half<T>();
 			T t=std::exp(_sigma*x*x);
 			kernel[n]=t;
 			sum+=t;

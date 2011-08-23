@@ -99,6 +99,9 @@
     <ClInclude Include="include\baldzarika\math\ec\galois\field_polynomial.h">
       <Filter>Header Files\baldzarika\math\ec\galois</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\math\round.h">
+      <Filter>Header Files\baldzarika\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\math\config.cpp">

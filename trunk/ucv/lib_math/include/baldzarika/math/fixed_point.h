@@ -40,8 +40,7 @@ namespace std {
 	template <boost::uint32_t I, boost::uint32_t F>
 	baldzarika::math::fixed_point<I,F> modf(baldzarika::math::fixed_point<I,F> const &, baldzarika::math::fixed_point<I,F> *);
 
-	template < typename T, boost::uint32_t I, boost::uint32_t F>
-	T round(baldzarika::math::fixed_point<I,F> const &);
+	
 
 	template <boost::uint32_t I, boost::uint32_t F>
 	baldzarika::math::fixed_point<I,F> sqrt(baldzarika::math::fixed_point<I,F> const &);
@@ -163,6 +162,8 @@ namespace baldzarika { namespace math {
 		struct fp_explicit_tag {};
 
 	} //namespace detail
+
+
 
 	template < boost::uint32_t I, boost::uint32_t F >
 	class fixed_point
@@ -426,9 +427,6 @@ namespace baldzarika { namespace math {
 		template < boost::uint32_t I2, boost::uint32_t F2 >
 		friend fixed_point<I2,F2> std::modf(fixed_point<I2,F2> const &, fixed_point<I2,F2> *);
 
-		template< typename T, boost::uint32_t I2, boost::uint32_t F2 >
-		friend T std::round(fixed_point<I2,F2> const &);
-
 		template < boost::uint32_t I2, boost::uint32_t F2 >
 		friend fixed_point<I2,F2> std::sqrt(fixed_point<I2,F2> const &);
 
@@ -591,19 +589,6 @@ namespace std
 			bmath::detail::fp_explicit_tag()
 		);
 	}
-
-	template< typename T, boost::uint32_t I, boost::uint32_t F >
-	inline T round(baldzarika::math::fixed_point<I,F> const &x)
-	{
-		namespace bmath=baldzarika::math;
-
-		return static_cast<T>(x>=bmath::constant::zero< bmath::fixed_point<I,F> >()?
-			x+bmath::constant::half< bmath::fixed_point<I,F> >():
-			x-bmath::constant::half< bmath::fixed_point<I,F> >()
-		);
-	}
-
-
 
 	template < boost::uint32_t I, boost::uint32_t F >
 	inline baldzarika::math::fixed_point<I,F> sqrt(baldzarika::math::fixed_point<I,F> const &x)

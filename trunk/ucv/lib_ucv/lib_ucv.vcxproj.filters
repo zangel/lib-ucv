@@ -51,9 +51,6 @@
     <ClInclude Include="include\baldzarika\ucv\gil_channel_traits.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\feature_point.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\gles\fbo.h">
       <Filter>Header Files\baldzarika\ucv\gles</Filter>
     </ClInclude>
@@ -67,9 +64,6 @@
       <Filter>Header Files\baldzarika\ucv\gles</Filter>
     </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\homography.h">
-      <Filter>Header Files\baldzarika\ucv</Filter>
-    </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\match_feature_points.h">
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\klt_tracker.h">
@@ -160,6 +154,15 @@
       <Filter>Header Files\baldzarika\ucv</Filter>
     </ClInclude>
     <ClInclude Include="include\baldzarika\ucv\surf\orientation_estimator.h">
+      <Filter>Header Files\baldzarika\ucv\surf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\surf\feature_point.h">
+      <Filter>Header Files\baldzarika\ucv\surf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\surf\match_feature_points.h">
+      <Filter>Header Files\baldzarika\ucv\surf</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\surf\desciber.h">
       <Filter>Header Files\baldzarika\ucv\surf</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,7 +2,9 @@
 #define BALDZARIKA_UCV_CONFIG_H
 
 #include <baldzarika/math/config.h>
+#include <baldzarika/math/constant.h>
 #include <baldzarika/math/fixed_point.h>
+#include <baldzarika/math/round.h>
 #include <baldzarika/math/point2.h>
 #include <baldzarika/math/size2.h>
 #include <baldzarika/math/box2.h>
@@ -16,7 +18,6 @@
 #include <baldzarika/math/ec/reed_solomon/decoder.h>
 
 #include <boost/config.hpp>
-#include <boost/math/special_functions.hpp>
 #include <boost/gil/image.hpp>
 #include <boost/gil/typedefs.hpp>
 #include <boost/gil/extension/numeric/sampler.hpp>
@@ -42,6 +43,9 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/dynamic_bitset.hpp>
+
+#include <boost/iterator/iterator_traits.hpp>
+#include <boost/type_traits.hpp>
 
 
 #if defined(HAVE_GLES2)
