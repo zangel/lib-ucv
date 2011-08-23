@@ -156,6 +156,12 @@
     <ClInclude Include="include\baldzarika\ucv\surf\hessian_detector.h">
       <Filter>Header Files\baldzarika\ucv\surf</Filter>
     </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\make_gaussian_kernel.h">
+      <Filter>Header Files\baldzarika\ucv</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baldzarika\ucv\surf\orientation_estimator.h">
+      <Filter>Header Files\baldzarika\ucv\surf</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\baldzarika\ucv\config.cpp">
