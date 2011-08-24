@@ -1102,7 +1102,7 @@ void do_surf_test()
 		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
 		hd.detect(1.0e-1f, dcb);
 		
-		gray_const_view_t iv=ucv::gil::const_view(integral_img);
+		gray_const_view_t iv=ucv::gil::const_view(gray_img);
 		boost::posix_time::ptime start_oe=boost::posix_time::microsec_clock::local_time();
 		for(boost::uint32_t i=0;i<I;++i)
 		{
@@ -1121,7 +1121,7 @@ void do_surf_test()
 		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
 		hd.detect(1.0e-1f, dcb);
 
-		gray_const_view_t iv=ucv::gil::const_view(integral_img);
+		gray_const_view_t iv=ucv::gil::const_view(gray_img);
 
 		for(boost::uint32_t ifp=0;ifp<pc._points.size();++ifp)
 			oe.estimate(iv, pc._points[ifp]);
@@ -1144,6 +1144,6 @@ BOOST_AUTO_TEST_CASE( surf_test )
 	namespace math=baldzarika::math;
 	namespace ucv=baldzarika::ucv;
 
-	do_surf_test< float, 1, 3, 5 >();
-	do_surf_test< math::fixed_point<10,21>, 1, 3, 5 >();
+	do_surf_test< float, 500, 3, 5 >();
+	do_surf_test< math::fixed_point<10,21>, 500, 3, 5 >();
 }

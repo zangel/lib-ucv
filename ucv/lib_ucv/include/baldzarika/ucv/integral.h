@@ -66,6 +66,13 @@ namespace baldzarika { namespace ucv {
 		boost::int32_t	m_p[4];
 	};
 
+	template <typename RT, typename IT>
+	RT integral_sample(IT const *op, integral_box<IT> const &pat)
+	{
+		return RT(op[pat.m_p[0]]+op[pat.m_p[3]]-op[pat.m_p[1]]-op[pat.m_p[2]])*pat.m_coeff;
+	}
+
+
 	template <typename RT, typename IT, boost::uint32_t N>
 	RT integral_sample(IT const *op, integral_box<IT>(&pat)[N])
 	{
