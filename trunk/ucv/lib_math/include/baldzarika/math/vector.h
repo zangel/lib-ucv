@@ -62,6 +62,20 @@ namespace baldzarika { namespace math {
 			return m_data[e];
 		}
 
+		template < boost::uint32_t SS >
+		inline vector<T, SS>& segment(boost::uint32_t offset)
+		{
+			BOOST_ASSERT(offset+SS<=D);
+			return *reinterpret_cast< vector<T,SS> *>(&m_data[offset]);
+		}
+
+		template < boost::uint32_t SS >
+		inline vector<T, SS> const& segment(boost::uint32_t offset) const
+		{
+			BOOST_ASSERT(offset+SS<=D);
+			return *reinterpret_cast< vector<T,SS> const *>(&m_data[offset]);
+		}
+
 		template < typename RT >
 		inline vector& operator =(vector< RT, D > const &rhs)
 		{

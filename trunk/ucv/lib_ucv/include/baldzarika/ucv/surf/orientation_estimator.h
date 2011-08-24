@@ -125,8 +125,8 @@ namespace baldzarika { namespace ucv { namespace surf {
 					boost::int32_t d=std::abs(math::iround(m_angle[i]-T(a)));
 					if(d<OW/2 || d>360-OW/2)
 						sum+=m_xy[i];
-
 				}
+				
 				temp_mod=sum.dot(sum);
 				if(temp_mod>desc_mod)
 				{
@@ -134,7 +134,7 @@ namespace baldzarika { namespace ucv { namespace surf {
 					best=sum;
 				}
 			}
-			fp.m_orientation=std::atan2(best[1],best[0]);
+			fp.m_orientation=std::atan2(best[1], best[0]);
 		}
 		
 	private:
