@@ -162,7 +162,7 @@
     <ClInclude Include="include\baldzarika\ucv\surf\match_feature_points.h">
       <Filter>Header Files\baldzarika\ucv\surf</Filter>
     </ClInclude>
-    <ClInclude Include="include\baldzarika\ucv\surf\desciber.h">
+    <ClInclude Include="include\baldzarika\ucv\surf\describer.h">
       <Filter>Header Files\baldzarika\ucv\surf</Filter>
     </ClInclude>
   </ItemGroup>
