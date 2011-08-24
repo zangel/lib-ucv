@@ -3,62 +3,52 @@
 
 namespace baldzarika { namespace ucv { namespace surf {
 
-	template < typename T,  typename DT, boost::uint32_t BS >
+	template < typename T, boost::uint32_t NB >
 	class feature_point
 		: public math::point2<T>
 	{
 	public:
-		static boost::uint32_t const BLOCK_SIZE=BS;
-		static boost::uint32_t const DESCRIPTOR_SIZE=4*BS*BS;
-		typedef T value_type;
-		typedef math::point2<value_type> point2_t;
-		typedef DT desc_value_type;
+		static boost::uint32_t const DESCRIPTOR_SIZE=4*NB*NB;
 
+		typedef T value_t;
+		typedef math::point2<value_t> base_t;
+		typedef math::vector<value_t,DESCRIPTOR_SIZE> descriptor_t;
+
+		
 		struct position_accessor
 		{
-			typedef value_type result_type;
+			typedef value_t result_type;
 			result_type operator()(feature_point const &t, size_t k) const { return t[k]; }
-			result_type operator()(point2_t const &t, size_t k) const { return t[k]; }
+			result_type operator()(base_t const &t, size_t k) const { return t[k]; }
 		};
 
 		struct description_accessor
 		{
-			typedef desc_value_type result_type;
-			result_type operator()(feature_point const &t, size_t k) const { return t.m_desc[k]; }
+			typedef value_t result_type;
+			result_type operator()(feature_point const &t, size_t k) const { return t.m_descriptor[k]; }
 		};
 		
-		feature_point(point2_t const &p, boost::int32_t s, bool lap)
-			: point2_t(p)
+		feature_point(base_t const &p, boost::int32_t s, bool lap)
+			: base_t(p)
 			, m_scale(s)
 			, m_laplacian(lap)
-			, m_orientation(math::constant::zero<value_type>())
+			, m_orientation(math::constant::zero<value_t>())
 		{
 		}
 
 		feature_point(feature_point const &that)
-			: point2_t(that)
+			: base_t(that)
 			, m_scale(that.m_scale)
 			, m_laplacian(that.m_laplacian)
 			, m_orientation(that.m_orientation)
+			, m_descriptor(that.m_descriptor)
 		{
-			::memcpy(m_desc, that.m_desc, sizeof(m_desc));
 		}
 
-		value_type operator -(feature_point const &rhs) const
+		value_t operator -(feature_point const &rhs) const
 		{
-			//static desc_value_type const s_coeff=10.0f;
-			//static desc_value_type const s_coeff=pow(detail::constants::two<desc_value_type>(), desc_value_type(typename desc_value_type::IS-1));
-			//static desc_value_type const s_icoeff=0.1f;//detail::constants::one<desc_value_type>()/s_coeff;
-			desc_value_type sum=0;
-			for(boost::uint32_t d=0;d<DESCRIPTOR_SIZE;++d)
-			{
-				desc_value_type diff=m_desc[d]-rhs.m_desc[d];
-				//float diff_=diff;
-				//float diff_diff_=diff*diff;
-				sum+=diff*diff;
-			}
-			//float sum_=sum;
-			return std::sqrt(sum);
+			return (m_descriptor-rhs.m_desriptor).norm_2();
+
 		}
 
 		bool operator&&(feature_point const &rhs) const
@@ -66,10 +56,10 @@ namespace baldzarika { namespace ucv { namespace surf {
 			return !(!m_laplacian ^ !rhs.m_laplacian);
 		}
 
-		boost::int32_t		m_scale;
-		bool				m_laplacian;
-		T					m_orientation;
-		desc_value_type		m_desc[DESCRIPTOR_SIZE];
+		boost::int32_t	m_scale;
+		bool			m_laplacian;
+		value_type		m_orientation;
+		descriptor_t	m_descriptor;
 	};
 
 	

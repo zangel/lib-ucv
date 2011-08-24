@@ -120,7 +120,7 @@
     <ClInclude Include="include\baldzarika\ucv\resize.h" />
     <ClInclude Include="include\baldzarika\ucv\sobel.h" />
     <ClInclude Include="include\baldzarika\ucv\extract_surf_descriptor.h" />
-    <ClInclude Include="include\baldzarika\ucv\surf\desciber.h" />
+    <ClInclude Include="include\baldzarika\ucv\surf\describer.h" />
     <ClInclude Include="include\baldzarika\ucv\surf\feature_point.h" />
     <ClInclude Include="include\baldzarika\ucv\surf\hessian_detector.h" />
     <ClInclude Include="include\baldzarika\ucv\surf\match_feature_points.h" />

@@ -31,6 +31,7 @@
 #include <baldzarika/ucv/pixel_count.h>
 #include <baldzarika/ucv/kalman_filter.h>
 #include <baldzarika/ucv/surf/orientation_estimator.h>
+#include <baldzarika/ucv/surf/describer.h>
 
 #include <boost/date_time.hpp>
 
@@ -1032,8 +1033,8 @@ BOOST_AUTO_TEST_CASE( kalman_filter_test )
 
 #endif
 
-template < typename T, boost::uint32_t I >
-void do_surf_hessian_response_test()
+template < typename T, boost::uint32_t I, boost::uint32_t NB, boost::uint32_t NSB >
+void do_surf_test()
 {
 	namespace ucv=baldzarika::ucv;
 	namespace math=baldzarika::math;
@@ -1045,6 +1046,8 @@ void do_surf_hessian_response_test()
 	typedef gray_image_t::const_view_t gray_const_view_t;
 	typedef ucv::surf::hessian_detector<T> hessian_detector_t;
 	typedef ucv::surf::orientation_estimator<T, 6, 5, 60 > orientation_estimator_t;
+	typedef ucv::surf::describer<T, NB, NSB> describer_t;
+	typedef ucv::surf::feature_point<T, NB> feature_point_t;
 
 
 	ucv::gil::gray8_image_t gray8_img;
@@ -1068,15 +1071,16 @@ void do_surf_hessian_response_test()
 
 	hessian_detector_t hd(math::size2ui(gray8_img.width(),gray8_img.height()),3,2);
 	orientation_estimator_t oe;
+	describer_t desc;
 	
 	struct points_collector
 	{
 		void add_pts(math::point2<T> const &p, boost::int32_t s, bool lap)
 		{
-			_points.push_back( ucv::surf::feature_point<T, T, 4>(p,s,lap) );
+			_points.push_back( feature_point_t(p,s,lap) );
 		}
 
-		std::vector< ucv::surf::feature_point<T, T, 4> > _points;
+		std::vector< feature_point_t > _points;
 	};
 
 
@@ -1098,21 +1102,48 @@ void do_surf_hessian_response_test()
 		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
 		hd.detect(1.0e-1f, dcb);
 		
+		gray_const_view_t iv=ucv::gil::const_view(integral_img);
 		boost::posix_time::ptime start_oe=boost::posix_time::microsec_clock::local_time();
 		for(boost::uint32_t i=0;i<I;++i)
 		{
-			oe.estimate(ucv::gil::const_view(integral_img), pc._points.begin(), pc._points.end());
+			
+			for(boost::uint32_t ifp=0;ifp<pc._points.size();++ifp)
+				oe.estimate(iv, pc._points[ifp]);
 		}
 		boost::posix_time::ptime finish_oe=boost::posix_time::microsec_clock::local_time();
 		std::cout << "orientation_estimator<" << typeid(T).name() << ">::estimate time=" <<
 			float((finish_oe-start_oe).total_milliseconds())/float(I) << " ms" << std::endl;
 	}
+
+	{
+		points_collector pc;
+		hd.update(ucv::gil::const_view(integral_img));
+		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
+		hd.detect(1.0e-1f, dcb);
+
+		gray_const_view_t iv=ucv::gil::const_view(integral_img);
+
+		for(boost::uint32_t ifp=0;ifp<pc._points.size();++ifp)
+			oe.estimate(iv, pc._points[ifp]);
+
+		
+		boost::posix_time::ptime start_desc=boost::posix_time::microsec_clock::local_time();
+		for(boost::uint32_t i=0;i<I;++i)
+		{
+			for(boost::uint32_t ifp=0;ifp<pc._points.size();++ifp)
+				desc.describe(iv, pc._points[ifp]);
+		}
+		boost::posix_time::ptime finish_desc=boost::posix_time::microsec_clock::local_time();
+		std::cout << "describer<" << typeid(T).name() << ">::describe time=" <<
+			float((finish_desc-start_desc).total_milliseconds())/float(I) << " ms" << std::endl;
+	}
 }
 
-BOOST_AUTO_TEST_CASE( surf_hessian_response_test )
+BOOST_AUTO_TEST_CASE( surf_test )
 {
 	namespace math=baldzarika::math;
+	namespace ucv=baldzarika::ucv;
 
-	do_surf_hessian_response_test<float, 500 >();
-	do_surf_hessian_response_test< math::fixed_point<10,21>, 500 >();
+	do_surf_test< float, 1, 3, 5 >();
+	do_surf_test< math::fixed_point<10,21>, 1, 3, 5 >();
 }
