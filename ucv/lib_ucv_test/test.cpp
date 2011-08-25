@@ -1034,7 +1034,7 @@ BOOST_AUTO_TEST_CASE( kalman_filter_test )
 #endif
 
 template < typename T, boost::uint32_t I, boost::uint32_t NB, boost::uint32_t NSB >
-void do_surf_test()
+void do_surf_performance_test()
 {
 	namespace ucv=baldzarika::ucv;
 	namespace math=baldzarika::math;
@@ -1139,11 +1139,120 @@ void do_surf_test()
 	}
 }
 
-BOOST_AUTO_TEST_CASE( surf_test )
+BOOST_AUTO_TEST_CASE( surf_performance_test )
 {
 	namespace math=baldzarika::math;
 	namespace ucv=baldzarika::ucv;
 
-	do_surf_test< float, 500, 3, 5 >();
-	do_surf_test< math::fixed_point<10,21>, 500, 3, 5 >();
+	//do_surf_performance_test< float, 1, 3, 5 >();
+	//do_surf_performance_test< math::fixed_point<10,21>, 1, 3, 5 >();
+}
+
+BOOST_AUTO_TEST_CASE( surf_match_test )
+{
+	namespace ucv=baldzarika::ucv;
+	namespace math=baldzarika::math;
+
+	typedef float gray_t;
+	typedef ucv::gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
+	typedef ucv::gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
+	typedef gray_image_t::view_t gray_view_t;
+	typedef gray_image_t::const_view_t gray_const_view_t;
+	typedef ucv::surf::hessian_detector<float> hessian_detector_t;
+	typedef ucv::surf::orientation_estimator<float, 6, 5, 60 > orientation_estimator_t;
+	typedef ucv::surf::describer<float, 4, 5> describer_t;
+	typedef describer_t::feature_point_t feature_point_t;
+	
+	struct points_collector
+	{
+		points_collector(std::vector< feature_point_t > &pts)
+			: m_points(pts)
+		{
+		}
+
+		void add_pts(feature_point_t::base_t const &p, boost::int32_t s, bool lap)
+		{
+			m_points.push_back( feature_point_t(p,s,lap) );
+		}
+		std::vector< feature_point_t > &m_points;
+	};
+
+	orientation_estimator_t oe;
+	describer_t desc;
+
+
+
+	//first image
+	ucv::gil::gray8_image_t gray8_img_1;
+	ucv::gil::png_read_and_convert_image("test_img2.png", gray8_img_1);
+	gray_image_t gray_img_1(gray8_img_1.width(), gray8_img_1.height());
+	
+	gray_t median_1;
+	ucv::convert(
+		ucv::gil::view(gray8_img_1),
+		ucv::gil::view(gray_img_1),
+		ucv::detail::grayscale_convert_and_median<gray_t>(
+			median_1,
+			gray8_img_1.width(),
+			gray8_img_1.height()
+		)
+	);
+	gray_image_t integral_img_1(gray8_img_1.width()+1, gray8_img_1.height()+1);
+	ucv::integral(ucv::gil::const_view(gray_img_1), ucv::gil::view(integral_img_1), median_1);
+
+	
+	std::vector<feature_point_t> fps_1;
+	points_collector ptsc_1(fps_1);
+
+	hessian_detector_t hd_1(math::size2ui(gray8_img_1.width(),gray8_img_1.height()),3,2,2);
+	hd_1.update(ucv::gil::const_view(integral_img_1));
+	hd_1.detect<float>(5.0e-2f, boost::bind(&points_collector::add_pts, &ptsc_1, _1, _2, _3));
+	for(boost::uint32_t i=0;i<fps_1.size();++i)
+	{
+		oe.estimate(ucv::gil::const_view(integral_img_1), fps_1[i]);
+		desc.describe(ucv::gil::const_view(gray_img_1), fps_1[i]);
+	}
+
+	//second image
+	ucv::gil::gray8_image_t gray8_img_2;
+	ucv::gil::png_read_and_convert_image("test_img2_match.png", gray8_img_2);
+	gray_image_t gray_img_2(gray8_img_2.width(), gray8_img_2.height());
+
+	gray_t median_2;
+	ucv::convert(
+		ucv::gil::view(gray8_img_2),
+		ucv::gil::view(gray_img_2),
+		ucv::detail::grayscale_convert_and_median<gray_t>(
+			median_2,
+			gray8_img_2.width(),
+			gray8_img_2.height()
+		)
+	);
+	gray_image_t integral_img_2(gray8_img_2.width()+1, gray8_img_2.height()+1);
+	ucv::integral(ucv::gil::const_view(gray_img_2), ucv::gil::view(integral_img_2), median_2);
+
+	std::vector<feature_point_t> fps_2;
+	points_collector ptsc_2(fps_2);
+
+	hessian_detector_t hd_2(math::size2ui(gray8_img_2.width(),gray8_img_2.height()),3,2,2);
+	hd_2.update(ucv::gil::const_view(integral_img_2));
+	hd_2.detect<float>(5.0e-2f, boost::bind(&points_collector::add_pts, &ptsc_2, _1, _2, _3));
+	for(boost::uint32_t i=0;i<fps_2.size();++i)
+	{
+		oe.estimate(ucv::gil::const_view(integral_img_2), fps_2[i]);
+		desc.describe(ucv::gil::const_view(gray_img_2), fps_2[i]);
+	}
+
+	std::vector<
+		std::pair<
+			std::vector<feature_point_t>::const_iterator,
+			std::vector<feature_point_t>::const_iterator
+		>
+	> matches;
+
+	ucv::surf::match_feature_points<
+		feature_point_t,
+		std::vector<feature_point_t>,
+		std::vector<feature_point_t>
+	>(fps_1, fps_2, matches, 0.65f);
 }
