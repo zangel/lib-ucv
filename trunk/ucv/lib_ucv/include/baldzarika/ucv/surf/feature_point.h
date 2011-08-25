@@ -47,7 +47,7 @@ namespace baldzarika { namespace ucv { namespace surf {
 
 		value_t operator -(feature_point const &rhs) const
 		{
-			return (m_descriptor-rhs.m_desriptor).norm_2();
+			return (m_descriptor-rhs.m_descriptor).norm_2();
 
 		}
 

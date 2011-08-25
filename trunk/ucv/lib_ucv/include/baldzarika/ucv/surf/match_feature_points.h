@@ -4,7 +4,7 @@
 #include <baldzarika/ucv/surf/feature_point.h>
 
 
-namespace baldzarika { namespace ucv {
+namespace baldzarika { namespace ucv { namespace surf {
 	
 	template < typename FP, typename FPS1, typename FPS2 >
 	void match_feature_points(FPS1 const &fps1, FPS2 const &fps2, std::vector< std::pair<typename FPS1::const_iterator, typename FPS2::const_iterator> > &m, typename FP::value_type const &d=typename FP::value_type(0.65f))
@@ -56,6 +56,7 @@ namespace baldzarika { namespace ucv {
 		}
 	}
 
+} //namespace surf
 } //namespace ucv
 } //namespace baldzarika
 

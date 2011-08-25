@@ -108,8 +108,23 @@ namespace baldzarika { namespace ucv { namespace surf {
 					boost::int32_t x=std::min(std::max(math::iround(pixel_x),0),iv.width()-1);
                     boost::int32_t y=std::min(std::max(math::iround(pixel_y),0),iv.height()-1);
 					win_row[j]=prev_win_row[j]+(sum+=T(*(reinterpret_cast<iv_channel_t const *>(iv.row_begin(y))+x)));
+					//win_row[j]=T(*(reinterpret_cast<iv_channel_t const *>(iv.row_begin(y))+x));
 				}
             }
+
+#if 0
+			{
+				ucv::gil::gray8_image_t save_img(win_view.width(),win_view.height());
+				ucv::convert(
+					win_view,
+					ucv::gil::view(save_img),
+					ucv::detail::grayscale_convert()
+					);
+
+				ucv::gil::png_write_view("win_view.png", ucv::gil::const_view(save_img));
+			}
+#endif			
+			
 
 			//compute gradients using integral window
 			for(boost::uint32_t i=0;i<describer_helper_t::KERNEL_SIZE;++i)
@@ -227,11 +242,11 @@ namespace baldzarika { namespace ucv { namespace surf {
 					ib
 				);
 
-				m_dx[describer_helper_t::KERNEL_SIZE-1][x-1]+=w_bl;
-				m_dx[describer_helper_t::KERNEL_SIZE-1][x]-=w_bl;
+				m_dx[describer_helper_t::KERNEL_SIZE-1][x-1]+=w;
+				m_dx[describer_helper_t::KERNEL_SIZE-1][x]-=w;
 
-				m_dy[describer_helper_t::KERNEL_SIZE-1][x-1]+=w_bl;
-				m_dy[describer_helper_t::KERNEL_SIZE-1][x]+=w_bl;
+				m_dy[describer_helper_t::KERNEL_SIZE-1][x-1]+=w;
+				m_dy[describer_helper_t::KERNEL_SIZE-1][x]+=w;
 			}
 
 
@@ -243,7 +258,65 @@ namespace baldzarika { namespace ucv { namespace surf {
 			m_dx[describer_helper_t::KERNEL_SIZE-1][describer_helper_t::KERNEL_SIZE-1]+=w_br;
 			m_dy[describer_helper_t::KERNEL_SIZE-1][describer_helper_t::KERNEL_SIZE-1]+=w_br;
 
+#if 0
+			for(boost::uint32_t i=0;i<describer_helper_t::KERNEL_SIZE;++i)
+			{
+				for(boost::uint32_t j=0;j<describer_helper_t::KERNEL_SIZE;++j)
+				{
+					m_dx[i][j]=0.5f*(1.0f+m_dx[i][j]);
+					m_dy[i][j]=0.5f*(1.0f+m_dy[i][j]);
+				}
+			}
+			ucv::gil::gray8_image_t grad_img(describer_helper_t::KERNEL_SIZE,describer_helper_t::KERNEL_SIZE);
+			ucv::convert(
+				ucv::gil::interleaved_view(
+					describer_helper_t::KERNEL_SIZE, describer_helper_t::KERNEL_SIZE,
+					reinterpret_cast<win_pixel_t const *>(&m_dx[0][0]),
+					describer_helper_t::KERNEL_SIZE*sizeof(T)
+				),
+				ucv::gil::view(grad_img),
+				ucv::detail::grayscale_convert()
+			);
+			ucv::gil::png_write_view("dx.png", ucv::gil::const_view(grad_img));
 
+			ucv::convert(
+				ucv::gil::interleaved_view(
+					describer_helper_t::KERNEL_SIZE, describer_helper_t::KERNEL_SIZE,
+					reinterpret_cast<win_pixel_t const *>(&m_dy[0][0]),
+					describer_helper_t::KERNEL_SIZE*sizeof(T)
+				),
+				ucv::gil::view(grad_img),
+				ucv::detail::grayscale_convert()
+			);
+			ucv::gil::png_write_view("dy.png", ucv::gil::const_view(grad_img));
+#endif
+			
+
+			
+			//compute the descriptor
+			static describer_helper_t const &desc_helper=describer_helper_t::get();
+			fp.m_descriptor=feature_point_t::descriptor_t::zero();
+			for(boost::uint32_t i=0;i<NB;++i)
+			{
+				for(boost::uint32_t j=0;j<NB;++j)
+				{
+					math::vector<T,4> &vec=fp.m_descriptor.segment<4>((i*NB+j)<<2);
+					
+					for(boost::uint32_t y=i*NSB;y<i*NSB+NSB;++y)
+					{
+						for(boost::uint32_t x=j*NSB;x<j*NSB+5;++x)
+						{
+							T tx=m_dx[y][x]*desc_helper.m_gauss33[y][x];
+							T ty=m_dy[y][x]*desc_helper.m_gauss33[y][x];
+							vec[0]+=tx;
+							vec[1]+=ty;
+							vec[2]+=std::abs(tx);
+							vec[3]+=std::abs(ty);
+						}
+					}
+				}
+			}
+			fp.m_descriptor.normalize();
 		}
 	
 	private:
