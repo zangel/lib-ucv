@@ -1144,8 +1144,8 @@ BOOST_AUTO_TEST_CASE( surf_performance_test )
 	namespace math=baldzarika::math;
 	namespace ucv=baldzarika::ucv;
 
-	//do_surf_performance_test< float, 1, 3, 5 >();
-	//do_surf_performance_test< math::fixed_point<10,21>, 1, 3, 5 >();
+	//do_surf_performance_test< float, 500, 3, 5 >();
+	//do_surf_performance_test< math::fixed_point<10,21>, 500, 3, 5 >();
 }
 
 BOOST_AUTO_TEST_CASE( surf_match_test )
@@ -1159,8 +1159,8 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 	typedef gray_image_t::view_t gray_view_t;
 	typedef gray_image_t::const_view_t gray_const_view_t;
 	typedef ucv::surf::hessian_detector<float> hessian_detector_t;
-	typedef ucv::surf::orientation_estimator<float, 6, 5, 60 > orientation_estimator_t;
-	typedef ucv::surf::describer<float, 4, 5> describer_t;
+	typedef ucv::surf::orientation_estimator<float, 6, 10, 10 > orientation_estimator_t;
+	typedef ucv::surf::describer<float, 3, 5> describer_t;
 	typedef describer_t::feature_point_t feature_point_t;
 	
 	struct points_collector
@@ -1184,7 +1184,7 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 
 	//first image
 	ucv::gil::gray8_image_t gray8_img_1;
-	ucv::gil::png_read_and_convert_image("test_img2.png", gray8_img_1);
+	ucv::gil::png_read_and_convert_image("box.png", gray8_img_1);
 	gray_image_t gray_img_1(gray8_img_1.width(), gray8_img_1.height());
 	
 	gray_t median_1;
@@ -1204,9 +1204,9 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 	std::vector<feature_point_t> fps_1;
 	points_collector ptsc_1(fps_1);
 
-	hessian_detector_t hd_1(math::size2ui(gray8_img_1.width(),gray8_img_1.height()),3,2,2);
+	hessian_detector_t hd_1(math::size2ui(gray8_img_1.width(),gray8_img_1.height()), 3, 3, 1);
 	hd_1.update(ucv::gil::const_view(integral_img_1));
-	hd_1.detect<float>(5.0e-2f, boost::bind(&points_collector::add_pts, &ptsc_1, _1, _2, _3));
+	hd_1.detect<float>(1.0e-3f, boost::bind(&points_collector::add_pts, &ptsc_1, _1, _2, _3));
 	for(boost::uint32_t i=0;i<fps_1.size();++i)
 	{
 		oe.estimate(ucv::gil::const_view(integral_img_1), fps_1[i]);
@@ -1215,7 +1215,7 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 
 	//second image
 	ucv::gil::gray8_image_t gray8_img_2;
-	ucv::gil::png_read_and_convert_image("test_img2_match.png", gray8_img_2);
+	ucv::gil::png_read_and_convert_image("box_in_scene.png", gray8_img_2);
 	gray_image_t gray_img_2(gray8_img_2.width(), gray8_img_2.height());
 
 	gray_t median_2;
@@ -1234,9 +1234,9 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 	std::vector<feature_point_t> fps_2;
 	points_collector ptsc_2(fps_2);
 
-	hessian_detector_t hd_2(math::size2ui(gray8_img_2.width(),gray8_img_2.height()),3,2,2);
+	hessian_detector_t hd_2(math::size2ui(gray8_img_2.width(),gray8_img_2.height()), 3, 3, 1);
 	hd_2.update(ucv::gil::const_view(integral_img_2));
-	hd_2.detect<float>(5.0e-2f, boost::bind(&points_collector::add_pts, &ptsc_2, _1, _2, _3));
+	hd_2.detect<float>(1.0e-3f, boost::bind(&points_collector::add_pts, &ptsc_2, _1, _2, _3));
 	for(boost::uint32_t i=0;i<fps_2.size();++i)
 	{
 		oe.estimate(ucv::gil::const_view(integral_img_2), fps_2[i]);
@@ -1255,4 +1255,88 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 		std::vector<feature_point_t>,
 		std::vector<feature_point_t>
 	>(fps_1, fps_2, matches, 0.65f);
+
+	cv::Mat cv_img1_rgb=cv::imread("box.png");
+	cv::Mat cv_img2_rgb=cv::imread("box_in_scene.png");
+	
+
+	for(std::size_t ifp=0;ifp<matches.size();++ifp)
+	{
+	
+		cv::circle(cv_img1_rgb,
+			cv::Point(static_cast<boost::int32_t>(matches[ifp].first->x()), static_cast<boost::int32_t>(matches[ifp].first->y())),
+			3,
+			cv::Scalar(0.0, 255.0, 0.0),
+			-1
+		);
+
+		cv::circle(cv_img2_rgb,
+			cv::Point(static_cast<boost::int32_t>(matches[ifp].second->x()), static_cast<boost::int32_t>(matches[ifp].second->y())),
+			3,
+			cv::Scalar(0.0, 255.0, 0.0),
+			-1
+		);
+	}
+
+	math::matrix33f hm;
+
+	ucv::find_homography_ransac(matches,hm,false);
+
+	float marker_corners[4][3]=
+	{
+		{
+			0.0f,
+			0.0f,
+			1.0f
+		},
+		{
+			static_cast<float>(gray8_img_1.width()),
+			0.0f,
+			1.0f
+		},
+		{
+			static_cast<float>(gray8_img_1.width()),
+			static_cast<float>(gray8_img_1.height()),
+			1.0f
+		},
+		{
+			0.0f,
+			static_cast<float>(gray8_img_1.height()),
+			1.0f
+		}
+	};
+
+	math::vector3f image_corners[4]=
+	{
+		(hm*math::vector3f(marker_corners[0])).homogenized(),
+		(hm*math::vector3f(marker_corners[1])).homogenized(),
+		(hm*math::vector3f(marker_corners[2])).homogenized(),
+		(hm*math::vector3f(marker_corners[3])).homogenized()
+	};
+
+	for(int p=0;p<4;++p)
+	{
+		math::vector3f const &p0=image_corners[p];
+		math::vector3f const &p1=image_corners[(p+1)%4];
+
+		cv::Point cvp0(
+			boost::math::round<int>(p0(0)),
+			boost::math::round<int>(p0(1))
+		);
+
+		cv::Point cvp1(
+			boost::math::round<int>(p1(0)),
+			boost::math::round<int>(p1(1))
+		);
+
+		cv::line(cv_img2_rgb, cvp0, cvp1, cv::Scalar(0.0, 255.0, 0.0));
+	}
+
+	
+	cv::namedWindow(OPENCV_WND_NAME2);
+	cv::imshow(OPENCV_WND_NAME2, cv_img1_rgb);
+	cv::imshow(OPENCV_WND_NAME, cv_img2_rgb);
+	
+	cv::waitKey();
+
 }

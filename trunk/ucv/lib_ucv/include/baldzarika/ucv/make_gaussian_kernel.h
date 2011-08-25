@@ -4,7 +4,7 @@
 namespace baldzarika { namespace ucv {
 
 	template < typename T, boost::int32_t N >
-	void make_gaussian_kernel(T(&kernel)[N], T sigma)
+	void make_gaussian_kernel(T(&kernel)[N], T sigma, bool normalize=true)
 	{
 		T _sigma=-math::constant::half<T>()/(sigma*sigma);
 		T sum=math::constant::zero<T>();
@@ -15,9 +15,12 @@ namespace baldzarika { namespace ucv {
 			kernel[n]=t;
 			sum+=t;
 		}
-		sum=math::constant::one<T>()/sum;
-		for(boost::int32_t n=0;n<N;++n)
-			kernel[n]*=sum;
+		if(normalize)
+		{
+			sum=math::constant::one<T>()/sum;
+			for(boost::int32_t n=0;n<N;++n)
+				kernel[n]*=sum;
+		}
 	}
 
 
