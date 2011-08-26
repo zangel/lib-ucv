@@ -1045,7 +1045,7 @@ void do_surf_performance_test()
 	typedef gray_image_t::view_t gray_view_t;
 	typedef gray_image_t::const_view_t gray_const_view_t;
 	typedef ucv::surf::hessian_detector<T> hessian_detector_t;
-	typedef ucv::surf::orientation_estimator<T, 6, 5, 60 > orientation_estimator_t;
+	typedef ucv::surf::orientation_estimator<T, 6, 10, 10 > orientation_estimator_t;
 	typedef ucv::surf::describer<T, NB, NSB> describer_t;
 	typedef ucv::surf::feature_point<T, NB> feature_point_t;
 
@@ -1069,7 +1069,7 @@ void do_surf_performance_test()
 	gray_image_t integral_img(gray8_img.width()+1, gray8_img.height()+1);
 	ucv::integral(ucv::gil::const_view(gray_img), ucv::gil::view(integral_img), median);
 
-	hessian_detector_t hd(math::size2ui(gray8_img.width(),gray8_img.height()),3,2);
+	hessian_detector_t hd(math::size2ui(gray8_img.width(),gray8_img.height()),2,2,2);
 	orientation_estimator_t oe;
 	describer_t desc;
 	
@@ -1090,7 +1090,7 @@ void do_surf_performance_test()
 		points_collector pc;
 		hd.update(ucv::gil::const_view(integral_img));
 		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
-		hd.detect(1.0e-1f, dcb);
+		hd.detect(1.0e-3f, dcb);
 	}
 	boost::posix_time::ptime finish_ud=boost::posix_time::microsec_clock::local_time();
 	std::cout << "hessian_response<" << typeid(T).name() << "> update+detect time=" <<
@@ -1100,7 +1100,7 @@ void do_surf_performance_test()
 		points_collector pc;
 		hd.update(ucv::gil::const_view(integral_img));
 		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
-		hd.detect(1.0e-1f, dcb);
+		hd.detect(1.0e-3f, dcb);
 		
 		gray_const_view_t iv=ucv::gil::const_view(gray_img);
 		boost::posix_time::ptime start_oe=boost::posix_time::microsec_clock::local_time();
@@ -1119,7 +1119,7 @@ void do_surf_performance_test()
 		points_collector pc;
 		hd.update(ucv::gil::const_view(integral_img));
 		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
-		hd.detect(1.0e-1f, dcb);
+		hd.detect(1.0e-3f, dcb);
 
 		gray_const_view_t iv=ucv::gil::const_view(gray_img);
 
@@ -1184,7 +1184,7 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 
 	//first image
 	ucv::gil::gray8_image_t gray8_img_1;
-	ucv::gil::png_read_and_convert_image("box.png", gray8_img_1);
+	ucv::gil::png_read_and_convert_image("test_img2.png", gray8_img_1);
 	gray_image_t gray_img_1(gray8_img_1.width(), gray8_img_1.height());
 	
 	gray_t median_1;
@@ -1204,9 +1204,9 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 	std::vector<feature_point_t> fps_1;
 	points_collector ptsc_1(fps_1);
 
-	hessian_detector_t hd_1(math::size2ui(gray8_img_1.width(),gray8_img_1.height()), 3, 3, 1);
+	hessian_detector_t hd_1(math::size2ui(gray8_img_1.width(),gray8_img_1.height()), 2, 3, 2);
 	hd_1.update(ucv::gil::const_view(integral_img_1));
-	hd_1.detect<float>(1.0e-3f, boost::bind(&points_collector::add_pts, &ptsc_1, _1, _2, _3));
+	hd_1.detect<float>(1.0e-2f, boost::bind(&points_collector::add_pts, &ptsc_1, _1, _2, _3));
 	for(boost::uint32_t i=0;i<fps_1.size();++i)
 	{
 		oe.estimate(ucv::gil::const_view(integral_img_1), fps_1[i]);
@@ -1215,7 +1215,7 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 
 	//second image
 	ucv::gil::gray8_image_t gray8_img_2;
-	ucv::gil::png_read_and_convert_image("box_in_scene.png", gray8_img_2);
+	ucv::gil::png_read_and_convert_image("test_img2_match.png", gray8_img_2);
 	gray_image_t gray_img_2(gray8_img_2.width(), gray8_img_2.height());
 
 	gray_t median_2;
@@ -1234,9 +1234,9 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 	std::vector<feature_point_t> fps_2;
 	points_collector ptsc_2(fps_2);
 
-	hessian_detector_t hd_2(math::size2ui(gray8_img_2.width(),gray8_img_2.height()), 3, 3, 1);
+	hessian_detector_t hd_2(math::size2ui(gray8_img_2.width(),gray8_img_2.height()), 2, 3, 2);
 	hd_2.update(ucv::gil::const_view(integral_img_2));
-	hd_2.detect<float>(1.0e-3f, boost::bind(&points_collector::add_pts, &ptsc_2, _1, _2, _3));
+	hd_2.detect<float>(1.0e-2f, boost::bind(&points_collector::add_pts, &ptsc_2, _1, _2, _3));
 	for(boost::uint32_t i=0;i<fps_2.size();++i)
 	{
 		oe.estimate(ucv::gil::const_view(integral_img_2), fps_2[i]);
@@ -1254,15 +1254,23 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 		feature_point_t,
 		std::vector<feature_point_t>,
 		std::vector<feature_point_t>
-	>(fps_1, fps_2, matches, 0.65f);
+	>(fps_1, fps_2, matches, 0.6f);
 
-	cv::Mat cv_img1_rgb=cv::imread("box.png");
-	cv::Mat cv_img2_rgb=cv::imread("box_in_scene.png");
+	cv::Mat cv_img1_rgb=cv::imread("test_img2.png");
+	cv::Mat cv_img2_rgb=cv::imread("test_img2_match.png");
 	
+	std::vector< feature_point_t::base_t > pts1(4), pts2(4);
 
 	for(std::size_t ifp=0;ifp<matches.size();++ifp)
 	{
 	
+		if(ifp<4)
+		{
+
+			pts1[ifp]=*matches[ifp].first;
+			pts2[ifp]=*matches[ifp].second;
+		}
+
 		cv::circle(cv_img1_rgb,
 			cv::Point(static_cast<boost::int32_t>(matches[ifp].first->x()), static_cast<boost::int32_t>(matches[ifp].first->y())),
 			3,
@@ -1281,6 +1289,7 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 	math::matrix33f hm;
 
 	ucv::find_homography_ransac(matches,hm,false);
+	//ucv::perspective_transform(pts1,pts2,hm);
 
 	float marker_corners[4][3]=
 	{
