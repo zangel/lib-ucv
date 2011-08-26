@@ -12,6 +12,11 @@ namespace baldzarika { namespace ucv {
 			{
 				return v;
 			}
+
+			inline bool operator()(float const &v) const
+			{
+				return std::abs(v)>=std::numeric_limits<float>::epsilon();
+			}
 		};
 
 		struct is_zero
@@ -20,6 +25,11 @@ namespace baldzarika { namespace ucv {
 			inline bool operator()(T const &v) const
 			{
 				return !v;
+			}
+
+			inline bool operator()(float const &v) const
+			{
+				return std::abs(v)<std::numeric_limits<float>::epsilon();
 			}
 		};
 		

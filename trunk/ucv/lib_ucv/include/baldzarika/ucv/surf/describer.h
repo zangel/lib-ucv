@@ -35,7 +35,7 @@ namespace baldzarika { namespace ucv { namespace surf {
 			describer_helper()
 			{
 				T g_k[PATCH_SIZE];
-				make_gaussian_kernel(g_k, T(3.3), false);
+				make_gaussian_kernel(g_k, T(3.3));
 				for(boost::uint32_t y=0;y<PATCH_SIZE;++y)
 					for(boost::uint32_t x=0;x<PATCH_SIZE;++x)
 						m_gauss33[y][x]=g_k[y]*g_k[x];
@@ -68,7 +68,8 @@ namespace baldzarika { namespace ucv { namespace surf {
 
 			static describer_helper const &desc_helper=describer_helper::get();
 
-			T s=static_cast<T>(fp.m_scale*1.2f/9.0f);
+			T s=static_cast<T>(fp.m_scale*1.2f/9.0f)*T(4)/T(NB)*T(0.9625f);
+			//T s=static_cast<T>(fp.m_scale*1.2f/9.0f)*T(4)/T(NB);
 			T win_ss=math::constant::one<T>()/s;
 			T win_sa=win_ss*win_ss;
 
@@ -219,7 +220,7 @@ namespace baldzarika { namespace ucv { namespace surf {
 			ucv::gil::png_write_view("dy.png", ucv::gil::const_view(grad_img));
 #endif
 			//compute the descriptor
-			fp.m_descriptor=feature_point_t::descriptor_t::zero();
+			fp.m_descriptor=feature_point_t::descriptor_type::zero();
 			for(boost::uint32_t i=0;i<NB;++i)
 			{
 				for(boost::uint32_t j=0;j<NB;++j)

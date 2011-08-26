@@ -109,6 +109,107 @@ namespace baldzarika { namespace ucv {
 		return false;
 	}
 
+	template < typename OI, typename II, typename MT >
+	bool find_homography(std::vector< std::pair<OI, II> > const &oim, math::size2ui const &ms, math::matrix<MT,3,3> &hm)
+	{
+		typedef typename boost::iterator_value<OI>::type obj_point_t;
+		typedef typename boost::iterator_value<II>::type img_point_t;
+
+		//BOOST_MPL_ASSERT( (boost::is_same<typename obj_point_t::value_type, typename img_point_t::value_type>) );
+
+		typedef typename obj_point_t::value_type point2_value_t;
+		typedef math::point2<point2_value_t> point2_t;
+										
+		typedef std::vector< std::pair< boost::uint32_t, point2_value_t> > averaged_corner_t;
+
+		averaged_corner_t averaged_corners[4];
+		
+		point2_value_t const inv_mwidth=
+			math::constant::one<point2_value_t>()/
+			point2_value_t(ms.width());
+
+		point2_value_t const inv_mheight=
+			math::constant::one<point2_value_t>()/
+			point2_value_t(ms.height());
+
+		point2_t corners[4]=
+		{
+			point2_t(
+				math::constant::zero<point2_value_t>(),
+				math::constant::zero<point2_value_t>()
+			),
+			point2_t(
+				math::constant::one<point2_value_t>(),
+				math::constant::zero<point2_value_t>()
+			),
+			point2_t(
+				math::constant::one<point2_value_t>(),
+				math::constant::one<point2_value_t>()
+			),
+			point2_t(
+				math::constant::zero<point2_value_t>(), 
+				math::constant::one<point2_value_t>()
+			)
+		};
+
+		
+		for(boost::uint32_t m=0;m<oim.size();++m)
+		{
+			point2_t normalized_pt(
+				oim[m].first->x()*inv_mwidth,
+				oim[m].first->y()*inv_mheight
+			);
+
+			for(boost::uint32_t c=0;c<4;++c)
+			{
+				point2_value_t corner_dist=(normalized_pt-corners[c]).length();
+
+				if(averaged_corners[c].empty())
+					averaged_corners[c].push_back( std::make_pair(m,corner_dist) );
+				else
+				{
+					averaged_corner_t::iterator iac=averaged_corners[c].begin();
+					while(iac!=averaged_corners[c].end() && corner_dist>=iac->second) iac++;
+
+					if(iac==averaged_corners[c].end())
+					{
+						if(averaged_corners[c].size()<3)
+							averaged_corners[c].push_back( std::make_pair(m,corner_dist) );
+					}
+					else
+						averaged_corners[c].insert(iac, std::make_pair(m,corner_dist));
+
+					while(averaged_corners[c].size()>3)
+						averaged_corners[c].pop_back();
+				}
+			}
+		}
+
+		std::vector< point2_t > marker_points(4), image_points(4);
+		for(boost::uint32_t c=0;c<4;++c)
+		{
+			point2_value_t const inv_size=
+				math::constant::one<point2_value_t>()/
+				point2_value_t(averaged_corners[c].size());
+
+			point2_t avg_mpoint(point2_t::zero());
+			point2_t avg_ipoint(point2_t::zero());
+
+
+			for(boost::uint32_t i=0;i<averaged_corners[c].size();++i)
+			{
+				avg_mpoint+=*oim[averaged_corners[c][i].first].first;
+				avg_ipoint+=*oim[averaged_corners[c][i].first].second;
+			}
+			avg_mpoint/=point2_value_t(averaged_corners[c].size());
+			avg_ipoint/=point2_value_t(averaged_corners[c].size());
+			marker_points[c]=avg_mpoint;
+			image_points[c]=avg_ipoint;
+		}
+
+		return ucv::perspective_transform(marker_points, image_points, hm);
+	}
+
 
 } //namespace ucv
 } //namespace baldzarika

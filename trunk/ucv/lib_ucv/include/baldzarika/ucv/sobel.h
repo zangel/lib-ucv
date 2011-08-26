@@ -23,7 +23,7 @@ namespace baldzarika { namespace ucv {
 				for(boost::int32_t x=1;x<width-1;++x)
 				{
 					ring_x[x]=src[x+1]-src[x-1];
-					ring_y[x]=src[x-1]+src[x].operator<<(1)+src[x+1];
+					ring_y[x]=src[x-1]+src[x]*math::constant::two<PT>()+src[x+1];
 				}
 
 				ring_x[width-1]=src[width-1]-src[width-2];
@@ -34,7 +34,7 @@ namespace baldzarika { namespace ucv {
 			{
 				for(boost::int32_t x=0;x<width;++x)
 				{
-					dst_x[x]=ring_x[0][x]+ring_x[1][x].operator<<(1)+ring_x[2][x];
+					dst_x[x]=ring_x[0][x]+ring_x[1][x]*math::constant::two<PT>()+ring_x[2][x];
 					dst_y[x]=ring_y[2][x]-ring_y[0][x];
 				}
 			}
@@ -137,7 +137,7 @@ namespace baldzarika { namespace ucv {
 		}
 	
 	private:
-		math::size2ui			m_frame_size;
+		math::size2ui	m_frame_size;
 		gray_image_t	m_ring_buffer_img;
 	};
 

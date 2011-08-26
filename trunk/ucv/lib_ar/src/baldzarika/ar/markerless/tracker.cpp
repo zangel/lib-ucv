@@ -4,11 +4,11 @@
 
 namespace baldzarika { namespace ar { namespace markerless {
 
-	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=3;
-	boost::uint32_t const tracker::DEFAULT_SURF_INTERVALS=4;
+	boost::uint32_t const tracker::DEFAULT_SURF_OCTAVES=2;
+	boost::uint32_t const tracker::DEFAULT_SURF_INTERVALS=2;
 	boost::uint32_t const tracker::DEFAULT_SURF_SAMPLE_STEPS=2;
-	float const tracker::DEFAULT_SURF_TRESHOLD=4.0e-4f;
-	float const tracker::DEFAULT_SURF_MATCH_DIST=0.65f;
+	float const tracker::DEFAULT_SURF_TRESHOLD=1.0e-2f;
+	float const tracker::DEFAULT_SURF_MATCH_DIST=0.6f;
 
 	boost::uint32_t const tracker::DEFAULT_KLT_HALF_WIN_SIZE=5;
 	boost::uint32_t const tracker::DEFAULT_KLT_LEVELS=4;
@@ -26,13 +26,15 @@ namespace baldzarika { namespace ar { namespace markerless {
 
 		struct compare_relative_fp_scales
 		{
-			typedef std::pair< tracker::feature_point_t::desc_value_type, std::size_t > compare_t;
+			typedef std::pair< tracker::feature_point_t::value_type, std::size_t > compare_t;
 			
 			bool operator()(compare_t const &a, compare_t const &b) const
 			{
 				return a.first<b.first;
 			}
 		};
+
+		//struct 
 
 	} //namespace anonymous
 
@@ -74,6 +76,7 @@ namespace baldzarika { namespace ar { namespace markerless {
 
 	tracker::tracker(math::size2ui const &fs)
 		: ar::tracker(fs)
+		, m_detection_threshold(DEFAULT_SURF_TRESHOLD)
 		, m_min_marker_features(DEFAULT_TRACKER_MIN_MARKER_FEATURES)
 		, m_max_marker_features(DEFAULT_TRACKER_MAX_MARKER_FEATURES)
 		, m_select_fp_scale(DEFAULT_TRACKER_SELECT_FP_SCALE)
@@ -83,12 +86,9 @@ namespace baldzarika { namespace ar { namespace markerless {
 		, m_integral_tmp(fs.width(),fs.height())
 		, m_integral_frame_seq(0)
 		, m_integral_views(2)
-		, m_surf(fs,
-			DEFAULT_SURF_OCTAVES,
-			DEFAULT_SURF_INTERVALS,
-			DEFAULT_SURF_SAMPLE_STEPS,
-			DEFAULT_SURF_TRESHOLD
-		)
+		, m_detector(fs, DEFAULT_SURF_OCTAVES, DEFAULT_SURF_INTERVALS, DEFAULT_SURF_SAMPLE_STEPS)
+		, m_orientation_estimator()
+		, m_describer()
 		, m_klt_tracker(fs,
 			math::size2ui(DEFAULT_KLT_HALF_WIN_SIZE,DEFAULT_KLT_HALF_WIN_SIZE),
 			DEFAULT_KLT_LEVELS,
@@ -106,14 +106,14 @@ namespace baldzarika { namespace ar { namespace markerless {
 
 	float tracker::get_detection_treshold() const
 	{
-		return m_surf.treshold();
+		return m_detection_threshold;
 	}
 
 	bool tracker::set_detection_treshold(float dt)
 	{
 		if(m_running_state)
 			return false;
-		m_surf.set_treshold(dt);
+		m_detection_threshold=dt;
 		return true;
 	}
 
@@ -312,7 +312,7 @@ namespace baldzarika { namespace ar { namespace markerless {
 	
 	bool tracker::on_set_frame_size(math::size2ui const &fs)
 	{
-		m_surf.resize(fs);
+		m_detector.resize(fs);
 		m_klt_tracker.set_frame_size(fs);
 		m_integral_tmp.recreate(fs.width(),fs.height());
 		m_integral_frame_stg[0].recreate(fs.width(), fs.height());
@@ -358,15 +358,9 @@ namespace baldzarika { namespace ar { namespace markerless {
 	{
 		if(ms.m_marker && !ms.m_marker->get_size().empty())
 		{
-			ucv::surf marker_surf(
-				ms.m_marker->get_size(),
-				3, //m_surf.octaves(),
-				4, //m_surf.intervals(),
-				2, //m_surf.sample_step(),
-				4.0e-4f//m_surf.treshold()
-			);
-
-			ucv::surf::integral_image_t marker_integral_img(
+			hessian_detector_t det(ms.m_marker->get_size(), DEFAULT_SURF_OCTAVES, DEFAULT_SURF_INTERVALS, DEFAULT_SURF_SAMPLE_STEPS);
+			
+			gray_image_t marker_integral_img(
 				ms.m_marker->get_size().width(),
 				ms.m_marker->get_size().height()
 			);
@@ -377,6 +371,9 @@ namespace baldzarika { namespace ar { namespace markerless {
 				ms.m_marker->get_median()
 			);
 
+			det.update(ucv::gil::const_view(marker_integral_img));
+			//det.detect(m_detection_threshold
+			
 			if(marker_surf.set_integral_view(ucv::gil::const_view(marker_integral_img)))
 			{
 				marker_surf.build_response_layers();
@@ -696,100 +693,6 @@ namespace baldzarika { namespace ar { namespace markerless {
 		while(m_integral_views.size()>1)
 			m_integral_views.pop_back();
 	}
-
-	template < typename I1, typename I2 >
-	void tracker::find_marker_homography(std::vector< std::pair<I1, I2> > const &oim, math::size2ui const &ms, math::matrix33f &hm)
-	{
-		typedef std::vector< std::pair< boost::uint32_t, feature_point_t::value_type> > averaged_corner_t;
-		averaged_corner_t averaged_corners[4];
-		
-		feature_point_t::value_type const inv_mwidth=
-			math::constant::one<feature_point_t::value_type>()/
-			feature_point_t::value_type(ms.width());
-
-		feature_point_t::value_type const inv_mheight=
-			math::constant::one<feature_point_t::value_type>()/
-			feature_point_t::value_type(ms.height());
-
-		feature_point_t::point2_t corners[4]=
-		{
-			feature_point_t::point2_t(
-				math::constant::zero<feature_point_t::value_type>(),
-				math::constant::zero<feature_point_t::value_type>()
-			),
-			feature_point_t::point2_t(
-				math::constant::one<feature_point_t::value_type>(),
-				math::constant::zero<feature_point_t::value_type>()
-			),
-			feature_point_t::point2_t(
-				math::constant::one<feature_point_t::value_type>(),
-				math::constant::one<feature_point_t::value_type>()
-			),
-			feature_point_t::point2_t(
-				math::constant::zero<feature_point_t::value_type>(), 
-				math::constant::one<feature_point_t::value_type>()
-			)
-		};
-
-		
-		for(boost::uint32_t m=0;m<oim.size();++m)
-		{
-			feature_point_t::point2_t normalized_pt(
-				oim[m].first->x()*inv_mwidth,
-				oim[m].first->y()*inv_mheight
-			);
-
-			for(boost::uint32_t c=0;c<4;++c)
-			{
-				feature_point_t::value_type corner_dist=(normalized_pt-corners[c]).length();
-
-				if(averaged_corners[c].empty())
-					averaged_corners[c].push_back( std::make_pair(m,corner_dist) );
-				else
-				{
-					averaged_corner_t::iterator iac=averaged_corners[c].begin();
-					while(iac!=averaged_corners[c].end() && corner_dist>=iac->second) iac++;
-
-					if(iac==averaged_corners[c].end())
-					{
-						if(averaged_corners[c].size()<3)
-							averaged_corners[c].push_back( std::make_pair(m,corner_dist) );
-					}
-					else
-						averaged_corners[c].insert(iac, std::make_pair(m,corner_dist));
-
-					while(averaged_corners[c].size()>3)
-						averaged_corners[c].pop_back();
-				}
-			}
-		}
-
-		std::vector<math::point2f> marker_points(4), image_points(4);
-		for(boost::uint32_t c=0;c<4;++c)
-		{
-			feature_point_t::value_type const inv_size=
-				math::constant::one<feature_point_t::value_type>()/
-				feature_point_t::value_type(averaged_corners[c].size());
-
-			math::point2f avg_mpoint(feature_point_t::point2_t::zero());
-			math::point2f avg_ipoint(feature_point_t::point2_t::zero());
-
-
-			for(boost::uint32_t i=0;i<averaged_corners[c].size();++i)
-			{
-				avg_mpoint+=*oim[averaged_corners[c][i].first].first;
-				avg_ipoint+=*oim[averaged_corners[c][i].first].second;
-			}
-			avg_mpoint/=float(averaged_corners[c].size());
-			avg_ipoint/=float(averaged_corners[c].size());
-			marker_points[c]=avg_mpoint;
-			image_points[c]=avg_ipoint;
-		}
-
-		ucv::perspective_transform(marker_points,image_points,hm);
-	}
-
-	
 
 } //namespace markerless
 } //namespace ar

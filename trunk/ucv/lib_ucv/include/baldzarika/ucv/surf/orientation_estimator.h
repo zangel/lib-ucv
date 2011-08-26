@@ -74,7 +74,7 @@ namespace baldzarika { namespace ucv { namespace surf {
 
 
 			boost::int32_t fp_scale=fp.m_scale;
-			T s=static_cast<T>(fp_scale*1.2f/9.0f);
+			T s=static_cast<T>(fp_scale*1.2f/9.0f);//*T(0.9625);
 			boost::int32_t grad_wav_size=2*math::iround(s*math::constant::two<T>());
 
 			float const ib_scale=float(grad_wav_size)/4.0f;

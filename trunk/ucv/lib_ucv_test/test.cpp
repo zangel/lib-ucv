@@ -1051,7 +1051,7 @@ void do_surf_performance_test()
 
 
 	ucv::gil::gray8_image_t gray8_img;
-	ucv::gil::png_read_and_convert_image("test_img2.png", gray8_img);
+	ucv::gil::png_read_and_convert_image("test_img2_match_bn.png", gray8_img);
 
 	gray_image_t gray_img(gray8_img.width(), gray8_img.height());
 
@@ -1090,7 +1090,7 @@ void do_surf_performance_test()
 		points_collector pc;
 		hd.update(ucv::gil::const_view(integral_img));
 		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
-		hd.detect(1.0e-3f, dcb);
+		hd.detect(1.0e-2f, dcb);
 	}
 	boost::posix_time::ptime finish_ud=boost::posix_time::microsec_clock::local_time();
 	std::cout << "hessian_response<" << typeid(T).name() << "> update+detect time=" <<
@@ -1100,7 +1100,7 @@ void do_surf_performance_test()
 		points_collector pc;
 		hd.update(ucv::gil::const_view(integral_img));
 		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
-		hd.detect(1.0e-3f, dcb);
+		hd.detect(1.0e-2f, dcb);
 		
 		gray_const_view_t iv=ucv::gil::const_view(gray_img);
 		boost::posix_time::ptime start_oe=boost::posix_time::microsec_clock::local_time();
@@ -1119,7 +1119,7 @@ void do_surf_performance_test()
 		points_collector pc;
 		hd.update(ucv::gil::const_view(integral_img));
 		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
-		hd.detect(1.0e-3f, dcb);
+		hd.detect(1.0e-2f, dcb);
 
 		gray_const_view_t iv=ucv::gil::const_view(gray_img);
 
@@ -1144,7 +1144,7 @@ BOOST_AUTO_TEST_CASE( surf_performance_test )
 	namespace math=baldzarika::math;
 	namespace ucv=baldzarika::ucv;
 
-	//do_surf_performance_test< float, 500, 3, 5 >();
+	do_surf_performance_test< float, 500, 3, 5 >();
 	//do_surf_performance_test< math::fixed_point<10,21>, 500, 3, 5 >();
 }
 
@@ -1170,7 +1170,7 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 		{
 		}
 
-		void add_pts(feature_point_t::base_t const &p, boost::int32_t s, bool lap)
+		void add_pts(feature_point_t::base_type const &p, boost::int32_t s, bool lap)
 		{
 			m_points.push_back( feature_point_t(p,s,lap) );
 		}
@@ -1204,7 +1204,7 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 	std::vector<feature_point_t> fps_1;
 	points_collector ptsc_1(fps_1);
 
-	hessian_detector_t hd_1(math::size2ui(gray8_img_1.width(),gray8_img_1.height()), 2, 3, 2);
+	hessian_detector_t hd_1(math::size2ui(gray8_img_1.width(),gray8_img_1.height()), 2, 2, 2);
 	hd_1.update(ucv::gil::const_view(integral_img_1));
 	hd_1.detect<float>(1.0e-2f, boost::bind(&points_collector::add_pts, &ptsc_1, _1, _2, _3));
 	for(boost::uint32_t i=0;i<fps_1.size();++i)
@@ -1234,7 +1234,7 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 	std::vector<feature_point_t> fps_2;
 	points_collector ptsc_2(fps_2);
 
-	hessian_detector_t hd_2(math::size2ui(gray8_img_2.width(),gray8_img_2.height()), 2, 3, 2);
+	hessian_detector_t hd_2(math::size2ui(gray8_img_2.width(),gray8_img_2.height()), 2, 2, 2);
 	hd_2.update(ucv::gil::const_view(integral_img_2));
 	hd_2.detect<float>(1.0e-2f, boost::bind(&points_collector::add_pts, &ptsc_2, _1, _2, _3));
 	for(boost::uint32_t i=0;i<fps_2.size();++i)
@@ -1259,7 +1259,7 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 	cv::Mat cv_img1_rgb=cv::imread("test_img2.png");
 	cv::Mat cv_img2_rgb=cv::imread("test_img2_match.png");
 	
-	std::vector< feature_point_t::base_t > pts1(4), pts2(4);
+	std::vector< feature_point_t::base_type > pts1(4), pts2(4);
 
 	for(std::size_t ifp=0;ifp<matches.size();++ifp)
 	{
@@ -1288,8 +1288,10 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 
 	math::matrix33f hm;
 
-	ucv::find_homography_ransac(matches,hm,false);
+	ucv::find_homography_ransac(matches,hm,false,2.5);
 	//ucv::perspective_transform(pts1,pts2,hm);
+	//ucv::find_homography(matches, math::size2ui(gray8_img_1.width(),gray8_img_1.height()), hm);
+
 
 	float marker_corners[4][3]=
 	{
