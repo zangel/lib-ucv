@@ -12,6 +12,8 @@ namespace baldzarika { namespace ucv {
 		typedef typename gil::channel_type<src_pixel_t>::type src_channel_t;
 		typedef typename gil::channel_type<dst_pixel_t>::type dst_channel_t;
 
+		static dst_channel_t const i4=dst_channel_t(0.25);
+
 		if(src.width()/2!=dst.width() && src.height()/2!=dst.height())
 			return false;
 
@@ -30,7 +32,7 @@ namespace baldzarika { namespace ucv {
 				converter(src_row[(x<<1)+1],		tmp[1]);
 				converter(nxt_src_row[x<<1],		tmp[2]);
 				converter(nxt_src_row[(x<<1)+1],	tmp[3]);
-				dst_row[x]=(tmp[0]+tmp[1]+tmp[2]+tmp[3]).operator>>(2);
+				dst_row[x]=(tmp[0]+tmp[1]+tmp[2]+tmp[3])*i4;
 			}
 			converter.end_row();
 		}

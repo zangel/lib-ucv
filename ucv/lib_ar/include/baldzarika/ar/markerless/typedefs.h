@@ -6,6 +6,8 @@
 namespace baldzarika { namespace ar { namespace markerless {
 
 
+
+
 } //namespace markerless
 } //namespace ar
 } //namespace baldzarika

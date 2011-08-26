@@ -270,6 +270,11 @@ namespace baldzarika { namespace ucv { namespace surf {
 			return m_sample_step0;
 		}
 
+		bool resize(math::size2ui const &sz)
+		{
+			return recreate(sz,m_octaves,m_octave_layers,m_sample_step0);
+		}
+
 		bool recreate(math::size2ui const &sz, boost::uint32_t oc=4, boost::uint32_t ol=2, boost::uint32_t ss0=1)
 		{
 			if(sz.empty() || oc==0 || ol==0 || ss0==0) return false;

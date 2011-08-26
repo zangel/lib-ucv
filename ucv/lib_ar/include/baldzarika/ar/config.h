@@ -8,8 +8,11 @@
 #include <baldzarika/ucv/integral.h>
 #include <baldzarika/ucv/norm.h>
 #include <baldzarika/ucv/contour.h>
-#include <baldzarika/ucv/surf.h>
-#include <baldzarika/ucv/match_feature_points.h>
+#include <baldzarika/ucv/surf/feature_point.h>
+#include <baldzarika/ucv/surf/hessian_detector.h>
+#include <baldzarika/ucv/surf/match_feature_points.h>
+#include <baldzarika/ucv/surf/orientation_estimator.h>
+#include <baldzarika/ucv/surf/describer.h>
 #include <baldzarika/ucv/klt_tracker.h>
 #include <baldzarika/ucv/homography.h>
 #include <baldzarika/ucv/perspective_transform.h>

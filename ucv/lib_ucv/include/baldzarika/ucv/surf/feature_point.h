@@ -10,34 +10,34 @@ namespace baldzarika { namespace ucv { namespace surf {
 	public:
 		static boost::uint32_t const DESCRIPTOR_SIZE=4*NB*NB;
 
-		typedef T value_t;
-		typedef math::point2<value_t> base_t;
-		typedef math::vector<value_t,DESCRIPTOR_SIZE> descriptor_t;
+		typedef T value_type;
+		typedef math::point2<value_type> base_type;
+		typedef math::vector<value_type,DESCRIPTOR_SIZE> descriptor_type;
 
 		
 		struct position_accessor
 		{
-			typedef value_t result_type;
+			typedef value_type result_type;
 			result_type operator()(feature_point const &t, size_t k) const { return t[k]; }
-			result_type operator()(base_t const &t, size_t k) const { return t[k]; }
+			result_type operator()(base_type const &t, size_t k) const { return t[k]; }
 		};
 
 		struct description_accessor
 		{
-			typedef value_t result_type;
+			typedef value_type result_type;
 			result_type operator()(feature_point const &t, size_t k) const { return t.m_descriptor[k]; }
 		};
 		
-		feature_point(base_t const &p, boost::int32_t s, bool lap)
-			: base_t(p)
+		feature_point(base_type const &p, boost::int32_t s, bool lap)
+			: base_type(p)
 			, m_scale(s)
 			, m_laplacian(lap)
-			, m_orientation(math::constant::zero<value_t>())
+			, m_orientation(math::constant::zero<value_type>())
 		{
 		}
 
 		feature_point(feature_point const &that)
-			: base_t(that)
+			: base_type(that)
 			, m_scale(that.m_scale)
 			, m_laplacian(that.m_laplacian)
 			, m_orientation(that.m_orientation)
@@ -45,7 +45,7 @@ namespace baldzarika { namespace ucv { namespace surf {
 		{
 		}
 
-		value_t operator -(feature_point const &rhs) const
+		value_type operator -(feature_point const &rhs) const
 		{
 			return (m_descriptor-rhs.m_descriptor).norm_2();
 
@@ -56,10 +56,10 @@ namespace baldzarika { namespace ucv { namespace surf {
 			return !(!m_laplacian ^ !rhs.m_laplacian);
 		}
 
-		boost::int32_t	m_scale;
-		bool			m_laplacian;
-		value_type		m_orientation;
-		descriptor_t	m_descriptor;
+		boost::int32_t		m_scale;
+		bool				m_laplacian;
+		value_type			m_orientation;
+		descriptor_type		m_descriptor;
 	};
 
 	

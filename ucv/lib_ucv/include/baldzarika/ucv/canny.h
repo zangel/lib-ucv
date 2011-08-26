@@ -150,8 +150,8 @@ namespace baldzarika { namespace ucv {
 
 		bool non_maxima_suppression(map_stack_t &map_stack)
 		{
-			static gray_t const tan_22_5=0.4142135623730950488016887242097;
-			static gray_t const tan_67_5=2.4142135623730950488016887242097;
+			static gray_t const tan_22_5=gray_t(0.4142135623730950488016887242097);
+			static gray_t const tan_67_5=gray_t(2.4142135623730950488016887242097);
 
 			boost::int32_t const width=boost::int32_t(m_frame_size.width());
 			boost::int32_t const height=boost::int32_t(m_frame_size.height());
@@ -231,7 +231,8 @@ namespace baldzarika { namespace ucv {
 					gray_t dy=dy_row[x];
 					gray_t m=mag[x];
 
-					boost::int32_t s=(dx.get() ^ dy.get())<0?-1:1;
+					//boost::int32_t s=(dx.get() ^ dy.get())<0?-1:1;
+					boost::int32_t s=dx*dy<0?-1:1;
 					
 					dx=std::abs(dx);
 					dy=std::abs(dy);
