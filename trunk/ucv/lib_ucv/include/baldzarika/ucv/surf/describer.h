@@ -78,8 +78,8 @@ namespace baldzarika { namespace ucv { namespace surf {
 			T patch_real_size=T(PATCH_SIZE+1);
 			T win_real_size=T(PATCH_SIZE+1)*s;
 			
-			boost::uint32_t win_size=std::ceil(win_real_size);
-			boost::uint32_t win_samples_size=win_size+PATCH_SIZE+1;
+			boost::uint32_t win_size=boost::uint32_t(std::ceil(win_real_size));
+			boost::uint32_t win_samples_size=boost::uint32_t(win_size+PATCH_SIZE+1);
 			
 			if(m_win_samples_size<win_samples_size)
 			{
@@ -242,6 +242,13 @@ namespace baldzarika { namespace ucv { namespace surf {
 				}
 			}
 			fp.m_descriptor.normalize();
+		}
+
+		template < typename IVT, typename FPI >
+		void describe(IVT const &iv, FPI first, FPI last)
+		{
+			for(FPI fpi=first;fpi!=last;++fpi)
+				describe(iv,*fpi);
 		}
 	
 	private:

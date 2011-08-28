@@ -34,7 +34,16 @@ namespace baldzarika { namespace ar { namespace markerless {
 			}
 		};
 
-		//struct 
+		void add_feature_point(std::vector<tracker::feature_point_t> &fps, tracker::feature_point_t::base_type const &p, boost::int32_t s, bool lap)
+		{
+			fps.push_back(
+				tracker::feature_point_t(
+					p,
+					s,
+					lap
+				)
+			);
+		}
 
 	} //namespace anonymous
 
@@ -83,9 +92,8 @@ namespace baldzarika { namespace ar { namespace markerless {
 		, m_select_fp_min_area(DEFAULT_TRACKER_SELECT_FP_MIN_AREA)
 		, m_detection_max_diff_norm(DEFAULT_DETECTION_MAX_DIFF_NORM)
 		, m_tracking_max_diff_norm(DEFAULT_TRACKING_MAX_DIFF_NORM)
-		, m_integral_tmp(fs.width(),fs.height())
-		, m_integral_frame_seq(0)
-		, m_integral_views(2)
+		, m_frame_seq(0)
+		, m_gray_integral_buffer(2)
 		, m_detector(fs, DEFAULT_SURF_OCTAVES, DEFAULT_SURF_INTERVALS, DEFAULT_SURF_SAMPLE_STEPS)
 		, m_orientation_estimator()
 		, m_describer()
@@ -96,8 +104,10 @@ namespace baldzarika { namespace ar { namespace markerless {
 			DEFAULT_KLT_EPSILON
 		)
 	{
-		m_integral_frame_stg[0].recreate(fs.width(), fs.height());
-		m_integral_frame_stg[1].recreate(fs.width(), fs.height());
+		m_gray_frame_stg[0].recreate(fs.width(), fs.height());
+		m_gray_frame_stg[1].recreate(fs.width(), fs.height());
+		m_integral_frame_stg[0].recreate(fs.width()+1, fs.height()+1);
+		m_integral_frame_stg[1].recreate(fs.width()+1, fs.height()+1);
 	}
 
 	tracker::~tracker()
@@ -242,8 +252,8 @@ namespace baldzarika { namespace ar { namespace markerless {
 
 	void tracker::on_start()
 	{
-		m_integral_frame_seq=0;
-		m_integral_views.clear();
+		m_frame_seq=0;
+		m_gray_integral_buffer.clear();
 
 		marker_states_t::index<marker_state::detected_tag>::type &markers_by_detected=m_marker_states.get<marker_state::detected_tag>();
 		for(marker_states_t::iterator it_marker=m_marker_states.begin();it_marker!=m_marker_states.end();++it_marker)
@@ -265,7 +275,7 @@ namespace baldzarika { namespace ar { namespace markerless {
 
 	void tracker::on_update()
 	{
-		if(!m_integral_views.empty())
+		if(!m_gray_integral_buffer.empty())
 		{
 			marker_states_t::index<marker_state::detected_tag>::type &marker_states_by_detected=
 				m_marker_states.get<marker_state::detected_tag>();
@@ -314,23 +324,21 @@ namespace baldzarika { namespace ar { namespace markerless {
 	{
 		m_detector.resize(fs);
 		m_klt_tracker.set_frame_size(fs);
-		m_integral_tmp.recreate(fs.width(),fs.height());
-		m_integral_frame_stg[0].recreate(fs.width(), fs.height());
-		m_integral_frame_stg[1].recreate(fs.width(), fs.height());
+		m_gray_frame_stg[0].recreate(fs.width(), fs.height());
+		m_gray_frame_stg[1].recreate(fs.width(), fs.height());
+		m_integral_frame_stg[0].recreate(fs.width()+1, fs.height()+1);
+		m_integral_frame_stg[1].recreate(fs.width()+1, fs.height()+1);
 		return true;
 	}
 
 	bool tracker::on_process_frame(ucv::gil::gray8c_view_t gv)
 	{
-		if(gv.width()!=m_integral_tmp.width() || gv.height()!=m_integral_tmp.height())
-			return false;
-
-		if(!m_integral_views.full())
+		if(!m_gray_integral_buffer.full())
 		{
 			gray_t median_value;
 			ucv::convert(
 				gv,
-				ucv::gil::view(m_integral_tmp),
+				ucv::gil::view(m_gray_frame_stg[(m_frame_seq & 0x0001)]),
 				ucv::detail::grayscale_convert_and_median<gray_t>(
 					median_value,
 					gv.width(),
@@ -339,16 +347,19 @@ namespace baldzarika { namespace ar { namespace markerless {
 			);
 
 			ucv::integral(
-				ucv::gil::const_view(m_integral_tmp),
-				ucv::gil::view(m_integral_frame_stg[(m_integral_frame_seq & 0x0001)]),
+				ucv::gil::const_view(m_gray_frame_stg[(m_frame_seq & 0x0001)]),
+				ucv::gil::view(m_integral_frame_stg[(m_frame_seq & 0x0001)]),
 				median_value
 			);
 					
-			m_integral_views.push_front(
-				ucv::gil::const_view(m_integral_frame_stg[(m_integral_frame_seq & 0x0001)])
+			m_gray_integral_buffer.push_front(
+				std::make_pair(
+					ucv::gil::const_view(m_gray_frame_stg[(m_frame_seq & 0x0001)]),
+					ucv::gil::const_view(m_integral_frame_stg[(m_frame_seq & 0x0001)])
+				)
 			);
 					
-			m_integral_frame_seq++;
+			m_frame_seq++;
 			return true;
 		}
 		return false;
@@ -361,8 +372,8 @@ namespace baldzarika { namespace ar { namespace markerless {
 			hessian_detector_t det(ms.m_marker->get_size(), DEFAULT_SURF_OCTAVES, DEFAULT_SURF_INTERVALS, DEFAULT_SURF_SAMPLE_STEPS);
 			
 			gray_image_t marker_integral_img(
-				ms.m_marker->get_size().width(),
-				ms.m_marker->get_size().height()
+				ms.m_marker->get_size().width()+1,
+				ms.m_marker->get_size().height()+1
 			);
 
 			ucv::integral(
@@ -372,14 +383,27 @@ namespace baldzarika { namespace ar { namespace markerless {
 			);
 
 			det.update(ucv::gil::const_view(marker_integral_img));
-			//det.detect(m_detection_threshold
-			
-			if(marker_surf.set_integral_view(ucv::gil::const_view(marker_integral_img)))
-			{
-				marker_surf.build_response_layers();
-				marker_surf.detect(ms.m_features);
-				marker_surf.describe(ms.m_features);
-			}
+			det.detect<gray_t>(
+				m_detection_threshold,
+				boost::bind(&add_feature_point,
+					boost::ref(ms.m_features),
+					_1,
+					_2,
+					_3
+				)
+			);
+
+			orientation_estimator_t().estimate(
+				ucv::gil::const_view(marker_integral_img),
+				ms.m_features.begin(),
+				ms.m_features.end()
+			);
+
+			describer_t().describe(
+				ucv::gil::const_view(ms.m_marker->get_image()),
+				ms.m_features.begin(),
+				ms.m_features.end()
+			);
 		}
 	}
 
@@ -388,22 +412,22 @@ namespace baldzarika { namespace ar { namespace markerless {
 	{
 		std::vector<
 			std::pair<
-				std::vector< ucv::surf::feature_point_t >::const_iterator,
-				std::vector< ucv::surf::feature_point_t >::const_iterator
+				std::vector< feature_point_t >::const_iterator,
+				std::vector< feature_point_t >::const_iterator
 			>
 		> marker_matches;
 
-		ucv::match_feature_points<
-			ucv::surf::feature_point_t,
-			std::vector<ucv::surf::feature_point_t>,
-			std::vector<ucv::surf::feature_point_t>
+		ucv::surf::match_feature_points<
+			feature_point_t,
+			std::vector<feature_point_t>,
+			std::vector<feature_point_t>
 		>(ms.m_features, ffs, marker_matches, DEFAULT_SURF_MATCH_DIST);
 
 		if(marker_matches.size()>=m_min_marker_features)
 		{
 			math::matrix33f hm;
 #if 1
-			find_marker_homography(marker_matches, ms.get_marker_size(), hm);
+			ucv::find_homography(marker_matches, ms.get_marker_size(), hm);
 
 #else
 			if(	ucv::find_homography_ransac(
@@ -414,13 +438,13 @@ namespace baldzarika { namespace ar { namespace markerless {
 #endif
 			{
 
-				feature_point_t::desc_value_type const select_scale=m_select_fp_scale;
-				feature_point_t::value_type const inv_select_fp_min_distance=1.0f/sqrt(m_surf.size().area()*m_select_fp_min_area);
+				feature_point_t::value_type const select_scale=m_select_fp_scale;
+				feature_point_t::value_type const inv_select_fp_min_distance=1.0f/sqrt(m_detector.size().area()*m_select_fp_min_area);
 
 				feature_point_t::value_type const marker_left=math::constant::zero<feature_point_t::value_type>();
-				feature_point_t::value_type const marker_right=ms.get_marker()->get_size().width();
+				feature_point_t::value_type const marker_right=feature_point_t::value_type(ms.get_marker()->get_size().width());
 				feature_point_t::value_type const marker_top=math::constant::zero<feature_point_t::value_type>();
-				feature_point_t::value_type const marker_bottom=ms.get_marker()->get_size().height();
+				feature_point_t::value_type const marker_bottom=feature_point_t::value_type(ms.get_marker()->get_size().height());
 
 				feature_point_t::value_type const inv_marker_width=
 					math::constant::one<feature_point_t::value_type>()/
@@ -432,7 +456,7 @@ namespace baldzarika { namespace ar { namespace markerless {
 								
 				std::vector<
 					std::pair<
-						feature_point_t::desc_value_type,
+						feature_point_t::value_type,
 						std::size_t
 					>
 				> marker_inliers;
@@ -452,18 +476,18 @@ namespace baldzarika { namespace ar { namespace markerless {
 						boost::uint32_t fp_g_x=static_cast<boost::uint32_t>(ffs[f].x()*inv_select_fp_min_distance);
 						boost::uint32_t fp_g_y=static_cast<boost::uint32_t>(ffs[f].y()*inv_select_fp_min_distance);
 
-						feature_point_t::desc_value_type mp_dist=math::point2<feature_point_t::desc_value_type>(
+						feature_point_t::value_type mp_dist=math::point2<feature_point_t::value_type>(
 							(
-								feature_point_t::desc_value_type(marker_points[f].x()*inv_marker_width)-
-								math::constant::half<feature_point_t::desc_value_type>()
-							).operator<<(1),
+								feature_point_t::value_type(marker_points[f].x()*inv_marker_width)-
+								math::constant::half<feature_point_t::value_type>()
+							)*math::constant::two<feature_point_t::value_type>(),
 							(
-								feature_point_t::desc_value_type(marker_points[f].y()*inv_marker_height)-
-								math::constant::half<feature_point_t::desc_value_type>()
-							).operator<<(1)
+								feature_point_t::value_type(marker_points[f].y()*inv_marker_height)-
+								math::constant::half<feature_point_t::value_type>()
+							)*math::constant::two<feature_point_t::value_type>()
 						).length();
 						
-						feature_point_t::desc_value_type fp_sel_scale=std::abs(ffs[f].m_scale-select_scale)*(math::constant::one<feature_point_t::desc_value_type>()-mp_dist);
+						feature_point_t::value_type fp_sel_scale=std::abs(ffs[f].m_scale-select_scale)*(math::constant::one<feature_point_t::value_type>()-mp_dist);
 
 						std::size_t si;
 						for(si=0;si<marker_inliers.size();++si)
@@ -508,7 +532,7 @@ namespace baldzarika { namespace ar { namespace markerless {
 					for(std::size_t il=0;il<select_n_inliers;++il)
 					{
 						ms.m_marker_points[il]=marker_points[marker_inliers[il].second];
-						ms.m_frame_points[il]=static_cast<feature_point_t::point2_t const &>(ffs[marker_inliers[il].second]);
+						ms.m_frame_points[il]=static_cast<feature_point_t::base_type const &>(ffs[marker_inliers[il].second]);
 					}
 					ms.set_homography(hm);
 					return true;
@@ -528,54 +552,69 @@ namespace baldzarika { namespace ar { namespace markerless {
 	void tracker::detect_markers()
 	{
 		//discard all but last frame
-		if(m_integral_views.size()<2)
+		if(m_gray_integral_buffer.size()<2)
 			return;
 
-		integral_view_buffer_t::const_iterator curr_frame_it=m_integral_views.begin();
-		integral_view_buffer_t::const_iterator prev_frame_it=curr_frame_it;
+		gray_integral_buffer_t::const_iterator curr_frame_it=m_gray_integral_buffer.begin();
+		gray_integral_buffer_t::const_iterator prev_frame_it=curr_frame_it;
 		prev_frame_it++;
 		
 		gray_t const detection_max_diff_norm=m_detection_max_diff_norm;
-		gray_t frame_diff=ucv::norm_l1<gray_t>(*prev_frame_it, *curr_frame_it, 2);
+		gray_t frame_diff=ucv::norm_l1<gray_t>(prev_frame_it->second, curr_frame_it->second, 2);
 
-		while(m_integral_views.size()>1)
-			m_integral_views.pop_back();
+		while(m_gray_integral_buffer.size()>1)
+			m_gray_integral_buffer.pop_back();
 
 		if(frame_diff>detection_max_diff_norm)
 			return;
 
-		if(m_surf.set_integral_view(m_integral_views.front()))
+		m_detector.update(curr_frame_it->second);
+		feature_points_t frame_features;
+		m_detector.detect<float>(
+			m_detection_threshold,
+			boost::bind(&add_feature_point,
+				boost::ref(frame_features),
+				_1,
+				_2,
+				_3
+			)
+		);
+
+		m_orientation_estimator.estimate(
+			curr_frame_it->second,
+			frame_features.begin(),
+			frame_features.end()
+		);
+		m_describer.describe(
+			curr_frame_it->first,
+			frame_features.begin(),
+			frame_features.end()
+		);
+			
+		if(frame_features.size()>=m_min_marker_features)
 		{
-			feature_points_t frame_features;
-			m_surf.build_response_layers();
-			m_surf.detect(frame_features);
-			m_surf.describe(frame_features);
+			marker_states_t::index<marker_state::detected_tag>::type &marker_states_by_detected=
+				m_marker_states.get<marker_state::detected_tag>();
 			
-			if(frame_features.size()>=m_min_marker_features)
+			for(marker_states_t::iterator itms=m_marker_states.begin();itms!=m_marker_states.end();++itms)
 			{
-				marker_states_t::index<marker_state::detected_tag>::type &marker_states_by_detected=
-					m_marker_states.get<marker_state::detected_tag>();
-			
-				for(marker_states_t::iterator itms=m_marker_states.begin();itms!=m_marker_states.end();++itms)
-				{
-					boost::shared_ptr<marker_state> pms=*itms;
-					BOOST_ASSERT(pms);
+				boost::shared_ptr<marker_state> pms=*itms;
+				BOOST_ASSERT(pms);
 					
-					if(detect_marker(*pms, frame_features))
-					{
-						marker_states_by_detected.modify(
-							m_marker_states.project<marker_state::detected_tag>(itms),
-							boost::bind(
-								&marker_state::set_detected,
-								_1,
-								true
-							)
-						);
-						m_marker_state_changed_signal(pms, marker_state::SC_DETECTION);
-					}
-					else
-						m_marker_state_changed_signal(pms, marker_state::SC_DETECT_NOTIFY);
+				if(detect_marker(*pms, frame_features))
+				{
+					marker_states_by_detected.modify(
+						m_marker_states.project<marker_state::detected_tag>(itms),
+						boost::bind(
+							&marker_state::set_detected,
+							_1,
+							true
+						)
+					);
+					m_marker_state_changed_signal(pms, marker_state::SC_DETECTION);
 				}
+				else
+					m_marker_state_changed_signal(pms, marker_state::SC_DETECT_NOTIFY);
 			}
 		}
 	}
@@ -612,7 +651,7 @@ namespace baldzarika { namespace ar { namespace markerless {
 		{
 			math::matrix33f hm;
 #if 1
-			find_marker_homography(matches,dms.get_marker_size(), hm);
+			ucv::find_homography(matches,dms.get_marker_size(), hm);
 #else
 			if(	ucv::find_homography_ransac(
 					matches,
@@ -640,11 +679,11 @@ namespace baldzarika { namespace ar { namespace markerless {
 
 	void tracker::track_markers(std::vector<marker_states_t::iterator> const &dms)
 	{
-		if(m_integral_views.size()<2)
+		if(m_gray_integral_buffer.size()<2)
 			return;
 
-		integral_view_buffer_t::iterator curr_frame_it=m_integral_views.begin();
-		integral_view_buffer_t::iterator prev_frame_it=curr_frame_it;
+		gray_integral_buffer_t::iterator curr_frame_it=m_gray_integral_buffer.begin();
+		gray_integral_buffer_t::iterator prev_frame_it=curr_frame_it;
 		prev_frame_it++;
 
 #if 0
@@ -658,7 +697,7 @@ namespace baldzarika { namespace ar { namespace markerless {
 		if(true)
 #endif
 		{
-			m_klt_tracker.set_integral_views(*prev_frame_it, *curr_frame_it);
+			m_klt_tracker.set_integral_views(prev_frame_it->second, curr_frame_it->second);
 
 			marker_states_t::index<marker_state::detected_tag>::type &marker_states_by_detected=
 				m_marker_states.get<marker_state::detected_tag>();
@@ -686,12 +725,12 @@ namespace baldzarika { namespace ar { namespace markerless {
 		else
 		{
 			//discard last frame
-			m_integral_views.pop_front();
+			m_gray_integral_buffer.pop_front();
 		}
 
 		//make room for next frames
-		while(m_integral_views.size()>1)
-			m_integral_views.pop_back();
+		while(m_gray_integral_buffer.size()>1)
+			m_gray_integral_buffer.pop_back();
 	}
 
 } //namespace markerless

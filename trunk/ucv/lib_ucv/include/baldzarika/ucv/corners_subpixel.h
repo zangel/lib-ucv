@@ -84,8 +84,8 @@ namespace baldzarika { namespace ucv {
 					PT py=PT(y-2);
 					for(boost::int32_t x=0;x<5;++x)
 					{
-						PT grad_x=PT((win[y+1][x+2]-win[y+1][x])*math::constant::half<PT>());
-						PT grad_y=PT((win[y+2][x+1]-win[y][x+1])*math::constant::half<PT>());
+						PT grad_x=PT(win[y+1][x+2]-win[y+1][x])*math::constant::half<PT>();
+						PT grad_y=PT(win[y+2][x+1]-win[y][x+1])*math::constant::half<PT>();
 
 						PT gxx=grad_x*grad_x*mask[y][x];
 						PT gxy=grad_x*grad_y*mask[y][x];

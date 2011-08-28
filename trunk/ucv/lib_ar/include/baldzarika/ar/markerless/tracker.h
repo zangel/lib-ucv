@@ -21,7 +21,9 @@ namespace baldzarika { namespace ar { namespace markerless {
 		typedef std::vector<feature_point_t> feature_points_t;
 
 		typedef ucv::klt_tracker<gray_t> klt_tracker_t;
-		typedef boost::circular_buffer<gray_const_view_t> integral_view_buffer_t;
+		typedef std::pair<gray_const_view_t,gray_const_view_t> gray_integral_pair_t;
+
+		typedef boost::circular_buffer<gray_integral_pair_t> gray_integral_buffer_t;
 
 		static boost::uint32_t const	DEFAULT_SURF_OCTAVES;
 		static boost::uint32_t const	DEFAULT_SURF_INTERVALS;
@@ -158,10 +160,10 @@ namespace baldzarika { namespace ar { namespace markerless {
 		float									m_detection_max_diff_norm;
 		float									m_tracking_max_diff_norm;
 		
-		gray_image_t							m_integral_tmp;
+		gray_image_t							m_gray_frame_stg[2];
 		gray_image_t							m_integral_frame_stg[2];
-		boost::uint32_t							m_integral_frame_seq;
-		integral_view_buffer_t					m_integral_views;
+		boost::uint32_t							m_frame_seq;
+		gray_integral_buffer_t					m_gray_integral_buffer;
 								
 		hessian_detector_t						m_detector;
 		orientation_estimator_t					m_orientation_estimator;

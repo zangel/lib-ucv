@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE( tracker_frame_size )
 	BOOST_CHECK(ar_tracker->set_frame_size(ucv::size2ui(100,100)));
 	BOOST_CHECK(ar_tracker->get_frame_size()==ucv::size2ui(100,100));
 }
-
+#endif
 
 BOOST_AUTO_TEST_CASE( tracker_detect_marker )
 {
@@ -95,6 +95,7 @@ BOOST_AUTO_TEST_CASE( tracker_detect_marker )
 	BOOST_CHECK_EQUAL(pdmms->get_marker(), pmarker);
 }
 
+#if 0
 
 
 
@@ -158,7 +159,7 @@ BOOST_AUTO_TEST_CASE( fiducial_detector_start_stop_test )
 	BOOST_CHECK(!tracker->is_active());
 }
 
-#endif
+
 
 template < typename MarkerModel >
 void test_fiducial_marker_model_detection(char const *test_image, boost::uint32_t expected_markers_count, boost::uint32_t n_frames=1)
@@ -235,3 +236,5 @@ BOOST_AUTO_TEST_CASE( fiducial_tracker_qr_detection )
 {
 	test_fiducial_marker_model_detection<baldzarika::ar::fiducial::qr_marker_model>("../lib_ucv_test/qr_code_test.png", 1, 2);
 }
+
+#endif

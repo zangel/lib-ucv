@@ -4,48 +4,82 @@
 #define SURF_TEST_WIDTH 320
 #define SURF_TEST_HEIGHT 240
 
+namespace {
+	
+	void add_feature_point(std::vector<SURFTestWidget::feature_point_t> &fps, SURFTestWidget::feature_point_t::base_type const &p, boost::int32_t s, bool lap)
+	{
+		fps.push_back(SURFTestWidget::feature_point_t(p,s,lap));
+	}
+
+}
+
 
 SURFTestWidget::SURFTestWidget(QWidget *parent/* =0 */)
 	: QGLWidget(parent)
-	, m_scene_surf(math::size2ui(SURF_TEST_WIDTH,SURF_TEST_HEIGHT),3,4,2,4.0e-4f)
+	, m_scene_detector(
+		math::size2ui(SURF_TEST_WIDTH,SURF_TEST_HEIGHT),
+		ar::markerless::tracker::DEFAULT_SURF_OCTAVES,
+		ar::markerless::tracker::DEFAULT_SURF_INTERVALS,
+		ar::markerless::tracker::DEFAULT_SURF_SAMPLE_STEPS
+	)
 	, m_MinScale(0.0f)
 	, m_MaxScale(20.0f)
 {
 	ucv::gil::gray8_image_t gray8_obj_img;
 	ucv::gil::png_read_and_convert_image("../lib_ucv_test/test_img.png", gray8_obj_img);
 
-	ucv::surf::integral_image_t gray_obj_img(gray8_obj_img.width(), gray8_obj_img.height());
+	ar::gray_image_t gray_obj_img(gray8_obj_img.width(), gray8_obj_img.height());
 	
-	ucv::surf::integral_t median;
+	ar::gray_t median;
 	ucv::convert(
 		ucv::gil::view(gray8_obj_img),
 		ucv::gil::view(gray_obj_img),
-		ucv::detail::grayscale_convert_and_median<ucv::surf::integral_t>(
+		ucv::detail::grayscale_convert_and_median<ar::gray_t>(
 			median,
 			gray8_obj_img.width(),
 			gray8_obj_img.height()
 		)
 	);
 
-	ucv::surf::integral_image_t gray_obj_int_img(gray8_obj_img.width(), gray8_obj_img.height());
+	ar::gray_image_t gray_obj_int_img(gray8_obj_img.width()+1, gray8_obj_img.height()+1);
 
 	ucv::integral(ucv::gil::const_view(gray_obj_img), ucv::gil::view(gray_obj_int_img), median);
 
-	ucv::surf obj_surf(math::size2ui(gray8_obj_img.width(), gray8_obj_img.height()), 3, 4, 2, 1.0e-4f);
-	obj_surf.set_integral_view(ucv::gil::const_view(gray_obj_int_img));
-	obj_surf.build_response_layers();
-	obj_surf.detect(m_obj_features);
-	obj_surf.describe(m_obj_features);
-	m_obj_features.optimise();
+	hessian_detector_t hd(
+		math::size2ui(gray8_obj_img.width(), gray8_obj_img.height()),
+		ar::markerless::tracker::DEFAULT_SURF_OCTAVES,
+		ar::markerless::tracker::DEFAULT_SURF_INTERVALS,
+		ar::markerless::tracker::DEFAULT_SURF_SAMPLE_STEPS
+	);
 
+	hd.update(ucv::gil::const_view(gray_obj_int_img));
+	hd.detect<ar::gray_t>(
+		ar::markerless::tracker::DEFAULT_SURF_TRESHOLD,
+		boost::bind(&add_feature_point,
+			boost::ref(m_obj_features),
+			_1,
+			_2,
+			_3
+		)
+	);
 
-
+	m_orientation_estimator.estimate(
+		ucv::gil::const_view(gray_obj_int_img),
+		m_obj_features.begin(),
+		m_obj_features.end()
+	);
+	m_describer.describe(
+		ucv::gil::const_view(gray_obj_img),
+		m_obj_features.begin(),
+		m_obj_features.end()
+	);
+	
 	setFixedSize(SURF_TEST_WIDTH,SURF_TEST_HEIGHT);
 	
 	m_frame.recreate(SURF_TEST_WIDTH,SURF_TEST_HEIGHT);
 	m_gray8_frame.recreate(SURF_TEST_WIDTH,SURF_TEST_HEIGHT);
 	m_gray_frame.recreate(SURF_TEST_WIDTH,SURF_TEST_HEIGHT);
-	m_integral_frame.recreate(SURF_TEST_WIDTH,SURF_TEST_HEIGHT);
+	m_integral_frame.recreate(SURF_TEST_WIDTH+1,SURF_TEST_HEIGHT+1);
 	
 	m_vi.setIdealFramerate(0, 30);
 	m_vi.setupDevice(0, SURF_TEST_WIDTH, SURF_TEST_HEIGHT);
@@ -91,6 +125,7 @@ void SURFTestWidget::paintGL()
 {
 	if(m_vi.isFrameNew(0))
 	{
+		m_scene_features.clear();
 		m_vi.getPixels(0, &ucv::gil::view(m_frame)[0][0], true, true);
 
 		ucv::gil::copy_and_convert_pixels(
@@ -98,46 +133,52 @@ void SURFTestWidget::paintGL()
 			ucv::gil::view(m_gray8_frame)
 		);
 
-		ucv::surf::integral_t median;
+		ar::gray_t median;
 		ucv::convert(
 			ucv::gil::const_view(m_gray8_frame),
 			ucv::gil::view(m_gray_frame),
-			ucv::detail::grayscale_convert_and_median<ucv::surf::integral_t>(
+			ucv::detail::grayscale_convert_and_median<ar::gray_t>(
 				median,
 				m_frame.width(),
 				m_frame.height()
 			)
 		);
-		ucv::integral(ucv::gil::const_view(m_gray_frame), ucv::gil::view(m_integral_frame), median);
-		m_scene_surf.set_integral_view(ucv::gil::const_view(m_integral_frame));
-		m_scene_surf.build_response_layers();
-		m_scene_surf.detect(m_scene_features);
-		m_scene_surf.describe(m_scene_features);
+		ucv::integral(
+			ucv::gil::const_view(m_gray_frame),
+			ucv::gil::view(m_integral_frame),
+			median
+		);
 
-		typedef  std::vector<
-			std::pair<
-				ucv::surf::fps_by_desc_tree_t::const_iterator,
-				ucv::surf::fps_by_pos_tree_t::const_iterator
-			>
-		> marker_matches_t;
+		m_scene_detector.update(ucv::gil::const_view(m_integral_frame));
 
-		marker_matches_t marker_matches;
+		m_scene_detector.detect<ar::gray_t>(
+			ar::markerless::tracker::DEFAULT_SURF_TRESHOLD,
+			boost::bind(&add_feature_point,
+				boost::ref(m_scene_features),
+				_1,
+				_2,
+				_3
+			)
+		);
 
-		ucv::match_feature_points<
-			ucv::surf::feature_point_t,
-			ucv::surf::fps_by_desc_tree_t,
-			ucv::surf::fps_by_pos_tree_t
-		>(m_obj_features, m_scene_features, marker_matches, 0.6f);
+		m_orientation_estimator.estimate(
+			ucv::gil::const_view(m_integral_frame),
+			m_scene_features.begin(),
+			m_scene_features.end()
+		);
+#if 1
+		m_describer.describe(
+			ucv::gil::const_view(m_gray_frame),
+			m_scene_features.begin(),
+			m_scene_features.end()
+		);
 
-		m_matched_points.clear();
-
-
-		for(marker_matches_t::const_iterator imm=marker_matches.begin();imm!=marker_matches.end();++imm)
-			m_matched_points.insert(*imm->second);
-
-
-
-
+		ucv::surf::match_feature_points<
+			feature_point_t,
+			feature_points_t,
+			feature_points_t
+		>(m_obj_features, m_scene_features, m_marker_matches, 0.6f);
+#endif
 		glBindTexture(GL_TEXTURE_2D, m_video_texture);
 		glTexSubImage2D(
 			GL_TEXTURE_2D,
@@ -194,10 +235,19 @@ void SURFTestWidget::paintGL()
 		glLineWidth(1.0f);
 
 #if 1
-		for(matched_points_t::const_iterator imp=m_matched_points.begin();imp!=m_matched_points.end();++imp)
+
+#if 0
+		for(feature_points_t::const_iterator ifpm=m_scene_features.begin();ifpm!=m_scene_features.end();++ifpm)
 		{
-			ucv::surf::feature_point_t const &feature=*imp;
-			float scale=2.0f*static_cast<float>(feature.m_scale);
+			feature_point_t const &feature=*ifpm;
+
+#else
+		for(fp_matches_t::const_iterator ifpm=m_marker_matches.begin();ifpm!=m_marker_matches.end();++ifpm)
+		{
+			feature_point_t const &feature=*(ifpm->second);
+
+#endif
+			float scale=feature.m_scale*(1.2f/9.0f);
 
 			if(scale<m_MinScale || scale>m_MaxScale) continue;
 
