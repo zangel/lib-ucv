@@ -71,8 +71,8 @@ namespace baldzarika { namespace ucv {
 		bool set_integral_views(const_integral_view_t prev_view, const_integral_view_t curr_view)
 		{
 			if(	m_frame_size.empty() ||
-				prev_view.width()!=curr_view.width() || prev_view.width()!=m_frame_size.width() ||
-				prev_view.height()!=curr_view.height() || prev_view.height()!=m_frame_size.height() ) return false;
+				prev_view.width()!=curr_view.width() || prev_view.width()-1!=m_frame_size.width() ||
+				prev_view.height()!=curr_view.height() || prev_view.height()-1!=m_frame_size.height() ) return false;
 			
 			m_prev_view=prev_view;
 			m_curr_view=curr_view;
@@ -83,8 +83,8 @@ namespace baldzarika { namespace ucv {
 		bool operator()(std::vector< math::point2< PT > > const &prev_fps, std::vector< math::point2< PT > > &curr_fps, std::vector<bool> &status)
 		{
 			if(	m_frame_size.empty() ||
-				m_prev_view.width()!=m_curr_view.width() || m_prev_view.width()!=m_frame_size.width() ||
-				m_prev_view.height()!=m_curr_view.height() || m_prev_view.height()!=m_frame_size.height() ) return false;
+				m_prev_view.width()!=m_curr_view.width() || m_prev_view.width()-1!=m_frame_size.width() ||
+				m_prev_view.height()!=m_curr_view.height() || m_prev_view.height()-1!=m_frame_size.height() ) return false;
 						
 			curr_fps.resize(prev_fps.size());
 			status.resize(prev_fps.size(),false);
@@ -189,30 +189,28 @@ namespace baldzarika { namespace ucv {
 		{
 			typedef math::point2<PT> point2_t;
 
-			boost::uint32_t s=1<<lshift;
+			boost::uint32_t const s=1<<lshift;
 			//integral_t 
 			integral_t const sca=math::constant::one<integral_t>()/integral_t(1<<lshift);
 			integral_t const i16=1.0f/float(1<<4);
 			integral_t const i8=1.0f/float(1<<3);
 
-			boost::int32_t const prev_w_step=m_prev_view.row_begin(1)-=m_prev_view.row_begin(0);
-			boost::int32_t const curr_w_step=m_curr_view.row_begin(1)-=m_curr_view.row_begin(0);
-
-
+			boost::int32_t const prev_w_step=m_prev_view.row_begin(1)-m_prev_view.row_begin(0);
+			boost::int32_t const curr_w_step=m_curr_view.row_begin(1)-m_curr_view.row_begin(0);
 
 			integral_box<integral_t> prev_box_sample=integral_box<integral_t>(
 				math::point2i(0,0),
 				math::size2i(1,1),
 				prev_w_step,
 				math::constant::one<integral_t>()
-			).scaled(1<<lshift, prev_w_step);
+			).scaled(float(1<<lshift), prev_w_step);
 
 			integral_box<integral_t> curr_box_sample=integral_box<integral_t>(
 				math::point2i(0,0),
 				math::size2i(1,1),
 				curr_w_step,
 				-math::constant::one<integral_t>()
-			).scaled(1<<lshift, curr_w_step);
+			).scaled(float(1<<lshift), curr_w_step);
 
 			integral_t prev_ax=integral_t(prev_pt.x()-static_cast<boost::int32_t>(prev_pt.x()))*sca;
 			integral_t prev_ay=integral_t(prev_pt.y()-static_cast<boost::int32_t>(prev_pt.y()))*sca;

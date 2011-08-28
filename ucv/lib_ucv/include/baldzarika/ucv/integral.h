@@ -47,13 +47,13 @@ namespace baldzarika { namespace ucv {
 		inline integral_box scaled(float s, boost::int32_t ns) const
 		{
 			math::point2i p1=math::point2i(
-				math::round(s*m_offset.x()),
-				math::round(s*m_offset.y())
+				math::iround(s*m_offset.x()),
+				math::iround(s*m_offset.y())
 			);
 
 			math::point2i p2=math::point2i(
-				math::round(s*(m_offset.x()+m_size.width())),
-				math::round(s*(m_offset.y()+m_size.height()))
+				math::iround(s*(m_offset.x()+m_size.width())),
+				math::iround(s*(m_offset.y()+m_size.height()))
 			);
 
 			math::size2i nbs=p2-p1;

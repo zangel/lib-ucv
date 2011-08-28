@@ -9,12 +9,17 @@ class SURFTestWidget
 public:
 	friend class SURFTestDlg;
 
-	typedef ucv::surf::feature_point_t feature_point_t;
-	typedef feature_point_t::point2_t point2_t;
+	typedef ar::markerless::tracker::feature_point_t feature_point_t;
+	typedef ar::markerless::tracker::hessian_detector_t hessian_detector_t;
+	typedef ar::markerless::tracker::orientation_estimator_t orientation_estimator_t;
+	typedef ar::markerless::tracker::describer_t describer_t;
 
-	typedef KDTree::KDTree<2, feature_point_t, feature_point_t::position_accessor> matched_points_t;
-
-
+	
+	typedef feature_point_t::base_type point2_t;
+	typedef std::vector<feature_point_t> feature_points_t;
+	typedef std::pair<feature_points_t::const_iterator,feature_points_t::const_iterator> fp_match_t;
+	typedef std::vector<fp_match_t>	fp_matches_t;
+	
 	SURFTestWidget(QWidget *parent=0);
 	~SURFTestWidget();
 
@@ -30,19 +35,22 @@ private:
 	GLuint										m_video_texture;
 	ucv::gil::rgb8_image_t						m_frame;
 	ucv::gil::gray8_image_t						m_gray8_frame;
-	ucv::surf::integral_image_t					m_gray_frame;
-	ucv::surf::integral_image_t					m_integral_frame;
+	ar::gray_image_t							m_gray_frame;
+	ar::gray_image_t							m_integral_frame;
 	videoInput									m_vi;
 
 	QTimer										*m_render_timer;
 
-	ucv::surf::fps_by_desc_tree_t				m_obj_features;
+	hessian_detector_t							m_scene_detector;
+	orientation_estimator_t						m_orientation_estimator;
+	describer_t									m_describer;
 
-	ucv::surf									m_scene_surf;
-	ucv::surf::fps_by_pos_tree_t				m_scene_features;
-
-	matched_points_t							m_matched_points;
+	std::vector<feature_point_t>				m_obj_features;
+	std::vector<feature_point_t>				m_scene_features;
+	fp_matches_t								m_marker_matches;
 	
+	
+
 	float										m_MinScale;
 	float										m_MaxScale;
 

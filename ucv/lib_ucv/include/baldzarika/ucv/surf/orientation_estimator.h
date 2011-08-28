@@ -63,7 +63,7 @@ namespace baldzarika { namespace ucv { namespace surf {
 
 		
 		template < typename IVT, boost::uint32_t BS >
-		void estimate(IVT iv, feature_point<T,BS> &fp) const
+		void estimate(IVT const &iv, feature_point<T,BS> &fp) const
 		{
 			typedef typename IVT::value_type	iv_pixel_t;
 			typedef typename gil::channel_type<iv_pixel_t>::type iv_channel_t;
@@ -135,6 +135,13 @@ namespace baldzarika { namespace ucv { namespace surf {
 				}
 			}
 			fp.m_orientation=std::atan2(best[1], best[0]);
+		}
+
+		template < typename IVT, typename FPI >
+		void estimate(IVT const &iv, FPI first, FPI last)
+		{
+			for(FPI fpi=first;fpi!=last;++fpi)
+				estimate(iv,*fpi);
 		}
 		
 	private:
