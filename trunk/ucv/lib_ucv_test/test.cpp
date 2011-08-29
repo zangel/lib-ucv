@@ -426,12 +426,14 @@ BOOST_AUTO_TEST_CASE( test_surf_match )
 	cv::waitKey();
 }
 
+#endif
+
 BOOST_AUTO_TEST_CASE( test_klt_tracker )
 {
 	namespace ucv=baldzarika::ucv;
 	namespace math=baldzarika::math;
 
-	typedef math::fixed_point<10, 21> gray_t;
+	typedef float gray_t;
 	typedef gil::pixel<gray_t, ucv::gil::gray_layout_t> gray_pixel_t;
 	typedef gil::image< gray_pixel_t, false, std::allocator<unsigned char> > gray_image_t;
 	typedef gray_image_t::view_t gray_view_t;
@@ -454,14 +456,33 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 
 
 	gray_image_t gray_img(marker_img.width(), marker_img.height()), shifted_gray_img(marker_img.width(), marker_img.height());
-	ucv::convert(ucv::gil::view(marker_img), ucv::gil::view(gray_img), ucv::detail::grayscale_convert());
-	ucv::convert(ucv::gil::view(shifted_marker_img), ucv::gil::view(shifted_gray_img), ucv::detail::grayscale_convert());
-	
-	ucv::surf::integral_image_t integral_img(marker_img.width(), marker_img.height()), shifted_integral_img(marker_img.width(), marker_img.height());
-	ucv::integral(ucv::gil::view(gray_img), ucv::gil::view(integral_img));
-	ucv::integral(ucv::gil::view(shifted_gray_img), ucv::gil::view(shifted_integral_img));
+	gray_t img_median, shifted_img_medain;
 
-	typedef ucv::good_features_detector<ucv::surf::integral_t::IS,ucv::surf::integral_t::FS> good_features_detector_t;
+	ucv::convert(
+		ucv::gil::const_view(marker_img),
+		ucv::gil::view(gray_img),
+		ucv::detail::grayscale_convert_and_median<gray_t>(
+			img_median,
+			marker_img.width(),
+			marker_img.height()
+		)
+	);
+
+	ucv::convert(
+		ucv::gil::const_view(shifted_marker_img),
+		ucv::gil::view(shifted_gray_img),
+		ucv::detail::grayscale_convert_and_median<gray_t>(
+			shifted_img_medain,
+			marker_img.width(),
+			marker_img.height()
+		)
+	);
+	
+	gray_image_t integral_img(marker_img.width()+1, marker_img.height()+1), shifted_integral_img(marker_img.width()+1, marker_img.height()+1);
+	ucv::integral(ucv::gil::const_view(gray_img), ucv::gil::view(integral_img), img_median);
+	ucv::integral(ucv::gil::const_view(shifted_gray_img), ucv::gil::view(shifted_integral_img),shifted_img_medain);
+
+	typedef ucv::good_features_detector<gray_t> good_features_detector_t;
 
 	good_features_detector_t gfd(
 		math::size2ui(marker_img.width(), marker_img.height())
@@ -472,7 +493,7 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 	{
 		boost::posix_time::ptime detect_start,detect_finish;
 		std::string detector_name;
-		std::vector<ucv::surf::feature_point_t::point2_t> prev_pts, next_pts;
+		std::vector<math::point2f> prev_pts, next_pts;
 		if(fd<7)
 		{
 			boost::scoped_ptr<cv::FeatureDetector> feature_detector;
@@ -507,7 +528,7 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 
 			for(std::size_t ifp=0;ifp<key_points.size();++ifp)
 				prev_pts.push_back(
-					ucv::surf::feature_point_t::point2_t(
+					math::point2f(
 						key_points[ifp].pt.x,
 						key_points[ifp].pt.y
 					)
@@ -516,24 +537,39 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 		else
 		if(fd==7)
 		{
+			typedef ucv::surf::hessian_detector<float> hessian_detector_t;
+			typedef ucv::surf::orientation_estimator<float, 6, 10, 10 > orientation_estimator_t;
+			typedef ucv::surf::describer<float, 3, 5> describer_t;
+			typedef ucv::surf::feature_point<float,3> feature_point_t;
+
+
+			std::vector<feature_point_t> key_points;
+		
+			detector_name="ucvSURF";
+			hessian_detector_t hd(math::size2ui(marker_img.width(),marker_img.height()), 2, 2, 2);
 			
-			detector_name="fpSURF";
-			ucv::surf surf_detector(math::size2ui(integral_img.width(), integral_img.height()), 3, 4, 2, 1.0e-4f);
-			std::vector<ucv::surf::feature_point_t> key_points;
+			
 
 			detect_start=boost::posix_time::microsec_clock::local_time();
 			for(int i=0;i<10;++i)
 			{
-				surf_detector.set_integral_view(ucv::gil::const_view(integral_img));
-				surf_detector.build_response_layers();
-			
-				surf_detector.detect(key_points);
+				key_points.clear();
+				hd.update(ucv::gil::const_view(integral_img));
+				hd.detect<float>(
+					1.0e-2f,
+					boost::bind(&ucv::surf::add_feature_point<feature_point_t::value_type, feature_point_t::NUM_BLOCKS> ,
+						boost::ref(key_points),
+						_1,
+						_2,
+						_3
+					)
+				);
 			}
 			detect_finish=boost::posix_time::microsec_clock::local_time();
 
 			for(std::size_t ifp=0;ifp<key_points.size();++ifp)
 				prev_pts.push_back(
-					ucv::surf::feature_point_t::point2_t(
+					feature_point_t::base_type(
 						key_points[ifp].x(),
 						key_points[ifp].y()
 					)
@@ -542,29 +578,25 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 		else
 		if(fd==8)
 		{
-			detector_name="fpGFTT";
+			detector_name="ucvGFTT";
 			good_features_detector_t gfd(
 				math::size2ui(marker_img.width(), marker_img.height())
 			);
 
 
-			std::vector<ucv::surf::feature_point_t::point2_t> key_points;
+			std::vector<math::point2f> key_points;
 			std::vector<cv::Point2f> good_features;
 			detect_start=boost::posix_time::microsec_clock::local_time();
 			for(int i=0;i<10;++i)
 				gfd(ucv::gil::view(integral_img), key_points);
 			detect_finish=boost::posix_time::microsec_clock::local_time();
 			for(std::size_t ifp=0;ifp<key_points.size();++ifp)
-				prev_pts.push_back(
-					ucv::surf::feature_point_t::point2_t(
-						key_points[ifp].x(),
-						key_points[ifp].y()
-					)
-				);
+				prev_pts.push_back(key_points[ifp]);
+
 		}
 
-		typedef ucv::klt_tracker<ucv::surf::integral_t::IS,ucv::surf::integral_t::FS> klt_tracker_t;
-		klt_tracker_t feature_point_tracker(math::size2ui(integral_img.width(), integral_img.height()), math::size2ui(7,7), 4, 100);
+		typedef ucv::klt_tracker<float> klt_tracker_t;
+		klt_tracker_t feature_point_tracker(math::size2ui(marker_img.width(), marker_img.height()), math::size2ui(5,5), 4, 2);
 		feature_point_tracker.set_integral_views(
 			ucv::gil::const_view(integral_img),
 			ucv::gil::const_view(shifted_integral_img)
@@ -577,12 +609,16 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 		boost::posix_time::ptime klt_track_finish=boost::posix_time::microsec_clock::local_time();
 
 		float er=0.0f;
+		boost::uint32_t n_tracked=0;
 		for(std::size_t ifp=0;ifp<next_pts.size();++ifp)
 		{
-			float dx=std::abs(static_cast<float>(next_pts[ifp].x()-prev_pts[ifp].x())+5.0f);
-			float dy=std::abs(static_cast<float>(next_pts[ifp].y()-prev_pts[ifp].y())-2.0f);
-
-			er+=dx*dx+dy*dy;
+			if(status[ifp])
+			{
+				float dx=std::abs(static_cast<float>(next_pts[ifp].x()-prev_pts[ifp].x())+5.0f);
+				float dy=std::abs(static_cast<float>(next_pts[ifp].y()-prev_pts[ifp].y())-2.0f);
+				er+=dx*dx+dy*dy;
+				n_tracked++;
+			}
 		}
 
 		std::cout << detector_name<< ": " << "n=" << prev_pts.size() <<
@@ -590,11 +626,11 @@ BOOST_AUTO_TEST_CASE( test_klt_tracker )
 			" (" << float((detect_finish-detect_start).total_microseconds())/(10.0f*prev_pts.size()) << ")" <<
 			" tt=" << float((klt_track_finish-klt_track_start).total_microseconds())/(10.0f) <<
 			" (" << float((klt_track_finish-klt_track_start).total_microseconds())/(10.0f*prev_pts.size()) << ")" <<
-			" e=" << er/float(prev_pts.size()) << std::endl;
+			" e=" << er/float(n_tracked) << std::endl;
 	}
 }
 
-
+#if 0
 BOOST_AUTO_TEST_CASE( perspective_transform_test )
 {
 	namespace ucv=baldzarika::ucv;

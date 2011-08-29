@@ -5,26 +5,26 @@
 
 namespace baldzarika { namespace ucv {
 
-	template < boost::uint32_t I, boost::uint32_t F >
+	template < typename T >
 	class good_features_detector
 	{
 	public:
-		typedef math::fixed_point<I, F> integral_t;
+		typedef T integral_t;
 		typedef gil::pixel<integral_t, ucv::gil::gray_layout_t> integral_pixel_t;
 		typedef gil::image< integral_pixel_t, false, std::allocator<unsigned char> > integral_image_t;
 		typedef typename integral_image_t::view_t integral_view_t;
 
 	protected:
-		template < boost::uint32_t I2, boost::uint32_t F2 >
-		static bool compare_points(std::pair< integral_t, math::point2< math::fixed_point< I2, F2 > > > const &a, std::pair< integral_t, math::point2< math::fixed_point< I2, F2 > > > const &b)
+		template < typename T2 >
+		static bool compare_points(std::pair< integral_t, math::point2< T2 > > const &a, std::pair< integral_t, math::point2< T2 > > const &b)
 		{
 			return a.first < b.first;
 		}
 
-		template < boost::uint32_t I2, boost::uint32_t F2 >
+		template < typename T2 >
 		struct point2_accessor
 		{
-			typedef math::fixed_point<I2,F2> result_type;
+			typedef T2 result_type;
 			typedef math::point2<result_type> point2_t;
 
 			result_type operator()(point2_t const &t, size_t k) const { return t[k]; }
@@ -44,15 +44,15 @@ namespace baldzarika { namespace ucv {
 		{
 		}
 
-		template < boost::uint32_t I2, boost::uint32_t F2 >
-		bool operator()(integral_view_t im, std::vector< math::point2< math::fixed_point< I2, F2 > > > &dps, boost::uint32_t md=5, boost::uint32_t mp=100)
+		template < typename T2 >
+		bool operator()(integral_view_t im, std::vector< math::point2< T2 > > &dps, boost::uint32_t md=5, boost::uint32_t mp=100)
 		{
-			typedef math::fixed_point< I2, F2 > point_real_t;
+			typedef T2 point_real_t;
 			typedef math::point2<point_real_t> point2_t;
 			
 			point_real_t const min_dist=md;
 
-			if(im.width()!=m_frame_size.width() || im.height()!=m_frame_size.height())
+			if(im.width()-1!=m_frame_size.width() || im.height()-1!=m_frame_size.height())
 				return false;
 
 			dps.clear();
@@ -63,15 +63,15 @@ namespace baldzarika { namespace ucv {
 			std::vector< std::pair< integral_t, point2_t> > points;
 			collect_points(max_eigen_value, points);
 
-			std::sort(points.begin(), points.end(), compare_points<I2,F2>);
+			std::sort(points.begin(), points.end(), compare_points<T2>);
 
-			KDTree::KDTree<2, point2_t, point2_accessor<I2,F2> > dist_search;
+			KDTree::KDTree<2, point2_t, point2_accessor<T2> > dist_search;
 
 			for(std::size_t ifp=0;ifp<points.size() && dist_search.size()<mp;++ifp)
 			{
 				std::pair<
-					KDTree::KDTree<2, point2_t, point2_accessor<I2,F2> >::iterator,
-					point2_accessor<I2,F2>::result_type
+					KDTree::KDTree<2, point2_t, point2_accessor<T2> >::iterator,
+					point2_accessor<T2>::result_type
 				> nearest=dist_search.find_nearest(points[ifp].second, min_dist);
 				if(nearest.first==dist_search.end())
 				{
@@ -97,6 +97,16 @@ namespace baldzarika { namespace ucv {
 		void compute_gradients(integral_view_t im)
 		{
 			static integral_t const sobel_scale=0.5f/4.0f;
+
+			boost::int32_t const width_step=im.row_begin(1)-im.row_begin(0);
+			
+			integral_box<integral_t> box_sample=integral_box<integral_t>(
+				math::point2i(0,0),
+				math::size2i(1,1),
+				width_step,
+				math::constant::one<integral_t>()
+			);
+
 
 			integral_view_t grad_x_view=grad_x();
 			integral_view_t grad_y_view=grad_y();
@@ -128,13 +138,12 @@ namespace baldzarika { namespace ucv {
 					reinterpret_cast<integral_t *>(grad_y_view.row_begin(y+1))+1,
 				};
 
-				for(boost::uint32_t x=1;x<m_frame_size.width()+1;++x)
+				integral_t const *row=reinterpret_cast<integral_t *>(im.row_begin(y-1));
+				
+				for(boost::uint32_t x=1;x<m_frame_size.width()+1;++x, row++)
 				{
-					integral_t pixel_val=sobel_scale*box_integral<integral_view_t,integral_t>(
-						im,
-						math::point2i(x-1, y-1),
-						math::size2ui(1,1)
-					);
+					integral_t pixel_val=sobel_scale*integral_sample<integral_t,integral_t>(row, box_sample);
+					
 					integral_t pixel_val_2=pixel_val*math::constant::two<integral_t>();
 
 					//grad_x
@@ -211,10 +220,10 @@ namespace baldzarika { namespace ucv {
 			return max_eigen_value;
 		}
 
-		template < boost::uint32_t I2, boost::uint32_t F2 >
-		void collect_points(integral_t const &mev, std::vector< std::pair< integral_t, math::point2< math::fixed_point<I2, F2> > > > &pts)
+		template < typename T2 >
+		void collect_points(integral_t const &mev, std::vector< std::pair< integral_t, math::point2< T2 > > > &pts)
 		{
-			typedef math::fixed_point< I2, F2 > point_real_t;
+			typedef T2 point_real_t;
 			typedef math::point2<point_real_t> point2_t;
 
 			boost::uint32_t half_bs=m_block_size/2;
