@@ -50,7 +50,7 @@ namespace baldzarika { namespace ucv {
 			typedef T2 point_real_t;
 			typedef math::point2<point_real_t> point2_t;
 			
-			point_real_t const min_dist=md;
+			point_real_t const min_dist=point_real_t(md);
 
 			if(im.width()-1!=m_frame_size.width() || im.height()-1!=m_frame_size.height())
 				return false;
@@ -239,7 +239,15 @@ namespace baldzarika { namespace ucv {
 				{
 					integral_t eigen_val=*eigen_row++;
 					if(eigen_val<treshold)
-						pts.push_back(std::make_pair(eigen_val, point2_t(x,y)));
+						pts.push_back(
+							std::make_pair(
+								eigen_val,
+								point2_t(
+									point_real_t(x),
+									point_real_t(y)
+								)
+							)
+						);
 				}
 			}
 		}

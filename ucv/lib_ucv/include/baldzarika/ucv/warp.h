@@ -20,7 +20,7 @@ namespace baldzarika { namespace ucv {
 		{
 			dst_channel_t *dst_row=reinterpret_cast<dst_channel_t *>(dst.row_begin(y));
 
-			MT y_dst=y;
+			MT y_dst=MT(y);
 
 			MT x_src_0=y_dst*mat(0,1)+mat(0,2);
 			MT y_src_0=y_dst*mat(1,1)+mat(1,2);
@@ -28,7 +28,7 @@ namespace baldzarika { namespace ucv {
 
 			for(boost::int32_t x=0;x<dst.width();++x)
 			{
-				MT x_dst=x;
+				MT x_dst=MT(x);
 
 				MT inv_w_src=x_dst*mat(2,0)+w_src_0;
 				inv_w_src=std::abs(inv_w_src)<std::numeric_limits<MT>::epsilon()?

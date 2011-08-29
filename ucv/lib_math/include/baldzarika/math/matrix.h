@@ -11,6 +11,7 @@ namespace baldzarika { namespace math {
 	class matrix
 	{
 	public:
+		typedef T value_type;
 		template < typename T2, boost::uint32_t R2, boost::uint32_t C2 > friend class matrix;
 		template < typename T2, boost::uint32_t R2, boost::uint32_t C2 > friend struct matrix_ops;
 
@@ -146,8 +147,9 @@ namespace baldzarika { namespace math {
 
 		template < typename RT, boost::uint32_t RR, boost::uint32_t RC >
 		inline
-		typename matrix_ops<T,R,C>::template product_result<RT,RR,RC>::type
-				operator *(matrix<RT,RR,RC> const &rhs) const
+		typename matrix_ops<T,R,C>::
+			template product_result<RT,RR,RC>::
+			type operator *(matrix<RT,RR,RC> const &rhs) const
 		{
 			return matrix_ops<T,R,C>::product(*this, rhs);
 		}
