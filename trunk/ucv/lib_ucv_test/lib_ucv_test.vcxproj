@@ -74,13 +74,13 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(BOOST_INC_DIR);$(OPENCV_DIR)/include;../3rd_party/libkdtree;../lib_math/include;../lib_ucv/include;$(LIBPNG_DIR)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>../lib;$(BOOST_LIB_DIR)/vc100/32/lib;$(OPENCV_DIR)/lib;$(LIBPNG_DIR)/projects/vstudio/Release Library</AdditionalLibraryDirectories>
       <AdditionalDependencies>lib_ucv_32.lib;opencv_core220.lib;opencv_highgui220.lib;opencv_imgproc220.lib;opencv_calib3d220.lib;opencv_features2d220.lib;libpng15.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -88,6 +88,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="test.cpp" />
+    <ClCompile Include="test_camera_pose.cpp" />
+    <ClCompile Include="test_canny.cpp" />
+    <ClCompile Include="test_kalman_filter.cpp" />
+    <ClCompile Include="test_klt_tracker.cpp" />
+    <ClCompile Include="test_perspective_transform.cpp" />
+    <ClCompile Include="test_surf.cpp" />
+    <ClCompile Include="test_warp.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

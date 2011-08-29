@@ -232,7 +232,7 @@ namespace baldzarika { namespace ucv {
 					gray_t m=mag[x];
 
 					//boost::int32_t s=(dx.get() ^ dy.get())<0?-1:1;
-					boost::int32_t s=dx*dy<0?-1:1;
+					boost::int32_t s=dx*dy<math::constant::zero<gray_t>()?-1:1;
 					
 					dx=std::abs(dx);
 					dy=std::abs(dy);

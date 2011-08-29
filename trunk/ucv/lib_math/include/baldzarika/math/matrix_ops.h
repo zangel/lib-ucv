@@ -5,10 +5,10 @@
 
 namespace baldzarika { namespace math {
 
-	template < typename T , boost::uint32_t R, boost::uint32_t C >
+	template < typename T, boost::uint32_t R, boost::uint32_t C >
 	struct matrix_ops
 	{
-		static inline matrix<T,R,C> make_zero()
+		static matrix<T,R,C> make_zero()
 		{
 			matrix<T,R,C> res;
 			for(boost::uint32_t r=0;r<R;++r)
