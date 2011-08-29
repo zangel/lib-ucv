@@ -2,8 +2,21 @@
 #define BALDZARIKA_UCV_SURF_HESSIAN_DETECTOR_H
 
 #include <baldzarika/ucv/integral.h>
+#include <baldzarika/ucv/surf/feature_point.h>
 
 namespace baldzarika { namespace ucv { namespace surf {
+
+	template < typename T , boost::uint32_t NB >
+	void add_feature_point(std::vector< feature_point<T,NB> > &fps, typename feature_point<T,NB>::base_type const &p, boost::int32_t s, bool lap)
+	{
+		fps.push_back(
+			feature_point<T,NB>(
+				p,
+				s,
+				lap
+			)
+		);
+	}
 
 	template < typename T >
 	class hessian_detector

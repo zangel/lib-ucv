@@ -101,8 +101,8 @@ namespace baldzarika { namespace ucv {
 		bool operator()(math::point2< PT > const &prev_fp, math::point2< PT > &curr_fp)
 		{
 			integral_t const range_corr=math::constant::one<integral_t>()/integral_t((2*m_half_win_size.width()+1)*(2*m_half_win_size.height()+1));
-			//integral_t const step_factor=2.0f;
 			curr_fp=prev_fp;
+
 			for(boost::uint32_t l=0;l<m_num_levels;++l)
 			{
 				
@@ -111,7 +111,9 @@ namespace baldzarika { namespace ucv {
 
 				for(boost::uint32_t i=0;i<m_max_iters;++i)
 				{
-					compute_gradient_sum_and_img_diff(prev_fp, curr_fp, lshift);
+					if(!compute_gradient_sum_and_img_diff(prev_fp, curr_fp, lshift))
+						return false;
+					
 					integral_t gxx, gyy, gxy, ex, ey;
 					compute_gradient_matrix_and_err_vector(gxx,gyy, gxy, ex, ey);
 
@@ -151,46 +153,31 @@ namespace baldzarika { namespace ucv {
 			return gil::subimage_view(gil::view(m_window), 2*(2*m_half_win_size.width()+1+5), 0, 2*m_half_win_size.width()+1+5, 2*m_half_win_size.height()+1+5);
 		}
 		
-		void compute_gradient_matrix_and_err_vector(integral_t &gxx, integral_t &gyy, integral_t &gxy, integral_t &ex, integral_t &ey)
-		{
-			gxx=math::constant::zero<integral_t>();
-			gyy=math::constant::zero<integral_t>();
-			gxy=math::constant::zero<integral_t>();
-			ex=math::constant::zero<integral_t>();
-			ey=math::constant::zero<integral_t>();
-						
-			integral_view_t img_diff_view=img_diff();
-			integral_view_t grad_sum_x_view=grad_sum_x();
-			integral_view_t grad_sum_y_view=grad_sum_y();
-
-			for(boost::uint32_t y=2;y<2*m_half_win_size.height()+1+2;++y)
-			{
-				integral_t *img_diff_row=reinterpret_cast<integral_t *>(img_diff_view.row_begin(y))+2;
-				integral_t *grad_sum_x_row=reinterpret_cast<integral_t *>(grad_sum_x_view.row_begin(y))+2;
-				integral_t *grad_sum_y_row=reinterpret_cast<integral_t *>(grad_sum_y_view.row_begin(y))+2;
-
-				for(boost::uint32_t x=2;x<2*m_half_win_size.width()+1+2;++x)
-				{
-					integral_t diff=*img_diff_row++;
-					integral_t gx=*grad_sum_x_row++;
-					integral_t gy=*grad_sum_y_row++;
-
-					gxx+=gx*gx;
-					gyy+=gy*gy;
-					gxy+=gx*gy;
-					ex+=diff*gx;
-					ey+=diff*gy;
-				}
-			}
-		}
-
 		template < typename PT >
-		void compute_gradient_sum_and_img_diff(math::point2< PT > const &prev_pt, math::point2< PT > const &curr_pt, boost::uint32_t lshift)
+		bool compute_gradient_sum_and_img_diff(math::point2< PT > const &prev_pt, math::point2< PT > const &curr_pt, boost::uint32_t lshift)
 		{
 			typedef math::point2<PT> point2_t;
 
+			math::point2i prev_ipt=math::point2i(
+				static_cast<boost::int32_t>(prev_pt.x()),
+				static_cast<boost::int32_t>(prev_pt.y())
+			);
+
+			math::point2i curr_ipt=math::point2i(
+				static_cast<boost::int32_t>(curr_pt.x()),
+				static_cast<boost::int32_t>(curr_pt.y())
+			);
+			
+			boost::int32_t h_margin=(m_half_win_size.width()+1)<<lshift;
+			boost::int32_t v_margin=(m_half_win_size.height()+1)<<lshift;
+			
+			if(	prev_ipt.x()<h_margin || prev_ipt.x()>m_prev_view.width()-h_margin ||
+				prev_ipt.y()<v_margin || prev_ipt.y()>m_prev_view.height()-v_margin ||
+				curr_ipt.x()<h_margin || curr_ipt.x()>m_curr_view.width()-h_margin ||
+				curr_ipt.y()<v_margin || curr_ipt.y()>m_curr_view.height()-v_margin) return false;
+
 			boost::uint32_t const s=1<<lshift;
-			//integral_t 
+			
 			integral_t const sca=math::constant::one<integral_t>()/integral_t(1<<lshift);
 			integral_t const i16=1.0f/float(1<<4);
 			integral_t const i8=1.0f/float(1<<3);
@@ -209,7 +196,7 @@ namespace baldzarika { namespace ucv {
 				math::point2i(0,0),
 				math::size2i(1,1),
 				curr_w_step,
-				-math::constant::one<integral_t>()
+				math::constant::one<integral_t>()
 			).scaled(float(1<<lshift), curr_w_step);
 
 			integral_t prev_ax=integral_t(prev_pt.x()-static_cast<boost::int32_t>(prev_pt.x()))*sca;
@@ -244,54 +231,44 @@ namespace baldzarika { namespace ucv {
 				}
 			}
 
-			for(boost::uint32_t y=1;y<(2*m_half_win_size.height()+1)+2+1;++y)
+			for(boost::uint32_t y=0;y<2*m_half_win_size.height()+3;++y)
 			{
 				integral_t *img_diff_rows[4]=
 				{
-					reinterpret_cast<integral_t *>(img_diff_view.row_begin(y-1))+1,
 					reinterpret_cast<integral_t *>(img_diff_view.row_begin(y+0))+1,
 					reinterpret_cast<integral_t *>(img_diff_view.row_begin(y+1))+1,
-					reinterpret_cast<integral_t *>(img_diff_view.row_begin(y+2))+1
+					reinterpret_cast<integral_t *>(img_diff_view.row_begin(y+2))+1,
+					reinterpret_cast<integral_t *>(img_diff_view.row_begin(y+3))+1
 				};
 
 				integral_t *grad_sum_x_rows[4]=
 				{
-					reinterpret_cast<integral_t *>(grad_sum_x_view.row_begin(y-1))+1,
 					reinterpret_cast<integral_t *>(grad_sum_x_view.row_begin(y+0))+1,
 					reinterpret_cast<integral_t *>(grad_sum_x_view.row_begin(y+1))+1,
-					reinterpret_cast<integral_t *>(grad_sum_x_view.row_begin(y+2))+1
+					reinterpret_cast<integral_t *>(grad_sum_x_view.row_begin(y+2))+1,
+					reinterpret_cast<integral_t *>(grad_sum_x_view.row_begin(y+3))+1
 				};
 
 				integral_t *grad_sum_y_rows[4]=
 				{
-					reinterpret_cast<integral_t *>(grad_sum_y_view.row_begin(y-1))+1,
 					reinterpret_cast<integral_t *>(grad_sum_y_view.row_begin(y+0))+1,
 					reinterpret_cast<integral_t *>(grad_sum_y_view.row_begin(y+1))+1,
-					reinterpret_cast<integral_t *>(grad_sum_y_view.row_begin(y+2))+1
+					reinterpret_cast<integral_t *>(grad_sum_y_view.row_begin(y+2))+1,
+					reinterpret_cast<integral_t *>(grad_sum_y_view.row_begin(y+3))+1
 				};
 
-				for(boost::uint32_t x=1;x<(2*m_half_win_size.width()+1)+2+1;++x)
+				integral_t const *prev_view_row=reinterpret_cast<integral_t const *>(m_prev_view.row_begin(prev_ipt.y()-v_margin+y*s))+prev_ipt.x()-h_margin;
+				integral_t const *curr_view_row=reinterpret_cast<integral_t const *>(m_curr_view.row_begin(curr_ipt.y()-v_margin+y*s))+curr_ipt.x()-h_margin;
+				
+				for(boost::uint32_t x=0;x<2*m_half_win_size.width()+3; ++x, prev_view_row+=s, curr_view_row+=s)
 				{
-					math::point2i prev_pos(
-						static_cast<boost::int32_t>(prev_pt.x())+((x-m_half_win_size.width()-2)<<lshift),
-						static_cast<boost::int32_t>(prev_pt.y())+((y-m_half_win_size.height()-2)<<lshift)
-					);
-
-					math::point2i curr_pos(
-						static_cast<math::point2i::value_type>(curr_pt.x())+((x-m_half_win_size.width()-2)<<lshift),
-						static_cast<math::point2i::value_type>(curr_pt.y())+((y-m_half_win_size.height()-2)<<lshift)
-					);
-
-					//integral_t prev_val=box_integral<const_integral_view_t,integral_t>(m_prev_view, prev_pos, math::size2ui(s,s)).operator>>(lshift<<1);
+					
 					integral_t prev_val=integral_sample<integral_t,integral_t>(
-						reinterpret_cast<integral_t const *>(m_prev_view.row_begin(prev_pos.y()))+prev_pos.x(),
-						prev_box_sample
+						prev_view_row, prev_box_sample
 					);
 
-					//integral_t curr_val=box_integral<const_integral_view_t,integral_t>(m_curr_view, curr_pos, math::size2ui(s,s)).operator>>(lshift<<1);
 					integral_t curr_val=integral_sample<integral_t,integral_t>(
-						reinterpret_cast<integral_t const *>(m_curr_view.row_begin(curr_pos.y()))+curr_pos.x(),
-						curr_box_sample
+						curr_view_row, curr_box_sample
 					);
 
 					//intensity difference
@@ -440,6 +417,40 @@ namespace baldzarika { namespace ucv {
 						grad_sum_x_rows[r]++;
 						grad_sum_y_rows[r]++;
 					}
+				}
+			}
+			return true;
+		}
+		
+		void compute_gradient_matrix_and_err_vector(integral_t &gxx, integral_t &gyy, integral_t &gxy, integral_t &ex, integral_t &ey)
+		{
+			gxx=math::constant::zero<integral_t>();
+			gyy=math::constant::zero<integral_t>();
+			gxy=math::constant::zero<integral_t>();
+			ex=math::constant::zero<integral_t>();
+			ey=math::constant::zero<integral_t>();
+						
+			integral_view_t img_diff_view=img_diff();
+			integral_view_t grad_sum_x_view=grad_sum_x();
+			integral_view_t grad_sum_y_view=grad_sum_y();
+
+			for(boost::uint32_t y=2;y<2*m_half_win_size.height()+1+2;++y)
+			{
+				integral_t *img_diff_row=reinterpret_cast<integral_t *>(img_diff_view.row_begin(y))+2;
+				integral_t *grad_sum_x_row=reinterpret_cast<integral_t *>(grad_sum_x_view.row_begin(y))+2;
+				integral_t *grad_sum_y_row=reinterpret_cast<integral_t *>(grad_sum_y_view.row_begin(y))+2;
+
+				for(boost::uint32_t x=2;x<2*m_half_win_size.width()+1+2;++x)
+				{
+					integral_t diff=*img_diff_row++;
+					integral_t gx=*grad_sum_x_row++;
+					integral_t gy=*grad_sum_y_row++;
+
+					gxx+=gx*gx;
+					gyy+=gy*gy;
+					gxy+=gx*gy;
+					ex+=diff*gx;
+					ey+=diff*gy;
 				}
 			}
 		}

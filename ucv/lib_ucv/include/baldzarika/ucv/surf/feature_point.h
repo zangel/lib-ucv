@@ -8,7 +8,8 @@ namespace baldzarika { namespace ucv { namespace surf {
 		: public math::point2<T>
 	{
 	public:
-		static boost::uint32_t const DESCRIPTOR_SIZE=4*NB*NB;
+		static boost::uint32_t const NUM_BLOCKS=NB;
+		static boost::uint32_t const DESCRIPTOR_SIZE=4*NUM_BLOCKS*NUM_BLOCKS;
 
 		typedef T value_type;
 		typedef math::point2<value_type> base_type;

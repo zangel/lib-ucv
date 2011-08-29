@@ -34,17 +34,6 @@ namespace baldzarika { namespace ar { namespace markerless {
 			}
 		};
 
-		void add_feature_point(std::vector<tracker::feature_point_t> &fps, tracker::feature_point_t::base_type const &p, boost::int32_t s, bool lap)
-		{
-			fps.push_back(
-				tracker::feature_point_t(
-					p,
-					s,
-					lap
-				)
-			);
-		}
-
 	} //namespace anonymous
 
 		
@@ -381,11 +370,11 @@ namespace baldzarika { namespace ar { namespace markerless {
 				ucv::gil::view(marker_integral_img),
 				ms.m_marker->get_median()
 			);
-
+			
 			det.update(ucv::gil::const_view(marker_integral_img));
 			det.detect<gray_t>(
 				m_detection_threshold,
-				boost::bind(&add_feature_point,
+				boost::bind(&ucv::surf::add_feature_point< feature_point_t::value_type, feature_point_t::NUM_BLOCKS >,
 					boost::ref(ms.m_features),
 					_1,
 					_2,
@@ -572,7 +561,7 @@ namespace baldzarika { namespace ar { namespace markerless {
 		feature_points_t frame_features;
 		m_detector.detect<float>(
 			m_detection_threshold,
-			boost::bind(&add_feature_point,
+			boost::bind(&ucv::surf::add_feature_point<feature_point_t::value_type, feature_point_t::NUM_BLOCKS> ,
 				boost::ref(frame_features),
 				_1,
 				_2,
