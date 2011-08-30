@@ -1,10 +1,5 @@
-APP_CPPFLAGS	+=	-DANDROID \
-					-D__ANDROID__ \
-					-DBOOST_THREAD_LINUX \
-					-DBOOST_HAS_PTHREADS \
-					-D_REENTRANT \
-					-D_GLIBCXX__PTHREADS \
-					-DBOOST_HAS_GETTIMEOFDAY \
-					-DBOOST_NO_INTRINSIC_WCHAR_T \
-					-D__LITTLE_ENDIAN__
-					
+APP_CPPFLAGS := -fexceptions -D__LITTLE_ENDIAN__
+APP_CPPFLAGS := -frtti
+APP_STL := gnustl_static
+
+APP_ABI := armeabi-v7a
