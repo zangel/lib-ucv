@@ -14,8 +14,9 @@
 #include <boost/date_time.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#define OPENCV_WND_NAME  "ucv"
-#define OPENCV_WND_NAME2  "ucv2"
+#define WND_MARKER_IMG "test_surf: marker image"
+#define WND_SCENE_IMG "test_surf: scene image"
+
 
 template < typename T, boost::uint32_t I, boost::uint32_t NB, boost::uint32_t NSB >
 void do_surf_performance_test()
@@ -57,66 +58,68 @@ void do_surf_performance_test()
 	orientation_estimator_t oe;
 	describer_t desc;
 	
-	struct points_collector
-	{
-		void add_pts(math::point2<T> const &p, boost::int32_t s, bool lap)
-		{
-			_points.push_back( feature_point_t(p,s,lap) );
-		}
-
-		std::vector< feature_point_t > _points;
-	};
-
-
 	boost::posix_time::ptime start_ud=boost::posix_time::microsec_clock::local_time();
 	for(boost::uint32_t i=0;i<I;++i)
 	{
-		points_collector pc;
+		std::vector<feature_point_t> fps;
 		hd.update(ucv::gil::const_view(integral_img));
-		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
-		hd.detect(1.0e-2f, dcb);
+		hd.detect<typename feature_point_t::value_type>(
+			1.0e-2f,
+			boost::bind(&ucv::surf::add_feature_point<typename feature_point_t::value_type, feature_point_t::NUM_BLOCKS>,
+			boost::ref(fps),
+			 _1,
+			 _2,
+			 _3
+			)
+		);
 	}
 	boost::posix_time::ptime finish_ud=boost::posix_time::microsec_clock::local_time();
 	std::cout << "hessian_response<" << typeid(T).name() << "> update+detect time=" <<
 		float((finish_ud-start_ud).total_milliseconds())/float(I) << " ms" << std::endl;
 
 	{
-		points_collector pc;
+		std::vector<feature_point_t> fps;
 		hd.update(ucv::gil::const_view(integral_img));
-		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
-		hd.detect(1.0e-2f, dcb);
+		hd.detect<typename feature_point_t::value_type>(
+			1.0e-2f,
+			boost::bind(&ucv::surf::add_feature_point<typename feature_point_t::value_type, feature_point_t::NUM_BLOCKS>,
+				boost::ref(fps),
+				_1,
+				_2,
+				_3
+			)
+		);
 		
 		gray_const_view_t iv=ucv::gil::const_view(gray_img);
 		boost::posix_time::ptime start_oe=boost::posix_time::microsec_clock::local_time();
 		for(boost::uint32_t i=0;i<I;++i)
-		{
-			
-			for(boost::uint32_t ifp=0;ifp<pc._points.size();++ifp)
-				oe.estimate(iv, pc._points[ifp]);
-		}
+			oe.estimate(iv, fps.begin(),fps.end());
 		boost::posix_time::ptime finish_oe=boost::posix_time::microsec_clock::local_time();
 		std::cout << "orientation_estimator<" << typeid(T).name() << ">::estimate time=" <<
 			float((finish_oe-start_oe).total_milliseconds())/float(I) << " ms" << std::endl;
 	}
 
 	{
-		points_collector pc;
+		std::vector<feature_point_t> fps;
 		hd.update(ucv::gil::const_view(integral_img));
-		boost::function<void (math::point2<T> const &, boost::int32_t, bool)> dcb(boost::bind(&points_collector::add_pts, &pc, _1, _2, _3));
-		hd.detect(1.0e-2f, dcb);
+		hd.detect<typename feature_point_t::value_type>(
+			1.0e-2f,
+			boost::bind(&ucv::surf::add_feature_point<typename feature_point_t::value_type, feature_point_t::NUM_BLOCKS>,
+				boost::ref(fps),
+				_1,
+				_2,
+				_3
+			)
+		);
 
 		gray_const_view_t iv=ucv::gil::const_view(gray_img);
 
-		for(boost::uint32_t ifp=0;ifp<pc._points.size();++ifp)
-			oe.estimate(iv, pc._points[ifp]);
+		oe.estimate(iv, fps.begin(), fps.end());
 
 		
 		boost::posix_time::ptime start_desc=boost::posix_time::microsec_clock::local_time();
 		for(boost::uint32_t i=0;i<I;++i)
-		{
-			for(boost::uint32_t ifp=0;ifp<pc._points.size();++ifp)
-				desc.describe(iv, pc._points[ifp]);
-		}
+			desc.describe(iv, fps.begin(), fps.end());
 		boost::posix_time::ptime finish_desc=boost::posix_time::microsec_clock::local_time();
 		std::cout << "describer<" << typeid(T).name() << ">::describe time=" <<
 			float((finish_desc-start_desc).total_milliseconds())/float(I) << " ms" << std::endl;
@@ -326,11 +329,15 @@ BOOST_AUTO_TEST_CASE( surf_match_test )
 
 		cv::line(cv_img2_rgb, cvp0, cvp1, cv::Scalar(0.0, 255.0, 0.0));
 	}
-
 	
-	cv::imshow(OPENCV_WND_NAME2, cv_img1_rgb);
-	cv::imshow(OPENCV_WND_NAME, cv_img2_rgb);
+	cv::namedWindow(WND_MARKER_IMG);
+	cv::namedWindow(WND_SCENE_IMG);
+
+	cv::imshow(WND_MARKER_IMG, cv_img1_rgb);
+	cv::imshow(WND_SCENE_IMG, cv_img2_rgb);
 	
 	cv::waitKey();
+	cv::destroyWindow(WND_MARKER_IMG);
+	cv::destroyWindow(WND_SCENE_IMG);
 
 }

@@ -39,5 +39,11 @@
     <ClCompile Include="test_surf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="test_convert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_integral.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

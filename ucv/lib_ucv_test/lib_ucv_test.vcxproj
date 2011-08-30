@@ -90,6 +90,8 @@
     <ClCompile Include="test.cpp" />
     <ClCompile Include="test_camera_pose.cpp" />
     <ClCompile Include="test_canny.cpp" />
+    <ClCompile Include="test_convert.cpp" />
+    <ClCompile Include="test_integral.cpp" />
     <ClCompile Include="test_kalman_filter.cpp" />
     <ClCompile Include="test_klt_tracker.cpp" />
     <ClCompile Include="test_perspective_transform.cpp" />

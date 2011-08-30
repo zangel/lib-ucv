@@ -15,8 +15,13 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#define OPENCV_WND_NAME  "ucv"
-#define OPENCV_WND_NAME2  "ucv2"
+#define WND_TEST_IMAGE "test_canny: test image"
+#define WND_THRESHOLD "test_canny: threshold"
+#define WND_OPENCV_GRAD_X "test_canny: opencv gradient x"
+#define WND_OPENCV_GRAD_Y "test_canny: opencv gradient y"
+#define WND_WARPED_IMAGE "test_canny: warped image"
+#define WND_CANNY "test_canny: canny image"
+#define WND_OPENCV_CANNY "test_canny: opencv canny image"
 
 BOOST_AUTO_TEST_CASE( canny_test )
 {
@@ -38,8 +43,8 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	
 
 	ucv::gil::gray8_image_t gray8_img;
-	//ucv::gil::png_read_and_convert_image("fiducial_test.png", gray8_img);
-	ucv::gil::png_read_and_convert_image("qr_code_test.png", gray8_img);
+	ucv::gil::png_read_and_convert_image("fiducial_test.png", gray8_img);
+	//ucv::gil::png_read_and_convert_image("qr_code_test.png", gray8_img);
 
 
 	gaussian_blur_t::gray_image_t raw_img(gray8_img.width(), gray8_img.height());
@@ -63,9 +68,10 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 	sobel(ucv::gil::const_view(gray_img), ucv::gil::view(dx_img), ucv::gil::view(dy_img));
 
-	cv::imshow(OPENCV_WND_NAME, cv::Mat(gray8_img.height(), gray8_img.width(), CV_8UC1, &ucv::gil::view(gray8_img)[0][0]));
-
+	cv::namedWindow(WND_TEST_IMAGE);
+	cv::imshow(WND_TEST_IMAGE, cv::Mat(gray8_img.height(), gray8_img.width(), CV_8UC1, &ucv::gil::view(gray8_img)[0][0]));
 	cv::waitKey();
+	cv::destroyWindow(WND_TEST_IMAGE);
 
 
 	ucv::gil::gray32f_image_t gray32f_img(dx_img.width(), dx_img.height());
@@ -81,8 +87,10 @@ BOOST_AUTO_TEST_CASE( canny_test )
 		ucv::detail::convert()
 	);
 
-	cv::imshow(OPENCV_WND_NAME, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &ucv::gil::view(gray32f_img)[0][0]));
+	cv::namedWindow(WND_THRESHOLD);
+	cv::imshow(WND_THRESHOLD, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &ucv::gil::view(gray32f_img)[0][0]));
 	cv::waitKey();
+	cv::destroyWindow(WND_THRESHOLD);
 
 
 
@@ -92,17 +100,19 @@ BOOST_AUTO_TEST_CASE( canny_test )
 		ucv::detail::convert()
 	);
 
-	cv::imshow(OPENCV_WND_NAME, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &ucv::gil::view(gray32f_img)[0][0]));
+	cv::namedWindow(WND_TEST_IMAGE);
+	cv::imshow(WND_TEST_IMAGE, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &ucv::gil::view(gray32f_img)[0][0]));
 	cv::waitKey();
+	cv::destroyWindow(WND_TEST_IMAGE);
 
-	//cv::Mat image=cv::imread("fiducial_test.png", CV_LOAD_IMAGE_GRAYSCALE);
-	cv::Mat image=cv::imread("qr_code_test.png", CV_LOAD_IMAGE_GRAYSCALE);
-
-
+	cv::Mat image=cv::imread("fiducial_test.png", CV_LOAD_IMAGE_GRAYSCALE);
+	
 	cv::blur(image,image,cv::Size(3,3));
 
-	cv::imshow(OPENCV_WND_NAME, image);
+	cv::namedWindow(WND_TEST_IMAGE);
+	cv::imshow(WND_TEST_IMAGE, image);
 	cv::waitKey();
+	cv::destroyWindow(WND_TEST_IMAGE);
 
 	cv::Mat image_dx, image_dy;
 	cv::Sobel(image,image_dx,CV_8UC1,1,0);
@@ -114,21 +124,20 @@ BOOST_AUTO_TEST_CASE( canny_test )
 		ucv::gil::view(gray32f_img),
 		ucv::detail::convert()
 	);
-	cv::imshow(OPENCV_WND_NAME, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &ucv::gil::view(gray32f_img)[0][0]));
+	cv::namedWindow(WND_OPENCV_GRAD_X);
+	cv::imshow(WND_OPENCV_GRAD_X, cv::Mat(dx_img.height(), dx_img.width(), CV_32FC1, &ucv::gil::view(gray32f_img)[0][0]));
 	cv::waitKey();
-
-	//cv::imshow(OPENCV_WND_NAME, image_dx);
-	//cv::waitKey();
+	cv::destroyWindow(WND_OPENCV_GRAD_X);
 
 	ucv::convert(
 		ucv::gil::const_view(dy_img),
 		ucv::gil::view(gray32f_img),
 		ucv::detail::convert()
 	);
-	cv::imshow(OPENCV_WND_NAME, cv::Mat(dy_img.height(), dy_img.width(), CV_32FC1, &ucv::gil::view(gray32f_img)[0][0]));
+	cv::namedWindow(WND_OPENCV_GRAD_Y);
+	cv::imshow(WND_OPENCV_GRAD_Y, cv::Mat(dy_img.height(), dy_img.width(), CV_32FC1, &ucv::gil::view(gray32f_img)[0][0]));
 	cv::waitKey();
-	//cv::imshow(OPENCV_WND_NAME, image_dy);
-	//cv::waitKey();
+	cv::destroyWindow(WND_OPENCV_GRAD_Y);
 
 
 	typedef ucv::canny<real_t, 3> canny_t;
@@ -155,6 +164,9 @@ BOOST_AUTO_TEST_CASE( canny_test )
 
 		canny(ucv::gil::const_view(gray_img), contours);
 		
+		cv::namedWindow(WND_TEST_IMAGE);
+		cv::namedWindow(WND_WARPED_IMAGE);
+
 		for(std::list<contour_t>::iterator ic=contours.begin();ic!=contours.end();++ic)
 		{
 			cv::Mat contour_img(dy_img.height(),dy_img.width(),CV_8UC3);
@@ -221,15 +233,19 @@ BOOST_AUTO_TEST_CASE( canny_test )
 				cv::Scalar(255, 0, 0)
 			);
 
-			cv::imshow(OPENCV_WND_NAME, contour_img);
-			cv::imshow(OPENCV_WND_NAME2, cv::Mat(50, 50, CV_8UC1, &ucv::gil::view(warped8_img)[0][0]));
+			
+			cv::imshow(WND_TEST_IMAGE, contour_img);
+			cv::imshow(WND_WARPED_IMAGE, cv::Mat(50, 50, CV_8UC1, &ucv::gil::view(warped8_img)[0][0]));
 			cv::waitKey();
 
 		}
 		
 	}
 
+	cv::destroyWindow(WND_TEST_IMAGE);
+	cv::destroyWindow(WND_WARPED_IMAGE);
 
+	cv::namedWindow(WND_CANNY);
 	real_t th=0.0;
 	for(int i=0;i<10;++i)
 	{
@@ -248,12 +264,16 @@ BOOST_AUTO_TEST_CASE( canny_test )
 			ucv::detail::convert()
 		);
 
-		cv::imshow(OPENCV_WND_NAME, cv::Mat(edge_img.height(), edge_img.width(), CV_32FC1, &ucv::gil::view(gray32f_img)[0][0]));
+
+		cv::imshow(WND_CANNY, cv::Mat(edge_img.height(), edge_img.width(), CV_32FC1, &ucv::gil::view(gray32f_img)[0][0]));
 		cv::waitKey();
 	}
 
+	cv::destroyWindow(WND_CANNY);
+
+	cv::namedWindow(WND_OPENCV_CANNY);
 	cv::Canny(image, image, 30, 90);
-	cv::imshow(OPENCV_WND_NAME, image);
+	cv::imshow(WND_OPENCV_CANNY, image);
 	cv::waitKey();
-	
+	cv::destroyWindow(WND_OPENCV_CANNY);
 }
