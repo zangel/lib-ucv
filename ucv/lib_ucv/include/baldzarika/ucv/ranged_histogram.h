@@ -3,7 +3,7 @@
 
 namespace baldzarika { namespace ucv {
 
-	template < typename VT , typename HT, boost::uint32_t N >
+	template < typename VT , typename HT, std::size_t N >
 	bool ranged_histogram(VT iv, boost::array<HT, N> &bins,
 		typename gil::channel_type<typename VT::value_type>::type min_val,
 		typename gil::channel_type<typename VT::value_type>::type max_val)

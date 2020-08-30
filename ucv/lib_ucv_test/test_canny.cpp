@@ -28,6 +28,7 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	namespace ucv=baldzarika::ucv;
 	namespace math=baldzarika::math;
 
+	//typedef float real_t;
 	typedef math::real_t real_t;
 	typedef ucv::sobel<real_t, 3, 1> sobel_t;
 	typedef ucv::gaussian_blur<real_t, 3> gaussian_blur_t;
@@ -39,11 +40,8 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	
 	unsigned int c=(i1-i2)%5;
 
-
-	
-
 	ucv::gil::gray8_image_t gray8_img;
-	ucv::gil::png_read_and_convert_image("fiducial_test.png", gray8_img);
+	ucv::gil::read_and_convert_image("fiducial_test.png", gray8_img, ucv::gil::png_tag());
 	//ucv::gil::png_read_and_convert_image("qr_code_test.png", gray8_img);
 
 

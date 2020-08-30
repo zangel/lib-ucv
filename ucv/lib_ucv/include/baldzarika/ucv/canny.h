@@ -187,16 +187,16 @@ namespace baldzarika { namespace ucv {
 				last_map_row[i]=1;
 			}
 			
-			boost::uint32_t const map_step=m_frame_size.width()+2;
+			boost::int32_t const map_step=m_frame_size.width()+2;
 
 			for(boost::int32_t y=0;y<=height;++y)
 			{
 				gray_t *mag=mag_buf[(y>0?2:1)]+1;
-				gray_t const *dx_row=reinterpret_cast<gray_t const *>(dx_view.row_begin(y));
-				gray_t const *dy_row=reinterpret_cast<gray_t const *>(dy_view.row_begin(y));
 
 				if(y<height)
 				{
+					gray_t const *dx_row=reinterpret_cast<gray_t const *>(dx_view.row_begin(y));
+					gray_t const *dy_row=reinterpret_cast<gray_t const *>(dy_view.row_begin(y));
 					mag[-1]=math::constant::zero<gray_t>();
 					mag[m_frame_size.width()]=math::constant::zero<gray_t>();
 					for(boost::int32_t x=0;x<width;++x)
@@ -217,8 +217,8 @@ namespace baldzarika { namespace ucv {
 
 
 				mag=mag_buf[1]+1;
-				dx_row=reinterpret_cast<gray_t const *>(dx_view.row_begin(y-1));
-				dy_row=reinterpret_cast<gray_t const *>(dy_view.row_begin(y-1));
+				gray_t const *dx_row=reinterpret_cast<gray_t const *>(dx_view.row_begin(y-1));
+				gray_t const *dy_row=reinterpret_cast<gray_t const *>(dy_view.row_begin(y-1));
 
 				boost::int32_t mag_step1=mag_buf[2]-mag_buf[1];
 				boost::int32_t mag_step2=mag_buf[0]-mag_buf[1];
@@ -303,7 +303,7 @@ namespace baldzarika { namespace ucv {
 
 		bool hysteresis_thresholding(map_stack_t &map_stack)
 		{
-			boost::uint32_t const map_step=m_frame_size.width()+2;
+			boost::int32_t const map_step=m_frame_size.width()+2;
 			while(!map_stack.empty())
 			{
 				map_t *m=map_stack.back(), *mt;

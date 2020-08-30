@@ -1,6 +1,8 @@
 #ifndef BALDZARIKA_UCV_ADAPTIVE_TRESHOLD_H
 #define BALDZARIKA_UCV_ADAPTIVE_TRESHOLD_H
 
+#include <baldzarika/ucv/gaussian_blur.h>
+
 namespace baldzarika { namespace ucv {
 
 	template < typename PT, boost::uint32_t MS , bool IBT=false >
@@ -18,7 +20,7 @@ namespace baldzarika { namespace ucv {
 		
 		adaptive_treshold()
 			: m_frame_size(0,0)
-			, m_max_value(detail::constant::one<gray_t>())
+			, m_max_value(math::constant::one<gray_t>())
 			, m_delta(0.2)
 		{
 		}
@@ -67,24 +69,19 @@ namespace baldzarika { namespace ucv {
 				gray_t *dst_row=reinterpret_cast<gray_t *>(dst.row_begin(y));
 
 				for(boost::uint32_t x=0;x<m_frame_size.width();++x)
-					dst_row[x]=treshold<IBT>(src_row[x]-median_row[x]);
+					dst_row[x]=treshold(src_row[x]-median_row[x], boost::mpl::bool_<IBT>());
 			}
 			
 			return true;
 		}
 
 	protected:
-		template < bool INV >
-		inline gray_t const& treshold(gray_t const &d) const;
-
-		template <>
-		inline gray_t const& treshold<false>(gray_t const &d) const
+		inline gray_t const& treshold(gray_t const &d, boost::mpl::bool_<false>) const
 		{
 			return d>=-m_delta?m_max_value:math::constant::zero<gray_t>();
 		}
 
-		template <>
-		inline gray_t const& treshold<true>(gray_t const &d) const
+		inline gray_t const& treshold(gray_t const &d, boost::mpl::bool_<true>) const
 		{
 			return d<-m_delta?m_max_value:math::constant::zero<gray_t>();
 		}

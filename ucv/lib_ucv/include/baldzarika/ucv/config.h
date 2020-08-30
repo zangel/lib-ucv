@@ -24,7 +24,7 @@
 #include <boost/gil/extension/numeric/resample.hpp>
 #define png_infopp_NULL (png_infopp)0
 #define int_p_NULL (int*)0
-#include <boost/gil/extension/io/png_io.hpp>
+#include <boost/gil/extension/io/png.hpp>
 
 #include <boost/smart_ptr.hpp>
 #include <boost/noncopyable.hpp>
@@ -36,11 +36,14 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 
+#include <boost/mpl/bool.hpp>
+
 #define BOOST_UBLAS_SHALLOW_ARRAY_ADAPTOR
 
 #include <boost/random.hpp>
 
 #include <boost/function.hpp>
+#define BOOST_BIND_NO_PLACEHOLDERS
 #include <boost/bind.hpp>
 #include <boost/dynamic_bitset.hpp>
 

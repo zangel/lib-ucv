@@ -15,7 +15,7 @@ namespace baldzarika { namespace ucv {
 		channel_t const max_range=(max_val-min_val)/channel_t(HBS);
 
 		boost::array<channel_t, HBS> histogram;
-		if(!ranged_histogram(iv,histogram, min_val, max_val))
+		if(!ranged_histogram(iv, histogram, min_val, max_val))
 			return max_val;
 
 		channel_t mu=math::constant::zero<channel_t>();
