@@ -34,12 +34,6 @@ BOOST_AUTO_TEST_CASE( canny_test )
 	typedef ucv::gaussian_blur<real_t, 3> gaussian_blur_t;
 	typedef ucv::adaptive_treshold<real_t, 5, true > adaptive_treshold_t;
 
-
-	unsigned int i1=1;
-	unsigned int i2=4;
-	
-	unsigned int c=(i1-i2)%5;
-
 	ucv::gil::gray8_image_t gray8_img;
 	ucv::gil::read_and_convert_image("fiducial_test.png", gray8_img, ucv::gil::png_tag());
 	//ucv::gil::png_read_and_convert_image("qr_code_test.png", gray8_img);

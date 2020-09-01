@@ -80,6 +80,8 @@ namespace baldzarika { namespace math {
 	};
 
 	typedef box2<float> box2f;
+	typedef box2<boost::uint32_t>	box2ui;
+	typedef box2<boost::int32_t>	box2i;
 
 } //namespace math
 } //namespace baldzarika

@@ -1,5 +1,4 @@
 
-
 set(math_headers
   include/baldzarika/math/config.h
   include/baldzarika/math/constant.h
@@ -25,4 +24,10 @@ set(math_sources
 add_library(math STATIC
 	${math_headers}
 	${math_sources}
+)
+
+target_include_directories(math
+	PUBLIC
+		include
+		${Boost_INCLUDE_DIR}
 )

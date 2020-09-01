@@ -22,9 +22,15 @@
 #include <boost/gil/typedefs.hpp>
 #include <boost/gil/extension/numeric/sampler.hpp>
 #include <boost/gil/extension/numeric/resample.hpp>
-#define png_infopp_NULL (png_infopp)0
-#define int_p_NULL (int*)0
-#include <boost/gil/extension/io/png.hpp>
+
+#if defined(UCV_HAS_PNG)
+#	include <boost/gil/extension/io/png.hpp>
+#endif
+
+#if defined(UCV_HAS_JPG)
+#	include <boost/gil/extension/io/jpeg.hpp>
+#endif
+
 
 #include <boost/smart_ptr.hpp>
 #include <boost/noncopyable.hpp>
