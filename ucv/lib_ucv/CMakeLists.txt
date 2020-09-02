@@ -1,3 +1,7 @@
+if (APPLE)
+    set(CMAKE_FIND_FRAMEWORK NEVER)
+endif()
+
 find_package(PNG)
 message(STATUS "Found PNG: ${PNG_VERSION_STRING}")
 
