@@ -66,6 +66,26 @@ namespace baldzarika { namespace ucv {
 				m_deltas[c]=DELTAS[c&7][1]*boost::int32_t(m_map_img.width())+DELTAS[c&7][0];
 		}
 
+		gray_t get_low_treshold() const
+		{
+			return m_low_treshold;
+		}
+
+		void set_low_treshold(gray_t treshold)
+		{
+			m_low_treshold = treshold;
+		}
+
+		gray_t get_high_treshold() const
+		{
+			return m_high_treshold;
+		}
+
+		void set_high_treshold(gray_t treshold)
+		{
+			m_high_treshold = treshold;
+		}
+
 		template < typename BVT >
 		bool operator()(gray_const_view_t img, BVT bvt)
 		{
