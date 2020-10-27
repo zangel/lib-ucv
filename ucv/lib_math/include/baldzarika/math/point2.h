@@ -42,6 +42,11 @@ namespace baldzarika { namespace math {
 
 		inline T& y() { return base_type::m_data[1]; }
 		inline T const& y() const { return base_type::m_data[1]; }
+
+		inline bool operator==(point2 const &rhs) const
+		{
+			return base_type::m_data[0]==rhs.m_data[0] && base_type::m_data[1]==rhs.m_data[1];
+		}
 	};
 
 	typedef point2<float>			point2f;
